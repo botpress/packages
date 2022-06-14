@@ -7,7 +7,7 @@ export class JSONFormatter implements LogEntryFormatter {
     const { namespace, level, type, message, stack, metadata } = entry
     return {
       ...entry,
-      formatted: JSON.stringify({ prefix, namespace, level, type, message, stack, metadata })
+      formatted: JSON.stringify({ ...metadata, prefix, namespace, level, type, message, stack })
     }
   }
 }

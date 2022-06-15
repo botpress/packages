@@ -1,5 +1,5 @@
 {
-  "name": "@botpress/logger",
+  "name": "@bpinternal/log4bot",
   "version": "0.0.1",
   "description": "Just a Logger",
   "main": "./dist/index.js",

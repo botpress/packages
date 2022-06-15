@@ -1,9 +1,14 @@
 {
-  "name": "@botpress/logger",
-  "version": "0.0.1",
+  "name": "@bpinternal/log4bot",
+  "version": "0.0.3",
   "description": "Just a Logger",
   "main": "./dist/index.js",
   "author": "Botpress, Inc.",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/botpress/packages",
+    "directory": "log4bot"
+  },
   "license": "AGPL-3.0",
   "types": "./dist/index.d.ts",
   "dependencies": {

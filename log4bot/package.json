@@ -1,6 +1,6 @@
 {
   "name": "@bpinternal/log4bot",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "Just a Logger",
   "main": "./dist/index.js",
   "author": "Botpress, Inc.",

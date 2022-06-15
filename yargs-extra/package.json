@@ -1,8 +1,13 @@
 {
-  "name": "@botpress/yargs-extra",
+  "name": "@bpinternal/yargs-extra",
   "description": "Utils functions that leverage yargs.",
   "version": "0.0.1",
   "author": "Botpress, Inc.",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/botpress/packages",
+    "directory": "yargs-extra"
+  },
   "license": "AGPL-3.0",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",

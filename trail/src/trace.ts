@@ -27,6 +27,7 @@ let initialized = false;
 type InitProps = {
   debug?: boolean;
   enabled?: boolean;
+  environment?: string;
   serviceName?: string;
   serviceNamespace?: string;
   serviceVersion?: string;
@@ -40,6 +41,7 @@ type InitProps = {
 export const init = ({ 
   debug, 
   enabled,
+  environment,
   serviceName,
   serviceNamespace,
   serviceVersion,
@@ -62,6 +64,7 @@ export const init = ({
     [SemanticResourceAttributes.SERVICE_VERSION]: serviceVersion ?? process.env.OTEL_SERVICE_VERSION,
     [SemanticResourceAttributes.SERVICE_INSTANCE_ID]: serviceInstanceId ?? process.env.OTEL_SERVICE_VERSION_INSTANCE_ID,
     [SemanticResourceAttributes.SERVICE_NAMESPACE]: serviceNamespace ?? process.env.OTEL_SERVICE_NAMESPACE,
+    [SemanticResourceAttributes.DEPLOYMENT_ENVIRONMENT]: environment ?? process.env.OTEL_DEPLOYMENT_ENVIRONMENT,
   })
 
   const provider = new NodeTracerProvider({

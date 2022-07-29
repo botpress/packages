@@ -1,7 +1,7 @@
 {
   "name": "@bpinternal/trail",
   "description": "Opentelemetry initialization package for nodejs.",
-  "version": "0.0.2",
+  "version": "0.1.0",
   "author": "Botpress, Inc.",
   "repository": {
     "type": "git",
@@ -11,6 +11,17 @@
   "license": "AGPL-3.0",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "require": "./dist/index.js",
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "./init": "./dist/init.js",
+    "./init.js": "./dist/init.js",
+    "./package.json": "./package.json"
+  },
+  "readmeFilename": "readme.md",
   "dependencies": {
     "@opentelemetry/api": "1.1.0",
     "@opentelemetry/auto-instrumentations-node": "0.27.0",

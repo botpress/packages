@@ -1,1 +1,1 @@
-export { init } from './trace'
+export { init, isEnabled } from './trace'

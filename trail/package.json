@@ -1,7 +1,7 @@
 {
   "name": "@bpinternal/trail",
   "description": "Opentelemetry initialization package for nodejs.",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "author": "Botpress, Inc.",
   "repository": {
     "type": "git",
@@ -30,5 +30,8 @@
   "scripts": {
     "build": "tsc --build",
     "clean": "rimraf ./dist && rimraf ./node_modules"
+  },
+  "engines": {
+    "node": ">=16.0.0"
   }
 }

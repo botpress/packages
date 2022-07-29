@@ -9,7 +9,7 @@ import { diag, DiagConsoleLogger, DiagLogLevel } from "@opentelemetry/api";
 import { JaegerExporter } from "@opentelemetry/exporter-jaeger";
 import yn from "yn";
 
-const isEnabled = (enabled?: boolean) => enabled !== undefined ? enabled : yn(process.env.TRACING_ENABLED, { default: false });
+export const isEnabled = () => yn(process.env.TRACING_ENABLED, { default: false });
 const isDebugEnabled = (enabled?: boolean) => enabled !== undefined ? enabled : yn(process.env.TRACING_DEBUG, { default: false });
 
 const removeUndefinedValues = <T>(obj: Record<string, T | undefined>): Record<string, T> => {
@@ -26,7 +26,6 @@ let initialized = false;
 
 type InitProps = {
   debug?: boolean;
-  enabled?: boolean;
   environment?: string;
   serviceName?: string;
   serviceNamespace?: string;
@@ -40,14 +39,13 @@ type InitProps = {
  */
 export const init = ({ 
   debug, 
-  enabled,
   environment,
   serviceName,
   serviceNamespace,
   serviceVersion,
   serviceInstanceId,
 }: InitProps = {}) => {
-  if (!isEnabled(enabled) || initialized) {
+  if (!isEnabled() || initialized) {
     return;
   }
 

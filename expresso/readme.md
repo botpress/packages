@@ -31,6 +31,7 @@ export const userHeader = { ["x-user-id"]: z.string() }
 import * as io from './io' // your zod schemas
 import express from 'express'
 import swaggerExpress from 'swagger-ui-express'
+import * as xo from '@bpinternal/expresso'
 
 const expressApp = express()
 const router = new xo.JsonRouter({ info: { title: 'My XO Server', version: '0.1.0' }, bodySize: options.bodySize })

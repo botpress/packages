@@ -16,10 +16,10 @@
     "decamelize": "5.0.1",
     "json-schema": "^0.4.0",
     "yargs": "^17.5.1",
-    "@types/yargs": "^17.0.10",
     "yn": "^4.0.0"
   },
   "devDependencies": {
+    "@types/yargs": "^17.0.10",
     "@types/lodash": "4.14.123",
     "@types/json-schema": "^7.0.9",
     "@types/node": "^16.11.10",

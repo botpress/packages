@@ -8,7 +8,7 @@ import {
   ParameterObject,
   SchemaObject,
   RequestBodyObject,
-  ResponseObject,
+  ResponseObject
 } from 'openapi3-ts'
 import { getPathVariables, mapPathFromExpressToOpenAPI } from './parse-path'
 import { AnyEndpoint } from './typings'
@@ -23,7 +23,7 @@ const pathParameterObject = (p: string): ParameterObject => {
     name: p,
     in: 'path',
     schema,
-    required: true,
+    required: true
   }
 }
 
@@ -33,7 +33,7 @@ const headerParameterObject = (p: string, optional: boolean): ParameterObject =>
     name: p,
     in: 'header',
     schema,
-    required: !optional,
+    required: !optional
   }
 }
 
@@ -41,27 +41,27 @@ const operationObject = ({ operationId, input, output }: AnyEndpoint): Operation
   const requestBody: RequestBodyObject | undefined = input && {
     content: {
       'application/json': {
-        schema: { ...generateSchema(input), nullable: false },
-      },
+        schema: { ...generateSchema(input), nullable: false }
+      }
     },
-    required: true,
+    required: true
   }
 
   const responseBody: ResponseObject | undefined = output && {
     description: '',
     content: {
       'application/json': {
-        schema: { ...generateSchema(output), nullable: false },
-      },
-    },
+        schema: { ...generateSchema(output), nullable: false }
+      }
+    }
   }
 
   return {
     operationId,
     requestBody,
     responses: {
-      default: responseBody,
-    },
+      default: responseBody
+    }
   }
 }
 
@@ -72,7 +72,7 @@ const pathItemObject = (e: AnyEndpoint) => {
   const headerParams = _.entries(headers).map(([k, v]) => headerParameterObject(k, v.isOptional()))
   return {
     parameters: [...pathParams, ...headerParams],
-    [method]: operationObject(e),
+    [method]: operationObject(e)
   }
 }
 
@@ -93,6 +93,6 @@ export const generateOpenAPI = (endpoints: AnyEndpoint[], info: InfoObject): Pat
   return OpenApiBuilder.create({
     info,
     openapi: OPENAPI_VERSION,
-    paths,
+    paths
   })
 }

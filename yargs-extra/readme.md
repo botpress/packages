@@ -19,7 +19,7 @@ const yargsSchema = asYargs({
   },
   oauth: {
     type: 'boolean',
-    description: 'Weither or not to use oauth'
+    description: 'Whether or not to use oauth'
   }
 })
 

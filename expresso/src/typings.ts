@@ -1,8 +1,10 @@
 import { Request as ExpressRequest, Response as ExpressResponse, NextFunction as ExpressNextFunction } from 'express'
 import { IncomingHttpHeaders } from 'http'
+import { SchemaObject } from 'openapi3-ts'
 import { z } from 'zod'
 import { PathVariables } from './parse-path'
 
+export type ZodTypeWithMeta = z.ZodType & { metaOpenApi?: SchemaObject | SchemaObject[] }
 export type ZodHeaderValue = z.ZodString | z.ZodOptional<z.ZodString>
 export type HeadersAnySchema = Record<string, ZodHeaderValue>
 export type ParsedHeaders<H extends HeadersAnySchema> = {
@@ -40,10 +42,10 @@ export type EndpointHandler<
 
 export type Endpoint<
   Path extends string,
-  I extends z.ZodType,
-  O extends z.ZodType,
+  I extends ZodTypeWithMeta,
+  O extends ZodTypeWithMeta,
   H extends HeadersAnySchema,
   M extends HTTPMethod
 > = EndpointProps<Path, I, O, H> & { method: M; handler: EndpointHandler<Path, I, O, H> }
 
-export type AnyEndpoint = Endpoint<string, z.ZodType, z.ZodType, HeadersAnySchema, HTTPMethod>
+export type AnyEndpoint = Endpoint<string, ZodTypeWithMeta, ZodTypeWithMeta, HeadersAnySchema, HTTPMethod>

@@ -148,30 +148,34 @@ export class JsonRouter {
 
   public get<Path extends string, I extends z.ZodType, O extends z.ZodType, H extends Record<string, z.ZodString>>(
     info: EndpointProps<Path, I, O, H>,
-    handler: EndpointHandler<Path, I, O, H>
+    ...handlers: Array<EndpointHandler<Path, I, O, H>>
   ) {
-    return this._router.get(info.path, this._makeHandler({ ...info, method: 'get', handler }))
+    return this._router.get(info.path, this._validationMw({ ...info, method: 'get' }), this._wrapHandlers(handlers))
   }
 
   public put<Path extends string, I extends z.ZodType, O extends z.ZodType, H extends Record<string, z.ZodString>>(
     info: EndpointProps<Path, I, O, H>,
-    handler: EndpointHandler<Path, I, O, H>
+    ...handlers: Array<EndpointHandler<Path, I, O, H>>
   ) {
-    return this._router.put(info.path, this._makeHandler({ ...info, method: 'put', handler }))
+    return this._router.put(info.path, this._validationMw({ ...info, method: 'put' }), this._wrapHandlers(handlers))
   }
 
   public post<Path extends string, I extends z.ZodType, O extends z.ZodType, H extends Record<string, z.ZodString>>(
     info: EndpointProps<Path, I, O, H>,
-    handler: EndpointHandler<Path, I, O, H>
+    ...handlers: Array<EndpointHandler<Path, I, O, H>>
   ) {
-    return this._router.post(info.path, this._makeHandler({ ...info, method: 'post', handler }))
+    return this._router.post(info.path, this._validationMw({ ...info, method: 'post' }), this._wrapHandlers(handlers))
   }
 
   public delete<Path extends string, I extends z.ZodType, O extends z.ZodType, H extends Record<string, z.ZodString>>(
     info: EndpointProps<Path, I, O, H>,
-    handler: EndpointHandler<Path, I, O, H>
+    ...handlers: Array<EndpointHandler<Path, I, O, H>>
   ) {
-    return this._router.delete(info.path, this._makeHandler({ ...info, method: 'delete', handler }))
+    return this._router.delete(
+      info.path,
+      this._validationMw({ ...info, method: 'delete' }),
+      this._wrapHandlers(handlers)
+    )
   }
 
   /** Adds an error handle. Must be added last on your router */
@@ -194,16 +198,17 @@ export class JsonRouter {
     }
   }
 
-  private _makeHandler = <
+  /** This middleware registers the endpoint and simply validate the input based on schemas */
+  private _validationMw = <
     Path extends string,
     I extends z.ZodType,
     O extends z.ZodType,
     H extends Record<string, z.ZodString>,
     M extends HTTPMethod
   >(
-    endpoint: Endpoint<Path, I, O, H, M>
+    endpoint: Partial<Endpoint<Path, I, O, H, M>>
   ) => {
-    const { input, headers: headersSchema, handler } = endpoint
+    const { input, headers: headersSchema } = endpoint
     this._endpoints.push(endpoint as AnyEndpoint)
 
     return async (req: express.Request, res: express.Response, next: express.NextFunction) => {
@@ -228,13 +233,27 @@ export class JsonRouter {
         }
       }
 
-      try {
-        await handler(req as any, res, next)
-        next()
-      } catch (thrown) {
-        return next(thrown)
-      }
+      next()
     }
+  }
+
+  private _wrapHandlers = <
+    Path extends string,
+    I extends z.ZodType,
+    O extends z.ZodType,
+    H extends Record<string, z.ZodString>
+  >(
+    handlers: Array<EndpointHandler<Path, I, O, H>>
+  ) => {
+    return handlers.map(
+      (handler) => async (req: express.Request, res: express.Response, next: express.NextFunction) => {
+        try {
+          await handler(req as any, res, next)
+        } catch (thrown) {
+          next(thrown)
+        }
+      }
+    )
   }
 
   /** Returns all the endpoints of the specified router, including its children, with the correct path */

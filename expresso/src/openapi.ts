@@ -11,6 +11,7 @@ import {
   ResponseObject
 } from 'openapi3-ts'
 import { getPathVariables, mapPathFromExpressToOpenAPI } from './parse-path'
+import { CustomInfo } from './router'
 import { AnyEndpoint, ZodTypeWithMeta } from './typings'
 
 const OPENAPI_VERSION = '3.0.0'
@@ -93,9 +94,15 @@ const pathItemObject = (endpoint: AnyEndpoint, schemas: Record<string, SchemaObj
   }
 }
 
-export const generateOpenAPI = (endpoints: AnyEndpoint[], info: InfoObject): PathObject => {
+export const generateOpenAPI = (endpoints: AnyEndpoint[], info: CustomInfo): PathObject => {
   const paths: Record<string, PathItemObject> = {}
   const schemas: Record<string, SchemaObject> = {}
+
+  if (info.schemas) {
+    Object.entries(info.schemas).forEach(([name, schema]) => {
+      schemas[name] = generateSchema(schema)
+    })
+  }
 
   for (const e of endpoints) {
     const { path: rawPath } = e
@@ -111,7 +118,7 @@ export const generateOpenAPI = (endpoints: AnyEndpoint[], info: InfoObject): Pat
   }
 
   return OpenApiBuilder.create({
-    info,
+    info: _.omit(info, 'schemas') as InfoObject,
     openapi: OPENAPI_VERSION,
     paths,
     components: { schemas }

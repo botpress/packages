@@ -11,7 +11,7 @@ import {
   ResponseObject
 } from 'openapi3-ts'
 import { getPathVariables, mapPathFromExpressToOpenAPI } from './parse-path'
-import { AnyEndpoint } from './typings'
+import { AnyEndpoint, ZodTypeWithMeta } from './typings'
 
 const OPENAPI_VERSION = '3.0.0'
 
@@ -37,11 +37,26 @@ const headerParameterObject = (p: string, optional: boolean): ParameterObject =>
   }
 }
 
-const operationObject = ({ operationId, input, output }: AnyEndpoint): OperationObject => {
+/** When building the schema, if there is a title, we build it as a reference instead */
+const buildSchema = (item: ZodTypeWithMeta, schemaRefs: Record<string, SchemaObject>) => {
+  const title = (item?.metaOpenApi as any)?.title
+
+  if (!title) {
+    return { ...generateSchema(item), nullable: false }
+  } else {
+    schemaRefs[title] = generateSchema(item)
+    return { $ref: `#/components/schemas/${title}`, nullable: false }
+  }
+}
+
+const operationObject = (
+  { operationId, input, output }: AnyEndpoint,
+  schemas: Record<string, SchemaObject>
+): OperationObject => {
   const requestBody: RequestBodyObject | undefined = input && {
     content: {
       'application/json': {
-        schema: { ...generateSchema(input), nullable: false }
+        schema: buildSchema(input, schemas)
       }
     },
     required: true
@@ -51,10 +66,12 @@ const operationObject = ({ operationId, input, output }: AnyEndpoint): Operation
     description: '',
     content: {
       'application/json': {
-        schema: { ...generateSchema(output), nullable: false }
+        schema: buildSchema(output, schemas)
       }
     }
   }
+
+  // console.log('out,, ', output)
 
   return {
     operationId,
@@ -65,23 +82,26 @@ const operationObject = ({ operationId, input, output }: AnyEndpoint): Operation
   }
 }
 
-const pathItemObject = (e: AnyEndpoint) => {
-  const { path, method, headers } = e
+const pathItemObject = (endpoint: AnyEndpoint, schemas: Record<string, SchemaObject>) => {
+  const { path, method, headers } = endpoint
 
   const pathParams = getPathVariables(path).map(pathParameterObject)
   const headerParams = _.entries(headers).map(([k, v]) => headerParameterObject(k, v.isOptional()))
   return {
     parameters: [...pathParams, ...headerParams],
-    [method]: operationObject(e)
+    [method]: operationObject(endpoint, schemas)
   }
 }
 
 export const generateOpenAPI = (endpoints: AnyEndpoint[], info: InfoObject): PathObject => {
   const paths: Record<string, PathItemObject> = {}
+  const schemas: Record<string, SchemaObject> = {}
+
   for (const e of endpoints) {
     const { path: rawPath } = e
     const path = mapPathFromExpressToOpenAPI(rawPath)
-    const pathItem = pathItemObject(e)
+    const pathItem = pathItemObject(e, schemas)
+
     if (paths[path]) {
       // multiple methods on same path
       paths[path] = { ...paths[path], ...pathItem } // TODO: maybe merge paramaters ?
@@ -93,6 +113,7 @@ export const generateOpenAPI = (endpoints: AnyEndpoint[], info: InfoObject): Pat
   return OpenApiBuilder.create({
     info,
     openapi: OPENAPI_VERSION,
-    paths
+    paths,
+    components: { schemas }
   })
 }

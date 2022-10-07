@@ -1,4 +1,5 @@
 ## 0.2.0
 
-- Added multiple handlers support when creating routes
-- Added tests
+- Feature: Support for middlewares when creating routes
+- Chore: Tests for router
+- Feature: When a title is defined on a schema, it will be created as a reference instead of the whole object

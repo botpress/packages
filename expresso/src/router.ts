@@ -14,8 +14,13 @@ import { EndpointProps, EndpointHandler, AnyEndpoint, Endpoint, HTTPMethod } fro
 const OPENAPI_DEFAULT_URL = '/openapi.json'
 const REDOC_DEFAULT_URL = '/redoc'
 
+export type CustomInfo = Partial<InfoObject> & {
+  /** Add custom schemas to the API definition */
+  schemas?: Record<string, z.ZodTypeAny>
+}
+
 export type JsonRouterProps = {
-  info: Partial<InfoObject>
+  info: CustomInfo
   bodySize: string | number
   /** The path under which all endpoints of this router will reside */
   basePath: string

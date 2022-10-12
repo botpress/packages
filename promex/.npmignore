@@ -1,2 +1,5 @@
 node_modules
 tsconfig.tsbuildinfo
+src/
+jest.config.js
+tsconfig.json

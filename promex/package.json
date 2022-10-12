@@ -1,7 +1,7 @@
 {
   "name": "@bpinternal/promex",
   "description": "Prometheus express initialization package for nodejs.",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "author": "Botpress, Inc.",
   "repository": {
     "type": "git",
@@ -24,14 +24,22 @@
     "@promster/express": "7.0.5",
     "@promster/metrics": "9.1.5",
     "@promster/server": "7.0.7",
-    "express": "^4.18.2"
+    "express": "^4.18.2",
+    "nanoid": "3.3.4",
+    "prom-client": "^14.1.0"
   },
   "devDependencies": {
+    "@promster/types": "^3.2.4",
+    "@types/express": "^4.17.14",
     "@types/node": "^16.11.10",
+    "axios": "^1.1.2",
+    "jest": "^29.1.2",
+    "ts-jest": "^29.0.3",
     "typescript": "^4.5.2"
   },
   "scripts": {
     "build": "tsc --build",
+    "test": "jest",
     "clean": "rimraf ./dist && rimraf ./node_modules"
   },
   "engines": {

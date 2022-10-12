@@ -1,7 +1,8 @@
 import { createMiddleware, defaultNormalizers, signalIsUp } from '@promster/express'
 import { getSummary, getContentType } from '@promster/metrics'
-import { Express, Request } from 'express'
+import type { Express, Request, Response } from 'express'
 import http from 'http'
+import { nanoid } from 'nanoid'
 
 type Route = {
   prefix?: RegExp
@@ -11,6 +12,7 @@ type Route = {
   path: string
 }
 
+const APP_NOT_FOUND = 'app_not_found'
 const NOT_FOUND = 'not_found'
 
 const trimPrefix = (value: string, prefix: string) => (value.startsWith(prefix) ? value.slice(prefix.length) : value)
@@ -55,7 +57,7 @@ const getRoutes = (app: Express) => {
   return routes
 }
 
-const getRoutesPath = (path: string, method: string, routes: Route[], prefix = '') => {
+const getRoutesPath = (path: string, method: string, routes: Route[], prefix = ''): string => {
   for (const route of routes) {
     if (route.prefix && route.subroutes) {
       if (route.prefix.test(path)) {
@@ -77,12 +79,33 @@ const getRoutesPath = (path: string, method: string, routes: Route[], prefix = '
  * @param app Express app
  * @returns A normalized path for the given request using the app routes
  */
-const normalizePath = (app: Express) => {
-  const routes: Route[] = []
+const normalizePath = (apps: Express[]) => {
+  const appRoutes: { [key: string]: { app: Express; routes: Route[] } } = {}
 
-  return (path: string, { req }: { req: Request }) => {
+  for (const app of apps) {
+    const id = nanoid()
+
+    ;(app as any).promexId = id
+
+    appRoutes[id] = {
+      app,
+      routes: []
+    }
+  }
+
+  return (path: string, { req }: { req: Request; res: Response }) => {
+    const appId = (req.app as any).promexId
+
+    const appRoute = appRoutes[appId]
+
+    if (!appRoute) {
+      return APP_NOT_FOUND
+    }
+
+    const routes = appRoute.routes
+
     if (!routes.length) {
-      routes.push(...getRoutes(app))
+      routes.push(...getRoutes(appRoute.app))
     }
 
     return getRoutesPath(path, req.method.toLowerCase(), routes)
@@ -91,10 +114,10 @@ const normalizePath = (app: Express) => {
 
 const createServer = (
   port: number,
-  onRequest?: (req: Request) => Promise<void>,
-  onError?: (req: Request, error: any) => Promise<void>
+  onRequest?: (req: http.IncomingMessage) => Promise<void>,
+  onError?: (req: http.IncomingMessage, error: any) => Promise<void>
 ) =>
-  new Promise((resolve, reject) => {
+  new Promise<http.Server>((resolve, reject) => {
     const server = http.createServer(async (req, res) => {
       try {
         if (onRequest) {
@@ -130,22 +153,22 @@ const createServer = (
 export const init = async (
   apps: Express[] = [],
   port = 9090,
-  onRequest?: (req: Request) => Promise<void>,
-  onError?: (req: Request, error: any) => Promise<void>
+  onRequest?: (req: http.IncomingMessage) => Promise<void>,
+  onError?: (req: http.IncomingMessage, error: any) => Promise<void>
 ) => {
+  const middleware = createMiddleware({
+    options: {
+      ...defaultNormalizers,
+      normalizePath: normalizePath(apps) as any, // The type of normalizePath is wrong
+      buckets: [0.05, 0.1, 0.5, 1, 3]
+    }
+  })
+
   for (const app of apps) {
-    app.use(
-      createMiddleware({
-        options: {
-          ...defaultNormalizers,
-          normalizePath: normalizePath(app),
-          buckets: [0.05, 0.1, 0.5, 1, 3]
-        }
-      })
-    )
+    app.use(middleware)
   }
 
-  await createServer(port, onRequest, onError)
+  const server = await createServer(port, onRequest, onError)
 
-  signalIsUp()
+  return server
 }

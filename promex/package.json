@@ -1,0 +1,40 @@
+{
+  "name": "@bpinternal/promex",
+  "description": "Prometheus express initialization package for nodejs.",
+  "version": "0.1.0",
+  "author": "Botpress, Inc.",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/botpress/packages",
+    "directory": "promex"
+  },
+  "license": "AGPL-3.0",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "require": "./dist/index.js",
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "readmeFilename": "readme.md",
+  "dependencies": {
+    "@promster/express": "7.0.5",
+    "@promster/metrics": "9.1.5",
+    "@promster/server": "7.0.7",
+    "express": "^4.18.2"
+  },
+  "devDependencies": {
+    "@types/node": "^16.11.10",
+    "typescript": "^4.5.2"
+  },
+  "scripts": {
+    "build": "tsc --build",
+    "clean": "rimraf ./dist && rimraf ./node_modules"
+  },
+  "engines": {
+    "node": ">=16.0.0"
+  }
+}

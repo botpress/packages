@@ -1,7 +1,7 @@
 {
   "name": "@bpinternal/promex",
   "description": "Prometheus express initialization package for nodejs.",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "author": "Botpress, Inc.",
   "repository": {
     "type": "git",

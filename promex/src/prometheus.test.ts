@@ -1,6 +1,6 @@
-import { describe, expect, test, beforeEach, jest } from '@jest/globals'
+import { describe, expect, test, beforeEach, jest, afterEach } from '@jest/globals'
 import express, { Express } from 'express'
-import { init } from './prometheus'
+import * as promex from './prometheus'
 import prom from 'prom-client'
 import axios from 'axios'
 import { Server } from 'http'
@@ -15,14 +15,15 @@ const listen = (app: Express, port: number) => {
 
 describe('init function', () => {
   beforeEach(() => prom.register.clear())
+  afterEach((done) => void promex.reset().then(() => done()))
 
   test('initialize a middleware on an express app', async () => {
     const app = express()
-    const server = await init([app])
+
+    await promex.init(app)
+    await promex.start()
 
     expect(app._router.stack.length).toBe(3)
-
-    server.close()
   })
 
   test('initialize a middleware on multiple express apps', async () => {
@@ -30,7 +31,9 @@ describe('init function', () => {
     const app2: any = express()
     const app3 = express()
 
-    const server = await init([app1, app2])
+    await promex.init(app1)
+    await promex.init(app2)
+    await promex.start()
 
     expect(app1._router.stack.length).toBe(3)
     expect(app2._router.stack.length).toBe(3)
@@ -40,8 +43,6 @@ describe('init function', () => {
     expect(app2.promexId).toBeDefined()
 
     expect(app1.promexId).not.toBe(app2.promexId)
-
-    server.close()
   })
 
   test('initialize a callback for each metric request', async () => {
@@ -51,25 +52,26 @@ describe('init function', () => {
     })
 
     const app = express()
-    const server = await init([app], 9090, callbackReq, callbackErr)
+    await promex.init(app, callbackReq, callbackErr)
+    await promex.start()
 
     await axios.get('http://127.0.0.1:9090/metrics').catch(() => {})
 
     expect(callbackReq).toHaveBeenCalledTimes(1)
     expect(callbackErr).toHaveBeenCalledTimes(1)
-
-    server.close()
   })
 
-  test('request should use the router of the right express app if multiple are defined', async () => {
+  test('should use the router of the right express app if multiple are defined', async () => {
     const app1 = express()
     const app2 = express()
 
-    const server = await init([app1, app2])
+    await promex.init(app1)
+    await promex.init(app2)
+    await promex.start()
 
-    app1.get('/', (req, res) => res.end())
-    app1.get('/app1/:id/name', (req, res) => res.end())
-    app2.post('/app2/:id/name', (req, res) => res.end())
+    app1.get('/', (_, res) => res.end())
+    app1.get('/app1/:id/name', (_, res) => res.end())
+    app2.post('/app2/:id/name', (_, res) => res.end())
 
     const app1Server = await listen(app1, 9091)
     const app2Server = await listen(app2, 9092)
@@ -84,15 +86,15 @@ describe('init function', () => {
     expect(res.data).toContain('http_requests_total{method="get",path="/app1/:id/name",status_code="200"} 1')
     expect(res.data).toContain('http_requests_total{method="post",path="/app2/:id/name",status_code="200"} 1')
 
-    server.close()
     app1Server.close()
     app2Server.close()
-  }, 30000)
+  })
 
-  test('request should use the router of the another express app', async () => {
+  test("should set undefined path label if the express app doesn't match any path", async () => {
     const app = express()
 
-    const server = await init([app])
+    await promex.init(app)
+    await promex.start()
 
     const appServer = await listen(app, 9091)
 
@@ -102,7 +104,24 @@ describe('init function', () => {
 
     expect(res.data).toContain('http_requests_total{method="post",path="not_found",status_code="404"} 1')
 
-    server.close()
     appServer.close()
+  })
+
+  test('should start & stop idempotent functions without issues', async () => {
+    const app = express()
+
+    await promex.init(app)
+    await promex.start()
+    await promex.start()
+
+    await axios.get('http://127.0.0.1:9090/metrics')
+
+    await promex.stop()
+    await promex.start()
+
+    await axios.get('http://127.0.0.1:9090/metrics')
+
+    await promex.stop()
+    await promex.stop()
   })
 })

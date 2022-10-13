@@ -12,8 +12,33 @@ type Route = {
   path: string
 }
 
+type RequestListener = (req: http.IncomingMessage) => Promise<void>
+type ErrorListener = (req: http.IncomingMessage, err: unknown) => Promise<void>
+
+type AppRoute = {
+  [key: string]: {
+    app: Express
+    routes: Route[]
+  }
+}
+
+type MetricListeners = {
+  onRequests: RequestListener[]
+  onErrors: ErrorListener[]
+}
+
 const APP_NOT_FOUND = 'app_not_found'
 const NOT_FOUND = 'not_found'
+
+/**
+ * Global variable are not the best, but it's the only way to do it with promster since it redeclares the global metrics.
+ * If the middleware was not declaring the global metrics, we could have prevented this.
+ */
+
+let server: http.Server | undefined
+let middleware: ReturnType<typeof createMiddleware> | undefined
+let appRoutes: AppRoute = {}
+const listeners: MetricListeners = { onRequests: [], onErrors: [] }
 
 const trimPrefix = (value: string, prefix: string) => (value.startsWith(prefix) ? value.slice(prefix.length) : value)
 
@@ -79,21 +104,9 @@ const getRoutesPath = (path: string, method: string, routes: Route[], prefix = '
  * @param app Express app
  * @returns A normalized path for the given request using the app routes
  */
-const normalizePath = (apps: Express[]) => {
-  const appRoutes: { [key: string]: { app: Express; routes: Route[] } } = {}
-
-  for (const app of apps) {
-    const id = nanoid()
-
-    ;(app as any).promexId = id
-
-    appRoutes[id] = {
-      app,
-      routes: []
-    }
-  }
-
-  return (path: string, { req }: { req: Request; res: Response }) => {
+const normalizePath =
+  () =>
+  (path: string, { req }: { req: Request; res: Response }) => {
     const appId = (req.app as any).promexId
 
     const appRoute = appRoutes[appId]
@@ -110,36 +123,35 @@ const normalizePath = (apps: Express[]) => {
 
     return getRoutesPath(path, req.method.toLowerCase(), routes)
   }
+
+const initAppRoute = (app: Express) => {
+  const id = nanoid()
+
+  ;(app as any).promexId = id
+
+  appRoutes[id] = {
+    app,
+    routes: []
+  }
 }
 
-const createServer = (
-  port: number,
-  onRequest?: (req: http.IncomingMessage) => Promise<void>,
-  onError?: (req: http.IncomingMessage, error: any) => Promise<void>
-) =>
-  new Promise<http.Server>((resolve, reject) => {
-    const server = http.createServer(async (req, res) => {
-      try {
-        if (onRequest) {
-          await onRequest(req)
-        }
-
-        res.writeHead(200, 'OK', { 'content-type': getContentType() })
-        res.end(await getSummary())
-      } catch (e) {
-        if (onError) {
-          onError(req, e)
-        }
-
-        res.writeHead(500, 'Internal Server Error')
-        res.end()
+const createServer = () =>
+  http.createServer(async (req, res) => {
+    try {
+      if (listeners.onRequests.length) {
+        await Promise.all(listeners.onRequests.map((listener) => listener(req)))
       }
-    })
 
-    server.once('error', reject)
-    server.once('listening', () => resolve(server))
+      res.writeHead(200, 'OK', { 'content-type': getContentType() })
+      res.end(await getSummary())
+    } catch (e) {
+      if (listeners.onErrors.length) {
+        await Promise.all(listeners.onErrors.map((listener) => listener(req, e)))
+      }
 
-    server.listen(port, '0.0.0.0')
+      res.writeHead(500, 'Internal Server Error')
+      res.end()
+    }
   })
 
 /**
@@ -150,25 +162,68 @@ const createServer = (
  * @param onRequest callback to be called before the metrics are returned
  * @param onError callback to be called when an error occurs
  */
-export const init = async (
-  apps: Express[] = [],
-  port = 9090,
-  onRequest?: (req: http.IncomingMessage) => Promise<void>,
-  onError?: (req: http.IncomingMessage, error: any) => Promise<void>
-) => {
-  const middleware = createMiddleware({
-    options: {
-      ...defaultNormalizers,
-      normalizePath: normalizePath(apps) as any, // The type of normalizePath is wrong
-      buckets: [0.05, 0.1, 0.5, 1, 3]
+export const init = async (app: Express, onRequest?: RequestListener, onError?: ErrorListener) => {
+  if (!middleware) {
+    middleware = createMiddleware({
+      options: {
+        ...defaultNormalizers,
+        normalizePath: normalizePath() as any, // The type of normalizePath is wrong
+        buckets: [0.05, 0.1, 0.5, 1, 3]
+      }
+    })
+  }
+
+  initAppRoute(app)
+
+  app.use(middleware)
+
+  if (onRequest) {
+    listeners.onRequests.push(onRequest)
+  }
+
+  if (onError) {
+    listeners.onErrors.push(onError)
+  }
+}
+
+export const start = async (port = 9090) =>
+  new Promise(async (resolve, reject) => {
+    signalIsUp()
+
+    if (!server) {
+      server = createServer()
+
+      server.once('error', reject)
+      server.once('listening', () => {
+        resolve(undefined)
+      })
+
+      server.listen(port, '0.0.0.0')
+    } else {
+      resolve(undefined)
     }
   })
 
-  for (const app of apps) {
-    app.use(middleware)
-  }
+export const stop = () =>
+  new Promise(async (resolve) => {
+    if (server) {
+      server.close(() => {
+        server = undefined
+        resolve(undefined)
+      })
+    } else {
+      resolve(undefined)
+    }
+  })
 
-  const server = await createServer(port, onRequest, onError)
-
-  return server
+/**
+ * reset removes all the routes and listeners from the app
+ * this is useful for testing
+ */
+export const reset = async () => {
+  await stop()
+  middleware = undefined
+  listeners.onErrors = []
+  listeners.onRequests = []
+  appRoutes = {}
 }

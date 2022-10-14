@@ -2,6 +2,7 @@ import { describe, expect, test, beforeEach, jest, afterEach } from '@jest/globa
 import express, { Express } from 'express'
 import * as promex from './prometheus'
 import prom from 'prom-client'
+import { defaultNormalizers } from '@promster/express'
 import axios from 'axios'
 import { Server } from 'http'
 
@@ -20,7 +21,7 @@ describe('init function', () => {
   test('initialize a middleware on an express app', async () => {
     const app = express()
 
-    await promex.init(app)
+    promex.init(app)
     await promex.start()
 
     expect(app._router.stack.length).toBe(3)
@@ -31,8 +32,8 @@ describe('init function', () => {
     const app2: any = express()
     const app3 = express()
 
-    await promex.init(app1)
-    await promex.init(app2)
+    promex.init(app1)
+    promex.init(app2)
     await promex.start()
 
     expect(app1._router.stack.length).toBe(3)
@@ -52,8 +53,8 @@ describe('init function', () => {
     })
 
     const app = express()
-    await promex.init(app, callbackReq, callbackErr)
-    await promex.start()
+    promex.init(app)
+    await promex.start({ onRequest: callbackReq, onError: callbackErr })
 
     await axios.get('http://127.0.0.1:9090/metrics').catch(() => {})
 
@@ -65,8 +66,8 @@ describe('init function', () => {
     const app1 = express()
     const app2 = express()
 
-    await promex.init(app1)
-    await promex.init(app2)
+    promex.init(app1)
+    promex.init(app2)
     await promex.start()
 
     app1.get('/', (_, res) => res.end())
@@ -93,7 +94,7 @@ describe('init function', () => {
   test("should set undefined path label if the express app doesn't match any path", async () => {
     const app = express()
 
-    await promex.init(app)
+    promex.init(app)
     await promex.start()
 
     const appServer = await listen(app, 9091)
@@ -110,7 +111,7 @@ describe('init function', () => {
   test('should start & stop idempotent functions without issues', async () => {
     const app = express()
 
-    await promex.init(app)
+    promex.init(app)
     await promex.start()
     await promex.start()
 
@@ -123,5 +124,46 @@ describe('init function', () => {
 
     await promex.stop()
     await promex.stop()
+  })
+
+  test('should add a handler on an express app', async () => {
+    const app = express()
+
+    app.get('/metrics', promex.handler())
+
+    promex.init(app)
+
+    app.get('/', (_, res) => res.end())
+
+    const appServer = await listen(app, 9091)
+
+    await axios.get('http://127.0.0.1:9091/')
+
+    const res = await axios.get('http://127.0.0.1:9091/metrics')
+
+    expect(res.data).toContain('http_requests_total{method="get",path="/",status_code="200"} 1')
+
+    appServer.close()
+  })
+
+  test('should not use the default normalize path', async () => {
+    const app = express()
+
+    promex.config({ normalizePath: defaultNormalizers.normalizePath })
+    promex.init(app)
+
+    app.get('/metrics', promex.handler())
+    app.get('/foo/:id/bar', (_, res) => res.end())
+
+    const appServer = await listen(app, 9091)
+
+    await axios.get('http://127.0.0.1:9091/foo/d3d6966e-4883-44b7-9ea4-59dae0326001/bar')
+
+    const res = await axios.get('http://127.0.0.1:9091/metrics')
+
+    expect(res.data).toContain('http_requests_total{method="get",path="/foo/#val/bar",status_code="200"} 1')
+    expect((app as any).promexId).toBeUndefined()
+
+    appServer.close()
   })
 })

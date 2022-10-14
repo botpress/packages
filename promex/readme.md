@@ -1,21 +1,44 @@
 # Promex
 
-> Prometheus client initialization package for nodejs
+> Prometheus client initialization package for epxress
 
 ## Usage
 
 Promex is a utility to initialize the Promster library. Install the package and use it like this:
 
 ```ts
-import { init } from '@bpinternal/promex';
+import * as promex from '@bpinternal/promex';
 import express from 'express';
 
-const app = express();
+const backend = express();
+const admin = express();
 
 [...]
 
-init([app]);
+promex.init(backend); // Adds a recording middleware on the express app
+promex.init(admin); // Adds a recording middleware on the express app
 
+[...]
+
+promex.start() // Starts a metrics server on port 9090
+
+```
+
+Promex can also be used with an handler on an express app
+
+```ts
+import * as promex from '@bpinternal/promex';
+import express from 'express';
+
+const app = express()
+
+app.get('/metrics', promex.handler()) // Adds a '/metrics' endpoint that returns the Prometheus metrics
+
+promex.init(app) // Adds a recording middleware on the express app
+
+[...]
+
+app.listen()
 ```
 
 ## Disclaimer ⚠️

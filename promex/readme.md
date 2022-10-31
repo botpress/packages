@@ -1,10 +1,10 @@
 # Promex
 
-> Prometheus client initialization package for epxress
+> Prometheus client initialization package for express
 
 ## Usage
 
-Promex is a utility to initialize the Promster library. Install the package and use it like this:
+Promex is a utility to initialize the Promster library. Install the package and see the example below
 
 ```ts
 import * as promex from '@bpinternal/promex';

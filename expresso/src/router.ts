@@ -92,10 +92,6 @@ export class JsonRouter {
     this._router = router
   }
 
-  public get endpoints() {
-    return this._endpoints
-  }
-
   public get basePath(): string {
     return this._basePath
   }
@@ -113,9 +109,9 @@ export class JsonRouter {
    * */
   public copyRoutesFromRouter(router: JsonRouter, paths?: { path: string; method: string }[]) {
     if (paths) {
-      _.intersectionBy(router.endpoints, paths, (x) => `${x.path}${x.method}`).forEach((x) => this._addEndpoint(x))
+      _.intersectionBy(router._endpoints, paths, (x) => `${x.path}${x.method}`).forEach((x) => this._addEndpoint(x))
     } else {
-      _.differenceBy(router.endpoints, this.endpoints, (x) => `${x.path}${x.method}`).forEach((x) =>
+      _.differenceBy(router._endpoints, this._endpoints, (x) => `${x.path}${x.method}`).forEach((x) =>
         this._addEndpoint(x)
       )
     }
@@ -144,11 +140,13 @@ export class JsonRouter {
 
   public get openapi() {
     const resolved = { ...DEFAULT_INFO, ...this._props.info }
-    return generateOpenAPI(this._getAllEndpoints(this), resolved)
+    const endpoints = this._getAllEndpoints(this)
+    return generateOpenAPI(endpoints, resolved)
   }
 
   public get cliDoc() {
-    return generateCliDocumentation(this.endpoints)
+    const endpoints = this._getAllEndpoints(this)
+    return generateCliDocumentation(endpoints)
   }
 
   public get<Path extends string, I extends z.ZodType, O extends z.ZodType, H extends Record<string, z.ZodString>>(
@@ -263,7 +261,7 @@ export class JsonRouter {
 
   /** Returns all the endpoints of the specified router, including its children, with the correct path */
   private _getAllEndpoints(router: JsonRouter) {
-    const allEndpoints = [...router.endpoints]
+    const allEndpoints = [...router._endpoints]
     if (router.children.length) {
       allEndpoints.push(..._.flatMap(router.children, (x) => this._getAllEndpoints(x)))
     }

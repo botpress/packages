@@ -27,7 +27,6 @@ export class InvalidRequestBodyFormatError extends InvalidRequestFormatError {
 
 export class InvalidRequestHeadersFormatError extends InvalidRequestFormatError {
   constructor(headerName: string, headerValue: string | string[] | undefined, err: z.ZodError) {
-    const header = { [headerName]: headerValue }
-    super(`Invalid Request Headers Format Error (${header}): "${err.message}"`, err)
+    super(`Invalid Request Headers Format Error (${headerName}): "${err.message}"`, err)
   }
 }

@@ -1,3 +1,7 @@
+## 0.2.2
+
+- Fix: cli doc includes all children endpoints
+
 ## 0.2.1
 
 - Feature: Ability to add custom schemas

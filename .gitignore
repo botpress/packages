@@ -74,6 +74,7 @@ jspm_packages/
 
 # Typescript build output
 dist/
+gen/
 
 # Other
 *.config.json

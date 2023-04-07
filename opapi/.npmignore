@@ -1,4 +1,6 @@
 node_modules
-tsconfig.tsbuildinfo
 src/
+test/
 tsconfig.json
+tsconfig.tsbuildinfo
+vite.config.ts

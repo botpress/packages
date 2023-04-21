@@ -20,6 +20,8 @@ const codes = {
 type ErrorCode = typeof codes[keyof typeof codes]
 
 abstract class BaseApiError<Code extends ErrorCode, Type extends string, Description extends string> extends Error {
+  public readonly isApiError = true
+
   constructor(
     public readonly code: Code,
     public readonly description: Description,
@@ -39,8 +41,12 @@ abstract class BaseApiError<Code extends ErrorCode, Type extends string, Descrip
   }
 }
 
+function isObject(obj: unknown): obj is object {
+  return typeof obj === 'object' && !Array.isArray(obj) && obj !== null
+}
+
 export const isApiError = (thrown: unknown): thrown is ApiError => {
-  return thrown instanceof BaseApiError 
+  return thrown instanceof BaseApiError || isObject(thrown) && thrown.isApiError === true
 }
 
 ${errors.map((err) => generateError(err)).join('\n')}
@@ -48,7 +54,7 @@ ${generateErrorType(types)}
 ${generateApiError(types)}
 ${generateErrorTypeMap(types)}
 export const errorFrom = (err: unknown): ApiError => {
-  if (err instanceof BaseApiError) {
+  if (isApiError(err)) {
     return err
   }
 

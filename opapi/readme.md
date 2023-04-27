@@ -92,3 +92,8 @@ The Botpress Engineering team.
 ## Licensing
 
 This software is protected by the same license as the [main Botpress repository](https://github.com/botpress/botpress). You can find the license file [here](https://github.com/botpress/botpress/blob/master/LICENSE).
+
+## Publishing
+
+1. [prerequisite] Login to npm: `pnpm login --scope bpinternal`
+1. Publish: `pnpm publish --access public`

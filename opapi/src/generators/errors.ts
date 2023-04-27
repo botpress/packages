@@ -41,9 +41,7 @@ abstract class BaseApiError<Code extends ErrorCode, Type extends string, Descrip
   }
 }
 
-function isObject(obj: unknown): obj is object {
-  return typeof obj === 'object' && !Array.isArray(obj) && obj !== null
-}
+const isObject = (obj: unknown): obj is object => typeof obj === 'object' && !Array.isArray(obj) && obj !== null
 
 export const isApiError = (thrown: unknown): thrown is ApiError => {
   return thrown instanceof BaseApiError || isObject(thrown) && thrown.isApiError === true

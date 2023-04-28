@@ -39,7 +39,7 @@ const internalError: ApiError = {
 }
 
 export type ApiError = {
-  status: 400 | 401 | 402 | 403 | 404 | 405 | 409 | 413 | 429 | 500
+  status: 400 | 401 | 402 | 403 | 404 | 405 | 408 | 409 | 413 | 415 | 429 | 500 | 501 | 502 | 503 | 504
   type: string
   description: string
 }
@@ -166,10 +166,10 @@ export function createState<SchemaName extends string, DefaultParameterName exte
 ): State<DefaultParameterName, SectionName> {
   const schemaEntries = props.schemas
     ? Object.entries<typeof props.schemas[SchemaName]>(props.schemas).map(([name, data]) => ({
-        name,
-        schema: data.schema,
-        section: data.section,
-      }))
+      name,
+      schema: data.schema,
+      section: data.section,
+    }))
     : []
 
   const schemas: State<DefaultParameterName, SectionName>['schemas'] = {}
@@ -185,11 +185,11 @@ export function createState<SchemaName extends string, DefaultParameterName exte
 
   const sections = props.sections
     ? toPairs(props.sections).map(([name, section]) => ({
-        ...section,
-        name,
-        operations: [],
-        schema: schemaEntries.find((schemaEntry) => schemaEntry.section === name)?.name,
-      }))
+      ...section,
+      name,
+      operations: [],
+      schema: schemaEntries.find((schemaEntry) => schemaEntry.section === name)?.name,
+    }))
     : []
 
   schemaEntries.forEach((schemaEntry) => {

@@ -22,17 +22,6 @@ afterEach(() => {
   cleanupEnv()
 })
 
-/**
- * Tests:
- * - parse_env_string_should_work
- * - parse_env_number_should_work
- * - parse_env_boolean_should_work
- * - parse_env_choices_should_work
-
- * - parse_env_string_array_should_work
- * - parse_env_number_array_should_work
- * - parse_env_boolean_array_should_work
- */
 test('parse_env_string_should_work', () => {
   const schema = {
     myStrParam: { type: 'string' }

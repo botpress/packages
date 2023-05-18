@@ -51,7 +51,7 @@ const buildSchema = (item: ZodTypeWithMeta, schemaRefs: Record<string, SchemaObj
 }
 
 const operationObject = (
-  { operationId, input, output }: AnyEndpoint,
+  { operationId, input, output, deprecated }: AnyEndpoint,
   schemas: Record<string, SchemaObject>
 ): OperationObject => {
   const requestBody: RequestBodyObject | undefined = input && {
@@ -72,10 +72,9 @@ const operationObject = (
     }
   }
 
-  // console.log('out,, ', output)
-
   return {
     operationId,
+    deprecated,
     requestBody,
     responses: {
       default: responseBody

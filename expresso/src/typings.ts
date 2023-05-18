@@ -27,6 +27,7 @@ export type EndpointProps<Path extends string, I extends z.ZodType, O extends z.
   output?: O
   headers?: H
   operationId?: string
+  deprecated?: boolean
 }
 
 export type EndpointHandler<

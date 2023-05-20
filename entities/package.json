@@ -6,7 +6,7 @@
   "scripts": {
     "build": "pnpm run build:node",
     "build:node": "wasm-pack build --target nodejs",
-    "start": "node -e 'require(`./pkg/entities`).greet()'"
+    "start": "node -e 'var sim = require(`./pkg/entities`).jaro_winkler_sim(`hello-world`, `hello-world`); console.log(sim);'"
   },
   "dependencies": {
     "lodash": "^4.17.19"

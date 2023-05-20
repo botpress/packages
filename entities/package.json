@@ -1,0 +1,22 @@
+{
+  "name": "@bpinternal/entities",
+  "version": "0.0.1",
+  "description": "Botpress Entities Extractor",
+  "main": "index.js",
+  "scripts": {
+    "build": "pnpm run build:node",
+    "build:node": "wasm-pack build --target nodejs",
+    "start": "node -e 'require(`./pkg/entities`).greet()'"
+  },
+  "dependencies": {
+    "lodash": "^4.17.19"
+  },
+  "devDependencies": {
+    "wasm-pack": "^0.11.1",
+    "typescript": "^5.0.4",
+    "@types/node": "^20.2.1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}

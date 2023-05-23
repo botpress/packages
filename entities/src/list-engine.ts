@@ -11,8 +11,8 @@ export type ListEntityExtraction = {
   confidence: number
   value: string
   source: string
-  charStart: number
-  charEnd: number
+  char_start: number
+  char_end: number
 }
 
 export const extractForListModel = (strTokens: string[], listModel: ListEntityModel): ListEntityExtraction[] => {

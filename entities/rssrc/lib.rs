@@ -3,6 +3,7 @@ use serde::de::{Deserialize, Deserializer, MapAccess, SeqAccess, Visitor};
 use serde::ser::{Serialize, SerializeStruct, Serializer};
 use serde_wasm_bindgen;
 
+use std::cmp::Ordering;
 use std::collections::HashMap;
 use std::fmt;
 use wasm_bindgen::prelude::*;
@@ -87,6 +88,20 @@ fn abs(n: i32) -> i32 {
         n
     }
 }
+
+// fn orderBy<T>(arr: &[T], key: &str, order: &str) -> Vec<T> {
+//     let mut res = arr.to_vec();
+//     res.sort_by(|a, b| {
+//         let a = a.as_ref();
+//         let b = b.as_ref();
+//         if order == "asc" {
+//             a[key].cmp(&b[key])
+//         } else {
+//             b[key].cmp(&a[key])
+//         }
+//     });
+//     res
+// }
 
 /**
  * ########################
@@ -253,8 +268,8 @@ struct Token {
     value: String,
     is_word: bool,
     is_space: bool,
-    start_char: usize,
-    end_char: usize,
+    char_start: usize,
+    char_end: usize,
     start_token: usize,
     end_token: usize,
 }
@@ -287,8 +302,8 @@ fn to_tokens(str_tokens: &Vec<String>) -> Vec<Token> {
             value: str_token.to_string(),
             is_word: is_word(str_token.to_string()),
             is_space: is_space(str_token.to_string()),
-            start_char: char_index,
-            end_char: char_index + str_token.len(),
+            char_start: char_index,
+            char_end: char_index + str_token.len(),
             start_token: i,
             end_token: i + 1,
         };
@@ -388,23 +403,19 @@ fn compute_structural_score(a: &[String], b: &[String]) -> f64 {
 }
 
 #[derive(Debug)]
-pub struct CandidateScore {
-    pub fuzzy_score: f64,
-    pub exact_score: f64,
-    pub structural_score: f64,
-    pub final_score: f64,
-}
+struct Candidate {
+    struct_score: f64,
+    length_score: f64, // structural score adjusted by the length of the synonym to favor longer matches
 
-#[derive(Debug)]
-pub struct Candidate {
-    pub score: f64,
-    pub canonical: String,
-    pub start: usize,
-    pub end: usize,
-    pub source: String,
-    pub occurrence: String,
-    pub eliminated: bool,
-    pub scores: CandidateScore,
+    token_start: usize,
+    token_end: usize,
+
+    name: String,    // fruit
+    value: String,   // Watermelon
+    synonym: String, // water-melon
+    source: String,  // water-meln
+
+    eliminated: bool,
 }
 
 #[derive(Debug)]
@@ -412,6 +423,15 @@ struct ListEntityModel {
     name: String,
     fuzzy: f64,
     tokens: HashMap<String, Vec<Vec<String>>>,
+}
+
+#[derive(Debug)]
+struct ListEntitySynonym {
+    name: String,
+    fuzzy: f64,
+    value: String,
+    tokens: Vec<String>,
+    max_synonym_len: usize,
 }
 
 #[derive(Debug)]
@@ -424,89 +444,157 @@ struct ListEntityExtraction {
     char_end: usize,
 }
 
-fn extract_for_list_model(
-    str_tokens: &Vec<String>,
-    list_model: &ListEntityModel,
-) -> Vec<ListEntityExtraction> {
+fn extract_for_synonym(tokens: &[Token], synonym: &ListEntitySynonym) -> Vec<Candidate> {
     let mut candidates: Vec<Candidate> = Vec::new();
-    let mut longest_candidate = 0;
+    let synonym_str = synonym.tokens.join("");
 
-    let tokens = to_tokens(str_tokens);
+    for token_idx in 0..tokens.len() {
+        if tokens[token_idx].is_space {
+            continue;
+        }
 
-    for (canonical, occurrences) in &list_model.tokens {
-        for occurrence in occurrences {
-            for i in 0..tokens.len() {
-                if tokens[i].is_space {
-                    continue;
-                }
+        let workset: Vec<String> = take_until(tokens, token_idx, synonym_str.len())
+            .iter()
+            .map(|x| x.value.clone())
+            .collect();
 
-                let workset = take_until(&tokens, i, occurrence.iter().map(|o| o.len()).sum());
-                let workset_str_low: Vec<String> =
-                    workset.iter().map(|x| x.value.to_lowercase()).collect();
-                let workset_str_wcase: Vec<String> =
-                    workset.iter().map(|x| x.value.clone()).collect();
-                let candidate_as_string = occurrence.join("");
+        let source = workset.join("");
 
-                if candidate_as_string.len() > longest_candidate {
-                    longest_candidate = candidate_as_string.len();
-                }
+        let is_fuzzy = synonym.fuzzy < 1.0 && source.len() >= 4;
 
-                let exact_score = if compute_exact_score(&workset_str_wcase, occurrence) == 1.0 {
-                    1.0
-                } else {
-                    0.0
-                };
+        let exact_score = compute_exact_score(&workset, &synonym.tokens);
+        let exact_factor = if exact_score == 1.0 { 1.0 } else { 0.0 };
 
-                let fuzzy = list_model.fuzzy < 1.0 && workset_str_low.join("").len() >= 4;
-                let fuzzy_score = compute_fuzzy_score(
-                    &workset_str_low,
-                    &occurrence
-                        .iter()
-                        .map(|t| t.to_lowercase())
-                        .collect::<Vec<String>>(),
-                );
-                let fuzzy_factor = if fuzzy_score >= list_model.fuzzy {
-                    fuzzy_score
-                } else {
-                    0.0
-                };
+        let fuzzy_score = compute_fuzzy_score(
+            &workset
+                .iter()
+                .map(|x| x.to_lowercase())
+                .collect::<Vec<String>>(),
+            &synonym
+                .tokens
+                .iter()
+                .map(|x| x.to_lowercase())
+                .collect::<Vec<String>>(),
+        );
+        let fuzzy_factor = if fuzzy_score >= synonym.fuzzy {
+            fuzzy_score
+        } else {
+            0.0
+        };
 
-                let structural_score = compute_structural_score(&workset_str_wcase, occurrence);
-                let final_score = if fuzzy {
-                    fuzzy_factor * structural_score
-                } else {
-                    exact_score * structural_score
-                };
+        let used_factor = if is_fuzzy { fuzzy_factor } else { exact_factor };
+        let structural_score = used_factor * compute_structural_score(&workset, &synonym.tokens);
 
-                candidates.push(Candidate {
-                    score: final_score,
-                    canonical: canonical.clone(),
-                    start: i,
-                    end: i + workset.len() - 1,
-                    source: workset.iter().map(|t| t.value.clone()).collect(),
-                    occurrence: occurrence.join(""),
-                    eliminated: false,
-                    scores: CandidateScore {
-                        fuzzy_score,
-                        exact_score,
-                        structural_score,
-                        final_score,
-                    },
-                });
-            }
+        let used_length = source.len().min(synonym.max_synonym_len);
+        let length_score = structural_score * (used_length as f64).powf(0.2);
+
+        candidates.push(Candidate {
+            struct_score: structural_score,
+            length_score,
+            name: synonym.name.clone(),
+            value: synonym.value.clone(),
+            token_start: token_idx,
+            token_end: token_idx + workset.len() - 1,
+            source,
+            synonym: synonym_str.clone(),
+            eliminated: false,
+        });
+    }
+
+    candidates
+}
+
+fn flatten_synonyms(list_model: ListEntityModel) -> Vec<ListEntitySynonym> {
+    let mut flat: Vec<ListEntitySynonym> = vec![];
+
+    for (value, synonyms) in list_model.tokens {
+        let max_synonym_len: usize = synonyms.iter().map(|s| s.join("").len()).max().unwrap_or(0);
+
+        for synonym_tokens in synonyms {
+            flat.push(ListEntitySynonym {
+                name: list_model.name.clone(),
+                fuzzy: list_model.fuzzy,
+                value: value.clone(),
+                tokens: synonym_tokens.clone(),
+                max_synonym_len: max_synonym_len,
+            });
         }
     }
 
-    let results: Vec<ListEntityExtraction> = candidates
-        .into_iter()
-        .filter(|x| !x.eliminated && x.score >= ENTITY_SCORE_THRESHOLD)
+    flat
+}
+
+fn extract_for_list_model(
+    str_tokens: Vec<String>,
+    list_model: ListEntityModel,
+) -> Vec<ListEntityExtraction> {
+    let utt_tokens = to_tokens(&str_tokens);
+
+    let synonyms: Vec<ListEntitySynonym> = flatten_synonyms(list_model);
+
+    let mut candidates: Vec<Candidate> = Vec::new();
+    for synonym in &synonyms {
+        let new_candidates = extract_for_synonym(&utt_tokens, synonym);
+        candidates.extend(new_candidates);
+    }
+
+    // B) eliminate overlapping candidates
+    for token_idx in 0..utt_tokens.len() {
+        let token_candidates: Vec<&Candidate> = candidates
+            .iter()
+            .filter(|c| c.token_start <= token_idx && c.token_end >= token_idx)
+            .collect();
+
+        let mut active_token_candidates: Vec<&Candidate> = token_candidates
+            .iter()
+            .filter(|c| !c.eliminated)
+            .cloned()
+            .collect();
+
+        // we use length adjusted score to favor longer matches
+        active_token_candidates.sort_by(|a, b| {
+            if a.length_score > b.length_score {
+                Ordering::Less // reverse order
+            } else if a.length_score < b.length_score {
+                Ordering::Greater
+            } else {
+                Ordering::Equal
+            }
+        });
+
+        if active_token_candidates.len() <= 1 {
+            continue;
+        }
+
+        let _winner = active_token_candidates[0];
+        let losers = &active_token_candidates[1..];
+
+        // TODO: fix this
+
+        // for loser in losers {
+        //     loser.eliminated = true;
+        // }
+    }
+
+    let winners: Vec<&Candidate> = candidates.iter().filter(|c| !c.eliminated).collect();
+
+    // C) from winners keep only matches with high enough structural score
+    let matches: Vec<&Candidate> = winners
+        .iter()
+        .filter(|x| x.struct_score >= ENTITY_SCORE_THRESHOLD)
+        .cloned()
+        .collect();
+
+    // D) map to results
+    let results: Vec<ListEntityExtraction> = matches
+        .iter()
         .map(|match_| ListEntityExtraction {
-            name: list_model.name.clone(),
-            confidence: match_.score,
-            char_start: tokens[match_.start].start_char,
-            char_end: tokens[match_.end].start_char + tokens[match_.end].value.len(),
-            value: match_.canonical,
-            source: match_.source,
+            name: match_.name.clone(),
+            confidence: match_.struct_score,
+            char_start: utt_tokens[match_.token_start].char_start,
+            char_end: utt_tokens[match_.token_end].char_end,
+            value: match_.value.clone(),
+            source: match_.source.clone(),
         })
         .collect();
 
@@ -547,8 +635,8 @@ impl Serialize for Token {
         state.serialize_field("value", &self.value)?;
         state.serialize_field("is_word", &self.is_word)?;
         state.serialize_field("is_space", &self.is_space)?;
-        state.serialize_field("start_char", &self.start_char)?;
-        state.serialize_field("end_char", &self.end_char)?;
+        state.serialize_field("start_char", &self.char_start)?;
+        state.serialize_field("end_char", &self.char_end)?;
         state.serialize_field("start_token", &self.start_token)?;
         state.serialize_field("end_token", &self.end_token)?;
         state.end()
@@ -695,7 +783,7 @@ pub fn extract(str_tokens: JsValue, list_model: JsValue) -> JsValue {
     let str_tokens: Vec<String> = serde_wasm_bindgen::from_value(str_tokens).unwrap();
     let list_model: ListEntityModel = serde_wasm_bindgen::from_value(list_model).unwrap();
 
-    let results = extract_for_list_model(&str_tokens, &list_model);
+    let results = extract_for_list_model(str_tokens, list_model);
 
     let ret = serde_wasm_bindgen::to_value(&results).unwrap();
     ret

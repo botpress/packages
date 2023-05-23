@@ -410,12 +410,9 @@ struct Candidate {
     token_start: usize,
     token_end: usize,
 
-    name: String,    // fruit
-    value: String,   // Watermelon
-    synonym: String, // water-melon
-    source: String,  // water-meln
-
-    eliminated: bool,
+    name: String,   // fruit
+    value: String,  // Watermelon
+    source: String, // water-meln
 }
 
 #[derive(Debug)]
@@ -496,8 +493,6 @@ fn extract_for_synonym(tokens: &[Token], synonym: &ListEntitySynonym) -> Vec<Can
             token_start: token_idx,
             token_end: token_idx + workset.len() - 1,
             source,
-            synonym: synonym_str.clone(),
-            eliminated: false,
         });
     }
 
@@ -539,20 +534,23 @@ fn extract_for_list_model(
     }
 
     // B) eliminate overlapping candidates
+
+    let mut eliminated: Vec<bool> = (0..candidates.len()).map(|_| false).collect();
+
     for token_idx in 0..utt_tokens.len() {
-        let token_candidates: Vec<&Candidate> = candidates
+        let token_candidates: Vec<(usize, &Candidate)> = candidates
             .iter()
-            .filter(|c| c.token_start <= token_idx && c.token_end >= token_idx)
+            .enumerate()
+            .filter(|(i, c)| c.token_start <= token_idx && c.token_end >= token_idx)
             .collect();
 
-        let mut active_token_candidates: Vec<&Candidate> = token_candidates
+        let mut active_token_candidates: Vec<&(usize, &Candidate)> = token_candidates
             .iter()
-            .filter(|c| !c.eliminated)
-            .cloned()
+            .filter(|(i, _)| !eliminated[*i])
             .collect();
 
         // we use length adjusted score to favor longer matches
-        active_token_candidates.sort_by(|a, b| {
+        active_token_candidates.sort_by(|(_, a), (_, b)| {
             if a.length_score > b.length_score {
                 Ordering::Less // reverse order
             } else if a.length_score < b.length_score {
@@ -566,17 +564,18 @@ fn extract_for_list_model(
             continue;
         }
 
-        let _winner = active_token_candidates[0];
         let losers = &active_token_candidates[1..];
-
-        // TODO: fix this
-
-        // for loser in losers {
-        //     loser.eliminated = true;
-        // }
+        for (loser_idx, _) in losers {
+            eliminated[*loser_idx] = true;
+        }
     }
 
-    let winners: Vec<&Candidate> = candidates.iter().filter(|c| !c.eliminated).collect();
+    let winners: Vec<&Candidate> = candidates
+        .iter()
+        .enumerate()
+        .filter(|(i, _)| !eliminated[*i])
+        .map(|(_, c)| c)
+        .collect();
 
     // C) from winners keep only matches with high enough structural score
     let matches: Vec<&Candidate> = winners

@@ -2,11 +2,10 @@ use serde;
 use serde::de::{Deserialize, Deserializer, MapAccess, SeqAccess, Visitor};
 use serde::ser::{Serialize, SerializeStruct, Serializer};
 use serde_wasm_bindgen;
+
 use std::collections::HashMap;
 use std::fmt;
 use wasm_bindgen::prelude::*;
-
-mod tmp;
 
 extern crate console_error_panic_hook;
 
@@ -51,22 +50,6 @@ fn union<T: PartialEq + Clone>(arr1: &[T], arr2: &[T]) -> Vec<T> {
     res
 }
 
-fn mean(arr: &[f64]) -> f64 {
-    let sum: f64 = arr.iter().sum();
-    sum / arr.len() as f64
-}
-
-fn sum_by<T, F>(arr: &[T], f: F) -> f64
-where
-    F: Fn(&T) -> f64,
-{
-    let mut sum = 0.0;
-    for x in arr {
-        sum += f(x);
-    }
-    sum
-}
-
 fn uniq<T: PartialEq + Clone>(arr: &[T]) -> Vec<T> {
     let mut res = vec![];
     for x in arr {
@@ -85,6 +68,16 @@ fn min(arr: &[usize]) -> usize {
         }
     }
     min
+}
+
+fn max(arr: &[usize]) -> usize {
+    let mut max = arr[0];
+    for x in arr {
+        if *x > max {
+            max = *x;
+        }
+    }
+    max
 }
 
 fn abs(n: i32) -> i32 {
@@ -109,7 +102,6 @@ fn abs(n: i32) -> i32 {
  */
 fn jaro_winkler_similarity(s1: &str, s2: &str, case_sensitive: Option<bool>) -> f64 {
     let case_sensitive = case_sensitive.unwrap_or(true);
-    let mut m = 0;
 
     // Exit early if either are empty.
     if s1.is_empty() || s2.is_empty() {
@@ -128,7 +120,8 @@ fn jaro_winkler_similarity(s1: &str, s2: &str, case_sensitive: Option<bool>) -> 
         return 1.0;
     }
 
-    let max_len = core::cmp::Ord::max(s1.len(), s2.len());
+    let mut m: i32 = 0;
+    let max_len = max(&[s1.len(), s2.len()]);
     let range = (max_len / 2) - 1;
     let mut s1_matches = vec![false; s1.len()];
     let mut s2_matches = vec![false; s2.len()];
@@ -160,35 +153,41 @@ fn jaro_winkler_similarity(s1: &str, s2: &str, case_sensitive: Option<bool>) -> 
     let mut k = 0;
     let mut num_trans = 0;
 
-    for (i, is_match) in s1_matches.iter().enumerate() {
-        if *is_match {
-            if let Some(j) = s2_matches.iter().skip(k).position(|&is_match| is_match) {
-                k += j + 1;
-            }
+    for i in 0..s1_matches.len() {
+        let is_match = s1_matches[i];
 
-            if s1.chars().nth(i) != s2.chars().nth(k) {
-                num_trans += 1;
+        if !is_match {
+            continue;
+        }
+
+        let mut j = k;
+        while j < s2_matches.len() {
+            if s2_matches[j] {
+                k = j + 1;
+                break;
             }
+            j += 1;
+        }
+
+        if s1.chars().nth(i) != s2.chars().nth(j) {
+            num_trans += 1;
         }
     }
 
-    let weight = (m as f64 / s1.len() as f64
+    let mut weight = (m as f64 / s1.len() as f64
         + m as f64 / s2.len() as f64
         + (m - num_trans / 2) as f64 / m as f64)
         / 3.0;
-    let mut l = 0;
+
     let p = 0.1;
 
     if weight > 0.7 {
-        for (c1, c2) in s1.chars().zip(s2.chars()).take(4) {
-            if c1 == c2 {
-                l += 1;
-            } else {
-                break;
-            }
+        let mut l = 0;
+        while s1.chars().nth(l) == s2.chars().nth(l) && l < 4 {
+            l += 1;
         }
 
-        return weight + l as f64 * p * (1.0 - weight);
+        weight += l as f64 * p * (1.0 - weight);
     }
 
     weight
@@ -217,26 +216,30 @@ fn levenshtein_distance(a: &str, b: &str) -> usize {
 
     let (a, b) = if a.len() > b.len() { (b, a) } else { (a, b) };
 
+    let mut res: usize = 0;
+
     let alen = a.len();
     let blen = b.len();
     let mut row = (0..alen + 1).collect::<Vec<usize>>();
 
     let mut tmp: usize;
+
     for i in 1..=blen {
-        let mut res = i;
+        res = i;
+
         for j in 1..=alen {
             tmp = row[j - 1];
             row[j - 1] = res;
-            res = if b.chars().nth(i - 1) == a.chars().nth(j - 1) {
-                tmp
+
+            if b.chars().nth(i - 1) == a.chars().nth(j - 1) {
+                res = tmp;
             } else {
-                let min_res: usize = min(&[tmp + 1, res + 1, row[j] + 1]);
-                min_res
-            };
+                res = min(&[tmp + 1, res + 1, row[j] + 1])
+            }
         }
     }
 
-    row[alen]
+    res
 }
 
 /**
@@ -359,8 +362,12 @@ fn compute_fuzzy_score(a: &[String], b: &[String]) -> f64 {
 }
 
 fn compute_structural_score(a: &[String], b: &[String]) -> f64 {
-    let charset1: Vec<char> = a.iter().flat_map(|x| x.chars()).collect();
-    let charset2: Vec<char> = b.iter().flat_map(|x| x.chars()).collect();
+    let mut charset1: Vec<char> = a.iter().flat_map(|x| x.chars()).collect();
+    let mut charset2: Vec<char> = b.iter().flat_map(|x| x.chars()).collect();
+
+    charset1 = uniq(&charset1);
+    charset2 = uniq(&charset2);
+
     let charset_score =
         intersection(&charset1, &charset2).len() as f64 / union(&charset1, &charset2).len() as f64;
     let charset_low1: Vec<char> = charset1.iter().map(|c| c.to_ascii_lowercase()).collect();
@@ -380,22 +387,34 @@ fn compute_structural_score(a: &[String], b: &[String]) -> f64 {
     (final_charset_score * token_qty_score * token_size_score).sqrt()
 }
 
-struct Candidate {
-    score: f64,
-    canonical: String,
-    start: usize,
-    end: usize,
-    source: String,
-    occurrence: String,
-    eliminated: bool,
+#[derive(Debug)]
+pub struct CandidateScore {
+    pub fuzzy_score: f64,
+    pub exact_score: f64,
+    pub structural_score: f64,
+    pub final_score: f64,
 }
 
+#[derive(Debug)]
+pub struct Candidate {
+    pub score: f64,
+    pub canonical: String,
+    pub start: usize,
+    pub end: usize,
+    pub source: String,
+    pub occurrence: String,
+    pub eliminated: bool,
+    pub scores: CandidateScore,
+}
+
+#[derive(Debug)]
 struct ListEntityModel {
     name: String,
     fuzzy: f64,
     tokens: HashMap<String, Vec<Vec<String>>>,
 }
 
+#[derive(Debug)]
 struct ListEntityExtraction {
     name: String,
     confidence: f64,
@@ -467,6 +486,12 @@ fn extract_for_list_model(
                     source: workset.iter().map(|t| t.value.clone()).collect(),
                     occurrence: occurrence.join(""),
                     eliminated: false,
+                    scores: CandidateScore {
+                        fuzzy_score,
+                        exact_score,
+                        structural_score,
+                        final_score,
+                    },
                 });
             }
         }
@@ -495,27 +520,21 @@ fn extract_for_list_model(
  */
 
 #[wasm_bindgen]
-pub fn greet() {
-    init();
-    log("Hello, entities!");
-}
-
-#[wasm_bindgen]
-pub fn print(value: String) {
-    init();
-    log(&value);
-}
-
-#[wasm_bindgen]
 pub fn jaro_winkler_sim(a: String, b: String) -> f64 {
     init();
-    jaro_winkler_similarity(&a, &b, Some(true))
+    jaro_winkler_similarity(&a, &b, None)
 }
 
 #[wasm_bindgen]
 pub fn levenshtein_sim(a: String, b: String) -> f64 {
     init();
     levenshtein_similarity(&a, &b)
+}
+
+#[wasm_bindgen]
+pub fn levenshtein_dist(a: String, b: String) -> usize {
+    init();
+    levenshtein_distance(&a, &b)
 }
 
 impl Serialize for Token {
@@ -671,21 +690,12 @@ impl<'de> Deserialize<'de> for ListEntityModel {
 }
 
 #[wasm_bindgen]
-pub fn to_toks(str_toks: JsValue) -> JsValue {
-    init();
-    let str_toks: Vec<String> = serde_wasm_bindgen::from_value(str_toks).unwrap();
-    let tokens = to_tokens(&str_toks);
-    let ret = serde_wasm_bindgen::to_value(&tokens).unwrap();
-    ret
-}
-
-#[wasm_bindgen]
 pub fn extract(str_tokens: JsValue, list_model: JsValue) -> JsValue {
     init();
     let str_tokens: Vec<String> = serde_wasm_bindgen::from_value(str_tokens).unwrap();
     let list_model: ListEntityModel = serde_wasm_bindgen::from_value(list_model).unwrap();
 
-    let mut results = extract_for_list_model(&str_tokens, &list_model);
+    let results = extract_for_list_model(&str_tokens, &list_model);
 
     let ret = serde_wasm_bindgen::to_value(&results).unwrap();
     ret

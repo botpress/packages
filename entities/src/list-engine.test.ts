@@ -1,11 +1,5 @@
 import { ListEntityExtraction, ListEntityModel, extractForListModel } from './list-engine'
-
-export type Tokenizer = (utterance: string) => string[]
-
-export const spaceTokenizer: Tokenizer = (text: string): string[] => {
-  return text.split(new RegExp('( )', 'g')).filter((x) => !!x)
-}
-
+import { spaceTokenizer } from './space-tokenizer'
 import { parseUtterance } from './utterance-parser.utils'
 
 const extractListEntities = (utt: string, models: ListEntityModel[]) => {

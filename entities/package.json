@@ -6,6 +6,8 @@
   "scripts": {
     "build": "pnpm run wasm:node && tsc",
     "wasm:node": "wasm-pack build --target nodejs",
+    "dev": "ts-node -T ./src/index.ts",
+    "start": "node ./dist/index.js",
     "test": "jest --roots ./dist"
   },
   "dependencies": {

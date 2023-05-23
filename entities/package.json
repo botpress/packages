@@ -4,9 +4,9 @@
   "description": "Botpress Entities Extractor",
   "main": "index.js",
   "scripts": {
-    "build": "pnpm run build:node",
-    "build:node": "wasm-pack build --target nodejs",
-    "start": "node -e 'var sim = require(`./pkg/entities`).jaro_winkler_sim(`hello-world`, `hello-world`); console.log(sim);'"
+    "build": "pnpm run wasm:node && tsc",
+    "wasm:node": "wasm-pack build --target nodejs",
+    "test": "jest --roots ./dist"
   },
   "dependencies": {
     "lodash": "^4.17.19"
@@ -14,7 +14,9 @@
   "devDependencies": {
     "wasm-pack": "^0.11.1",
     "typescript": "^5.0.4",
-    "@types/node": "^20.2.1"
+    "@types/node": "^20.2.1",
+    "@types/jest": "^26.0.14",
+    "jest": "^24.0.0"
   },
   "keywords": [],
   "author": "",

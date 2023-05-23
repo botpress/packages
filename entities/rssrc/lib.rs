@@ -1,8 +1,9 @@
-use js_sys;
 use serde;
+use serde::de::{Deserialize, Deserializer, MapAccess, SeqAccess, Visitor};
 use serde::ser::{Serialize, SerializeStruct, Serializer};
 use serde_wasm_bindgen;
 use std::collections::HashMap;
+use std::fmt;
 use wasm_bindgen::prelude::*;
 
 mod tmp;
@@ -379,6 +380,114 @@ fn compute_structural_score(a: &[String], b: &[String]) -> f64 {
     (final_charset_score * token_qty_score * token_size_score).sqrt()
 }
 
+struct Candidate {
+    score: f64,
+    canonical: String,
+    start: usize,
+    end: usize,
+    source: String,
+    occurrence: String,
+    eliminated: bool,
+}
+
+struct ListEntityModel {
+    name: String,
+    fuzzy: f64,
+    tokens: HashMap<String, Vec<Vec<String>>>,
+}
+
+struct ListEntityExtraction {
+    name: String,
+    confidence: f64,
+    value: String,
+    source: String,
+    char_start: usize,
+    char_end: usize,
+}
+
+fn extract_for_list_model(
+    str_tokens: &Vec<String>,
+    list_model: &ListEntityModel,
+) -> Vec<ListEntityExtraction> {
+    let mut candidates: Vec<Candidate> = Vec::new();
+    let mut longest_candidate = 0;
+
+    let tokens = to_tokens(str_tokens);
+
+    for (canonical, occurrences) in &list_model.tokens {
+        for occurrence in occurrences {
+            for i in 0..tokens.len() {
+                if tokens[i].is_space {
+                    continue;
+                }
+
+                let workset = take_until(&tokens, i, occurrence.iter().map(|o| o.len()).sum());
+                let workset_str_low: Vec<String> =
+                    workset.iter().map(|x| x.value.to_lowercase()).collect();
+                let workset_str_wcase: Vec<String> =
+                    workset.iter().map(|x| x.value.clone()).collect();
+                let candidate_as_string = occurrence.join("");
+
+                if candidate_as_string.len() > longest_candidate {
+                    longest_candidate = candidate_as_string.len();
+                }
+
+                let exact_score = if compute_exact_score(&workset_str_wcase, occurrence) == 1.0 {
+                    1.0
+                } else {
+                    0.0
+                };
+
+                let fuzzy = list_model.fuzzy < 1.0 && workset_str_low.join("").len() >= 4;
+                let fuzzy_score = compute_fuzzy_score(
+                    &workset_str_low,
+                    &occurrence
+                        .iter()
+                        .map(|t| t.to_lowercase())
+                        .collect::<Vec<String>>(),
+                );
+                let fuzzy_factor = if fuzzy_score >= list_model.fuzzy {
+                    fuzzy_score
+                } else {
+                    0.0
+                };
+
+                let structural_score = compute_structural_score(&workset_str_wcase, occurrence);
+                let final_score = if fuzzy {
+                    fuzzy_factor * structural_score
+                } else {
+                    exact_score * structural_score
+                };
+
+                candidates.push(Candidate {
+                    score: final_score,
+                    canonical: canonical.clone(),
+                    start: i,
+                    end: i + workset.len() - 1,
+                    source: workset.iter().map(|t| t.value.clone()).collect(),
+                    occurrence: occurrence.join(""),
+                    eliminated: false,
+                });
+            }
+        }
+    }
+
+    let results: Vec<ListEntityExtraction> = candidates
+        .into_iter()
+        .filter(|x| !x.eliminated && x.score >= ENTITY_SCORE_THRESHOLD)
+        .map(|match_| ListEntityExtraction {
+            name: list_model.name.clone(),
+            confidence: match_.score,
+            char_start: tokens[match_.start].start_char,
+            char_end: tokens[match_.end].start_char + tokens[match_.end].value.len(),
+            value: match_.canonical,
+            source: match_.source,
+        })
+        .collect();
+
+    results
+}
+
 /**
  * ######################
  * ###   4. wasm-io   ###
@@ -427,11 +536,157 @@ impl Serialize for Token {
     }
 }
 
+impl Serialize for ListEntityExtraction {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: Serializer,
+    {
+        let mut state = serializer.serialize_struct("ListEntityExtraction", 6)?;
+        state.serialize_field("name", &self.name)?;
+        state.serialize_field("confidence", &self.confidence)?;
+        state.serialize_field("value", &self.value)?;
+        state.serialize_field("source", &self.source)?;
+        state.serialize_field("char_start", &self.char_start)?;
+        state.serialize_field("char_end", &self.char_end)?;
+        state.end()
+    }
+}
+
+impl<'de> Deserialize<'de> for ListEntityModel {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: Deserializer<'de>,
+    {
+        enum Field {
+            Name,
+            Fuzzy,
+            Tokens,
+        }
+
+        impl<'de> Deserialize<'de> for Field {
+            fn deserialize<D>(deserializer: D) -> Result<Field, D::Error>
+            where
+                D: Deserializer<'de>,
+            {
+                struct FieldVisitor;
+
+                impl<'de> Visitor<'de> for FieldVisitor {
+                    type Value = Field;
+
+                    fn expecting(&self, formatter: &mut fmt::Formatter) -> fmt::Result {
+                        formatter.write_str("`name`, `fuzzy` or `tokens`")
+                    }
+
+                    fn visit_str<E>(self, value: &str) -> Result<Field, E>
+                    where
+                        E: serde::de::Error,
+                    {
+                        match value {
+                            "name" => Ok(Field::Name),
+                            "fuzzy" => Ok(Field::Fuzzy),
+                            "tokens" => Ok(Field::Tokens),
+                            _ => Err(serde::de::Error::unknown_field(value, FIELDS)),
+                        }
+                    }
+                }
+
+                deserializer.deserialize_identifier(FieldVisitor)
+            }
+        }
+
+        struct ListEntityModelVisitor;
+
+        impl<'de> Visitor<'de> for ListEntityModelVisitor {
+            type Value = ListEntityModel;
+
+            fn expecting(&self, formatter: &mut fmt::Formatter) -> fmt::Result {
+                formatter.write_str("struct Duration")
+            }
+
+            fn visit_seq<V>(self, mut seq: V) -> Result<ListEntityModel, V::Error>
+            where
+                V: SeqAccess<'de>,
+            {
+                let name = seq
+                    .next_element()?
+                    .ok_or_else(|| serde::de::Error::invalid_length(0, &self))?;
+                let fuzzy = seq
+                    .next_element()?
+                    .ok_or_else(|| serde::de::Error::invalid_length(1, &self))?;
+                let tokens = seq
+                    .next_element()?
+                    .ok_or_else(|| serde::de::Error::invalid_length(2, &self))?;
+
+                Ok(ListEntityModel {
+                    name: name,
+                    fuzzy: fuzzy,
+                    tokens: tokens,
+                })
+            }
+
+            fn visit_map<V>(self, mut map: V) -> Result<ListEntityModel, V::Error>
+            where
+                V: MapAccess<'de>,
+            {
+                let mut name = None;
+                let mut fuzzy = None;
+                let mut tokens = None;
+
+                while let Some(key) = map.next_key()? {
+                    match key {
+                        Field::Name => {
+                            if name.is_some() {
+                                return Err(serde::de::Error::duplicate_field("name"));
+                            }
+                            name = Some(map.next_value()?);
+                        }
+                        Field::Fuzzy => {
+                            if fuzzy.is_some() {
+                                return Err(serde::de::Error::duplicate_field("fuzzy"));
+                            }
+                            fuzzy = Some(map.next_value()?);
+                        }
+                        Field::Tokens => {
+                            if tokens.is_some() {
+                                return Err(serde::de::Error::duplicate_field("tokens"));
+                            }
+                            tokens = Some(map.next_value()?);
+                        }
+                    }
+                }
+                let name = name.ok_or_else(|| serde::de::Error::missing_field("name"))?;
+                let fuzzy = fuzzy.ok_or_else(|| serde::de::Error::missing_field("fuzzy"))?;
+                let tokens = tokens.ok_or_else(|| serde::de::Error::missing_field("tokens"))?;
+                Ok(ListEntityModel {
+                    name: name,
+                    fuzzy: fuzzy,
+                    tokens: tokens,
+                })
+            }
+        }
+
+        const FIELDS: &'static [&'static str] = &["name", "fuzzy", "tokens"];
+        deserializer.deserialize_struct("ListEntityModel", FIELDS, ListEntityModelVisitor)
+    }
+}
+
 #[wasm_bindgen]
 pub fn to_toks(str_toks: JsValue) -> JsValue {
     init();
     let str_toks: Vec<String> = serde_wasm_bindgen::from_value(str_toks).unwrap();
     let tokens = to_tokens(&str_toks);
     let ret = serde_wasm_bindgen::to_value(&tokens).unwrap();
+    ret
+}
+
+#[wasm_bindgen]
+pub fn extract(str_tokens: JsValue, list_model: JsValue) -> JsValue {
+    init();
+    let str_tokens: Vec<String> = serde_wasm_bindgen::from_value(str_tokens).unwrap();
+    let list_model: ListEntityModel = serde_wasm_bindgen::from_value(list_model).unwrap();
+
+    let mut results = extract_for_list_model(&str_tokens, &list_model);
+
+    let ret = serde_wasm_bindgen::to_value(&results).unwrap();
     ret
 }

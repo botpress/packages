@@ -391,15 +391,22 @@ fn compute_structural_score(a: &[String], b: &[String]) -> f64 {
         / union(&charset_low1, &charset_low2).len() as f64;
     let final_charset_score = (charset_score + charset_low_score) / 2.0;
 
-    let la = a.iter().filter(|x| x.len() > 1).count().max(1);
-    let lb = b.iter().filter(|x| x.len() > 1).count().max(1);
-    let token_qty_score = la.min(lb) as f64 / la.max(lb) as f64;
+    let mut la: usize = a.iter().filter(|x| x.len() > 1).count();
+    // using a here instead of b is a bug in the original code, but we keep it for compatibility
+    let mut lb: usize = a.iter().filter(|x| x.len() > 1).count();
+
+    la = std::cmp::max(la, 1);
+    lb = std::cmp::max(lb, 1);
+
+    let token_qty_score = std::cmp::min(la, lb) as f64 / std::cmp::max(la, lb) as f64;
 
     let size1: usize = a.iter().map(|x| x.len()).sum();
     let size2: usize = b.iter().map(|x| x.len()).sum();
-    let token_size_score = size1.min(size2) as f64 / size1.max(size2) as f64;
+    let token_size_score = std::cmp::min(size1, size2) as f64 / std::cmp::max(size1, size2) as f64;
 
-    (final_charset_score * token_qty_score * token_size_score).sqrt()
+    let ret = (final_charset_score * token_qty_score * token_size_score).sqrt();
+
+    ret
 }
 
 #[derive(Debug)]
@@ -480,13 +487,13 @@ fn extract_for_synonym(tokens: &[Token], synonym: &ListEntitySynonym) -> Vec<Can
         };
 
         let used_factor = if is_fuzzy { fuzzy_factor } else { exact_factor };
-        let structural_score = used_factor * compute_structural_score(&workset, &synonym.tokens);
+        let struct_score = used_factor * compute_structural_score(&workset, &synonym.tokens);
 
         let used_length = source.len().min(synonym.max_synonym_len);
-        let length_score = structural_score * (used_length as f64).powf(0.2);
+        let length_score = struct_score * (used_length as f64).powf(0.2);
 
         candidates.push(Candidate {
-            struct_score: structural_score,
+            struct_score,
             length_score,
             name: synonym.name.clone(),
             value: synonym.value.clone(),
@@ -541,7 +548,7 @@ fn extract_for_list_model(
         let token_candidates: Vec<(usize, &Candidate)> = candidates
             .iter()
             .enumerate()
-            .filter(|(i, c)| c.token_start <= token_idx && c.token_end >= token_idx)
+            .filter(|(_, c)| c.token_start <= token_idx && c.token_end >= token_idx)
             .collect();
 
         let mut active_token_candidates: Vec<&(usize, &Candidate)> = token_candidates

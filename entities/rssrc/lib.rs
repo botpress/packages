@@ -89,20 +89,6 @@ fn abs(n: i32) -> i32 {
     }
 }
 
-// fn orderBy<T>(arr: &[T], key: &str, order: &str) -> Vec<T> {
-//     let mut res = arr.to_vec();
-//     res.sort_by(|a, b| {
-//         let a = a.as_ref();
-//         let b = b.as_ref();
-//         if order == "asc" {
-//             a[key].cmp(&b[key])
-//         } else {
-//             b[key].cmp(&a[key])
-//         }
-//     });
-//     res
-// }
-
 /**
  * ########################
  * ###    1. strings    ###

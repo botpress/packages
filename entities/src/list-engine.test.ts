@@ -1,10 +1,10 @@
-import { ListEntityExtraction, ListEntityModel, extractForListModel } from './list-engine'
+import { ListEntityExtraction, ListEntityModel, wasm } from './list-engine'
 import { spaceTokenizer } from './space-tokenizer'
 import { parseUtterance } from './utterance-parser.utils'
 
 const extractListEntities = (utt: string, models: ListEntityModel[]) => {
   const tokens = spaceTokenizer(utt)
-  return models.flatMap((m) => extractForListModel(tokens, m))
+  return models.flatMap((m) => wasm.extractForListModel(tokens, m))
 }
 
 const FuzzyTolerance = {

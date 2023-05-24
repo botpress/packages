@@ -121,22 +121,24 @@ fn jaro_winkler_similarity(s1: &str, s2: &str, case_sensitive: Option<bool>) -> 
         return 1.0;
     }
 
+    let s1_chars: Vec<char> = s1.chars().collect();
+    let s2_chars: Vec<char> = s2.chars().collect();
     let mut m: i32 = 0;
-    let max_len = max(&[s1.len(), s2.len()]);
+    let max_len = core::cmp::max(s1_chars.len(), s2_chars.len());
     let range = (max_len / 2) - 1;
-    let mut s1_matches = vec![false; s1.len()];
-    let mut s2_matches = vec![false; s2.len()];
+    let mut s1_matches = vec![false; s1_chars.len()];
+    let mut s2_matches = vec![false; s2_chars.len()];
 
-    for i in 0..s1.len() {
+    for i in 0..s1_chars.len() {
         let low = if i >= range { i - range } else { 0 };
-        let high = if i + range <= s2.len() - 1 {
+        let high = if i + range <= s2_chars.len() - 1 {
             i + range
         } else {
-            s2.len() - 1
+            s2_chars.len() - 1
         };
 
         for j in low..=high {
-            if !s1_matches[i] && !s2_matches[j] && s1.chars().nth(i) == s2.chars().nth(j) {
+            if !s1_matches[i] && !s2_matches[j] && s1_chars[i] == s2_chars[j] {
                 m += 1;
                 s1_matches[i] = true;
                 s2_matches[j] = true;
@@ -170,13 +172,13 @@ fn jaro_winkler_similarity(s1: &str, s2: &str, case_sensitive: Option<bool>) -> 
             j += 1;
         }
 
-        if s1.chars().nth(i) != s2.chars().nth(j) {
+        if s1_chars[i] != s2_chars[j] {
             num_trans += 1;
         }
     }
 
-    let mut weight = (m as f64 / s1.len() as f64
-        + m as f64 / s2.len() as f64
+    let weight = (m as f64 / s1_chars.len() as f64
+        + m as f64 / s2_chars.len() as f64
         + (m - num_trans / 2) as f64 / m as f64)
         / 3.0;
 
@@ -184,11 +186,11 @@ fn jaro_winkler_similarity(s1: &str, s2: &str, case_sensitive: Option<bool>) -> 
 
     if weight > 0.7 {
         let mut l = 0;
-        while s1.chars().nth(l) == s2.chars().nth(l) && l < 4 {
+        while s1_chars.get(l) == s2_chars.get(l) && l < 4 {
             l += 1;
         }
 
-        weight += l as f64 * p * (1.0 - weight);
+        return weight + (l as f64) * p * (1.0 - weight);
     }
 
     weight

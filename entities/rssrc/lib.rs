@@ -1,11 +1,5 @@
-use serde;
-use serde::de::{Deserialize, Deserializer, MapAccess, SeqAccess, Visitor};
-use serde::ser::{Serialize, SerializeStruct, Serializer};
-use serde_wasm_bindgen;
-
 use std::cmp::Ordering;
 use std::collections::HashMap;
-use std::fmt;
 use wasm_bindgen::prelude::*;
 
 extern crate console_error_panic_hook;
@@ -599,148 +593,177 @@ pub fn levenshtein_dist(a: String, b: String) -> usize {
     levenshtein_distance(&a, &b)
 }
 
-impl Serialize for ListEntityExtraction {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: Serializer,
-    {
-        let mut state = serializer.serialize_struct("ListEntityExtraction", 6)?;
-        state.serialize_field("name", &self.name)?;
-        state.serialize_field("confidence", &self.confidence)?;
-        state.serialize_field("value", &self.value)?;
-        state.serialize_field("source", &self.source)?;
-        state.serialize_field("char_start", &self.char_start)?;
-        state.serialize_field("char_end", &self.char_end)?;
-        state.end()
+#[derive(Clone)]
+#[wasm_bindgen]
+pub struct ValueDefinition {
+    name: String,
+    synonyms: SynonymArray,
+}
+#[wasm_bindgen]
+impl ValueDefinition {
+    #[wasm_bindgen(constructor)]
+    pub fn new(name: String, synonyms: SynonymArray) -> Self {
+        Self { name, synonyms }
     }
 }
 
-impl<'de> Deserialize<'de> for ListEntityModel {
-    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: Deserializer<'de>,
-    {
-        enum Field {
-            Name,
-            Fuzzy,
-            Tokens,
+#[derive(Clone)]
+#[wasm_bindgen]
+pub struct SynonymDefinition {
+    tokens: StringArray,
+}
+#[wasm_bindgen]
+impl SynonymDefinition {
+    #[wasm_bindgen(constructor)]
+    pub fn new(tokens: StringArray) -> Self {
+        Self { tokens }
+    }
+}
+
+#[derive(Clone)]
+#[wasm_bindgen]
+pub struct EntityDefinition {
+    name: String,
+    fuzzy: f64,
+    values: ValueArray,
+}
+#[wasm_bindgen]
+impl EntityDefinition {
+    #[wasm_bindgen(constructor)]
+    pub fn new(name: String, fuzzy: f64, values: ValueArray) -> Self {
+        Self {
+            name,
+            fuzzy,
+            values,
         }
+    }
+}
 
-        impl<'de> Deserialize<'de> for Field {
-            fn deserialize<D>(deserializer: D) -> Result<Field, D::Error>
-            where
-                D: Deserializer<'de>,
-            {
-                struct FieldVisitor;
+#[derive(Clone)]
+#[wasm_bindgen]
+pub struct EntityExtraction {
+    name: String,
+    pub confidence: f64,
+    pub char_start: usize,
+    pub char_end: usize,
+    value: String,
+    source: String,
+}
+#[wasm_bindgen]
+impl EntityExtraction {
+    #[wasm_bindgen(getter)]
+    pub fn name(&self) -> String {
+        self.name.clone()
+    }
+    #[wasm_bindgen(getter)]
+    pub fn value(&self) -> String {
+        self.value.clone()
+    }
+    #[wasm_bindgen(getter)]
+    pub fn source(&self) -> String {
+        self.source.clone()
+    }
+}
 
-                impl<'de> Visitor<'de> for FieldVisitor {
-                    type Value = Field;
+#[derive(Clone)]
+#[wasm_bindgen]
+pub struct StringArray(Vec<String>);
+#[wasm_bindgen]
+impl StringArray {
+    #[wasm_bindgen(constructor)]
+    pub fn new() -> StringArray {
+        StringArray(Vec::new())
+    }
 
-                    fn expecting(&self, formatter: &mut fmt::Formatter) -> fmt::Result {
-                        formatter.write_str("`name`, `fuzzy` or `tokens`")
-                    }
+    #[wasm_bindgen]
+    pub fn push(&mut self, s: String) {
+        self.0.push(s);
+    }
+}
 
-                    fn visit_str<E>(self, value: &str) -> Result<Field, E>
-                    where
-                        E: serde::de::Error,
-                    {
-                        match value {
-                            "name" => Ok(Field::Name),
-                            "fuzzy" => Ok(Field::Fuzzy),
-                            "tokens" => Ok(Field::Tokens),
-                            _ => Err(serde::de::Error::unknown_field(value, FIELDS)),
-                        }
-                    }
-                }
+#[derive(Clone)]
+#[wasm_bindgen]
+pub struct SynonymArray(Vec<SynonymDefinition>);
+#[wasm_bindgen]
+impl SynonymArray {
+    #[wasm_bindgen(constructor)]
+    pub fn new() -> SynonymArray {
+        SynonymArray(Vec::new())
+    }
 
-                deserializer.deserialize_identifier(FieldVisitor)
-            }
-        }
+    #[wasm_bindgen]
+    pub fn push(&mut self, s: SynonymDefinition) {
+        self.0.push(s);
+    }
+}
 
-        struct ListEntityModelVisitor;
+#[derive(Clone)]
+#[wasm_bindgen]
+pub struct ValueArray(Vec<ValueDefinition>);
+#[wasm_bindgen]
+impl ValueArray {
+    #[wasm_bindgen(constructor)]
+    pub fn new() -> ValueArray {
+        ValueArray(Vec::new())
+    }
 
-        impl<'de> Visitor<'de> for ListEntityModelVisitor {
-            type Value = ListEntityModel;
-
-            fn expecting(&self, formatter: &mut fmt::Formatter) -> fmt::Result {
-                formatter.write_str("struct Duration")
-            }
-
-            fn visit_seq<V>(self, mut seq: V) -> Result<ListEntityModel, V::Error>
-            where
-                V: SeqAccess<'de>,
-            {
-                let name = seq
-                    .next_element()?
-                    .ok_or_else(|| serde::de::Error::invalid_length(0, &self))?;
-                let fuzzy = seq
-                    .next_element()?
-                    .ok_or_else(|| serde::de::Error::invalid_length(1, &self))?;
-                let tokens = seq
-                    .next_element()?
-                    .ok_or_else(|| serde::de::Error::invalid_length(2, &self))?;
-
-                Ok(ListEntityModel {
-                    name: name,
-                    fuzzy: fuzzy,
-                    tokens: tokens,
-                })
-            }
-
-            fn visit_map<V>(self, mut map: V) -> Result<ListEntityModel, V::Error>
-            where
-                V: MapAccess<'de>,
-            {
-                let mut name = None;
-                let mut fuzzy = None;
-                let mut tokens = None;
-
-                while let Some(key) = map.next_key()? {
-                    match key {
-                        Field::Name => {
-                            if name.is_some() {
-                                return Err(serde::de::Error::duplicate_field("name"));
-                            }
-                            name = Some(map.next_value()?);
-                        }
-                        Field::Fuzzy => {
-                            if fuzzy.is_some() {
-                                return Err(serde::de::Error::duplicate_field("fuzzy"));
-                            }
-                            fuzzy = Some(map.next_value()?);
-                        }
-                        Field::Tokens => {
-                            if tokens.is_some() {
-                                return Err(serde::de::Error::duplicate_field("tokens"));
-                            }
-                            tokens = Some(map.next_value()?);
-                        }
-                    }
-                }
-                let name = name.ok_or_else(|| serde::de::Error::missing_field("name"))?;
-                let fuzzy = fuzzy.ok_or_else(|| serde::de::Error::missing_field("fuzzy"))?;
-                let tokens = tokens.ok_or_else(|| serde::de::Error::missing_field("tokens"))?;
-                Ok(ListEntityModel {
-                    name: name,
-                    fuzzy: fuzzy,
-                    tokens: tokens,
-                })
-            }
-        }
-
-        const FIELDS: &'static [&'static str] = &["name", "fuzzy", "tokens"];
-        deserializer.deserialize_struct("ListEntityModel", FIELDS, ListEntityModelVisitor)
+    #[wasm_bindgen]
+    pub fn push(&mut self, s: ValueDefinition) {
+        self.0.push(s);
     }
 }
 
 #[wasm_bindgen]
-pub fn extract(str_tokens: JsValue, list_model: JsValue) -> JsValue {
+pub struct ExtractionArray(Vec<EntityExtraction>);
+#[wasm_bindgen]
+impl ExtractionArray {
+    fn from(x: Vec<EntityExtraction>) -> Self {
+        Self(x)
+    }
+
+    #[wasm_bindgen]
+    pub fn get(&self, idx: usize) -> EntityExtraction {
+        self.0.get(idx).unwrap().clone()
+    }
+    #[wasm_bindgen]
+    pub fn len(&self) -> usize {
+        self.0.len()
+    }
+}
+
+#[wasm_bindgen]
+pub fn extract(arg0: StringArray, arg1: EntityDefinition) -> ExtractionArray {
     init();
-    let str_tokens: Vec<String> = serde_wasm_bindgen::from_value(str_tokens).unwrap();
-    let list_model: ListEntityModel = serde_wasm_bindgen::from_value(list_model).unwrap();
+    let str_tokens: Vec<String> = arg0.0;
 
-    let results = extract_for_list_model(str_tokens, list_model);
+    let mut tokens: HashMap<String, Vec<Vec<String>>> = HashMap::new();
+    for value in arg1.values.0 {
+        let mut synonyms: Vec<Vec<String>> = Vec::new();
+        for synonym in value.synonyms.0 {
+            synonyms.push(synonym.tokens.0);
+        }
+        tokens.insert(value.name, synonyms);
+    }
 
-    let ret = serde_wasm_bindgen::to_value(&results).unwrap();
-    ret
+    let list_model: ListEntityModel = ListEntityModel {
+        name: arg1.name,
+        fuzzy: arg1.fuzzy,
+        tokens,
+    };
+
+    let list_extractions = extract_for_list_model(str_tokens, list_model);
+
+    let extractions: Vec<EntityExtraction> = list_extractions
+        .into_iter()
+        .map(|match_| EntityExtraction {
+            name: match_.name.clone(),
+            confidence: match_.confidence,
+            char_start: match_.char_start,
+            char_end: match_.char_end,
+            value: match_.value.clone(),
+            source: match_.source.clone(),
+        })
+        .collect();
+
+    ExtractionArray::from(extractions)
 }

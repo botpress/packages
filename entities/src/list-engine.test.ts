@@ -1,4 +1,4 @@
-import { ListEntityExtraction, ListEntityModel, extractForListModel } from './list-engine'
+import { ListEntityExtraction, ListEntityModel, ListEntitySynonym, extractForListModel } from './list-engine'
 import { spaceTokenizer } from './space-tokenizer'
 import { parseUtterance } from './utterance-parser.utils'
 
@@ -13,36 +13,40 @@ const FuzzyTolerance = {
   Strict: 1
 }
 
-const T = (utterance: string): string[] => utterance.split(/( )/g)
+const T = (syn: string): ListEntitySynonym => ({
+  tokens: syn.split(/( )/g)
+})
 
 const list_entities: ListEntityModel[] = [
   {
     name: 'fruit',
     fuzzy: FuzzyTolerance.Medium,
-    tokens: {
-      Blueberry: ['blueberries', 'blueberry', 'blue berries', 'blue berry', 'poisonous blueberry'].map(T),
-      Strawberry: ['strawberries', 'strawberry', 'straw berries', 'straw berry'].map(T),
-      Raspberry: ['raspberries', 'raspberry', 'rasp berries', 'rasp berry'].map(T),
-      Apple: ['apple', 'apples', 'red apple', 'yellow apple'].map(T)
-    }
+    values: [
+      {
+        name: 'Blueberry',
+        synonyms: ['blueberries', 'blueberry', 'blue berries', 'blue berry', 'poisonous blueberry'].map(T)
+      },
+      { name: 'Strawberry', synonyms: ['strawberries', 'strawberry', 'straw berries', 'straw berry'].map(T) },
+      { name: 'Raspberry', synonyms: ['raspberries', 'raspberry', 'rasp berries', 'rasp berry'].map(T) },
+      { name: 'Apple', synonyms: ['apple', 'apples', 'red apple', 'yellow apple'].map(T) }
+    ]
   },
   {
     name: 'company',
     fuzzy: FuzzyTolerance.Medium,
-    tokens: {
-      Apple: ['Apple', 'Apple Computers', 'Apple Corporation', 'Apple Inc'].map(T)
-    }
+    values: [{ name: 'Apple', synonyms: ['Apple', 'Apple Computers', 'Apple Corporation', 'Apple Inc'].map(T) }]
   },
   {
     name: 'airport',
     fuzzy: FuzzyTolerance.Medium,
-    tokens: {
-      JFK: ['JFK', 'New-York', 'NYC'].map(T),
-      SFO: ['SFO', 'SF', 'San-Francisco'].map(T),
-      YQB: ['YQB', 'Quebec', 'Quebec city', 'QUEB'].map(T)
-    }
+    values: [
+      { name: 'JFK', synonyms: ['JFK', 'New-York', 'NYC'].map(T) },
+      { name: 'SFO', synonyms: ['SFO', 'SF', 'San-Francisco'].map(T) },
+      { name: 'YQB', synonyms: ['YQB', 'Quebec', 'Quebec city', 'QUEB'].map(T) }
+    ]
   }
 ]
+
 describe('list entity extractor', () => {
   test('Data structure test', async () => {
     const utterance = 'Blueberries are berries that are blue'
@@ -85,17 +89,12 @@ describe('list entity extractor', () => {
       {
         name: 'state',
         fuzzy: FuzzyTolerance.Medium,
-        tokens: {
-          NewYork: ['New York'].map(T)
-        }
+        values: [{ name: 'NewYork', synonyms: ['New York'].map(T) }]
       },
       {
         name: 'city',
         fuzzy: FuzzyTolerance.Medium,
-
-        tokens: {
-          NewYork: ['New York'].map(T)
-        }
+        values: [{ name: 'NewYork', synonyms: ['New York'].map(T) }]
       }
     ]
 

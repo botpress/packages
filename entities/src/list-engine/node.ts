@@ -397,19 +397,17 @@ type Candidate = {
   eliminated: boolean
 }
 
-type ListEntitySynonym = {
+type FlatSynonym = {
   name: string
   fuzzy: number
-
   value: string
   tokens: string[]
-
   max_synonym_length: number
 }
 
 const low = (str: string) => str.toLowerCase()
 
-const extractForSynonym = (tokens: Token[], synonym: ListEntitySynonym): Candidate[] => {
+const extractForSynonym = (tokens: Token[], synonym: FlatSynonym): Candidate[] => {
   const candidates: Candidate[] = []
   const synonymStr = synonym.tokens.join('')
 
@@ -459,14 +457,14 @@ const extractForSynonym = (tokens: Token[], synonym: ListEntitySynonym): Candida
 export const extractForListModel = (strTokens: string[], listModel: ListEntityModel): ListEntityExtraction[] => {
   const uttTokens = toTokens(strTokens)
 
-  const synonyms: ListEntitySynonym[] = Object.entries(listModel.tokens).flatMap(([value, synonyms]) => {
-    const max_synonym_length: number = Math.max(...synonyms.map((s) => s.join('').length))
+  const synonyms: FlatSynonym[] = listModel.values.flatMap((value) => {
+    const max_synonym_length: number = Math.max(...value.synonyms.map(({ tokens }) => tokens.join('').length))
 
-    return synonyms.map((synonymTokens) => ({
+    return value.synonyms.map((synonym) => ({
       name: listModel.name,
       fuzzy: listModel.fuzzy,
-      value,
-      tokens: synonymTokens,
+      value: value.name,
+      tokens: synonym.tokens,
       max_synonym_length
     }))
   })

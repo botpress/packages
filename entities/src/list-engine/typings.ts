@@ -1,7 +1,16 @@
+export type ListEntitySynonym = {
+  tokens: string[]
+}
+
+export type ListEntityValue = {
+  name: string,
+  synonyms: ListEntitySynonym[]
+}
+
 export type ListEntityModel = {
   name: string
   fuzzy: number
-  tokens: Record<string, string[][]>
+  values: ListEntityValue[]
 }
 
 export type ListEntityExtraction = {

@@ -4,7 +4,7 @@ import * as types from './typings'
 
 export * from './typings'
 
-let ENGINE: 'wasm' | 'node' = 'node'
+let ENGINE: 'wasm' | 'node' = 'wasm'
 
 type Exports = {
   levenshteinSimilarity: typeof wasm.levenshteinSimilarity

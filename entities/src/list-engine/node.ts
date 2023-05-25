@@ -227,6 +227,7 @@ export const levenshteinSimilarity = (a: string, b: string): number => {
  */
 export const levenshteinDistance = (a: string, b: string): number => {
   if (a.length === 0 || b.length === 0) {
+    // BUG: should return the length of the non-empty string, but we keep this behavior for compatibility
     return 0
   }
 

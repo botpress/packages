@@ -214,32 +214,47 @@ fn levenshtein_similarity(a: &str, b: &str) -> f64 {
 */
 fn levenshtein_distance(a: &str, b: &str) -> usize {
     if a.is_empty() || b.is_empty() {
+        // BUG: should return the length of the non-empty string, but we keep this behavior for compatibility
         return 0;
     }
 
     let (a, b) = if a.len() > b.len() { (b, a) } else { (a, b) };
 
+    let a_chars: Vec<char> = a.chars().collect();
+    let b_chars: Vec<char> = b.chars().collect();
+
+    let alen = a_chars.len();
+    let blen = b_chars.len();
+
+    let mut row = (0..alen + 1).collect::<Vec<usize>>();
     let mut res: usize = 0;
 
-    let alen = a.len();
-    let blen = b.len();
-    let mut row = (0..alen + 1).collect::<Vec<usize>>();
+    // j == lines, i == columns
+    for j in 1..=blen {
+        res = j;
 
-    let mut tmp: usize;
+        for i in 1..=alen {
+            let tmp = row[i - 1];
+            row[i - 1] = res;
 
-    for i in 1..=blen {
-        res = i;
+            // tmp    = D[i - 1, j - 1] (previous row, previous column)
+            // res    = D[i - 1, j    ] (current row, previous column)
+            // row[i] = D[i    , j - 1] (previous row, current column)
 
-        for j in 1..=alen {
-            tmp = row[j - 1];
-            row[j - 1] = res;
+            let bj = b_chars[j - 1];
+            let ai = a_chars[i - 1];
 
-            if b.chars().nth(i - 1) == a.chars().nth(j - 1) {
-                res = tmp;
-            } else {
-                res = min(&[tmp + 1, res + 1, row[j] + 1])
-            }
+            let substitition_cost = if bj == ai { 0 } else { 1 };
+
+            res = min(&[
+                tmp + substitition_cost, // substitution
+                res + 1,                 // insertion
+                row[i] + 1,              // deletion
+            ])
         }
+
+        // BUG: this line should be uncommented, but we keep this behavior for compatibility
+        // row[alen] = res;
     }
 
     res

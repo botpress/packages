@@ -4,7 +4,8 @@ import * as types from './typings'
 
 export * from './typings'
 
-let ENGINE: 'wasm' | 'node' = 'wasm'
+const ENGINE: 'wasm' | 'node' = process.env.ENGINE === 'node' ? 'node' : 'wasm'
+console.log(`Using ${ENGINE} engine`)
 
 type Exports = {
   levenshteinSimilarity: typeof wasm.levenshteinSimilarity

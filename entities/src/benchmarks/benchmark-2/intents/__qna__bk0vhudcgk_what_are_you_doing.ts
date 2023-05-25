@@ -1,0 +1,33 @@
+export default {
+  name: '__qna__bk0vhudcgk_what_are_you_doing',
+  contexts: ['Smalltalk'],
+  utterances: {
+    en: [
+      'What are you doing?',
+      'What is up?',
+      'whatsup',
+      'wazaa',
+      'What are you up to?',
+      'What are your plans for the day?',
+      'Any plans?',
+      'Tell me what you are doing right now.',
+      'What is new?',
+      'What are you doing next?',
+      'Any big plans for this afternoon?'
+    ],
+    fr: [
+      "Qu'est ce que tu fais?",
+      'Vous foutez quoi?',
+      'Quoi de neuf?',
+      'Tu fais quoi?',
+      "Qu'est ce qui se passe?",
+      'À quoi tu joues présentement?',
+      'Quelque chose de nouveau?',
+      "Qu'est qui vous tient occupé?",
+      'Que fais tu, ces temps-ci?',
+      'Tu es entrain de faire quoi?'
+    ]
+  },
+  slots: []
+} as const
+ 

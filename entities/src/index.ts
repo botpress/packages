@@ -12,7 +12,7 @@ type Logger = {
 }
 
 let DEBUG: boolean = false
-let ITERATIONS: number = 1000
+let ITERATIONS: number = 1
 
 const logger: Logger = {
   debug: (...x) => DEBUG && console.log(...x),
@@ -72,4 +72,4 @@ const runBenchmark = (benchmark: bench.BenchMark): void => {
   logger.info(`Time: ${t1 - t0}ms`)
 }
 
-runBenchmark(bench.benchmark1)
+runBenchmark(bench.benchmark2)

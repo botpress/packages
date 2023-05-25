@@ -1,0 +1,35 @@
+export default {
+  name: '__qna__73f1ra05zn_you_are_great',
+  contexts: ['Smalltalk'],
+  utterances: {
+    en: [
+      'you are great!',
+      'you are perfect',
+      'you are awesome',
+      'you look amazing',
+      'you are qualified',
+      'you are too smart',
+      'I see intelligence is your strong suit',
+      "you're a genius",
+      "you're a smart cookie",
+      "you're qualified",
+      'you are cool',
+      'I think you might be the best bot ever',
+      'you are the best in the world'
+    ],
+    fr: [
+      'Tu es formidable',
+      'Vous êtes un fantastique robot',
+      "Meilleur chatbot j'ai jamais vu",
+      'Tu es le roi des robots',
+      'Vous êtes génial',
+      'Tu es le meilleur',
+      'Wow, tu es vraiment trop fort',
+      'Ayoye, impressionant!',
+      'Votre Intelligence est inégalé',
+      'Solide performance de votre intelligence artificielle'
+    ]
+  },
+  slots: []
+} as const
+ 

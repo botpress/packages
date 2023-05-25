@@ -26,6 +26,11 @@ describe('String utils', () => {
     expect(stringUtils.levenshteinDistance('tetsong', 'testing')).toEqual(3) // 1 x letterSwap (1 sup + 1 add) + 1 x substitution
   })
 
+  test('new-york', () => {
+    // this is a bug, but we have to keep it for backward compatibility (it should be 3)
+    expect(stringUtils.levenshteinDistance('new-york', 'new-yorkers')).toEqual(4)
+  })
+
   test('jaro-winkler', () => {
     expectRounded(stringUtils.jaroWinklerSimilarity('testing', 'tesing')).toApproximatelyEqual(0.967)
     expectRounded(stringUtils.jaroWinklerSimilarity('testting', 'testing')).toApproximatelyEqual(0.975) // 1 x addition

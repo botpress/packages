@@ -380,7 +380,7 @@ fn compute_structural_score(a: &[String], b: &[String]) -> f64 {
     let final_charset_score = (charset_score + charset_low_score) / 2.0;
 
     let mut la: usize = a.iter().filter(|x| x.len() > 1).count();
-    // using a here instead of b is a bug in the original code, but we keep it for compatibility
+    // BUG: using a here instead of b is a bug, but we have to keep it for compatibility
     let mut lb: usize = a.iter().filter(|x| x.len() > 1).count();
 
     la = std::cmp::max(la, 1);

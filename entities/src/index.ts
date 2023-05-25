@@ -1,4 +1,4 @@
-import { ListEntityExtraction, ListEntityModel, wasm, node } from './list-engine'
+import { ListEntityExtraction, ListEntityModel, extractForListModel } from './list-engine'
 import { spaceTokenizer } from './space-tokenizer'
 
 type Logger = {
@@ -10,7 +10,6 @@ type Logger = {
 
 let DEBUG: boolean = false
 let ITERATIONS: number = 1000
-let ENGINE: 'node' | 'wasm' = 'wasm'
 
 const logger: Logger = {
   debug: (...x) => DEBUG && console.log(...x),
@@ -94,11 +93,7 @@ const runExtraction = (utt: string, models: ListEntityModel | readonly ListEntit
   const tokens = spaceTokenizer(utt)
   const output: ListEntityExtraction[] = []
   for (const model of models) {
-    if (ENGINE === 'node') {
-      output.push(...node.extractForListModel(tokens, model))
-    } else {
-      output.push(...wasm.extractForListModel(tokens, model))
-    }
+    output.push(...extractForListModel(tokens, model))
   }
 
   if (!DEBUG) {

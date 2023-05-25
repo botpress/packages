@@ -125,7 +125,7 @@ const uniq = <T>(arr: T[]): T[] => {
  * @param s2 String B
  * @returns A number between 0 and 1, where 1 means very similar
  */
-const jaroWinklerSimilarity = (
+export const jaroWinklerSimilarity = (
   s1: string,
   s2: string,
   options: { caseSensitive: boolean } = { caseSensitive: true }
@@ -215,7 +215,7 @@ const jaroWinklerSimilarity = (
  * sim(a, b) ∈ [0, 1]
  * @returns the proximity between 0 and 1, where 1 is very close
  */
-const levenshteinSimilarity = (a: string, b: string): number => {
+export const levenshteinSimilarity = (a: string, b: string): number => {
   const len = Math.max(a.length, b.length)
   const dist = levenshteinDistance(a, b)
   return (len - dist) / len
@@ -225,7 +225,7 @@ const levenshteinSimilarity = (a: string, b: string): number => {
  * Returns the levenshtein distance two strings, i.e. the # of operations required to go from a to b
  * dist(a, b) ∈ [0, max(|a|, |b|)]
  */
-const levenshteinDistance = (a: string, b: string): number => {
+export const levenshteinDistance = (a: string, b: string): number => {
   if (a.length === 0 || b.length === 0) {
     return 0
   }
@@ -368,6 +368,7 @@ const computeStructuralScore = (a: string[], b: string[]): number => {
   const final_charset_score = mean([charset_score, charset_low_score])
 
   const la = Math.max(1, a.filter((x) => x.length > 1).length)
+  // BUG: using a here instead of b is a bug, but we have to keep it for compatibility
   const lb = Math.max(1, a.filter((x) => x.length > 1).length)
   const token_qty_score = Math.min(la, lb) / Math.max(la, lb)
 

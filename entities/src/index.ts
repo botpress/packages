@@ -1,5 +1,8 @@
+import { listEntities } from './benchmarks/benchmark-1'
 import { ListEntityModel, ListEntitySynonym, extractForListModels } from './list-engine'
 import { spaceTokenizer } from './space-tokenizer'
+
+import * as bench from './benchmarks'
 
 type Logger = {
   debug: (...x: string[]) => void
@@ -18,12 +21,6 @@ const logger: Logger = {
   error: (...x) => console.log(...x)
 }
 
-const FuzzyTolerance = {
-  Loose: 0.65,
-  Medium: 0.8,
-  Strict: 1
-} as const
-
 const chalk = {
   red: (x: string) => `\x1b[31m${x}\x1b[0m`,
   green: (x: string) => `\x1b[32m${x}\x1b[0m`,
@@ -38,50 +35,6 @@ const chalk = {
   magentaBright: (x: string) => `\x1b[95m${x}\x1b[0m`,
   cyanBright: (x: string) => `\x1b[96m${x}\x1b[0m`
 }
-
-const T = (syn: string): ListEntitySynonym => ({
-  tokens: syn.split(/( )/g)
-})
-
-const list_entities = [
-  {
-    name: 'fruit',
-    fuzzy: FuzzyTolerance.Medium,
-    values: [
-      {
-        name: 'Blueberry',
-        synonyms: ['blueberries', 'blueberry', 'blue berries', 'blue berry', 'poisonous blueberry'].map(T)
-      },
-      { name: 'Strawberry', synonyms: ['strawberries', 'strawberry', 'straw berries', 'straw berry'].map(T) },
-      { name: 'Raspberry', synonyms: ['raspberries', 'raspberry', 'rasp berries', 'rasp berry'].map(T) },
-      { name: 'Apple', synonyms: ['apple', 'apples', 'red apple', 'yellow apple'].map(T) }
-    ]
-  },
-  {
-    name: 'company',
-    fuzzy: FuzzyTolerance.Medium,
-    values: [{ name: 'Apple', synonyms: ['Apple', 'Apple Computers', 'Apple Corporation', 'Apple Inc'].map(T) }]
-  },
-  {
-    name: 'airport',
-    fuzzy: FuzzyTolerance.Medium,
-    values: [
-      { name: 'JFK', synonyms: ['JFK', 'New-York', 'NYC'].map(T) },
-      { name: 'SFO', synonyms: ['SFO', 'SF', 'San-Francisco'].map(T) },
-      { name: 'YQB', synonyms: ['YQB', 'Quebec', 'Quebec city', 'QUEB'].map(T) }
-    ]
-  },
-  {
-    name: 'state',
-    fuzzy: FuzzyTolerance.Medium,
-    values: [{ name: 'NewYork', synonyms: ['New York'].map(T) }]
-  },
-  {
-    name: 'city',
-    fuzzy: FuzzyTolerance.Medium,
-    values: [{ name: 'NewYork', synonyms: ['New York'].map(T) }]
-  }
-] satisfies ListEntityModel[]
 
 const runExtraction = (utt: string, models: ListEntityModel[]): void => {
   logger.debug(chalk.blueBright(`\n\n${utt}`))
@@ -107,13 +60,16 @@ const runExtraction = (utt: string, models: ListEntityModel[]): void => {
   }
 }
 
-logger.info('Start')
-const t0 = Date.now()
-for (let i = 0; i < ITERATIONS; i++) {
-  runExtraction('Blueberries are berries that are blue', list_entities)
-  runExtraction('I want to go to New-York', list_entities)
-  runExtraction('I want to eat an apple', list_entities)
-  runExtraction('I want to eat an Apple in the big Apple', list_entities)
+const runBenchmark = (benchmark: bench.BenchMark): void => {
+  logger.info(`Start benchmark: ${chalk.yellowBright(benchmark.name)} (${ITERATIONS} iterations)`)
+  const t0 = Date.now()
+  for (let i = 0; i < ITERATIONS; i++) {
+    for (const utt of benchmark.utterances) {
+      runExtraction(utt, benchmark.entities)
+    }
+  }
+  const t1 = Date.now()
+  logger.info(`Time: ${t1 - t0}ms`)
 }
-const t1 = Date.now()
-logger.info(`Time: ${t1 - t0}ms`)
+
+runBenchmark(bench.benchmark1)

@@ -1,4 +1,3 @@
-use std::cmp::Ordering;
 use wasm_bindgen::prelude::*;
 
 mod lodash;
@@ -169,7 +168,6 @@ impl ExtractionArray {
     fn from(x: Vec<EntityExtraction>) -> Self {
         Self(x)
     }
-
     #[wasm_bindgen]
     pub fn get(&self, idx: usize) -> EntityExtraction {
         self.0.get(idx).unwrap().clone()
@@ -206,34 +204,6 @@ struct FlatSynonym {
     value: String,
     tokens: Vec<String>,
     max_synonym_len: usize,
-}
-
-#[derive(Debug, Clone)]
-struct ListEntitySynonym {
-    tokens: Vec<String>,
-}
-
-#[derive(Debug, Clone)]
-struct ListEntityValue {
-    name: String,
-    synonyms: Vec<ListEntitySynonym>,
-}
-
-#[derive(Debug, Clone)]
-struct ListEntityModel {
-    name: String,
-    fuzzy: f64,
-    values: Vec<ListEntityValue>,
-}
-
-#[derive(Debug, Clone)]
-struct ListEntityExtraction {
-    name: String,
-    confidence: f64,
-    value: String,
-    source: String,
-    char_start: usize,
-    char_end: usize,
 }
 
 fn extract_for_synonym(tokens: &[tokens::Token], synonym: &FlatSynonym) -> Vec<Candidate> {
@@ -295,23 +265,24 @@ fn extract_for_synonym(tokens: &[tokens::Token], synonym: &FlatSynonym) -> Vec<C
     candidates
 }
 
-fn flatten_synonyms(list_model: ListEntityModel) -> Vec<FlatSynonym> {
+fn flatten_synonyms(list_model: EntityDefinition) -> Vec<FlatSynonym> {
     let mut flattened: Vec<FlatSynonym> = vec![];
 
-    for value in list_model.values {
+    for value in list_model.values.0 {
         let max_synonym_len: usize = value
             .synonyms
+            .0
             .iter()
-            .map(|s| s.tokens.join("").len())
+            .map(|s| s.tokens.0.join("").len())
             .max()
             .unwrap_or(0);
 
-        for synonym in value.synonyms {
+        for synonym in value.synonyms.0 {
             flattened.push(FlatSynonym {
                 name: list_model.name.clone(),
                 fuzzy: list_model.fuzzy,
                 value: value.name.clone(),
-                tokens: synonym.tokens.clone(),
+                tokens: synonym.tokens.0.clone(),
                 max_synonym_len: max_synonym_len,
             });
         }
@@ -320,11 +291,9 @@ fn flatten_synonyms(list_model: ListEntityModel) -> Vec<FlatSynonym> {
     flattened
 }
 
-fn extract_for_list_model(
-    str_tokens: Vec<String>,
-    list_model: ListEntityModel,
-) -> Vec<ListEntityExtraction> {
-    let utt_tokens = tokens::to_tokens(&str_tokens);
+#[wasm_bindgen]
+pub fn extract(str_tokens: StringArray, list_model: EntityDefinition) -> ExtractionArray {
+    let utt_tokens = tokens::to_tokens(&str_tokens.0);
 
     let synonyms: Vec<FlatSynonym> = flatten_synonyms(list_model);
 
@@ -338,7 +307,7 @@ fn extract_for_list_model(
 
     // B) eliminate overlapping candidates
 
-    let mut eliminated: Vec<bool> = (0..candidates.len()).map(|_| false).collect();
+    let mut eliminated: Vec<bool> = vec![false; candidates.len()];
 
     for token_idx in 0..utt_tokens.len() {
         let token_candidates: Vec<(usize, &Candidate)> = candidates
@@ -353,15 +322,11 @@ fn extract_for_list_model(
             .collect();
 
         // we use length adjusted score to favor longer matches
-        active_token_candidates.sort_by(|(_, a), (_, b)| {
-            if a.length_score > b.length_score {
-                Ordering::Less // reverse order
-            } else if a.length_score < b.length_score {
-                Ordering::Greater
-            } else {
-                Ordering::Equal
-            }
-        });
+        lodash::sort_by(
+            &mut active_token_candidates,
+            |(_, c)| c.length_score,
+            lodash::SortOrder::Descending,
+        );
 
         if active_token_candidates.len() <= 1 {
             continue;
@@ -388,9 +353,9 @@ fn extract_for_list_model(
         .collect();
 
     // D) map to results
-    let results: Vec<ListEntityExtraction> = matches
+    let results: Vec<EntityExtraction> = matches
         .iter()
-        .map(|match_| ListEntityExtraction {
+        .map(|match_| EntityExtraction {
             name: match_.name.clone(),
             confidence: match_.struct_score,
             char_start: utt_tokens[match_.token_start].char_start,
@@ -400,46 +365,5 @@ fn extract_for_list_model(
         })
         .collect();
 
-    results
-}
-
-#[wasm_bindgen]
-pub fn extract(arg0: StringArray, arg1: EntityDefinition) -> ExtractionArray {
-    init();
-    let str_tokens: Vec<String> = arg0.0;
-
-    let list_model: ListEntityModel = ListEntityModel {
-        name: arg1.name,
-        fuzzy: arg1.fuzzy,
-        values: arg1
-            .values
-            .0
-            .into_iter()
-            .map(|x| ListEntityValue {
-                name: x.name.clone(),
-                synonyms: x
-                    .synonyms
-                    .0
-                    .into_iter()
-                    .map(|y| ListEntitySynonym { tokens: y.tokens.0 })
-                    .collect(),
-            })
-            .collect(),
-    };
-
-    let list_extractions = extract_for_list_model(str_tokens, list_model);
-
-    let extractions: Vec<EntityExtraction> = list_extractions
-        .into_iter()
-        .map(|match_| EntityExtraction {
-            name: match_.name.clone(),
-            confidence: match_.confidence,
-            char_start: match_.char_start,
-            char_end: match_.char_end,
-            value: match_.value.clone(),
-            source: match_.source.clone(),
-        })
-        .collect();
-
-    ExtractionArray::from(extractions)
+    ExtractionArray::from(results)
 }

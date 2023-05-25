@@ -10,16 +10,6 @@ use wasm_bindgen::prelude::*;
 
 extern crate console_error_panic_hook;
 
-#[wasm_bindgen]
-extern "C" {
-    #[wasm_bindgen(js_namespace = console)]
-    fn log(s: &str);
-}
-
-fn init() {
-    console_error_panic_hook::set_once();
-}
-
 /**
  * #######################
  * ###    0. lodash    ###
@@ -254,26 +244,9 @@ fn levenshtein_distance(a: &str, b: &str) -> usize {
 #[derive(Clone)]
 struct Token {
     value: String,
-    is_word: bool,
     is_space: bool,
     char_start: usize,
     char_end: usize,
-    start_token: usize,
-    end_token: usize,
-}
-
-const SPECIAL_CHARSET: [&str; 45] = [
-    "¿", "÷", "≥", "≤", "µ", "˜", "∫", "√", "≈", "æ", "…", "¬", "˚", "˙", "©", "+", "-", "_", "!",
-    "@", "#", "$", "%", "?", "&", "*", "(", ")", "/", "\\", "[", "]", "{", "}", ":", ";", "<", ">",
-    "=", ".", ",", "~", "`", "\"", "'",
-];
-
-fn is_word(str: String) -> bool {
-    !SPECIAL_CHARSET.iter().any(|c| str.contains(c)) && !has_space(str)
-}
-
-fn has_space(str: String) -> bool {
-    str.contains(' ')
 }
 
 fn is_space(str: String) -> bool {
@@ -288,12 +261,9 @@ fn to_tokens(str_tokens: &Vec<String>) -> Vec<Token> {
         let str_token = &str_tokens[i];
         let token = Token {
             value: str_token.to_string(),
-            is_word: is_word(str_token.to_string()),
             is_space: is_space(str_token.to_string()),
             char_start: char_index,
             char_end: char_index + str_token.len(),
-            start_token: i,
-            end_token: i + 1,
         };
 
         tokens.push(token);
@@ -602,6 +572,16 @@ fn extract_for_list_model(
  */
 
 #[wasm_bindgen]
+extern "C" {
+    #[wasm_bindgen(js_namespace = console)]
+    fn log(s: &str);
+}
+
+fn init() {
+    console_error_panic_hook::set_once();
+}
+
+#[wasm_bindgen]
 pub fn jaro_winkler_sim(a: String, b: String) -> f64 {
     init();
     jaro_winkler_similarity(&a, &b, None)
@@ -617,24 +597,6 @@ pub fn levenshtein_sim(a: String, b: String) -> f64 {
 pub fn levenshtein_dist(a: String, b: String) -> usize {
     init();
     levenshtein_distance(&a, &b)
-}
-
-impl Serialize for Token {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: Serializer,
-    {
-        // 3 is the number of fields in the struct.
-        let mut state = serializer.serialize_struct("Token", 7)?;
-        state.serialize_field("value", &self.value)?;
-        state.serialize_field("is_word", &self.is_word)?;
-        state.serialize_field("is_space", &self.is_space)?;
-        state.serialize_field("start_char", &self.char_start)?;
-        state.serialize_field("end_char", &self.char_end)?;
-        state.serialize_field("start_token", &self.start_token)?;
-        state.serialize_field("end_token", &self.end_token)?;
-        state.end()
-    }
 }
 
 impl Serialize for ListEntityExtraction {

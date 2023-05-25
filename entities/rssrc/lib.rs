@@ -26,26 +26,21 @@ fn init() {
  * #######################
  */
 
-fn intersection<T: PartialEq + Clone>(arr1: &[T], arr2: &[T]) -> Vec<T> {
-    let mut res = vec![];
+fn intersection_len<T: PartialEq + Clone>(arr1: &[T], arr2: &[T]) -> usize {
+    let mut res = 0;
     for x in arr1 {
         if arr2.contains(x) {
-            res.push(x.clone());
+            res += 1;
         }
     }
     res
 }
 
-fn union<T: PartialEq + Clone>(arr1: &[T], arr2: &[T]) -> Vec<T> {
-    let mut res = vec![];
-    for x in arr1 {
-        if !res.contains(x) {
-            res.push(x.clone());
-        }
-    }
+fn union_len<T: PartialEq + Clone>(arr1: &[T], arr2: &[T]) -> usize {
+    let mut res = arr1.len();
     for x in arr2 {
-        if !res.contains(x) {
-            res.push(x.clone());
+        if !arr1.contains(x) {
+            res += 1;
         }
     }
     res
@@ -387,11 +382,11 @@ fn compute_structural_score(a: &[String], b: &[String]) -> f64 {
     charset2 = uniq(&charset2);
 
     let charset_score =
-        intersection(&charset1, &charset2).len() as f64 / union(&charset1, &charset2).len() as f64;
+        intersection_len(&charset1, &charset2) as f64 / union_len(&charset1, &charset2) as f64;
     let charset_low1: Vec<char> = charset1.iter().map(|c| c.to_ascii_lowercase()).collect();
     let charset_low2: Vec<char> = charset2.iter().map(|c| c.to_ascii_lowercase()).collect();
-    let charset_low_score = intersection(&charset_low1, &charset_low2).len() as f64
-        / union(&charset_low1, &charset_low2).len() as f64;
+    let charset_low_score = intersection_len(&charset_low1, &charset_low2) as f64
+        / union_len(&charset_low1, &charset_low2) as f64;
     let final_charset_score = (charset_score + charset_low_score) / 2.0;
 
     let mut la: usize = a.iter().filter(|x| x.len() > 1).count();

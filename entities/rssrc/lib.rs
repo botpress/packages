@@ -66,16 +66,6 @@ fn min(arr: &[usize]) -> usize {
     min
 }
 
-fn max(arr: &[usize]) -> usize {
-    let mut max = arr[0];
-    for x in arr {
-        if *x > max {
-            max = *x;
-        }
-    }
-    max
-}
-
 fn abs(n: i32) -> i32 {
     if n < 0 {
         -n

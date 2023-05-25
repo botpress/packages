@@ -19,9 +19,7 @@ const fill = <T, A extends ArrayOf<T>>(arr: A, items: T[]) => {
   return arr
 }
 
-export const extractForListModel = (strTokens: string[], listModel: ListEntityModel): ListEntityExtraction[] => {
-  const str_tokens = fill(new pkg.StringArray(), strTokens)
-
+const mapListModel = (listModel: ListEntityModel): pkg.EntityDefinition => {
   const values = fill(
     new pkg.ValueArray(),
     listModel.values.map((value) => {
@@ -34,9 +32,10 @@ export const extractForListModel = (strTokens: string[], listModel: ListEntityMo
   )
 
   const list_definition = new pkg.EntityDefinition(listModel.name, listModel.fuzzy, values)
+  return list_definition
+}
 
-  const list_extractions = pkg.extract(str_tokens, list_definition)
-
+const mapExtractions = (list_extractions: pkg.ExtractionArray): ListEntityExtraction[] => {
   const extractions: ListEntityExtraction[] = []
   for (let i = 0; i < list_extractions.len(); i++) {
     const extraction = list_extractions.get(i)
@@ -48,9 +47,25 @@ export const extractForListModel = (strTokens: string[], listModel: ListEntityMo
       char_start: extraction.char_start,
       char_end: extraction.char_end
     })
+    // IMPORTANT: free the extraction to avoid memory leaks
     extraction.free()
   }
-  list_extractions.free()
 
+  // IMPORTANT: free the extraction to avoid memory leaks
+  list_extractions.free()
   return extractions
+}
+
+export const extractForListModel = (strTokens: string[], listModel: ListEntityModel): ListEntityExtraction[] => {
+  const str_tokens = fill(new pkg.StringArray(), strTokens)
+  const list_definition = mapListModel(listModel)
+  const list_extractions = pkg.extract_single(str_tokens, list_definition)
+  return mapExtractions(list_extractions)
+}
+
+export const extractForListModels = (strTokens: string[], listModels: ListEntityModel[]): ListEntityExtraction[] => {
+  const str_tokens = fill(new pkg.StringArray(), strTokens)
+  const list_definitions = fill(new pkg.EntityArray(), listModels.map(mapListModel))
+  const list_extractions = pkg.extract_multiple(str_tokens, list_definitions)
+  return mapExtractions(list_extractions)
 }

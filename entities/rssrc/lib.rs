@@ -161,6 +161,22 @@ impl ValueArray {
     }
 }
 
+#[derive(Clone)]
+#[wasm_bindgen]
+pub struct EntityArray(Vec<EntityDefinition>);
+#[wasm_bindgen]
+impl EntityArray {
+    #[wasm_bindgen(constructor)]
+    pub fn new() -> EntityArray {
+        EntityArray(Vec::new())
+    }
+
+    #[wasm_bindgen]
+    pub fn push(&mut self, s: EntityDefinition) {
+        self.0.push(s);
+    }
+}
+
 #[wasm_bindgen]
 pub struct ExtractionArray(Vec<EntityExtraction>);
 #[wasm_bindgen]
@@ -206,7 +222,7 @@ struct FlatSynonym {
     max_synonym_len: usize,
 }
 
-fn extract_for_synonym(tokens: &[tokens::Token], synonym: &FlatSynonym) -> Vec<Candidate> {
+fn extract_synonym(tokens: &[tokens::Token], synonym: &FlatSynonym) -> Vec<Candidate> {
     let mut candidates: Vec<Candidate> = Vec::new();
     let synonym_str = synonym.tokens.join("");
 
@@ -265,10 +281,10 @@ fn extract_for_synonym(tokens: &[tokens::Token], synonym: &FlatSynonym) -> Vec<C
     candidates
 }
 
-fn flatten_synonyms(list_model: EntityDefinition) -> Vec<FlatSynonym> {
+fn flatten_synonyms(list_model: &EntityDefinition) -> Vec<FlatSynonym> {
     let mut flattened: Vec<FlatSynonym> = vec![];
 
-    for value in list_model.values.0 {
+    for value in list_model.values.0.iter() {
         let max_synonym_len: usize = value
             .synonyms
             .0
@@ -277,7 +293,7 @@ fn flatten_synonyms(list_model: EntityDefinition) -> Vec<FlatSynonym> {
             .max()
             .unwrap_or(0);
 
-        for synonym in value.synonyms.0 {
+        for synonym in value.synonyms.0.iter() {
             flattened.push(FlatSynonym {
                 name: list_model.name.clone(),
                 fuzzy: list_model.fuzzy,
@@ -291,17 +307,16 @@ fn flatten_synonyms(list_model: EntityDefinition) -> Vec<FlatSynonym> {
     flattened
 }
 
-#[wasm_bindgen]
-pub fn extract(str_tokens: StringArray, list_model: EntityDefinition) -> ExtractionArray {
+fn extract(str_tokens: &StringArray, entity_def: &EntityDefinition) -> Vec<EntityExtraction> {
     let utt_tokens = tokens::to_tokens(&str_tokens.0);
 
-    let synonyms: Vec<FlatSynonym> = flatten_synonyms(list_model);
+    let synonyms: Vec<FlatSynonym> = flatten_synonyms(entity_def);
 
     // A) extract all candidates
 
     let mut candidates: Vec<Candidate> = Vec::new();
     for synonym in &synonyms {
-        let new_candidates = extract_for_synonym(&utt_tokens, synonym);
+        let new_candidates = extract_synonym(&utt_tokens, synonym);
         candidates.extend(new_candidates);
     }
 
@@ -346,6 +361,7 @@ pub fn extract(str_tokens: StringArray, list_model: EntityDefinition) -> Extract
         .collect();
 
     // C) from winners keep only matches with high enough structural score
+
     let matches: Vec<&Candidate> = winners
         .iter()
         .filter(|x| x.struct_score >= ENTITY_SCORE_THRESHOLD)
@@ -353,6 +369,7 @@ pub fn extract(str_tokens: StringArray, list_model: EntityDefinition) -> Extract
         .collect();
 
     // D) map to results
+
     let results: Vec<EntityExtraction> = matches
         .iter()
         .map(|match_| EntityExtraction {
@@ -364,6 +381,24 @@ pub fn extract(str_tokens: StringArray, list_model: EntityDefinition) -> Extract
             source: match_.source.clone(),
         })
         .collect();
+
+    results
+}
+
+#[wasm_bindgen]
+pub fn extract_single(str_tokens: StringArray, entity_def: EntityDefinition) -> ExtractionArray {
+    let results = extract(&str_tokens, &entity_def);
+    ExtractionArray::from(results)
+}
+
+#[wasm_bindgen]
+pub fn extract_multiple(str_tokens: StringArray, entity_defs: EntityArray) -> ExtractionArray {
+    let mut results: Vec<EntityExtraction> = vec![];
+
+    for entity_def in entity_defs.0 {
+        let mut entity_results = extract(&str_tokens, &entity_def);
+        results.append(&mut entity_results);
+    }
 
     ExtractionArray::from(results)
 }

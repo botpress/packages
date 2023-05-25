@@ -1,4 +1,4 @@
-import { ListEntityExtraction, ListEntityModel, ListEntitySynonym, extractForListModel } from './list-engine'
+import { ListEntityModel, ListEntitySynonym, extractForListModels } from './list-engine'
 import { spaceTokenizer } from './space-tokenizer'
 
 type Logger = {
@@ -87,10 +87,7 @@ const runExtraction = (utt: string, models: ListEntityModel[]): void => {
   logger.debug(chalk.blueBright(`\n\n${utt}`))
 
   const tokens = spaceTokenizer(utt)
-  const output: ListEntityExtraction[] = []
-  for (const model of models) {
-    output.push(...extractForListModel(tokens, model))
-  }
+  const output = extractForListModels(tokens, models)
 
   if (!DEBUG) {
     return

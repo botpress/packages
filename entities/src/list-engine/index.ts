@@ -12,6 +12,7 @@ type Exports = {
   jaroWinklerSimilarity: typeof wasm.jaroWinklerSimilarity
   levenshteinDistance: typeof wasm.levenshteinDistance
   extractForListModel: typeof wasm.extractForListModel
+  extractForListModels: typeof wasm.extractForListModels
 }
 
 const wasmExports: Exports = wasm
@@ -31,4 +32,10 @@ export const extractForListModel = (
   listModel: types.ListEntityModel
 ): types.ListEntityExtraction[] => {
   return (ENGINE === 'wasm' ? wasmExports : nodeExports).extractForListModel(strTokens, listModel)
+}
+export const extractForListModels = (
+  strTokens: string[],
+  listModels: types.ListEntityModel[]
+): types.ListEntityExtraction[] => {
+  return (ENGINE === 'wasm' ? wasmExports : nodeExports).extractForListModels(strTokens, listModels)
 }

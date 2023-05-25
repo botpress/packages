@@ -512,3 +512,12 @@ export const extractForListModel = (strTokens: string[], listModel: ListEntityMo
   }))
   return results
 }
+
+export const extractForListModels = (strTokens: string[], listModels: ListEntityModel[]): ListEntityExtraction[] => {
+  const results: ListEntityExtraction[] = []
+  for (const listModel of listModels) {
+    const newResults = extractForListModel(strTokens, listModel)
+    results.push(...newResults)
+  }
+  return results
+}

@@ -1,5 +1,4 @@
-import { listEntities } from './benchmarks/benchmark-1'
-import { ListEntityModel, ListEntitySynonym, extractForListModels } from './list-engine'
+import { ListEntityModel, extractForListModels } from './list-engine'
 import { spaceTokenizer } from './space-tokenizer'
 
 import * as bench from './benchmarks'
@@ -72,4 +71,4 @@ const runBenchmark = (benchmark: bench.BenchMark): void => {
   logger.info(`Time: ${t1 - t0}ms`)
 }
 
-runBenchmark(bench.benchmark2)
+runBenchmark(bench.benchmark1)

@@ -82,29 +82,14 @@ impl EntityDefinition {
 }
 
 #[derive(Clone)]
-#[wasm_bindgen]
+#[wasm_bindgen(getter_with_clone)]
 pub struct EntityExtraction {
-    name: String,
+    pub name: String,
     pub confidence: f64,
     pub char_start: usize,
     pub char_end: usize,
-    value: String,
-    source: String,
-}
-#[wasm_bindgen]
-impl EntityExtraction {
-    #[wasm_bindgen(getter)]
-    pub fn name(&self) -> String {
-        self.name.clone()
-    }
-    #[wasm_bindgen(getter)]
-    pub fn value(&self) -> String {
-        self.value.clone()
-    }
-    #[wasm_bindgen(getter)]
-    pub fn source(&self) -> String {
-        self.source.clone()
-    }
+    pub value: String,
+    pub source: String,
 }
 
 #[derive(Clone)]
@@ -120,6 +105,11 @@ impl StringArray {
     #[wasm_bindgen]
     pub fn push(&mut self, s: String) {
         self.0.push(s);
+    }
+}
+impl StringArray {
+    pub fn from(vec: Vec<String>) -> StringArray {
+        StringArray(vec)
     }
 }
 
@@ -138,6 +128,11 @@ impl SynonymArray {
         self.0.push(s);
     }
 }
+impl SynonymArray {
+    pub fn from(vec: Vec<SynonymDefinition>) -> SynonymArray {
+        SynonymArray(vec)
+    }
+}
 
 #[derive(Clone)]
 #[wasm_bindgen]
@@ -152,6 +147,11 @@ impl ValueArray {
     #[wasm_bindgen]
     pub fn push(&mut self, s: ValueDefinition) {
         self.0.push(s);
+    }
+}
+impl ValueArray {
+    pub fn from(vec: Vec<ValueDefinition>) -> ValueArray {
+        ValueArray(vec)
     }
 }
 
@@ -170,14 +170,16 @@ impl EntityArray {
         self.0.push(s);
     }
 }
+impl EntityArray {
+    pub fn from(vec: Vec<EntityDefinition>) -> EntityArray {
+        EntityArray(vec)
+    }
+}
 
 #[wasm_bindgen]
 pub struct ExtractionArray(Vec<EntityExtraction>);
 #[wasm_bindgen]
 impl ExtractionArray {
-    fn from(x: Vec<EntityExtraction>) -> Self {
-        Self(x)
-    }
     #[wasm_bindgen]
     pub fn get(&self, idx: usize) -> EntityExtraction {
         self.0.get(idx).unwrap().clone()
@@ -185,6 +187,11 @@ impl ExtractionArray {
     #[wasm_bindgen]
     pub fn len(&self) -> usize {
         self.0.len()
+    }
+}
+impl ExtractionArray {
+    pub fn from(vec: Vec<EntityExtraction>) -> ExtractionArray {
+        ExtractionArray(vec)
     }
 }
 

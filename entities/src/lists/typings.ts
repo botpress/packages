@@ -3,11 +3,11 @@ export type ListEntitySynonym = {
 }
 
 export type ListEntityValue = {
-  name: string,
+  name: string
   synonyms: ListEntitySynonym[]
 }
 
-export type ListEntityModel = {
+export type ListEntityDef = {
   name: string
   fuzzy: number
   values: ListEntityValue[]
@@ -21,3 +21,5 @@ export type ListEntityExtraction = {
   char_start: number
   char_end: number
 }
+
+export type Tokenizer = (utterance: string) => string[]

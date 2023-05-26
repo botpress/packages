@@ -1,6 +1,6 @@
-import { ListEntityModel, ListEntitySynonym, wasm, node, ListEntityEngine } from './list-engine'
+import { ListEntityDef, ListEntitySynonym, ListEntityEngine, ListEntityParser } from './lists'
 import { EntityExpectations, ListEntityAssert } from './lists.util.test'
-import { spaceTokenizer } from './space-tokenizer'
+import { spaceTokenizer } from './lists/space-tokenizer'
 
 /**
  * This test suite is really old (year 2020).
@@ -18,7 +18,7 @@ const FuzzyTolerance = {
   Strict: 1
 }
 
-const list_entities: ListEntityModel[] = [
+const list_entities: ListEntityDef[] = [
   {
     name: 'fruit',
     fuzzy: FuzzyTolerance.Medium,
@@ -48,11 +48,9 @@ const list_entities: ListEntityModel[] = [
   }
 ]
 
-type EngineType = 'WASM' | 'NODE'
-
-describe.each(['WASM', 'NODE'] satisfies EngineType[])('%s list entity extractor', (engineName) => {
-  const engine = engineName === 'WASM' ? wasm : node
-  const entityAssert = new ListEntityAssert(engine, list_entities)
+describe.each(['wasm', 'node'] satisfies ListEntityEngine[])('%s list entity extractor', (engine) => {
+  const parser = new ListEntityParser(list_entities, { engine })
+  const entityAssert = new ListEntityAssert(parser)
   const entityTest = <T extends string>(utt: T, ...tags: EntityExpectations<T>): void =>
     test(utt, () => entityAssert.expectSpans(utt).toBe(...tags))
 
@@ -109,7 +107,7 @@ describe.each(['WASM', 'NODE'] satisfies EngineType[])('%s list entity extractor
 
   test('same occurence in multiple entities extracts multiple entities', () => {
     // arrange
-    const testEntities: ListEntityModel[] = [
+    const testEntities: ListEntityDef[] = [
       ...list_entities,
       {
         name: 'state',
@@ -122,12 +120,12 @@ describe.each(['WASM', 'NODE'] satisfies EngineType[])('%s list entity extractor
         values: [{ name: 'NewYork', synonyms: ['New York'].map(T) }]
       }
     ]
+    const parser = new ListEntityParser(testEntities, { engine })
 
     const utterance = 'I want to go to New York'
 
     // act
-    const tokens = spaceTokenizer(utterance)
-    const results = engine.extractForListModels(tokens, testEntities)
+    const results = parser.parse(utterance)
 
     // assert
     expect(results.length).toEqual(3)

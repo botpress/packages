@@ -1,4 +1,7 @@
+export type EntityType = 'list' | 'pattern'
+
 export type Entity = {
+  type: EntityType
   name: string
   confidence: number
   value: string

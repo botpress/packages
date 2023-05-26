@@ -1,5 +1,5 @@
 import * as pkg from '../../pkg'
-import { ListEntityExtraction, ListEntityModel } from './typings'
+import { ListEntityExtraction, ListEntityDef } from './typings'
 
 type ArrayOf<T> = { push: (item: T) => void }
 const fill = <T, A extends ArrayOf<T>>(arr: A, items: T[]) => {
@@ -7,7 +7,7 @@ const fill = <T, A extends ArrayOf<T>>(arr: A, items: T[]) => {
   return arr
 }
 
-const mapListModel = (listModel: ListEntityModel): pkg.EntityDefinition => {
+const mapListModel = (listModel: ListEntityDef): pkg.EntityDefinition => {
   const values = fill(
     new pkg.ValueArray(),
     listModel.values.map((value) => {
@@ -44,14 +44,14 @@ const mapExtractions = (list_extractions: pkg.ExtractionArray): ListEntityExtrac
   return extractions
 }
 
-export const extractForListModel = (strTokens: string[], listModel: ListEntityModel): ListEntityExtraction[] => {
+export const extractForListModel = (strTokens: string[], listModel: ListEntityDef): ListEntityExtraction[] => {
   const str_tokens = fill(new pkg.StringArray(), strTokens)
   const list_definition = mapListModel(listModel)
   const list_extractions = pkg.extract_single(str_tokens, list_definition)
   return mapExtractions(list_extractions)
 }
 
-export const extractForListModels = (strTokens: string[], listModels: ListEntityModel[]): ListEntityExtraction[] => {
+export const extractForListModels = (strTokens: string[], listModels: ListEntityDef[]): ListEntityExtraction[] => {
   const str_tokens = fill(new pkg.StringArray(), strTokens)
   const list_definitions = fill(new pkg.EntityArray(), listModels.map(mapListModel))
   const list_extractions = pkg.extract_multiple(str_tokens, list_definitions)

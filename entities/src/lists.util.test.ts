@@ -10,8 +10,7 @@
  * This module exposes utilities to better test list entities.
  */
 
-import { ListEntityEngine, ListEntityModel } from './list-engine'
-import { spaceTokenizer } from './space-tokenizer'
+import { ListEntityParser } from './lists'
 import { MapSpans, Span, parseSpans } from './span.util.test'
 import { Entity } from './typings'
 
@@ -26,12 +25,11 @@ type EntityExpectation = {
 export type EntityExpectations<T extends string> = MapSpans<T, EntityExpectation>
 
 export class ListEntityAssert {
-  constructor(private _engine: ListEntityEngine, private _listEntities: ListEntityModel[]) {}
+  constructor(private _parser: ListEntityParser) {}
 
   public expectSpans = <T extends string>(templateStr: T) => {
     const { text, spans } = parseSpans(templateStr)
-    const tokens = spaceTokenizer(text)
-    const entities = this._engine.extractForListModels(tokens, this._listEntities)
+    const entities = this._parser.parse(text)
 
     return {
       toBe: (...expected: EntityExpectations<T>) => {

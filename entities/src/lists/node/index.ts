@@ -1,5 +1,5 @@
 import _ from 'lodash'
-import { ListEntityExtraction, ListEntityModel } from '../typings'
+import { ListEntityExtraction, ListEntityDef } from '../typings'
 import * as strings from './strings'
 import * as toks from './tokens'
 
@@ -122,7 +122,7 @@ const extractForSynonym = (tokens: toks.Token[], synonym: FlatSynonym): Candidat
   return candidates
 }
 
-export const extractForListModel = (strTokens: string[], listModel: ListEntityModel): ListEntityExtraction[] => {
+export const extractForListModel = (strTokens: string[], listModel: ListEntityDef): ListEntityExtraction[] => {
   const uttTokens = toks.toTokens(strTokens)
 
   const synonyms: FlatSynonym[] = listModel.values.flatMap((value) => {
@@ -181,7 +181,7 @@ export const extractForListModel = (strTokens: string[], listModel: ListEntityMo
   return results
 }
 
-export const extractForListModels = (strTokens: string[], listModels: ListEntityModel[]): ListEntityExtraction[] => {
+export const extractForListModels = (strTokens: string[], listModels: ListEntityDef[]): ListEntityExtraction[] => {
   const results: ListEntityExtraction[] = []
   for (const listModel of listModels) {
     const newResults = extractForListModel(strTokens, listModel)

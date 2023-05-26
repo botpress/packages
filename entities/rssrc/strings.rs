@@ -164,3 +164,55 @@ pub fn levenshtein_distance(a: &str, b: &str) -> usize {
 
     res
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    fn assert_eq_rounded(a: f64, b: f64) {
+        let rounded_a = (a * 1000.0).round() / 1000.0;
+        let rounded_b = (b * 1000.0).round() / 1000.0;
+        assert_eq!(rounded_a, rounded_b);
+    }
+
+    #[test]
+    fn levenshtein() {
+        assert_eq!(levenshtein_distance("testing", "tesing"), 1); // 1 x suppression
+        assert_eq!(levenshtein_distance("testting", "testing"), 1); // 1 x addition
+        assert_eq!(levenshtein_distance("tasting", "testing"), 1); // 1 x substitution
+        assert_eq!(levenshtein_distance("teing", "testing"), 2); // 2 x suppression
+        assert_eq!(levenshtein_distance("tesstting", "testing"), 2); // 2 x addition
+        assert_eq!(levenshtein_distance("teasing", "testing"), 2); // 1 x suppression + 1 x addition
+        assert_eq!(levenshtein_distance("teasing", "testing"), 2); // 1 x suppression + 1 x addition
+        assert_eq!(levenshtein_distance("tastting", "testing"), 2); // 1 x substitution + 1 x addition
+        assert_eq!(levenshtein_distance("tetsng", "testing"), 2); // 1 x suppression + 1 x substitution
+        assert_eq!(levenshtein_distance("tetsing", "testing"), 2); // letterSwap (1 sup + 1 add)
+        assert_eq!(levenshtein_distance("tetsig", "testing"), 3); // 1 x suppression + 1 x letterSwap (1 sup + 1 add)
+        assert_eq!(levenshtein_distance("tetsinng", "testing"), 3); // 1 x letterSwap (1 sup + 1 add) + 1 x addition
+        assert_eq!(levenshtein_distance("tetsinng", "testing"), 3); // 1 x letterSwap (1 sup + 1 add) + 1 x addition
+        assert_eq!(levenshtein_distance("tetsong", "testing"), 3); // 1 x letterSwap (1 sup + 1 add) + 1 x substitution
+    }
+
+    #[test]
+    fn new_york() {
+        // this is a bug, but we have to keep it for backward compatibility (it should be 3)
+        assert_eq!(levenshtein_distance("new-york", "new-yorkers"), 4);
+    }
+
+    #[test]
+    fn jaro_winkler() {
+        assert_eq_rounded(jaro_winkler_similarity("testing", "tesing", None), 0.967);
+        assert_eq_rounded(jaro_winkler_similarity("testting", "testing", None), 0.975);
+        assert_eq_rounded(jaro_winkler_similarity("tasting", "testing", None), 0.914);
+        assert_eq_rounded(jaro_winkler_similarity("teing", "testing", None), 0.924);
+        assert_eq_rounded(jaro_winkler_similarity("tesstting", "testing", None), 0.948);
+        assert_eq_rounded(jaro_winkler_similarity("teasing", "testing", None), 0.924);
+        assert_eq_rounded(jaro_winkler_similarity("teasing", "testing", None), 0.924);
+        assert_eq_rounded(jaro_winkler_similarity("tastting", "testing", None), 0.882);
+        assert_eq_rounded(jaro_winkler_similarity("tetsing", "testing", None), 0.962);
+        assert_eq_rounded(jaro_winkler_similarity("tetsng", "testing", None), 0.917);
+        assert_eq_rounded(jaro_winkler_similarity("tetsiing", "testing", None), 0.929);
+        assert_eq_rounded(jaro_winkler_similarity("tetsiing", "testing", None), 0.929);
+        assert_eq_rounded(jaro_winkler_similarity("tetsong", "testing", None), 0.879);
+    }
+}

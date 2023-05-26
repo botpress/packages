@@ -7,28 +7,6 @@ mod tokens;
 
 extern crate console_error_panic_hook;
 
-fn init() {
-    console_error_panic_hook::set_once();
-}
-
-#[wasm_bindgen]
-pub fn jaro_winkler_sim(a: String, b: String) -> f64 {
-    init();
-    strings::jaro_winkler_similarity(&a, &b, None)
-}
-
-#[wasm_bindgen]
-pub fn levenshtein_sim(a: String, b: String) -> f64 {
-    init();
-    strings::levenshtein_similarity(&a, &b)
-}
-
-#[wasm_bindgen]
-pub fn levenshtein_dist(a: String, b: String) -> usize {
-    init();
-    strings::levenshtein_distance(&a, &b)
-}
-
 // ####################
 // ###              ###
 // ### IO / Typings ###
@@ -386,14 +364,21 @@ fn extract(str_tokens: &StringArray, entity_def: &EntityDefinition) -> Vec<Entit
     results
 }
 
+fn init() {
+    console_error_panic_hook::set_once();
+}
+
 #[wasm_bindgen]
 pub fn extract_single(str_tokens: StringArray, entity_def: EntityDefinition) -> ExtractionArray {
+    init();
     let results = extract(&str_tokens, &entity_def);
     ExtractionArray::from(results)
 }
 
 #[wasm_bindgen]
 pub fn extract_multiple(str_tokens: StringArray, entity_defs: EntityArray) -> ExtractionArray {
+    init();
+
     let mut results: Vec<EntityExtraction> = vec![];
 
     for entity_def in entity_defs.0 {

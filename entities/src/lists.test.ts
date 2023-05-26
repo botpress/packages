@@ -1,7 +1,6 @@
 import { ListEntityModel, ListEntitySynonym, wasm, node, ListEntityEngine } from './list-engine'
-import { MapSpans, Span, parseSpans } from './span.util.test'
+import { EntityExpectations, ListEntityAssert } from './lists.util.test'
 import { spaceTokenizer } from './space-tokenizer'
-import { Entity } from './typings'
 
 /**
  * This test suite is really old (year 2020).
@@ -9,88 +8,9 @@ import { Entity } from './typings'
  * see: https://github.com/botpress/botpress/blob/7beb86ad5384d683ad868d3662e5f57eced89214/modules/nlu/src/backend/entities/list-extractor.test.ts
  */
 
-// ######################
-// ###    0. Utils    ###
-// ######################
-
-type EntityExpectation = {
-  source?: string
-  qty?: number
-  name?: string
-  value?: string
-  confidence?: number
-}
-
-type EntityExpectations<T extends string> = MapSpans<T, EntityExpectation>
-
-const extractEntities = (engine: ListEntityEngine, utterance: string, entities: ListEntityModel[]) => {
-  return engine.extractForListModels(spaceTokenizer(utterance), entities)
-}
-
-class ListEntityAssert {
-  constructor(private _engine: ListEntityEngine, private _listEntities: ListEntityModel[]) {}
-
-  public expectSpans = <T extends string>(templateStr: T) => {
-    const { text, spans } = parseSpans(templateStr)
-    const entities = extractEntities(this._engine, text, this._listEntities)
-
-    return {
-      toBe: (...expected: EntityExpectations<T>) => {
-        const cases: [string, number | string, number | string][] = []
-        for (let i = 0; i < expected.length; i++) {
-          let tag = expected[i] as EntityExpectation
-          let span = spans[i] as Span<string>
-
-          let e: Entity | undefined = undefined
-
-          const found = entities.filter(
-            (x) =>
-              (x.char_start >= span.start && x.char_start < span.end) ||
-              (x.char_end <= span.end && x.char_end > span.start)
-          )
-
-          if (tag.qty) {
-            cases.push(['qty', tag.qty, found.length])
-          }
-          if (tag.name) {
-            e = found.find((x) => x.name === tag.name)
-            cases.push(['type', tag.name, e ? e.name : 'N/A'])
-          }
-          if (tag.value) {
-            e = found.find((x) => x.value === tag.value)
-            cases.push(['value', tag.value, e ? e.value : 'N/A'])
-          }
-          if (tag.confidence && e) {
-            cases.push(['confidence', tag.confidence, e.confidence])
-          }
-
-          if (e) {
-            cases.push(['start', span.start, e.char_start])
-            cases.push(['end', span.end, e.char_end])
-          }
-        }
-
-        for (const [expression, a, b] of cases) {
-          if (expression === 'confidence') {
-            expect(Number(b)).toBeGreaterThanOrEqual(Number(a))
-          } else if (['qty', 'start', 'end'].includes(expression)) {
-            expect(Number(b)).toEqual(Number(a))
-          } else {
-            expect(b).toEqual(a)
-          }
-        }
-      }
-    }
-  }
-}
-
 const T = (syn: string): ListEntitySynonym => ({
-  tokens: syn.split(/( )/g)
+  tokens: spaceTokenizer(syn)
 })
-
-// ######################
-// ###    1. Tests    ###
-// ######################
 
 const FuzzyTolerance = {
   Loose: 0.65,
@@ -128,7 +48,9 @@ const list_entities: ListEntityModel[] = [
   }
 ]
 
-describe.each(['WASM', 'NODE'])('%s list entity extractor', (engineName: string) => {
+type EngineType = 'WASM' | 'NODE'
+
+describe.each(['WASM', 'NODE'] satisfies EngineType[])('%s list entity extractor', (engineName) => {
   const engine = engineName === 'WASM' ? wasm : node
   const entityAssert = new ListEntityAssert(engine, list_entities)
   const entityTest = <T extends string>(utt: T, ...tags: EntityExpectations<T>): void =>
@@ -204,7 +126,8 @@ describe.each(['WASM', 'NODE'])('%s list entity extractor', (engineName: string)
     const utterance = 'I want to go to New York'
 
     // act
-    const results = extractEntities(engine, utterance, testEntities)
+    const tokens = spaceTokenizer(utterance)
+    const results = engine.extractForListModels(tokens, testEntities)
 
     // assert
     expect(results.length).toEqual(3)

@@ -1,5 +1,3 @@
-import _ from 'lodash'
-
 /**
  * # Test Utilities
  *
@@ -30,6 +28,8 @@ import _ from 'lodash'
  *   spanAssert.expectSpans(text).toBe({ source: "apple" })
  * ```
  */
+
+import _ from 'lodash'
 
 type Cast<T, U> = T extends U ? T : U
 

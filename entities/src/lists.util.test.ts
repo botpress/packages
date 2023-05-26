@@ -1,5 +1,5 @@
 import _ from 'lodash'
-import { EntityParser } from './typings'
+import { Entity, EntityParser } from './typings'
 
 type Cast<T, U> = T extends U ? T : U
 type ParseTemplateString<T extends string> = T extends `${infer Before}[${infer Source}]${infer After}`
@@ -108,30 +108,21 @@ const assert_gte = (actual: number, expected: number, n_digits: number = 3) => {
   }
 }
 
-export type EntityExpectation<Source extends string> =
-  | {
-      source?: Source
-      qty: 'none'
-    }
-  | {
-      source?: Source
-      qty: 'single'
-      name?: string
-      value?: string
-      confidence?: number
-    }
-  | {
-      source?: Source
-      qty: number
-    }
+export type EntityExpectation = {
+  source?: string
+  qty?: number
+  name?: string
+  value?: string
+  confidence?: number
+}
 
-type _EntityExpections<Spans extends string[]> = Spans extends [infer First, ...infer Others]
-  ? [EntityExpectation<Cast<First, string>>, ..._EntityExpections<Cast<Others, string[]>>]
+type _EntityExpectations<Spans extends string[]> = Spans extends [infer First, ...infer Others]
+  ? [EntityExpectation, ..._EntityExpectations<Cast<Others, string[]>>]
   : Spans extends [infer Last]
-  ? [EntityExpectation<Cast<Last, string>>]
+  ? [EntityExpectation]
   : []
 
-export type EntityExpections<T extends string> = _EntityExpections<ParseTemplateString<T>>
+export type EntityExpectations<T extends string> = _EntityExpectations<ParseTemplateString<T>>
 
 export class EntityAssert {
   public constructor(private _parser: EntityParser) {}
@@ -140,42 +131,59 @@ export class EntityAssert {
     const { result, spans } = parseTemplateString(templateStr)
     const entities = this._parser.parse(result)
     return {
-      toBe: (...tags: EntityExpections<T>) => {
+      toBe: (...tags: EntityExpectations<T>) => {
         if (tags.length !== spans.length) {
           throw new Error(
             `Expected ${tags.length} tags, but found ${spans.length} in template string "${templateStr}""`
           )
         }
 
-        for (let i = 0; i < tags.length; i++) {
-          const tag = tags[i] as EntityExpectation<string>
-          const span = spans[i]
+        /** Conditions copied from old test suite */
 
-          const isInside = (n: number, range: [number, number]) => n >= range[0] && n <= range[1]
-          const actual = entities.filter(
-            // should be (e.char_start === span.start && e.char_end === span.end), but we keep this for compatibility with previous test suite
-            (e) => isInside(e.char_start, [span.start, span.end]) || isInside(e.char_end, [span.start, span.end])
+        const cases: [string, number | string, number | string][] = []
+        for (let i = 0; i < tags.length; i++) {
+          let tag = tags[i] as EntityExpectation
+          let span = spans[i]
+
+          let e: Entity | undefined = undefined
+
+          const found = entities.filter(
+            (x) =>
+              (x.char_start >= span.start && x.char_start < span.end) ||
+              (x.char_end <= span.end && x.char_end > span.start)
           )
-          if (tag.qty === 'none') {
-            assert_equal(actual.length, 0)
-          } else if (tag.qty === 'single') {
-            assert_gte(actual.length, 1)
-            const first = actual[0]
-            tag.source && assert_equal(first.source, tag.source, 'source')
-            tag.name && assert_equal(first.name, tag.name, 'name')
-            tag.value && assert_equal(first.value, tag.value, 'value')
-            tag.confidence && assert_gte(first.confidence, tag.confidence)
+
+          if (tag.qty) {
+            cases.push(['qty', tag.qty, found.length])
+          }
+          if (tag.name) {
+            e = found.find((x) => x.name === tag.name)
+            cases.push(['type', tag.name, e ? e.name : 'N/A'])
+          }
+          if (tag.value) {
+            e = found.find((x) => x.value === tag.value)
+            cases.push(['value', tag.value, e ? e.value : 'N/A'])
+          }
+          if (tag.confidence && e) {
+            cases.push(['confidence', tag.confidence, e.confidence])
+          }
+
+          if (e) {
+            cases.push(['start', span.start, e.char_start])
+            cases.push(['end', span.end, e.char_end])
+          }
+        }
+
+        for (const [expression, a, b] of cases) {
+          if (expression === 'confidence') {
+            assert_gte(Number(b), Number(a))
+          } else if (['qty', 'start', 'end'].includes(expression)) {
+            assert_equal(Number(b), Number(a), expression)
           } else {
-            assert_equal(actual.length, tag.qty, 'qty')
+            assert_equal(b, a, expression)
           }
         }
       }
     }
-  }
-
-  public parse = (templateStr: string) => {
-    const { result, spans } = parseTemplateString(templateStr)
-    const entities = this._parser.parse(result)
-    return { entities, spans }
   }
 }

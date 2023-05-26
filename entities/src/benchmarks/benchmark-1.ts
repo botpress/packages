@@ -1,4 +1,4 @@
-import { ListEntityModel, ListEntitySynonym, extractForListModels } from '../list-engine'
+import { ListEntityModel, ListEntitySynonym } from '../list-engine'
 
 const FuzzyTolerance = {
   Loose: 0.65,

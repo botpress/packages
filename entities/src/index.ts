@@ -1,4 +1,4 @@
-import { ListEntityModel, extractForListModels } from './list-engine'
+import { ListEntityModel, node, wasm } from './list-engine'
 import { spaceTokenizer } from './space-tokenizer'
 
 import * as bench from './benchmarks'
@@ -39,7 +39,10 @@ const runExtraction = (utt: string, models: ListEntityModel[]): void => {
   logger.debug(chalk.blueBright(`\n\n${utt}`))
 
   const tokens = spaceTokenizer(utt)
-  const output = extractForListModels(tokens, models)
+  const output =
+    process.env.ENGINE === 'node'
+      ? node.extractForListModels(tokens, models)
+      : wasm.extractForListModels(tokens, models)
 
   if (!DEBUG) {
     return

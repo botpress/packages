@@ -19,7 +19,7 @@
     "@types/node": "^20.2.1",
     "@types/jest": "^26.0.14",
     "@types/lodash": "^4.14.195",
-    "jest": "^24.0.0"
+    "jest": "^26.6.3"
   },
   "keywords": [],
   "author": "",

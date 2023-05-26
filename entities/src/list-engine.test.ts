@@ -1,21 +1,78 @@
-import { ListEntityExtraction, ListEntityModel, ListEntitySynonym, extractForListModel } from './list-engine'
+import { ListEntityExtraction, ListEntityModel, ListEntitySynonym, wasm, node, ListEntityEngine } from './list-engine'
 import { spaceTokenizer } from './space-tokenizer'
 import { parseUtterance } from './utterance-parser.utils'
 
-const extractListEntities = (utt: string, models: ListEntityModel[]) => {
+// #######################
+// ###   0. Utilities  ###
+// #######################
+
+const makeExtracter = (engine: ListEntityEngine) => (utt: string, models: ListEntityModel[]) => {
   const tokens = spaceTokenizer(utt)
-  return models.flatMap((m) => extractForListModel(tokens, m))
+  return models.flatMap((m) => engine.extractForListModel(tokens, m))
 }
+
+const makeAsserter = (engine: ListEntityEngine) => (expression: string) => {
+  const { utterance: text, parsedSlots } = parseUtterance(expression)
+  const parts = parsedSlots.map((p) => p.value)
+
+  const utterance = text
+  const results = makeExtracter(engine)(utterance, list_entities)
+
+  for (const strConds of parsedSlots) {
+    const { start, end } = strConds.cleanPosition
+    const found = results.filter(
+      (x) => (x.char_start >= start && x.char_start < end) || (x.char_end <= end && x.char_end > start)
+    )
+
+    const conditions = strConds.name.split(' ')
+
+    const cases: [string, number | string, number | string][] = []
+    let t: ListEntityExtraction | undefined = undefined
+
+    for (const [name, value] of conditions.map((x) => x.split(':'))) {
+      if (name === 'qty') {
+        cases.push(['qty', value, found.length])
+      } else if (name === 'name') {
+        t = found.find((x) => x.name === value)
+        cases.push(['type', value, t ? t.name : 'N/A'])
+      } else if (name === 'value') {
+        t = found.find((x) => x.value === value)
+        cases.push(['value', value, t ? t.value : 'N/A'])
+      } else if (name === 'confidence' && t) {
+        cases.push(['confidence', value, t.confidence])
+      }
+    }
+
+    if (t) {
+      cases.push(['start', start, t.char_start])
+      cases.push(['end', end, t.char_end])
+    }
+
+    test.each(cases)(`"${text}" (${parts}) '%s' -> Expected(%s) Actual(%s)`, (expression, a, b) => {
+      if (expression === 'confidence') {
+        expect(Number(b)).toBeGreaterThanOrEqual(Number(a))
+      } else if (['qty', 'start', 'end'].includes(expression)) {
+        expect(Number(b)).toEqual(Number(a))
+      } else {
+        expect(b).toEqual(a)
+      }
+    })
+  }
+}
+
+const T = (syn: string): ListEntitySynonym => ({
+  tokens: syn.split(/( )/g)
+})
+
+// ########################
+// ###   1. Testcases   ###
+// ########################
 
 const FuzzyTolerance = {
   Loose: 0.65,
   Medium: 0.8,
   Strict: 1
 }
-
-const T = (syn: string): ListEntitySynonym => ({
-  tokens: syn.split(/( )/g)
-})
 
 const list_entities: ListEntityModel[] = [
   {
@@ -47,7 +104,11 @@ const list_entities: ListEntityModel[] = [
   }
 ]
 
-describe('list entity extractor', () => {
+describe.each(['WASM', 'NODE'])('%s list entity extractor', (engineName: string) => {
+  const engine = engineName === 'WASM' ? wasm : node
+  const assertEntity = makeAsserter(engine)
+  const extractListEntities = makeExtracter(engine)
+
   test('Data structure test', async () => {
     const utterance = 'Blueberries are berries that are blue'
     const results = extractListEntities(utterance, list_entities)
@@ -175,56 +236,3 @@ describe('list entity extractor', () => {
     assertEntity('Blueberries [are berries that are blue](qty:0)')
   })
 })
-
-///////////////////
-////// HELPERS
-///////////////////
-
-function assertEntity(expression: string) {
-  const { utterance: text, parsedSlots } = parseUtterance(expression)
-  const parts = parsedSlots.map((p) => p.value)
-
-  const utterance = text
-  const results = extractListEntities(utterance, list_entities)
-
-  for (const strConds of parsedSlots) {
-    const { start, end } = strConds.cleanPosition
-    const found = results.filter(
-      (x) => (x.char_start >= start && x.char_start < end) || (x.char_end <= end && x.char_end > start)
-    )
-
-    const conditions = strConds.name.split(' ')
-
-    const cases: [string, number | string, number | string][] = []
-    let t: ListEntityExtraction | undefined = undefined
-
-    for (const [name, value] of conditions.map((x) => x.split(':'))) {
-      if (name === 'qty') {
-        cases.push(['qty', value, found.length])
-      } else if (name === 'name') {
-        t = found.find((x) => x.name === value)
-        cases.push(['type', value, t ? t.name : 'N/A'])
-      } else if (name === 'value') {
-        t = found.find((x) => x.value === value)
-        cases.push(['value', value, t ? t.value : 'N/A'])
-      } else if (name === 'confidence' && t) {
-        cases.push(['confidence', value, t.confidence])
-      }
-    }
-
-    if (t) {
-      cases.push(['start', start, t.char_start])
-      cases.push(['end', end, t.char_end])
-    }
-
-    test.each(cases)(`"${text}" (${parts}) '%s' -> Expected(%s) Actual(%s)`, (expression, a, b) => {
-      if (expression === 'confidence') {
-        expect(Number(b)).toBeGreaterThanOrEqual(Number(a))
-      } else if (['qty', 'start', 'end'].includes(expression)) {
-        expect(Number(b)).toEqual(Number(a))
-      } else {
-        expect(b).toEqual(a)
-      }
-    })
-  }
-}

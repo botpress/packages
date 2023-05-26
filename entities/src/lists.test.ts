@@ -1,24 +1,96 @@
 import { ListEntityModel, ListEntitySynonym, wasm, node, ListEntityEngine } from './list-engine'
-import { EntityAssert, EntityExpectations } from './lists.util.test'
+import { MapSpans, Span, parseSpans } from './span.util.test'
 import { spaceTokenizer } from './space-tokenizer'
-import { EntityParser } from './typings'
+import { Entity } from './typings'
 
 /**
- * This test suite is really old. It can be traced back to botpress v12.10.8 and before (commit 7beb86ad5384d683ad868d3662e5f57eced89214)
+ * This test suite is really old (year 2020).
+ * It can be traced back to botpress v12.10.8 and **before** (commit 7beb86ad5384d683ad868d3662e5f57eced89214).
  * see: https://github.com/botpress/botpress/blob/7beb86ad5384d683ad868d3662e5f57eced89214/modules/nlu/src/backend/entities/list-extractor.test.ts
  */
 
-export class ListEntityParser implements EntityParser {
+// ######################
+// ###    0. Utils    ###
+// ######################
+
+type EntityExpectation = {
+  source?: string
+  qty?: number
+  name?: string
+  value?: string
+  confidence?: number
+}
+
+type EntityExpectations<T extends string> = MapSpans<T, EntityExpectation>
+
+const extractEntities = (engine: ListEntityEngine, utterance: string, entities: ListEntityModel[]) => {
+  return engine.extractForListModels(spaceTokenizer(utterance), entities)
+}
+
+class ListEntityAssert {
   constructor(private _engine: ListEntityEngine, private _listEntities: ListEntityModel[]) {}
-  public parse = (text: string) => {
-    const tokens = spaceTokenizer(text)
-    return this._engine.extractForListModels(tokens, this._listEntities)
+
+  public expectSpans = <T extends string>(templateStr: T) => {
+    const { text, spans } = parseSpans(templateStr)
+    const entities = extractEntities(this._engine, text, this._listEntities)
+
+    return {
+      toBe: (...expected: EntityExpectations<T>) => {
+        const cases: [string, number | string, number | string][] = []
+        for (let i = 0; i < expected.length; i++) {
+          let tag = expected[i] as EntityExpectation
+          let span = spans[i] as Span<string>
+
+          let e: Entity | undefined = undefined
+
+          const found = entities.filter(
+            (x) =>
+              (x.char_start >= span.start && x.char_start < span.end) ||
+              (x.char_end <= span.end && x.char_end > span.start)
+          )
+
+          if (tag.qty) {
+            cases.push(['qty', tag.qty, found.length])
+          }
+          if (tag.name) {
+            e = found.find((x) => x.name === tag.name)
+            cases.push(['type', tag.name, e ? e.name : 'N/A'])
+          }
+          if (tag.value) {
+            e = found.find((x) => x.value === tag.value)
+            cases.push(['value', tag.value, e ? e.value : 'N/A'])
+          }
+          if (tag.confidence && e) {
+            cases.push(['confidence', tag.confidence, e.confidence])
+          }
+
+          if (e) {
+            cases.push(['start', span.start, e.char_start])
+            cases.push(['end', span.end, e.char_end])
+          }
+        }
+
+        for (const [expression, a, b] of cases) {
+          if (expression === 'confidence') {
+            expect(Number(b)).toBeGreaterThanOrEqual(Number(a))
+          } else if (['qty', 'start', 'end'].includes(expression)) {
+            expect(Number(b)).toEqual(Number(a))
+          } else {
+            expect(b).toEqual(a)
+          }
+        }
+      }
+    }
   }
 }
 
 const T = (syn: string): ListEntitySynonym => ({
   tokens: syn.split(/( )/g)
 })
+
+// ######################
+// ###    1. Tests    ###
+// ######################
 
 const FuzzyTolerance = {
   Loose: 0.65,
@@ -58,17 +130,12 @@ const list_entities: ListEntityModel[] = [
 
 describe.each(['WASM', 'NODE'])('%s list entity extractor', (engineName: string) => {
   const engine = engineName === 'WASM' ? wasm : node
-  const entityParser = new ListEntityParser(engine, list_entities)
-  const entityAssert = new EntityAssert(entityParser)
-
-  const entityTest = <T extends string>(utt: T, ...tags: EntityExpectations<T>): void => {
-    test(utt, () => {
-      entityAssert.expect(utt).toBe(...tags)
-    })
-  }
+  const entityAssert = new ListEntityAssert(engine, list_entities)
+  const entityTest = <T extends string>(utt: T, ...tags: EntityExpectations<T>): void =>
+    test(utt, () => entityAssert.expectSpans(utt).toBe(...tags))
 
   test('Data structure test', async () => {
-    entityAssert.expect('[Blueberries] are berries that are blue').toBe({
+    entityAssert.expectSpans('[Blueberries] are berries that are blue').toBe({
       source: 'Blueberries',
       qty: 1,
       value: 'Blueberry',
@@ -120,7 +187,7 @@ describe.each(['WASM', 'NODE'])('%s list entity extractor', (engineName: string)
 
   test('same occurence in multiple entities extracts multiple entities', () => {
     // arrange
-    const test_entities: ListEntityModel[] = [
+    const testEntities: ListEntityModel[] = [
       ...list_entities,
       {
         name: 'state',
@@ -133,12 +200,11 @@ describe.each(['WASM', 'NODE'])('%s list entity extractor', (engineName: string)
         values: [{ name: 'NewYork', synonyms: ['New York'].map(T) }]
       }
     ]
-    const entityParser = new ListEntityParser(engine, test_entities)
 
     const utterance = 'I want to go to New York'
 
     // act
-    const results = entityParser.parse(utterance)
+    const results = extractEntities(engine, utterance, testEntities)
 
     // assert
     expect(results.length).toEqual(3)

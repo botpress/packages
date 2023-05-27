@@ -2,7 +2,8 @@
   "name": "@bpinternal/entities",
   "version": "0.0.1",
   "description": "Botpress Entities Extractor",
-  "main": "index.js",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "scripts": {
     "build": "pnpm run wasm:node && tsc",
     "wasm:node": "wasm-pack build --target nodejs --release",

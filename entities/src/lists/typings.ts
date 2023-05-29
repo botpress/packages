@@ -7,8 +7,10 @@ export type ListEntityValue = {
   synonyms: string[]
 }
 
+export type FuzzyTolerance = 'loose' | 'medium' | 'strict'
+
 export type ListEntityDef = {
   name: string
-  fuzzy: number
+  fuzzy: FuzzyTolerance
   values: ListEntityValue[]
 }

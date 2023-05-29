@@ -7,16 +7,10 @@ import { EntityExpectations, ListEntityAssert } from './lists.util.test'
  * see: https://github.com/botpress/botpress/blob/7beb86ad5384d683ad868d3662e5f57eced89214/modules/nlu/src/backend/entities/list-extractor.test.ts
  */
 
-const FuzzyTolerance = {
-  Loose: 0.65,
-  Medium: 0.8,
-  Strict: 1
-}
-
-const list_entities: ListEntityDef[] = [
+const listEntities: ListEntityDef[] = [
   {
     name: 'fruit',
-    fuzzy: FuzzyTolerance.Medium,
+    fuzzy: 'medium',
     values: [
       {
         name: 'Blueberry',
@@ -29,12 +23,12 @@ const list_entities: ListEntityDef[] = [
   },
   {
     name: 'company',
-    fuzzy: FuzzyTolerance.Medium,
+    fuzzy: 'medium',
     values: [{ name: 'Apple', synonyms: ['Apple', 'Apple Computers', 'Apple Corporation', 'Apple Inc'] }]
   },
   {
     name: 'airport',
-    fuzzy: FuzzyTolerance.Medium,
+    fuzzy: 'medium',
     values: [
       { name: 'JFK', synonyms: ['JFK', 'New-York', 'NYC'] },
       { name: 'SFO', synonyms: ['SFO', 'SF', 'San-Francisco'] },
@@ -44,7 +38,7 @@ const list_entities: ListEntityDef[] = [
 ]
 
 describe.each(['wasm', 'node'] satisfies ListEntityEngine[])('%s list entity extractor', (engine) => {
-  const extractor = new ListEntityExtractor(list_entities, { engine })
+  const extractor = new ListEntityExtractor(listEntities, { engine })
   const entityAssert = new ListEntityAssert(extractor)
   const entityTest = <T extends string>(utt: T, ...tags: EntityExpectations<T>): void =>
     test(utt, () => entityAssert.expectSpans(utt).toBe(...tags))
@@ -103,15 +97,15 @@ describe.each(['wasm', 'node'] satisfies ListEntityEngine[])('%s list entity ext
   test('same occurence in multiple entities extracts multiple entities', () => {
     // arrange
     const testEntities: ListEntityDef[] = [
-      ...list_entities,
+      ...listEntities,
       {
         name: 'state',
-        fuzzy: FuzzyTolerance.Medium,
+        fuzzy: 'medium',
         values: [{ name: 'NewYork', synonyms: ['New York'] }]
       },
       {
         name: 'city',
-        fuzzy: FuzzyTolerance.Medium,
+        fuzzy: 'medium',
         values: [{ name: 'NewYork', synonyms: ['New York'] }]
       }
     ]

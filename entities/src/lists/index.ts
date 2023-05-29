@@ -1,9 +1,15 @@
 import { EntityExtractor } from '../typings'
 import { wasm, node, ListEntityModel } from './engines'
 import { spaceTokenizer } from './space-tokenizer'
-import { ListEntityDef, ListEntityEngine, Tokenizer } from './typings'
+import { FuzzyTolerance, ListEntityDef, ListEntityEngine, Tokenizer } from './typings'
 
 export * from './typings'
+
+const FUZZY_TOLERANCE: Record<FuzzyTolerance, number> = {
+  loose: 0.65,
+  medium: 0.8,
+  strict: 1
+}
 
 export type ListEntityExtractorProps = {
   tokenizer: Tokenizer
@@ -22,7 +28,8 @@ export class ListEntityExtractor implements EntityExtractor {
   public constructor(entities: ListEntityDef[], props: Partial<ListEntityExtractorProps> = {}) {
     this._props = { ...DEFAULT_PROPS, ...props }
     this._models = entities.map((x) => ({
-      ...x,
+      name: x.name,
+      fuzzy: FUZZY_TOLERANCE[x.fuzzy],
       values: x.values.map((y) => ({
         ...y,
         synonyms: y.synonyms.map((z) => ({ tokens: this._props.tokenizer(z) }))

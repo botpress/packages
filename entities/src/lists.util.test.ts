@@ -42,8 +42,7 @@ export class ListEntityAssert {
 
           const found = entities.filter(
             (x) =>
-              (x.char_start >= span.start && x.char_start < span.end) ||
-              (x.char_end <= span.end && x.char_end > span.start)
+              (x.charStart >= span.start && x.charStart < span.end) || (x.charEnd <= span.end && x.charEnd > span.start)
           )
 
           if (tag.qty) {
@@ -62,8 +61,8 @@ export class ListEntityAssert {
           }
 
           if (e) {
-            cases.push(['start', span.start, e.char_start])
-            cases.push(['end', span.end, e.char_end])
+            cases.push(['start', span.start, e.charStart])
+            cases.push(['end', span.end, e.charEnd])
           }
         }
 

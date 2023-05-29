@@ -1,10 +1,10 @@
-export type ListEntitySynonym = {
-  tokens: string[]
-}
+export type ListEntityEngine = 'wasm' | 'node'
+
+export type Tokenizer = (utterance: string) => string[]
 
 export type ListEntityValue = {
   name: string
-  synonyms: ListEntitySynonym[]
+  synonyms: string[]
 }
 
 export type ListEntityDef = {
@@ -12,14 +12,3 @@ export type ListEntityDef = {
   fuzzy: number
   values: ListEntityValue[]
 }
-
-export type ListEntityExtraction = {
-  name: string
-  confidence: number
-  value: string
-  source: string
-  char_start: number
-  char_end: number
-}
-
-export type Tokenizer = (utterance: string) => string[]

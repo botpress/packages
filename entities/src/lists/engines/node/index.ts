@@ -1,5 +1,5 @@
 import _ from 'lodash'
-import { ListEntityExtraction, ListEntityDef } from '../typings'
+import { ListEntityExtraction, ListEntityModel } from '../typings'
 import * as strings from './strings'
 import * as toks from './tokens'
 
@@ -122,7 +122,7 @@ const extractForSynonym = (tokens: toks.Token[], synonym: FlatSynonym): Candidat
   return candidates
 }
 
-export const extractForListModel = (strTokens: string[], listModel: ListEntityDef): ListEntityExtraction[] => {
+export const extractForListModel = (strTokens: string[], listModel: ListEntityModel): ListEntityExtraction[] => {
   const uttTokens = toks.toTokens(strTokens)
 
   const synonyms: FlatSynonym[] = listModel.values.flatMap((value) => {
@@ -173,15 +173,15 @@ export const extractForListModel = (strTokens: string[], listModel: ListEntityDe
   const results: ListEntityExtraction[] = matches.map((match) => ({
     name: listModel.name,
     confidence: match.struct_score,
-    char_start: uttTokens[match.token_start].startChar,
-    char_end: uttTokens[match.token_end].endChar,
+    charStart: uttTokens[match.token_start].startChar,
+    charEnd: uttTokens[match.token_end].endChar,
     value: match.value,
     source: match.source
   }))
   return results
 }
 
-export const extractForListModels = (strTokens: string[], listModels: ListEntityDef[]): ListEntityExtraction[] => {
+export const extractForListModels = (strTokens: string[], listModels: ListEntityModel[]): ListEntityExtraction[] => {
   const results: ListEntityExtraction[] = []
   for (const listModel of listModels) {
     const newResults = extractForListModel(strTokens, listModel)

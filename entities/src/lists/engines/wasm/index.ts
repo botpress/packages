@@ -1,5 +1,5 @@
-import * as pkg from '../../../pkg/entities'
-import { ListEntityExtraction, ListEntityDef, ListEntityValue, ListEntitySynonym } from '../typings'
+import * as pkg from '../../../../pkg/entities'
+import { ListEntityExtraction, ListEntityModel } from '../typings'
 import { WasmVec } from './wasm-vec'
 
 /**
@@ -12,16 +12,20 @@ import { WasmVec } from './wasm-vec'
  *   However, outputs of wasm functions must be freed, otherwise there will be memory leaks.
  */
 
+type Model = ListEntityModel
+type Value = Model['values'][number]
+type Synonym = Value['synonyms'][number]
+
 namespace fromJs {
-  export const mapEntitySynonym = (synonym: ListEntitySynonym): pkg.SynonymDefinition => {
+  export const mapEntitySynonym = (synonym: Synonym): pkg.SynonymDefinition => {
     const wasmTokens = new WasmVec(pkg.StringArray).fill(synonym.tokens)
     return new pkg.SynonymDefinition(wasmTokens.x)
   }
-  export const mapEntityValue = (value: ListEntityValue): pkg.ValueDefinition => {
+  export const mapEntityValue = (value: Value): pkg.ValueDefinition => {
     const wasmSynonyms = new WasmVec(pkg.SynonymArray).fill(value.synonyms.map(mapEntitySynonym))
     return new pkg.ValueDefinition(value.name, wasmSynonyms.x)
   }
-  export const mapEntityDef = (listModel: ListEntityDef): pkg.EntityDefinition => {
+  export const mapEntityModel = (listModel: ListEntityModel): pkg.EntityDefinition => {
     const wasmValues = new WasmVec(pkg.ValueArray).fill(listModel.values.map(mapEntityValue))
     return new pkg.EntityDefinition(listModel.name, listModel.fuzzy, wasmValues.x)
   }
@@ -34,8 +38,8 @@ namespace fromRust {
       confidence: wasmExtraction.confidence,
       value: wasmExtraction.value,
       source: wasmExtraction.source,
-      char_start: wasmExtraction.char_start,
-      char_end: wasmExtraction.char_end
+      charStart: wasmExtraction.char_start,
+      charEnd: wasmExtraction.char_end
     }
 
     // IMPORTANT: free the extraction to avoid memory leaks
@@ -58,9 +62,12 @@ namespace fromRust {
   }
 }
 
-export const extractForListModels = (strTokens: string[], listDefinitions: ListEntityDef[]): ListEntityExtraction[] => {
+export const extractForListModels = (
+  strTokens: string[],
+  listDefinitions: ListEntityModel[]
+): ListEntityExtraction[] => {
   const wasmStrTokens = new WasmVec(pkg.StringArray).fill(strTokens)
-  const wasmListDefinitions = new WasmVec(pkg.EntityArray).fill(listDefinitions.map(fromJs.mapEntityDef))
+  const wasmListDefinitions = new WasmVec(pkg.EntityArray).fill(listDefinitions.map(fromJs.mapEntityModel))
   const wasmListExtractions = pkg.extract_multiple(wasmStrTokens.x, wasmListDefinitions.x)
   const listExtractions = fromRust.mapEntityExtractions(wasmListExtractions)
   return listExtractions

@@ -1,16 +1,11 @@
-import { ListEntityDef, ListEntitySynonym, ListEntityEngine, ListEntityParser } from './lists'
+import { ListEntityDef, ListEntityEngine, ListEntityParser } from './lists'
 import { EntityExpectations, ListEntityAssert } from './lists.util.test'
-import { spaceTokenizer } from './lists/space-tokenizer'
 
 /**
  * This test suite is really old (year 2020).
  * It can be traced back to botpress v12.10.8 and **before** (commit 7beb86ad5384d683ad868d3662e5f57eced89214).
  * see: https://github.com/botpress/botpress/blob/7beb86ad5384d683ad868d3662e5f57eced89214/modules/nlu/src/backend/entities/list-extractor.test.ts
  */
-
-const T = (syn: string): ListEntitySynonym => ({
-  tokens: spaceTokenizer(syn)
-})
 
 const FuzzyTolerance = {
   Loose: 0.65,
@@ -25,25 +20,25 @@ const list_entities: ListEntityDef[] = [
     values: [
       {
         name: 'Blueberry',
-        synonyms: ['blueberries', 'blueberry', 'blue berries', 'blue berry', 'poisonous blueberry'].map(T)
+        synonyms: ['blueberries', 'blueberry', 'blue berries', 'blue berry', 'poisonous blueberry']
       },
-      { name: 'Strawberry', synonyms: ['strawberries', 'strawberry', 'straw berries', 'straw berry'].map(T) },
-      { name: 'Raspberry', synonyms: ['raspberries', 'raspberry', 'rasp berries', 'rasp berry'].map(T) },
-      { name: 'Apple', synonyms: ['apple', 'apples', 'red apple', 'yellow apple'].map(T) }
+      { name: 'Strawberry', synonyms: ['strawberries', 'strawberry', 'straw berries', 'straw berry'] },
+      { name: 'Raspberry', synonyms: ['raspberries', 'raspberry', 'rasp berries', 'rasp berry'] },
+      { name: 'Apple', synonyms: ['apple', 'apples', 'red apple', 'yellow apple'] }
     ]
   },
   {
     name: 'company',
     fuzzy: FuzzyTolerance.Medium,
-    values: [{ name: 'Apple', synonyms: ['Apple', 'Apple Computers', 'Apple Corporation', 'Apple Inc'].map(T) }]
+    values: [{ name: 'Apple', synonyms: ['Apple', 'Apple Computers', 'Apple Corporation', 'Apple Inc'] }]
   },
   {
     name: 'airport',
     fuzzy: FuzzyTolerance.Medium,
     values: [
-      { name: 'JFK', synonyms: ['JFK', 'New-York', 'NYC'].map(T) },
-      { name: 'SFO', synonyms: ['SFO', 'SF', 'San-Francisco'].map(T) },
-      { name: 'YQB', synonyms: ['YQB', 'Quebec', 'Quebec city', 'QUEB'].map(T) }
+      { name: 'JFK', synonyms: ['JFK', 'New-York', 'NYC'] },
+      { name: 'SFO', synonyms: ['SFO', 'SF', 'San-Francisco'] },
+      { name: 'YQB', synonyms: ['YQB', 'Quebec', 'Quebec city', 'QUEB'] }
     ]
   }
 ]
@@ -112,12 +107,12 @@ describe.each(['wasm', 'node'] satisfies ListEntityEngine[])('%s list entity ext
       {
         name: 'state',
         fuzzy: FuzzyTolerance.Medium,
-        values: [{ name: 'NewYork', synonyms: ['New York'].map(T) }]
+        values: [{ name: 'NewYork', synonyms: ['New York'] }]
       },
       {
         name: 'city',
         fuzzy: FuzzyTolerance.Medium,
-        values: [{ name: 'NewYork', synonyms: ['New York'].map(T) }]
+        values: [{ name: 'NewYork', synonyms: ['New York'] }]
       }
     ]
     const parser = new ListEntityParser(testEntities, { engine })

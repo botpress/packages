@@ -55,8 +55,8 @@ const extractPatternEntities = (utterance: string, pattern_entities: any[]): Ent
           type: 'pattern',
           name: ent.name,
           confidence: 1,
-          char_start: Math.max(0, res.sourceIndex),
-          char_end: Math.min(input.length, res.sourceIndex + res.value.length),
+          charStart: Math.max(0, res.sourceIndex),
+          charEnd: Math.min(input.length, res.sourceIndex + res.value.length),
           value: res.value,
           source: res.value
         } satisfies Entity)

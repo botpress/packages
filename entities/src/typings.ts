@@ -6,8 +6,8 @@ export type Entity = {
   confidence: number
   value: string
   source: string
-  char_start: number
-  char_end: number
+  charStart: number
+  charEnd: number
 }
 
 export type EntityParser = {

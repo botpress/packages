@@ -1,25 +1,25 @@
-import { EntityParser } from '../typings'
+import { EntityExtractor } from '../typings'
 import { wasm, node, ListEntityModel } from './engines'
 import { spaceTokenizer } from './space-tokenizer'
 import { ListEntityDef, ListEntityEngine, Tokenizer } from './typings'
 
 export * from './typings'
 
-export type ListEntityParserProps = {
+export type ListEntityExtractorProps = {
   tokenizer: Tokenizer
   engine: ListEntityEngine
 }
 
-const DEFAULT_PROPS: ListEntityParserProps = {
+const DEFAULT_PROPS: ListEntityExtractorProps = {
   tokenizer: spaceTokenizer,
   engine: 'wasm'
 }
 
-export class ListEntityParser implements EntityParser {
-  private _props: ListEntityParserProps
+export class ListEntityExtractor implements EntityExtractor {
+  private _props: ListEntityExtractorProps
   private _models: ListEntityModel[]
 
-  public constructor(entities: ListEntityDef[], props: Partial<ListEntityParserProps> = {}) {
+  public constructor(entities: ListEntityDef[], props: Partial<ListEntityExtractorProps> = {}) {
     this._props = { ...DEFAULT_PROPS, ...props }
     this._models = entities.map((x) => ({
       ...x,
@@ -30,7 +30,7 @@ export class ListEntityParser implements EntityParser {
     }))
   }
 
-  public parse = (text: string) => {
+  public extract = (text: string) => {
     const tokens = this._props.tokenizer(text)
 
     const extractions =

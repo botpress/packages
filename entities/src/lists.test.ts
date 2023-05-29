@@ -1,4 +1,4 @@
-import { ListEntityDef, ListEntityEngine, ListEntityParser } from './lists'
+import { ListEntityDef, ListEntityEngine, ListEntityExtractor } from './lists'
 import { EntityExpectations, ListEntityAssert } from './lists.util.test'
 
 /**
@@ -44,8 +44,8 @@ const list_entities: ListEntityDef[] = [
 ]
 
 describe.each(['wasm', 'node'] satisfies ListEntityEngine[])('%s list entity extractor', (engine) => {
-  const parser = new ListEntityParser(list_entities, { engine })
-  const entityAssert = new ListEntityAssert(parser)
+  const extractor = new ListEntityExtractor(list_entities, { engine })
+  const entityAssert = new ListEntityAssert(extractor)
   const entityTest = <T extends string>(utt: T, ...tags: EntityExpectations<T>): void =>
     test(utt, () => entityAssert.expectSpans(utt).toBe(...tags))
 
@@ -115,12 +115,12 @@ describe.each(['wasm', 'node'] satisfies ListEntityEngine[])('%s list entity ext
         values: [{ name: 'NewYork', synonyms: ['New York'] }]
       }
     ]
-    const parser = new ListEntityParser(testEntities, { engine })
+    const extractor = new ListEntityExtractor(testEntities, { engine })
 
     const utterance = 'I want to go to New York'
 
     // act
-    const results = parser.parse(utterance)
+    const results = extractor.extract(utterance)
 
     // assert
     expect(results.length).toEqual(3)

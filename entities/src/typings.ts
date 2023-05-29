@@ -10,6 +10,6 @@ export type Entity = {
   charEnd: number
 }
 
-export type EntityParser = {
-  parse: (text: string) => Entity[]
+export type EntityExtractor = {
+  extract: (text: string) => Entity[]
 }

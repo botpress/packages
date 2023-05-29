@@ -1,5 +1,5 @@
 import _ from 'lodash'
-import { Entity, EntityParser } from './typings'
+import { Entity, EntityExtractor } from './typings'
 
 type ExtractedPattern = {
   value: string
@@ -72,10 +72,10 @@ export type PatternEntity = {
   sensitive: boolean
 }
 
-export class PatternEntityParser implements EntityParser {
+export class PatternEntityExtractor implements EntityExtractor {
   public constructor(private pattern_entities: any[]) {}
 
-  public parse(utterance: string): Entity[] {
+  public extract(utterance: string): Entity[] {
     const invalidPattern = this.pattern_entities.find((ent) => !isPatternValid(ent.pattern))
     if (invalidPattern) {
       throw new Error(`Invalid pattern: ${invalidPattern.pattern}`)

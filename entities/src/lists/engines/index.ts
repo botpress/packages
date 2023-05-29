@@ -1,3 +1,3 @@
 export * from './typings'
 export * as wasm from './wasm'
-export * as node from './node'
+export * as javascript from './javascript'

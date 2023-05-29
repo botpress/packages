@@ -37,7 +37,7 @@ const listEntities: ListEntityDef[] = [
   }
 ]
 
-describe.each(['wasm', 'node'] satisfies ListEntityEngine[])('%s list entity extractor', (engine) => {
+describe.each(['wasm', 'javascript'] satisfies ListEntityEngine[])('%s list entity extractor', (engine) => {
   const extractor = new ListEntityExtractor(listEntities, { engine })
   const entityAssert = new ListEntityAssert(extractor)
   const entityTest = <T extends string>(utt: T, ...tags: EntityExpectations<T>): void =>

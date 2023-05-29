@@ -11,7 +11,7 @@ npm i @bpinternal/entities
 ## Usage
 
 ```ts
-import { lists } from '../entities'
+import { lists } from '@bpinternal/entities'
 
 const listEntities: lists.ListEntityDef[] = [
   {

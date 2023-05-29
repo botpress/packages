@@ -1,4 +1,4 @@
-export type ListEntityEngine = 'wasm' | 'node'
+export type ListEntityEngine = 'wasm' | 'javascript'
 
 export type Tokenizer = (utterance: string) => string[]
 

@@ -5,8 +5,8 @@
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
-    "build": "pnpm run wasm:node && tsc",
-    "wasm:node": "wasm-pack build --target nodejs --release",
+    "build": "pnpm run build:node && tsc",
+    "build:node": "wasm-pack build --target nodejs --release",
     "dev": "ts-node -T ./src/index.ts",
     "start": "node ./dist/index.js",
     "test": "jest --roots ./dist --testPathIgnorePatterns \\.util\\.test\\.js && cargo test"

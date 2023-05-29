@@ -1,5 +1,5 @@
 import { EntityExtractor } from '../typings'
-import { wasm, node, ListEntityModel } from './engines'
+import { wasm, javascript, ListEntityModel } from './engines'
 import { spaceTokenizer } from './space-tokenizer'
 import { FuzzyTolerance, ListEntityDef, ListEntityEngine, Tokenizer } from './typings'
 
@@ -43,7 +43,7 @@ export class ListEntityExtractor implements EntityExtractor {
     const extractions =
       this._props.engine === 'wasm'
         ? wasm.extractForListModels(tokens, this._models)
-        : node.extractForListModels(tokens, this._models)
+        : javascript.extractForListModels(tokens, this._models)
 
     return extractions.map((x) => ({
       type: 'list' as const,

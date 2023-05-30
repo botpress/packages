@@ -1,9 +1,5 @@
 import type { ApiError } from '../state'
 
-export function generateErrors(errors: ApiError[]) {
-  const types = errors.map((error) => error.type)
-
-  return `
 const codes = {
   HTTP_STATUS_BAD_REQUEST: 400,
   HTTP_STATUS_UNAUTHORIZED: 401,
@@ -11,10 +7,26 @@ const codes = {
   HTTP_STATUS_FORBIDDEN: 403,
   HTTP_STATUS_NOT_FOUND: 404,
   HTTP_STATUS_METHOD_NOT_ALLOWED: 405,
+  HTTP_STATUS_REQUEST_TIMEOUT: 408,
   HTTP_STATUS_CONFLICT: 409,
   HTTP_STATUS_PAYLOAD_TOO_LARGE: 413,
+  HTTP_STATUS_UNSUPPORTED_MEDIA_TYPE: 415,
   HTTP_STATUS_TOO_MANY_REQUESTS: 429,
   HTTP_STATUS_INTERNAL_SERVER_ERROR: 500,
+  HTTP_STATUS_NOT_IMPLEMENTED: 501,
+  HTTP_STATUS_BAD_GATEWAY: 502,
+  HTTP_STATUS_SERVICE_UNAVAILABLE: 503,
+  HTTP_STATUS_GATEWAY_TIMEOUT: 504
+} as const
+
+export function generateErrors(errors: ApiError[]) {
+  const types = errors.map((error) => error.type)
+
+  return `
+const codes = {
+${Object.entries(codes)
+  .map(([name, code]) => `  ${name}: ${code},`)
+  .join('\n')}
 } as const
 
 type ErrorCode = typeof codes[keyof typeof codes]
@@ -44,7 +56,7 @@ abstract class BaseApiError<Code extends ErrorCode, Type extends string, Descrip
 const isObject = (obj: unknown): obj is object => typeof obj === 'object' && !Array.isArray(obj) && obj !== null
 
 export const isApiError = (thrown: unknown): thrown is ApiError => {
-  return thrown instanceof BaseApiError || isObject(thrown) && thrown.isApiError === true
+  return thrown instanceof BaseApiError || isObject(thrown) && (thrown as ApiError).isApiError === true
 }
 
 ${errors.map((err) => generateError(err)).join('\n')}

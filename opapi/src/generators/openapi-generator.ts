@@ -16,8 +16,7 @@ export const runOpenApiCodeGenerator = async (
   const id = await client.generateClient(openapiSpect, {
     supportsES6: true,
     useSingleRequestParameter: true,
-    withNodeImports: false,
-    withInterfaces: true,
+    withNodeImports: false
   })
 
   const buffer = await client.downloadClient(id)

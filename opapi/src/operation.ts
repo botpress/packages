@@ -8,17 +8,17 @@ import { SchemaObject } from 'openapi3-ts'
 export const addOperation = <
   SchemaName extends string,
   DefaultParameterName extends string,
-  SectionName extends string
+  SectionName extends string,
 >(
   state: State<SchemaName, DefaultParameterName, SectionName>,
-  operationProps: Operation<DefaultParameterName, SectionName, string, ZodTypeAny>
+  operationProps: Operation<DefaultParameterName, SectionName, string, ZodTypeAny>,
 ) => {
   const { name } = operationProps
 
   const parameters = createParameters(
     operationProps.parameters,
     state.defaultParameters,
-    operationProps.disableDefaultParameters
+    operationProps.disableDefaultParameters,
   )
 
   if (operationProps.path[0] !== '/') {
@@ -50,8 +50,8 @@ export const addOperation = <
     response: {
       description: operationProps.response.description,
       status: operationProps.response.status,
-      schema: generateSchemaFromZod(operationProps.response.schema)
-    }
+      schema: generateSchemaFromZod(operationProps.response.schema),
+    },
   }
 
   state.sections.find((section) => section.name === operationProps.section)?.operations?.push(name)
@@ -60,7 +60,7 @@ export const addOperation = <
 function createParameters<DefaultParameterNames extends string>(
   parameters: ParametersMap = {},
   defaultParameters: ParametersMap = {},
-  disableDefaultParameters: { [name in DefaultParameterNames]?: boolean } = {}
+  disableDefaultParameters: { [name in DefaultParameterNames]?: boolean } = {},
 ): ParametersMap {
   const params: ParametersMap = parameters
 
@@ -76,7 +76,7 @@ function createParameters<DefaultParameterNames extends string>(
 }
 
 export function operationBodyTypeGuard<DefaultParameterNames extends string, Tag extends string>(
-  operation: Operation<DefaultParameterNames, Tag, string, any>
+  operation: Operation<DefaultParameterNames, Tag, string, any>,
 ): operation is OperationWithBodyProps<DefaultParameterNames, Tag, string, SchemaObject> {
   return operation.method === 'put' || operation.method === 'post' || operation.method === 'patch'
 }

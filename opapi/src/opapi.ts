@@ -10,7 +10,7 @@ export const schema = extendApi
 export type OpenApi<
   SchemaName extends string = string,
   DefaultParameterName extends string = string,
-  SectionName extends string = string
+  SectionName extends string = string,
 > = ReturnType<typeof createOpapiFromState<SchemaName, DefaultParameterName, SectionName>>
 
 export type OpenApiProps<SchemaName extends string, DefaultParameterName extends string, SectionName extends string> = {
@@ -36,26 +36,26 @@ const asReadonly = <T extends Record<string, any>>(obj: T): Readonly<T> => obj
 const createOpapiFromState = <
   SchemaName extends string,
   DefaultParameterName extends string,
-  SectionName extends string
+  SectionName extends string,
 >(
-  state: State<SchemaName, DefaultParameterName, SectionName>
+  state: State<SchemaName, DefaultParameterName, SectionName>,
 ) => {
   return asReadonly({
     state,
     getModelRef: (name: SchemaName): OpenApiZodAny => getRef(state, ComponentType.SCHEMAS, name),
     addOperation: <Path extends string>(
-      operationProps: Operation<DefaultParameterName, SectionName, Path, ZodTypeAny>
+      operationProps: Operation<DefaultParameterName, SectionName, Path, ZodTypeAny>,
     ) => addOperation(state, operationProps),
     exportClient: (dir = '.', openapiGeneratorEndpoint: string, postProcessors?: OpenApiPostProcessors) =>
       generateClient(state, dir, openapiGeneratorEndpoint, postProcessors),
     exportServer: (dir = '.', useExpressTypes: boolean) => generateServer(state, dir, useExpressTypes),
     exportOpenapi: (dir = '.') => generateOpenapi(state, dir),
-    exportState: (dir = '.') => exportStateAsTypescript(state, dir)
+    exportState: (dir = '.') => exportStateAsTypescript(state, dir),
   })
 }
 
 export function OpenApi<SchemaName extends string, DefaultParameterName extends string, SectionName extends string>(
-  props: OpenApiProps<SchemaName, DefaultParameterName, SectionName>
+  props: OpenApiProps<SchemaName, DefaultParameterName, SectionName>,
 ) {
   const state = createState(props)
   return createOpapiFromState(state)
@@ -63,7 +63,7 @@ export function OpenApi<SchemaName extends string, DefaultParameterName extends 
 
 export namespace OpenApi {
   export const fromState = <SchemaName extends string, DefaultParameterName extends string, SectionName extends string>(
-    state: State<SchemaName, DefaultParameterName, SectionName>
+    state: State<SchemaName, DefaultParameterName, SectionName>,
   ) => createOpapiFromState(state as State<SchemaName, DefaultParameterName, SectionName>)
 }
 

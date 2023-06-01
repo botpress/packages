@@ -15,6 +15,7 @@ specifiers:
   nodemon: ^2.0.20
   openapi-typescript: ^6.1.0
   openapi3-ts: ^2.0.2
+  prettier: ^2.8.8
   radash: ^9.5.0
   ts-node: ^10.9.1
   tsconfig-paths: ^4.1.1
@@ -36,6 +37,7 @@ dependencies:
   nodemon: 2.0.22
   openapi-typescript: 6.2.1
   openapi3-ts: 2.0.2
+  prettier: 2.8.8
   radash: 9.5.0
   tsconfig-paths: 4.2.0
   verror: 1.10.1
@@ -1806,6 +1808,12 @@ packages:
       picocolors: 1.0.0
       source-map-js: 1.0.2
     dev: true
+
+  /prettier/2.8.8:
+    resolution: {integrity: sha512-tdN8qQGvNjw4CHbY+XXk0JgCXn9QiF21a55rBe5LJAU+kDyC4WQn4+awm2Xfk2lQMk5fKup9XgzTZtGkjBdP9Q==}
+    engines: {node: '>=10.13.0'}
+    hasBin: true
+    dev: false
 
   /process-nextick-args/2.0.1:
     resolution: {integrity: sha512-3ouUOpQhtgrbOa17J7+uxOTpITYWaGP7/AhoR3+A+/1e9skrzelGi/dXzEYyvbxubEF6Wn2ypscTKiKJFFn1ag==}

@@ -11,9 +11,9 @@ const entries = <K extends string, V>(obj: Record<K, V>) => Object.entries(obj) 
 export const createOpenapi = <
   SchemaName extends string,
   DefaultParameterName extends string,
-  SectionName extends string
+  SectionName extends string,
 >(
-  state: State<SchemaName, DefaultParameterName, SectionName>
+  state: State<SchemaName, DefaultParameterName, SectionName>,
 ) => {
   const { metadata, schemas, operations } = state
   const { description, server, title, version } = metadata
@@ -24,15 +24,15 @@ export const createOpenapi = <
     info: {
       title,
       description,
-      version
+      version,
     },
     paths: {},
     components: {
       schemas: {},
       responses: {},
       requestBodies: {},
-      parameters: {}
-    }
+      parameters: {},
+    },
   })
 
   entries(schemas).forEach(([schemaName, { schema }]) => {
@@ -49,13 +49,13 @@ export const createOpenapi = <
       description: response.description,
       content: {
         'application/json': {
-          schema: { ...response.schema, title: responseName }
-        }
-      }
+          schema: { ...response.schema, title: responseName },
+        },
+      },
     })
 
     const responseRefSchema = generateSchemaFromZod(
-      getRef(state, ComponentType.RESPONSES, responseName)
+      getRef(state, ComponentType.RESPONSES, responseName),
     ) as ReferenceObject
 
     const operation: OperationObject = {
@@ -64,8 +64,8 @@ export const createOpenapi = <
       parameters: [],
       responses: {
         default: responseRefSchema as ReferenceObject,
-        [response.status ?? defaultResponseStatus]: responseRefSchema as ReferenceObject
-      }
+        [response.status ?? defaultResponseStatus]: responseRefSchema as ReferenceObject,
+      },
     }
 
     if (operationBodyTypeGuard(operationObject)) {
@@ -75,9 +75,9 @@ export const createOpenapi = <
         description: requestBody.description,
         content: {
           'application/json': {
-            schema: { ...requestBody.schema, title: bodyName }
-          }
-        }
+            schema: { ...requestBody.schema, title: bodyName },
+          },
+        },
       })
 
       const bodyRefSchema = generateSchemaFromZod(getRef(state, ComponentType.REQUESTS, bodyName)) as ReferenceObject
@@ -98,8 +98,8 @@ export const createOpenapi = <
               required: parameter.in === 'path' ? true : parameter.required,
               schema: {
                 type: 'string',
-                enum: parameter.enum as string[]
-              }
+                enum: parameter.enum as string[],
+              },
             })
             break
           case 'string[]':
@@ -112,9 +112,9 @@ export const createOpenapi = <
                 type: 'array',
                 items: {
                   type: 'string',
-                  enum: parameter.enum
-                }
-              }
+                  enum: parameter.enum,
+                },
+              },
             })
             break
           case 'object':
@@ -123,7 +123,7 @@ export const createOpenapi = <
               in: parameter.in,
               description: parameter.description,
               required: parameter.required,
-              schema: parameter.schema
+              schema: parameter.schema,
             })
             break
           default:

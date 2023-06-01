@@ -6,10 +6,10 @@ import { tsFileHeader } from '../const'
 export const exportStateAsTypescript = <
   SchemaName extends string,
   DefaultParameterName extends string,
-  SectionName extends string
+  SectionName extends string,
 >(
   state: State<SchemaName, DefaultParameterName, SectionName>,
-  dir: string
+  dir: string,
 ): void => {
   const json = JSON.stringify(state, null, 2)
 

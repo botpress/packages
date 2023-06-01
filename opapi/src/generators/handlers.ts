@@ -5,7 +5,7 @@ import type {
   QueryParameterStringArray,
   QueryParameterObject,
   PathParameter,
-  Operation
+  Operation,
 } from '../state'
 
 export type GenerateHandlersProps = {
@@ -69,18 +69,18 @@ const generateParameterFields = ({
   params,
   queries,
   body,
-  operationName
+  operationName,
 }: GenerateHandlerProps): string =>
   [
     body ? generateBodyField(operationName) : undefined,
     ...cookies.map((cookie) =>
-      generateField(cookie.name, 'cookies', cookie.parameter, cookie.parameter.required !== false)
+      generateField(cookie.name, 'cookies', cookie.parameter, cookie.parameter.required !== false),
     ),
     ...headers.map((header) =>
-      generateField(header.name, 'headers', header.parameter, header.parameter.required !== false)
+      generateField(header.name, 'headers', header.parameter, header.parameter.required !== false),
     ),
     ...queries.map((query) => generateField(query.name, 'query', query.parameter, query.parameter.required !== false)),
-    ...params.map((param) => generateField(param.name, 'params', param.parameter, true))
+    ...params.map((param) => generateField(param.name, 'params', param.parameter, true)),
   ]
     .filter((v) => !!v)
     .join('\n')
@@ -142,7 +142,7 @@ const generateResolver = (operations: GenerateHandlerProps[]) => {
 
     if (handlerObject[operation.operation.path]![operation.operation.method]) {
       throw new Error(
-        `Duplicate operation ${operation.operationName}: ${operation.operation.method} ${operation.operation.path}`
+        `Duplicate operation ${operation.operationName}: ${operation.operation.method} ${operation.operation.path}`,
       )
     }
 

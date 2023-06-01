@@ -1,15 +1,17 @@
 import { VError } from 'verror'
 import type { Operation, OperationWithBodyProps, ParametersMap, State } from './state'
 import { formatBodyName, formatResponseName, isAlphanumeric } from './util'
+import { ZodTypeAny } from 'zod'
+import { generateSchemaFromZod } from './jsonschema'
+import { SchemaObject } from 'openapi3-ts'
 
 export const addOperation = <
   SchemaName extends string,
   DefaultParameterName extends string,
-  SectionName extends string,
-  SchemaSectionName extends SectionName
+  SectionName extends string
 >(
-  state: State<SchemaName, DefaultParameterName, SectionName, SchemaSectionName>,
-  operationProps: Operation<DefaultParameterName, SectionName>
+  state: State<SchemaName, DefaultParameterName, SectionName>,
+  operationProps: Operation<DefaultParameterName, SectionName, string, ZodTypeAny>
 ) => {
   const { name } = operationProps
 
@@ -44,7 +46,12 @@ export const addOperation = <
   state.operations[name] = {
     ...operationProps,
     parameters,
-    path
+    path,
+    response: {
+      description: operationProps.response.description,
+      status: operationProps.response.status,
+      schema: generateSchemaFromZod(operationProps.response.schema)
+    }
   }
 
   state.sections.find((section) => section.name === operationProps.section)?.operations?.push(name)
@@ -69,8 +76,8 @@ function createParameters<DefaultParameterNames extends string>(
 }
 
 export function operationBodyTypeGuard<DefaultParameterNames extends string, Tag extends string>(
-  operation: Operation<DefaultParameterNames, Tag>
-): operation is OperationWithBodyProps<DefaultParameterNames, Tag> {
+  operation: Operation<DefaultParameterNames, Tag, string, any>
+): operation is OperationWithBodyProps<DefaultParameterNames, Tag, string, SchemaObject> {
   return operation.method === 'put' || operation.method === 'post' || operation.method === 'patch'
 }
 

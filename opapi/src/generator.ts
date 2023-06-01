@@ -17,12 +17,9 @@ import type { OpenApiPostProcessors } from './opapi'
 import { createOpenapi } from './openapi'
 import { operationBodyTypeGuard } from './operation'
 import type { Operation, State } from './state'
+import { SchemaObject } from 'openapi3-ts'
 
-export const generateServer = async (
-  state: State<string, string, string, string>,
-  dir: string,
-  useExpressTypes: boolean
-) => {
+export const generateServer = async (state: State<string, string, string>, dir: string, useExpressTypes: boolean) => {
   initDirectory(dir)
 
   log.info('Generating openapi content')
@@ -75,7 +72,7 @@ export const generateServer = async (
 }
 
 export const generateClient = async (
-  state: State<string, string, string, string>,
+  state: State<string, string, string>,
   dir = '.',
   openApiGeneratorEndpoint: string,
   postProcessors?: OpenApiPostProcessors
@@ -122,7 +119,7 @@ export const generateClient = async (
   log.info('')
 }
 
-export function generateOpenapi(state: State<string, string, string, string>, dir = '.') {
+export function generateOpenapi(state: State<string, string, string>, dir = '.') {
   initDirectory(dir)
 
   log.info('Generating openapi content')
@@ -138,7 +135,10 @@ export function generateOpenapi(state: State<string, string, string, string>, di
   log.info('')
 }
 
-function mapOperationPropsToHandlerProps(operationName: string, operation: Operation<string, string>) {
+function mapOperationPropsToHandlerProps(
+  operationName: string,
+  operation: Operation<string, string, string, SchemaObject>
+) {
   const generateHandlerProps: GenerateHandlerProps = {
     operationName,
     operation,

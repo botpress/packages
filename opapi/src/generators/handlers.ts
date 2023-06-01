@@ -1,10 +1,11 @@
+import { SchemaObject } from 'openapi3-ts'
 import type {
   Parameter as OpenApiParameter,
   StandardParameter,
   QueryParameterStringArray,
   QueryParameterObject,
   PathParameter,
-  Operation,
+  Operation
 } from '../state'
 
 export type GenerateHandlersProps = {
@@ -29,7 +30,7 @@ type Parameter<P> = {
 
 export type GenerateHandlerProps = {
   operationName: string
-  operation: Operation<string, string>
+  operation: Operation<string, string, string, SchemaObject>
   headers: Parameter<StandardParameter>[]
   cookies: Parameter<StandardParameter>[]
   params: Parameter<PathParameter>[]
@@ -68,7 +69,7 @@ const generateParameterFields = ({
   params,
   queries,
   body,
-  operationName,
+  operationName
 }: GenerateHandlerProps): string =>
   [
     body ? generateBodyField(operationName) : undefined,
@@ -79,7 +80,7 @@ const generateParameterFields = ({
       generateField(header.name, 'headers', header.parameter, header.parameter.required !== false)
     ),
     ...queries.map((query) => generateField(query.name, 'query', query.parameter, query.parameter.required !== false)),
-    ...params.map((param) => generateField(param.name, 'params', param.parameter, true)),
+    ...params.map((param) => generateField(param.name, 'params', param.parameter, true))
   ]
     .filter((v) => !!v)
     .join('\n')

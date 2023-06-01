@@ -10,10 +10,9 @@ import { formatBodyName, formatResponseName } from './util'
 export const createOpenapi = <
   SchemaName extends string,
   DefaultParameterName extends string,
-  SectionName extends string,
-  SchemaSectionName extends SectionName
+  SectionName extends string
 >(
-  state: State<SchemaName, DefaultParameterName, SectionName, SchemaSectionName>
+  state: State<SchemaName, DefaultParameterName, SectionName>
 ) => {
   const { metadata, schemas, operations } = state
   const { description, server, title, version } = metadata
@@ -50,7 +49,7 @@ export const createOpenapi = <
       description: response.description,
       content: {
         'application/json': {
-          schema: generateSchemaFromZod(extendApi(response.schema, { title: responseName }))
+          schema: response.schema // TODO: add title
         }
       }
     })
@@ -76,7 +75,7 @@ export const createOpenapi = <
         description: requestBody.description,
         content: {
           'application/json': {
-            schema: generateSchemaFromZod(extendApi(requestBody.schema, { title: bodyName }))
+            schema: requestBody.schema // TODO: add title
           }
         }
       })
@@ -124,7 +123,7 @@ export const createOpenapi = <
               in: parameter.in,
               description: parameter.description,
               required: parameter.required,
-              schema: generateSchemaFromZod(parameter.schema)
+              schema: parameter.schema // TODO: add title
             })
             break
           default:

@@ -1,4 +1,3 @@
-import { SchemaObject } from 'openapi3-ts'
 import type {
   Parameter as OpenApiParameter,
   StandardParameter,
@@ -30,11 +29,11 @@ type Parameter<P> = {
 
 export type GenerateHandlerProps = {
   operationName: string
-  operation: Operation<string, string, string, SchemaObject>
+  operation: Operation<string, string, string, 'json-schema'>
   headers: Parameter<StandardParameter>[]
   cookies: Parameter<StandardParameter>[]
   params: Parameter<PathParameter>[]
-  queries: Parameter<StandardParameter | QueryParameterStringArray | QueryParameterObject>[]
+  queries: Parameter<StandardParameter | QueryParameterStringArray | QueryParameterObject<'json-schema'>>[]
   status: number
   body: boolean
 }
@@ -87,10 +86,10 @@ const generateParameterFields = ({
 
 type FieldType = 'headers' | 'cookies' | 'params' | 'query'
 
-const generateField = (name: string, type: FieldType, parameter: OpenApiParameter, required: boolean) =>
+const generateField = (name: string, type: FieldType, parameter: OpenApiParameter<'json-schema'>, required: boolean) =>
   `\t\t'${name}': req.${type}['${name}'] ${generateTypeAnnotation(parameter, required)},`
 
-const generateTypeAnnotation = (parameter: OpenApiParameter, required: boolean) => {
+const generateTypeAnnotation = (parameter: OpenApiParameter<'json-schema'>, required: boolean) => {
   let typeAnnotation = 'as'
 
   const parameterType = parameter.type

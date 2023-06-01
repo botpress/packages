@@ -1,17 +1,20 @@
 import type { SchemaObject } from 'openapi3-ts'
 import { VError } from 'verror'
-import { ZodTypeAny, z } from 'zod'
+import { z } from 'zod'
 import { schema } from './opapi'
 import type { PathParams } from './path-params'
 import { isAlphanumeric, isCapitalAlphabetical } from './util'
 import { generateSchemaFromZod } from './jsonschema'
+import { OpenApiZodAny } from '@anatine/zod-openapi'
+import { objects } from './objects'
 
-type MaybeZod = ZodTypeAny | SchemaObject
+type SchemaType = 'zod-schema' | 'json-schema'
+type SchemaOf<T extends SchemaType> = T extends 'zod-schema' ? OpenApiZodAny : SchemaObject
 
 export type State<SchemaName extends string, DefaultParameterName extends string, SectionName extends string> = {
   metadata: Metadata
   refs: RefMap
-  defaultParameters?: { [name in DefaultParameterName]: Parameter }
+  defaultParameters?: { [name in DefaultParameterName]: Parameter<'json-schema'> }
   sections: {
     name: SectionName
     title: string
@@ -21,7 +24,7 @@ export type State<SchemaName extends string, DefaultParameterName extends string
   }[]
   schemas: Record<SchemaName, { schema: SchemaObject; section: SectionName }>
   errors?: ApiError[]
-  operations: { [name: string]: Operation<DefaultParameterName, SectionName, string, SchemaObject> }
+  operations: { [name: string]: Operation<DefaultParameterName, SectionName, string, 'json-schema'> }
 }
 
 const unknownError: ApiError = {
@@ -81,46 +84,52 @@ export type QueryParameterStringArray = BaseParameter & {
   in: 'query'
 }
 
-export type QueryParameterObject = BaseParameter & {
+export type QueryParameterObject<Schema extends SchemaType> = BaseParameter & {
   type: 'object'
   in: 'query'
   required?: boolean
-  schema: SchemaObject
+  schema: SchemaOf<Schema>
 }
 
-export type Parameter = StandardParameter | PathParameter | QueryParameterObject | QueryParameterStringArray
+export type Parameter<Schema extends SchemaType> =
+  | StandardParameter
+  | PathParameter
+  | QueryParameterObject<Schema>
+  | QueryParameterStringArray
 
+export type OperationWithBodyMethod = 'post' | 'put' | 'patch'
 export type OperationWithBodyProps<
   DefaultParameterName extends string,
   SectionName extends string,
   Path extends string,
-  Schema extends MaybeZod,
+  Schema extends SchemaType,
 > = {
   // Method of the operation
-  method: 'post' | 'put' | 'patch'
+  method: OperationWithBodyMethod
 
   // Request body of the operation
   requestBody: {
     description: string
-    schema: SchemaObject
+    schema: SchemaOf<Schema>
   }
 } & BaseOperationProps<DefaultParameterName, SectionName, Path, Schema>
 
+export type OperationWithoutBodyMethod = 'get' | 'delete' | 'options' | 'head' | 'trace'
 export type OperationWithoutBodyProps<
   DefaultParameterName extends string,
   SectionName extends string,
   Path extends string,
-  Schema extends MaybeZod,
+  Schema extends SchemaType,
 > = {
   // Method of the operation
-  method: 'get' | 'delete' | 'options' | 'head' | 'trace'
+  method: OperationWithoutBodyMethod
 } & BaseOperationProps<DefaultParameterName, SectionName, Path, Schema>
 
 export type Operation<
   DefaultParameterName extends string,
   SectionName extends string,
   Path extends string,
-  Schema extends MaybeZod,
+  Schema extends SchemaType,
 > =
   | OperationWithBodyProps<DefaultParameterName, SectionName, Path, Schema>
   | OperationWithoutBodyProps<DefaultParameterName, SectionName, Path, Schema>
@@ -132,14 +141,14 @@ export enum ComponentType {
   PARAMETERS = 'parameters',
 }
 
-export type ParametersMap<Path extends string = string> = Record<PathParams<Path>, PathParameter> &
-  Record<string, Parameter> // flexible enough to allow bypassing type strictness
+export type ParametersMap<Path extends string, Schema extends SchemaType> = Record<PathParams<Path>, PathParameter> &
+  Record<string, Parameter<Schema>> // flexible enough to allow bypassing type strictness
 
 type BaseOperationProps<
   DefaultParameterName extends string,
   SectionName extends string,
   Path extends string,
-  Schema extends MaybeZod,
+  Schema extends SchemaType,
 > = {
   // Name of the operation
   name: string
@@ -148,7 +157,7 @@ type BaseOperationProps<
   // Description of the operation
   description: string
   // additional parameters from the headers, cookies, query or path
-  parameters?: ParametersMap<Path>
+  parameters?: ParametersMap<Path, Schema>
   disableDefaultParameters?: {
     [name in DefaultParameterName]?: boolean
   }
@@ -159,14 +168,14 @@ type BaseOperationProps<
     // Default is 200
     status?: 200 | 201 | 418
     description: string
-    schema: Schema
+    schema: SchemaOf<Schema>
   }
 }
 
 type CreateStateProps<SchemaName extends string, DefaultParameterName extends string, SectionName extends string> = {
   metadata: Metadata
-  defaultParameters?: Record<DefaultParameterName, Parameter>
-  schemas?: Record<SchemaName, { schema: ZodTypeAny; section: SectionName }>
+  defaultParameters?: Record<DefaultParameterName, Parameter<'zod-schema'>>
+  schemas?: Record<SchemaName, { schema: OpenApiZodAny; section: SectionName }>
   sections?: Record<SectionName, { title: string; description: string }>
   errors?: readonly ApiError[]
 }
@@ -244,10 +253,17 @@ export function createState<SchemaName extends string, DefaultParameterName exte
     }
   })
 
+  const defaultParameters = props.defaultParameters
+    ? (objects.mapValues(props.defaultParameters, mapParameter) satisfies Record<
+        DefaultParameterName,
+        Parameter<'json-schema'>
+      >)
+    : undefined
+
   return {
     operations: {},
     metadata: props.metadata,
-    defaultParameters: props.defaultParameters,
+    defaultParameters,
     errors,
     refs,
     schemas,
@@ -255,7 +271,7 @@ export function createState<SchemaName extends string, DefaultParameterName exte
   }
 }
 
-export function getRef(state: State<string, string, string>, type: ComponentType, name: string): ZodTypeAny {
+export function getRef(state: State<string, string, string>, type: ComponentType, name: string): OpenApiZodAny {
   if (!state.refs[type][name]) {
     throw new VError(`${type} ${name} does not exist`)
   }
@@ -266,4 +282,14 @@ export function getRef(state: State<string, string, string>, type: ComponentType
     required: undefined,
     $ref: `#/components/${type}/${name}`,
   })
+}
+
+export const mapParameter = (param: Parameter<'zod-schema'>): Parameter<'json-schema'> => {
+  if ('schema' in param) {
+    return {
+      ...param,
+      schema: generateSchemaFromZod(param.schema),
+    }
+  }
+  return param
 }

@@ -3,7 +3,6 @@ import { generateClient, generateOpenapi, generateServer } from './generator'
 import { addOperation } from './operation'
 import { ApiError, ComponentType, createState, getRef, Metadata, Operation, Parameter, State } from './state'
 import { exportStateAsTypescript } from './generators/ts-state'
-import { ZodTypeAny } from 'zod'
 export { Operation, Parameter } from './state'
 
 export const schema = extendApi
@@ -16,7 +15,7 @@ export type OpenApi<
 export type OpenApiProps<SchemaName extends string, DefaultParameterName extends string, SectionName extends string> = {
   metadata: Metadata
   // adds default parameters to all operations
-  defaultParameters?: Record<DefaultParameterName, Parameter>
+  defaultParameters?: Record<DefaultParameterName, Parameter<'zod-schema'>>
   // adds the openapi schemas
   schemas?: Record<SchemaName, { schema: OpenApiZodAny; section: SectionName }>
   // adds the openapi tags
@@ -41,10 +40,9 @@ const createOpapiFromState = <
   state: State<SchemaName, DefaultParameterName, SectionName>,
 ) => {
   return asReadonly({
-    state,
     getModelRef: (name: SchemaName): OpenApiZodAny => getRef(state, ComponentType.SCHEMAS, name),
     addOperation: <Path extends string>(
-      operationProps: Operation<DefaultParameterName, SectionName, Path, ZodTypeAny>,
+      operationProps: Operation<DefaultParameterName, SectionName, Path, 'zod-schema'>,
     ) => addOperation(state, operationProps),
     exportClient: (dir = '.', openapiGeneratorEndpoint: string, postProcessors?: OpenApiPostProcessors) =>
       generateClient(state, dir, openapiGeneratorEndpoint, postProcessors),

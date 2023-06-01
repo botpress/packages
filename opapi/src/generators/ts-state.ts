@@ -2,6 +2,7 @@ import pathlib from 'path'
 import fs from 'fs'
 import { State } from '../state'
 import { tsFileHeader } from '../const'
+import prettier from 'prettier'
 
 export const exportStateAsTypescript = <
   SchemaName extends string,
@@ -11,6 +12,8 @@ export const exportStateAsTypescript = <
   state: State<SchemaName, DefaultParameterName, SectionName>,
   dir: string,
 ): void => {
+  fs.mkdirSync(dir, { recursive: true })
+
   const json = JSON.stringify(state, null, 2)
 
   const schemaNames = Object.keys(state.schemas)
@@ -25,9 +28,9 @@ export const exportStateAsTypescript = <
   const imports = `import { State } from '@bpinternal/opapi'\n`
   const body = `export const state = ${json} satisfies State<${typeSchema}, ${typeParam}, ${typeSection}>\n`
 
-  // TODO: run prettier on the generated body
+  const formatted = prettier.format(body, { parser: 'typescript' })
 
-  const ts = header + imports + body
+  const ts = header + imports + formatted
   const path = pathlib.join(dir, 'state.ts')
   fs.writeFileSync(path, ts)
 }

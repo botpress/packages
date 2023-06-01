@@ -1,11 +1,12 @@
-import { OpenApiZodAny, extendApi } from '@anatine/zod-openapi'
-import { OpenApiBuilder, OperationObject, ReferenceObject } from 'openapi3-ts'
+import { OpenApiBuilder, OperationObject, ReferenceObject, SchemaObject } from 'openapi3-ts'
 import VError from 'verror'
 import { defaultResponseStatus } from './const'
 import { generateSchemaFromZod } from './jsonschema'
 import { operationBodyTypeGuard } from './operation'
 import { ComponentType, getRef, State } from './state'
 import { formatBodyName, formatResponseName } from './util'
+
+const entries = <K extends string, V>(obj: Record<K, V>) => Object.entries(obj) as [K, V][]
 
 export const createOpenapi = <
   SchemaName extends string,
@@ -34,12 +35,11 @@ export const createOpenapi = <
     }
   })
 
-  Object.entries(schemas).forEach(([schemaName, schemaProps]) => {
-    const { schema } = schemaProps as { schema: OpenApiZodAny }
-    openapi.addSchema(schemaName, generateSchemaFromZod(schema))
+  entries(schemas).forEach(([schemaName, { schema }]) => {
+    openapi.addSchema(schemaName, schema)
   })
 
-  Object.entries(operations).forEach(([operationName, operationObject]) => {
+  entries(operations).forEach(([operationName, operationObject]) => {
     const { method, path, response } = operationObject
 
     const responseName = formatResponseName(operationName)
@@ -49,7 +49,7 @@ export const createOpenapi = <
       description: response.description,
       content: {
         'application/json': {
-          schema: response.schema // TODO: add title
+          schema: { ...response.schema, title: responseName }
         }
       }
     })
@@ -75,7 +75,7 @@ export const createOpenapi = <
         description: requestBody.description,
         content: {
           'application/json': {
-            schema: requestBody.schema // TODO: add title
+            schema: { ...requestBody.schema, title: bodyName }
           }
         }
       })
@@ -86,7 +86,7 @@ export const createOpenapi = <
     }
 
     if (operationObject.parameters) {
-      Object.entries(operationObject.parameters).forEach(([parameterName, parameter]) => {
+      entries(operationObject.parameters).forEach(([parameterName, parameter]) => {
         const parameterType = parameter.type
 
         switch (parameterType) {
@@ -123,7 +123,7 @@ export const createOpenapi = <
               in: parameter.in,
               description: parameter.description,
               required: parameter.required,
-              schema: parameter.schema // TODO: add title
+              schema: parameter.schema
             })
             break
           default:

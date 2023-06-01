@@ -8,7 +8,7 @@ import {
   GenerateHandlerProps,
   generateHandlers,
   generateTypes,
-  runOpenApiCodeGenerator,
+  runOpenApiCodeGenerator
 } from './generators'
 import { generateErrors } from './generators/errors'
 import { generateOpenapiTypescript } from './generators/openapi-typescript'
@@ -18,7 +18,11 @@ import { createOpenapi } from './openapi'
 import { operationBodyTypeGuard } from './operation'
 import type { Operation, State } from './state'
 
-export const generateServer = async (state: State<string, string>, dir: string, useExpressTypes: boolean) => {
+export const generateServer = async (
+  state: State<string, string, string, string>,
+  dir: string,
+  useExpressTypes: boolean
+) => {
   initDirectory(dir)
 
   log.info('Generating openapi content')
@@ -43,7 +47,7 @@ export const generateServer = async (state: State<string, string>, dir: string, 
     operations: Object.entries(state.operations).map(([name, operation]) =>
       mapOperationPropsToHandlerProps(name, operation)
     ),
-    useExpressTypes,
+    useExpressTypes
   })
   log.info('')
 
@@ -71,7 +75,7 @@ export const generateServer = async (state: State<string, string>, dir: string, 
 }
 
 export const generateClient = async (
-  state: State<string, string>,
+  state: State<string, string, string, string>,
   dir = '.',
   openApiGeneratorEndpoint: string,
   postProcessors?: OpenApiPostProcessors
@@ -92,7 +96,7 @@ export const generateClient = async (
   const clientCode = generateClientCode({
     operations: Object.entries(state.operations).map(([name, operation]) =>
       mapOperationPropsToHandlerProps(name, operation)
-    ),
+    )
   })
   log.info('')
 
@@ -118,7 +122,7 @@ export const generateClient = async (
   log.info('')
 }
 
-export function generateOpenapi(state: State<string, string>, dir = '.') {
+export function generateOpenapi(state: State<string, string, string, string>, dir = '.') {
   initDirectory(dir)
 
   log.info('Generating openapi content')
@@ -143,7 +147,7 @@ function mapOperationPropsToHandlerProps(operationName: string, operation: Opera
     cookies: [],
     queries: [],
     params: [],
-    body: operationBodyTypeGuard(operation) ? true : false,
+    body: operationBodyTypeGuard(operation) ? true : false
   }
 
   if (operation.parameters) {

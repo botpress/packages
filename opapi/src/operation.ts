@@ -2,8 +2,13 @@ import { VError } from 'verror'
 import type { Operation, OperationWithBodyProps, ParametersMap, State } from './state'
 import { formatBodyName, formatResponseName, isAlphanumeric } from './util'
 
-export const addOperation = <DefaultParameterName extends string, SectionName extends string>(
-  state: State<DefaultParameterName, SectionName>,
+export const addOperation = <
+  SchemaName extends string,
+  DefaultParameterName extends string,
+  SectionName extends string,
+  SchemaSectionName extends SectionName
+>(
+  state: State<SchemaName, DefaultParameterName, SectionName, SchemaSectionName>,
   operationProps: Operation<DefaultParameterName, SectionName>
 ) => {
   const { name } = operationProps
@@ -39,7 +44,7 @@ export const addOperation = <DefaultParameterName extends string, SectionName ex
   state.operations[name] = {
     ...operationProps,
     parameters,
-    path,
+    path
   }
 
   state.sections.find((section) => section.name === operationProps.section)?.operations?.push(name)

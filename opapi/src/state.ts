@@ -5,7 +5,12 @@ import { schema } from './opapi'
 import type { PathParams } from './path-params'
 import { isAlphanumeric, isCapitalAlphabetical } from './util'
 
-export type State<DefaultParameterName extends string, SectionName extends string> = {
+export type State<
+  SchemaName extends string,
+  DefaultParameterName extends string,
+  SectionName extends string,
+  SchemaSectionName extends SectionName
+> = {
   metadata: Metadata
   refs: RefMap
   defaultParameters?: { [name in DefaultParameterName]: Parameter }
@@ -16,12 +21,7 @@ export type State<DefaultParameterName extends string, SectionName extends strin
     schema?: string
     operations: string[]
   }[]
-  schemas: {
-    [name: string]: {
-      schema: OpenApiZodAny
-      section: SectionName
-    }
-  }
+  schemas: Record<SchemaName, { schema: OpenApiZodAny; section: SchemaSectionName }>
   errors?: ApiError[]
   operations: { [name: string]: Operation<DefaultParameterName, SectionName, string> }
 }
@@ -29,13 +29,13 @@ export type State<DefaultParameterName extends string, SectionName extends strin
 const unknownError: ApiError = {
   status: 500,
   type: 'Unknown',
-  description: 'An unknown error occurred',
+  description: 'An unknown error occurred'
 }
 
 const internalError: ApiError = {
   status: 500,
   type: 'Internal',
-  description: 'An internal error occurred',
+  description: 'An internal error occurred'
 }
 
 export type ApiError = {
@@ -124,7 +124,7 @@ export enum ComponentType {
   SCHEMAS = 'schemas',
   RESPONSES = 'responses',
   REQUESTS = 'requestBodies',
-  PARAMETERS = 'parameters',
+  PARAMETERS = 'parameters'
 }
 
 export type ParametersMap<Path extends string = string> = Record<PathParams<Path>, PathParameter> &
@@ -153,43 +153,53 @@ type BaseOperationProps<DefaultParameterName extends string, SectionName extends
   }
 }
 
-type CreateStateProps<SchemaName extends string, DefaultParameterName extends string, SectionName extends string> = {
+type CreateStateProps<
+  SchemaName extends string,
+  DefaultParameterName extends string,
+  SectionName extends string,
+  SchemaSectionName extends SectionName
+> = {
   metadata: Metadata
   defaultParameters?: Record<DefaultParameterName, Parameter>
-  schemas?: Record<SchemaName, { schema: OpenApiZodAny; section: SectionName }>
+  schemas?: Record<SchemaName, { schema: OpenApiZodAny; section: SchemaSectionName }>
   sections?: Record<SectionName, { title: string; description: string }>
   errors?: readonly ApiError[]
 }
 
-export function createState<SchemaName extends string, DefaultParameterName extends string, SectionName extends string>(
-  props: CreateStateProps<SchemaName, DefaultParameterName, SectionName>
-): State<DefaultParameterName, SectionName> {
+export function createState<
+  SchemaName extends string,
+  DefaultParameterName extends string,
+  SectionName extends string,
+  SchemaSectionName extends SectionName
+>(
+  props: CreateStateProps<SchemaName, DefaultParameterName, SectionName, SchemaSectionName>
+): State<SchemaName, DefaultParameterName, SectionName, SchemaSectionName> {
   const schemaEntries = props.schemas
-    ? Object.entries<typeof props.schemas[SchemaName]>(props.schemas).map(([name, data]) => ({
-      name,
-      schema: data.schema,
-      section: data.section,
-    }))
+    ? Object.entries<(typeof props.schemas)[SchemaName]>(props.schemas).map(([name, data]) => ({
+        name,
+        schema: data.schema,
+        section: data.section
+      }))
     : []
 
-  const schemas: State<DefaultParameterName, SectionName>['schemas'] = {}
+  const schemas: Record<string, { schema: OpenApiZodAny; section: SchemaSectionName }> = {}
 
-  const refs: State<DefaultParameterName, SectionName>['refs'] = {
+  const refs: State<SchemaName, DefaultParameterName, SectionName, SchemaSectionName>['refs'] = {
     parameters: {},
     requestBodies: {},
     responses: {},
-    schemas: {},
+    schemas: {}
   }
 
   const toPairs = <K extends string, T>(obj: Record<K, T>): [K, T][] => Object.entries(obj) as [K, T][]
 
   const sections = props.sections
     ? toPairs(props.sections).map(([name, section]) => ({
-      ...section,
-      name,
-      operations: [],
-      schema: schemaEntries.find((schemaEntry) => schemaEntry.section === name)?.name,
-    }))
+        ...section,
+        name,
+        operations: [],
+        schema: schemaEntries.find((schemaEntry) => schemaEntry.section === name)?.name
+      }))
     : []
 
   schemaEntries.forEach((schemaEntry) => {
@@ -238,11 +248,11 @@ export function createState<SchemaName extends string, DefaultParameterName exte
     errors,
     refs,
     schemas,
-    sections,
+    sections
   }
 }
 
-export function getRef(state: State<string, string>, type: ComponentType, name: string): OpenApiZodAny {
+export function getRef(state: State<string, string, string, string>, type: ComponentType, name: string): OpenApiZodAny {
   if (!state.refs[type][name]) {
     throw new VError(`${type} ${name} does not exist`)
   }
@@ -251,6 +261,6 @@ export function getRef(state: State<string, string>, type: ComponentType, name: 
     type: undefined,
     properties: undefined,
     required: undefined,
-    $ref: `#/components/${type}/${name}`,
+    $ref: `#/components/${type}/${name}`
   })
 }

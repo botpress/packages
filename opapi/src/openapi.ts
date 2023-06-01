@@ -1,4 +1,4 @@
-import { extendApi } from '@anatine/zod-openapi'
+import { OpenApiZodAny, extendApi } from '@anatine/zod-openapi'
 import { OpenApiBuilder, OperationObject, ReferenceObject } from 'openapi3-ts'
 import VError from 'verror'
 import { defaultResponseStatus } from './const'
@@ -7,8 +7,13 @@ import { operationBodyTypeGuard } from './operation'
 import { ComponentType, getRef, State } from './state'
 import { formatBodyName, formatResponseName } from './util'
 
-export const createOpenapi = <DefaultParameterName extends string, SectionName extends string>(
-  state: State<DefaultParameterName, SectionName>
+export const createOpenapi = <
+  SchemaName extends string,
+  DefaultParameterName extends string,
+  SectionName extends string,
+  SchemaSectionName extends SectionName
+>(
+  state: State<SchemaName, DefaultParameterName, SectionName, SchemaSectionName>
 ) => {
   const { metadata, schemas, operations } = state
   const { description, server, title, version } = metadata
@@ -19,20 +24,21 @@ export const createOpenapi = <DefaultParameterName extends string, SectionName e
     info: {
       title,
       description,
-      version,
+      version
     },
     paths: {},
     components: {
       schemas: {},
       responses: {},
       requestBodies: {},
-      parameters: {},
-    },
+      parameters: {}
+    }
   })
 
-  Object.entries(schemas).forEach(([schemaName, schema]) =>
-    openapi.addSchema(schemaName, generateSchemaFromZod(schema.schema))
-  )
+  Object.entries(schemas).forEach(([schemaName, schemaProps]) => {
+    const { schema } = schemaProps as { schema: OpenApiZodAny }
+    openapi.addSchema(schemaName, generateSchemaFromZod(schema))
+  })
 
   Object.entries(operations).forEach(([operationName, operationObject]) => {
     const { method, path, response } = operationObject
@@ -44,9 +50,9 @@ export const createOpenapi = <DefaultParameterName extends string, SectionName e
       description: response.description,
       content: {
         'application/json': {
-          schema: generateSchemaFromZod(extendApi(response.schema, { title: responseName })),
-        },
-      },
+          schema: generateSchemaFromZod(extendApi(response.schema, { title: responseName }))
+        }
+      }
     })
 
     const responseRefSchema = generateSchemaFromZod(
@@ -59,8 +65,8 @@ export const createOpenapi = <DefaultParameterName extends string, SectionName e
       parameters: [],
       responses: {
         default: responseRefSchema as ReferenceObject,
-        [response.status ?? defaultResponseStatus]: responseRefSchema as ReferenceObject,
-      },
+        [response.status ?? defaultResponseStatus]: responseRefSchema as ReferenceObject
+      }
     }
 
     if (operationBodyTypeGuard(operationObject)) {
@@ -70,9 +76,9 @@ export const createOpenapi = <DefaultParameterName extends string, SectionName e
         description: requestBody.description,
         content: {
           'application/json': {
-            schema: generateSchemaFromZod(extendApi(requestBody.schema, { title: bodyName })),
-          },
-        },
+            schema: generateSchemaFromZod(extendApi(requestBody.schema, { title: bodyName }))
+          }
+        }
       })
 
       const bodyRefSchema = generateSchemaFromZod(getRef(state, ComponentType.REQUESTS, bodyName)) as ReferenceObject
@@ -93,8 +99,8 @@ export const createOpenapi = <DefaultParameterName extends string, SectionName e
               required: parameter.in === 'path' ? true : parameter.required,
               schema: {
                 type: 'string',
-                enum: parameter.enum as string[],
-              },
+                enum: parameter.enum as string[]
+              }
             })
             break
           case 'string[]':
@@ -107,9 +113,9 @@ export const createOpenapi = <DefaultParameterName extends string, SectionName e
                 type: 'array',
                 items: {
                   type: 'string',
-                  enum: parameter.enum,
-                },
-              },
+                  enum: parameter.enum
+                }
+              }
             })
             break
           case 'object':
@@ -118,7 +124,7 @@ export const createOpenapi = <DefaultParameterName extends string, SectionName e
               in: parameter.in,
               description: parameter.description,
               required: parameter.required,
-              schema: generateSchemaFromZod(parameter.schema),
+              schema: generateSchemaFromZod(parameter.schema)
             })
             break
           default:

@@ -84,14 +84,14 @@ export type QueryParameterStringArray = BaseParameter & {
   in: 'query'
 }
 
-export type QueryParameterObject<S extends SchemaType> = BaseParameter & {
+export type QueryParameterObject<S extends SchemaType = 'zod-schema'> = BaseParameter & {
   type: 'object'
   in: 'query'
   required?: boolean
   schema: SchemaOfType<S>
 }
 
-export type Parameter<S extends SchemaType> =
+export type Parameter<S extends SchemaType = 'zod-schema'> =
   | StandardParameter
   | PathParameter
   | QueryParameterObject<S>
@@ -101,8 +101,8 @@ export type OperationWithBodyMethod = 'post' | 'put' | 'patch'
 export type OperationWithBodyProps<
   DefaultParameterName extends string,
   SectionName extends string,
-  Path extends string,
-  S extends SchemaType
+  Path extends string = string,
+  S extends SchemaType = 'zod-schema'
 > = {
   // Method of the operation
   method: OperationWithBodyMethod
@@ -118,8 +118,8 @@ export type OperationWithoutBodyMethod = 'get' | 'delete' | 'options' | 'head' |
 export type OperationWithoutBodyProps<
   DefaultParameterName extends string,
   SectionName extends string,
-  Path extends string,
-  S extends SchemaType
+  Path extends string = string,
+  S extends SchemaType = 'zod-schema'
 > = {
   // Method of the operation
   method: OperationWithoutBodyMethod
@@ -128,8 +128,8 @@ export type OperationWithoutBodyProps<
 export type Operation<
   DefaultParameterName extends string,
   SectionName extends string,
-  Path extends string,
-  S extends SchemaType
+  Path extends string = string,
+  S extends SchemaType = 'zod-schema'
 > =
   | OperationWithBodyProps<DefaultParameterName, SectionName, Path, S>
   | OperationWithoutBodyProps<DefaultParameterName, SectionName, Path, S>
@@ -141,14 +141,17 @@ export enum ComponentType {
   PARAMETERS = 'parameters'
 }
 
-export type ParametersMap<Path extends string, S extends SchemaType> = Record<PathParams<Path>, PathParameter> &
+export type ParametersMap<Path extends string = string, S extends SchemaType = 'zod-schema'> = Record<
+  PathParams<Path>,
+  PathParameter
+> &
   Record<string, Parameter<S>> // flexible enough to allow bypassing type strictness
 
 type BaseOperationProps<
   DefaultParameterName extends string,
   SectionName extends string,
-  Path extends string,
-  S extends SchemaType
+  Path extends string = string,
+  S extends SchemaType = 'zod-schema'
 > = {
   // Name of the operation
   name: string

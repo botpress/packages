@@ -12,6 +12,7 @@ export type OpenApi<
   SectionName extends string = string
 > = ReturnType<typeof createOpapiFromState<SchemaName, DefaultParameterName, SectionName>>
 
+// TODO: ensure type inference comes from field 'sections' not 'schemas'
 export type OpenApiProps<SchemaName extends string, DefaultParameterName extends string, SectionName extends string> = {
   metadata: Metadata
   // adds default parameters to all operations

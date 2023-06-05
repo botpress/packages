@@ -50,6 +50,6 @@
     "zod": "^3.20.6"
   },
   "keywords": [],
-  "author": "",
-  "license": "ISC"
+  "author": "Botpress, Inc.",
+  "license": "AGPL-3.0"
 }

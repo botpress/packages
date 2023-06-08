@@ -1,4 +1,4 @@
-import { registerInstrumentations } from '@opentelemetry/instrumentation'
+import { InstrumentationOption, registerInstrumentations } from '@opentelemetry/instrumentation'
 import { BatchSpanProcessor } from '@opentelemetry/sdk-trace-base'
 import { NodeTracerProvider } from '@opentelemetry/sdk-trace-node'
 import { getNodeAutoInstrumentations } from '@opentelemetry/auto-instrumentations-node'
@@ -32,6 +32,10 @@ type InitProps = {
   serviceNamespace?: string
   serviceVersion?: string
   serviceInstanceId?: string
+  /**
+   * @default [getNodeAutoInstrumentations()]
+   */
+  instrumentations?: InstrumentationOption[]
 }
 
 /**
@@ -44,7 +48,8 @@ export const init = ({
   serviceName,
   serviceNamespace,
   serviceVersion,
-  serviceInstanceId
+  serviceInstanceId,
+  instrumentations
 }: InitProps = {}) => {
   if (!isEnabled() || initialized) {
     return
@@ -75,7 +80,7 @@ export const init = ({
 
   registerInstrumentations({
     tracerProvider: provider,
-    instrumentations: [getNodeAutoInstrumentations()]
+    instrumentations: instrumentations ?? [getNodeAutoInstrumentations()]
   })
 
   initialized = true

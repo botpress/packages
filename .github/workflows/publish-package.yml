@@ -1,0 +1,50 @@
+name: Publish Package
+
+on:
+  workflow_dispatch:
+    inputs:
+      package:
+        type: choice
+        description: 'Package to publish'
+        required: true
+        options:
+          - expresso
+          - log4bot
+          - opapi
+          - promex
+          - ptb-schema
+          - readiness
+          - trail
+          - yargs-extra
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  publish-package:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      NODE_OPTIONS: '--max_old_space_size=8192'
+    steps:
+      - uses: actions/checkout@v2
+      - name: Change Directory
+        run: cd ./${{ github.event.inputs.package }}
+      - name: Install And Build
+        run: |
+          if [ -f yarn.lock ]; then
+            yarn install
+            yarn build
+          elif [ -f pnpm-lock.yaml ]; then
+            pnpm install
+            pnpm build
+          else
+            npm install
+            npm run build
+          fi
+      - name: Publish
+        uses: botpress/gh-actions/publish-if-not-exists@master
+        with:
+          path: './${{ github.event.inputs.package }}'
+          token: '${{ secrets.NPM_ACCESS_TOKEN }}'

@@ -1,9 +1,10 @@
 name: Log4Bot
 
-on:
-  pull_request:
-    paths:
-      - 'log4bot/**'
+on: pull_request
+# on:
+#   pull_request:
+#     paths:
+#       - 'log4bot/**'
 
 defaults:
   run:

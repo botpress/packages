@@ -1,10 +1,9 @@
 name: Yargs Extra
 
-on: pull_request
-# on:
-#   pull_request:
-#     paths:
-#       - 'yargs-extra/**'
+on:
+  pull_request:
+    paths:
+      - 'yargs-extra/**'
 
 defaults:
   run:

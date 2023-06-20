@@ -1,0 +1,24 @@
+name: Entities
+
+on:
+  pull_request:
+    paths:
+      - 'entities/**'
+
+defaults:
+  run:
+    working-directory: ./entities
+
+jobs:
+  entities:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v2
+      - uses: pnpm/action-setup@v2.2.4
+        with:
+          version: 8
+      - name: Install And Build
+        run: pnpm install && pnpm build
+      - name: Test
+        run: pnpm test

@@ -6,7 +6,7 @@
   "types": "dist/index.d.ts",
   "scripts": {
     "build": "pnpm run build:node && tsc",
-    "build:node": "wasm-pack build --target nodejs --release",
+    "build:node": "wasm-pack build --verbose --target nodejs --release",
     "dev": "ts-node -T ./src/index.ts",
     "start": "node ./dist/index.js",
     "test": "jest --roots ./dist --testPathIgnorePatterns \\.util\\.test\\.js && cargo test"
@@ -15,7 +15,7 @@
     "lodash": "^4.17.19"
   },
   "devDependencies": {
-    "wasm-pack": "^0.11.1",
+    "wasm-pack": "^0.12.0",
     "typescript": "^5.0.4",
     "@types/node": "^20.2.1",
     "@types/jest": "^26.0.14",

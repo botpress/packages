@@ -1,0 +1,21 @@
+name: Yargs Extra
+
+on:
+  pull_request:
+    paths:
+      - 'yargs-extra/**'
+
+defaults:
+  run:
+    working-directory: ./yargs-extra
+
+jobs:
+  yargs-extra:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v2
+      - name: Install And Build
+        run: yarn install && yarn build
+      - name: Test
+        run: yarn test

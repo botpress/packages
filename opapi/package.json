@@ -14,6 +14,7 @@
   },
   "scripts": {
     "test:e2e": "vitest",
+    "test": "pnpm run test:e2e",
     "build": "tsup src/index.ts --dts --format cjs,esm --clean",
     "type-check": "tsc --noEmit",
     "format": "prettier --write ."
@@ -51,5 +52,6 @@
   },
   "keywords": [],
   "author": "Botpress, Inc.",
-  "license": "AGPL-3.0"
+  "license": "AGPL-3.0",
+  "packageManager": "pnpm@8.6.0+"
 }

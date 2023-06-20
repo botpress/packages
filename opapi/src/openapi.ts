@@ -1,14 +1,18 @@
-import { extendApi } from '@anatine/zod-openapi'
-import { OpenApiBuilder, OperationObject, ReferenceObject } from 'openapi3-ts'
+import { OpenApiBuilder, OperationObject, ReferenceObject, SchemaObject } from 'openapi3-ts'
 import VError from 'verror'
 import { defaultResponseStatus } from './const'
 import { generateSchemaFromZod } from './jsonschema'
 import { operationBodyTypeGuard } from './operation'
 import { ComponentType, getRef, State } from './state'
 import { formatBodyName, formatResponseName } from './util'
+import { objects } from './objects'
 
-export const createOpenapi = <DefaultParameterName extends string, SectionName extends string>(
-  state: State<DefaultParameterName, SectionName>
+export const createOpenapi = <
+  SchemaName extends string,
+  DefaultParameterName extends string,
+  SectionName extends string,
+>(
+  state: State<SchemaName, DefaultParameterName, SectionName>,
 ) => {
   const { metadata, schemas, operations } = state
   const { description, server, title, version } = metadata
@@ -30,11 +34,11 @@ export const createOpenapi = <DefaultParameterName extends string, SectionName e
     },
   })
 
-  Object.entries(schemas).forEach(([schemaName, schema]) =>
-    openapi.addSchema(schemaName, generateSchemaFromZod(schema.schema))
-  )
+  objects.entries(schemas).forEach(([schemaName, { schema }]) => {
+    openapi.addSchema(schemaName, schema)
+  })
 
-  Object.entries(operations).forEach(([operationName, operationObject]) => {
+  objects.entries(operations).forEach(([operationName, operationObject]) => {
     const { method, path, response } = operationObject
 
     const responseName = formatResponseName(operationName)
@@ -44,13 +48,13 @@ export const createOpenapi = <DefaultParameterName extends string, SectionName e
       description: response.description,
       content: {
         'application/json': {
-          schema: generateSchemaFromZod(extendApi(response.schema, { title: responseName })),
+          schema: response.schema,
         },
       },
     })
 
     const responseRefSchema = generateSchemaFromZod(
-      getRef(state, ComponentType.RESPONSES, responseName)
+      getRef(state, ComponentType.RESPONSES, responseName),
     ) as ReferenceObject
 
     const operation: OperationObject = {
@@ -70,7 +74,7 @@ export const createOpenapi = <DefaultParameterName extends string, SectionName e
         description: requestBody.description,
         content: {
           'application/json': {
-            schema: generateSchemaFromZod(extendApi(requestBody.schema, { title: bodyName })),
+            schema: requestBody.schema,
           },
         },
       })
@@ -81,7 +85,7 @@ export const createOpenapi = <DefaultParameterName extends string, SectionName e
     }
 
     if (operationObject.parameters) {
-      Object.entries(operationObject.parameters).forEach(([parameterName, parameter]) => {
+      objects.entries(operationObject.parameters).forEach(([parameterName, parameter]) => {
         const parameterType = parameter.type
 
         switch (parameterType) {
@@ -118,7 +122,7 @@ export const createOpenapi = <DefaultParameterName extends string, SectionName e
               in: parameter.in,
               description: parameter.description,
               required: parameter.required,
-              schema: generateSchemaFromZod(parameter.schema),
+              schema: parameter.schema,
             })
             break
           default:

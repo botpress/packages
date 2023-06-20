@@ -1,15 +1,31 @@
 import { VError } from 'verror'
-import type { Operation, OperationWithBodyProps, ParametersMap, State } from './state'
+import {
+  Operation,
+  OperationWithBodyProps,
+  OperationWithoutBodyMethod,
+  ParametersMap,
+  State,
+  mapParameter
+} from './state'
 import { formatBodyName, formatResponseName, isAlphanumeric } from './util'
+import { generateSchemaFromZod } from './jsonschema'
+import { extendApi } from '@anatine/zod-openapi'
+import { objects } from './objects'
 
-export const addOperation = <DefaultParameterName extends string, SectionName extends string>(
-  state: State<DefaultParameterName, SectionName>,
-  operationProps: Operation<DefaultParameterName, SectionName>
+export const addOperation = <
+  SchemaName extends string,
+  DefaultParameterName extends string,
+  SectionName extends string
+>(
+  state: State<SchemaName, DefaultParameterName, SectionName>,
+  operationProps: Operation<DefaultParameterName, SectionName, string, 'zod-schema'>
 ) => {
   const { name } = operationProps
+  const responseName = formatResponseName(name)
+  const bodyName = formatBodyName(name)
 
   const parameters = createParameters(
-    operationProps.parameters,
+    operationProps.parameters ? objects.mapValues(operationProps.parameters, mapParameter) : undefined,
     state.defaultParameters,
     operationProps.disableDefaultParameters
   )
@@ -30,27 +46,48 @@ export const addOperation = <DefaultParameterName extends string, SectionName ex
 
   state.refs.responses[formatResponseName(name)] = true
 
+  const response = {
+    description: operationProps.response.description,
+    status: operationProps.response.status,
+    schema: generateSchemaFromZod(extendApi(operationProps.response.schema, { title: responseName }))
+  }
+
+  let operation: Operation<DefaultParameterName, SectionName, string, 'json-schema'>
   if (operationBodyTypeGuard(operationProps)) {
     state.refs.requestBodies[formatBodyName(name)] = true
+    operation = {
+      ...operationProps,
+      parameters,
+      path,
+      response,
+      requestBody: {
+        description: operationProps.requestBody.description,
+        schema: generateSchemaFromZod(extendApi(operationProps.requestBody.schema, { title: bodyName }))
+      }
+    }
+  } else {
+    operation = {
+      ...operationProps,
+      method: operationProps.method as OperationWithoutBodyMethod,
+      parameters,
+      path,
+      response
+    }
   }
 
   validateParametersInPath(path, parameters)
 
-  state.operations[name] = {
-    ...operationProps,
-    parameters,
-    path,
-  }
+  state.operations[name] = operation
 
   state.sections.find((section) => section.name === operationProps.section)?.operations?.push(name)
 }
 
 function createParameters<DefaultParameterNames extends string>(
-  parameters: ParametersMap = {},
-  defaultParameters: ParametersMap = {},
+  parameters: ParametersMap<string, 'json-schema'> = {},
+  defaultParameters: ParametersMap<string, 'json-schema'> = {},
   disableDefaultParameters: { [name in DefaultParameterNames]?: boolean } = {}
-): ParametersMap {
-  const params: ParametersMap = parameters
+): ParametersMap<string, 'json-schema'> {
+  const params: ParametersMap<string, 'json-schema'> = parameters
 
   Object.entries(defaultParameters).forEach(([name, parameter]) => {
     const isDefaultParameterEnabled = disableDefaultParameters[name as DefaultParameterNames] !== true
@@ -64,12 +101,12 @@ function createParameters<DefaultParameterNames extends string>(
 }
 
 export function operationBodyTypeGuard<DefaultParameterNames extends string, Tag extends string>(
-  operation: Operation<DefaultParameterNames, Tag>
-): operation is OperationWithBodyProps<DefaultParameterNames, Tag> {
+  operation: Operation<DefaultParameterNames, Tag, string, 'json-schema' | 'zod-schema'>
+): operation is OperationWithBodyProps<DefaultParameterNames, Tag, string, 'json-schema'> {
   return operation.method === 'put' || operation.method === 'post' || operation.method === 'patch'
 }
 
-function validateParametersInPath(path: string, parameters?: ParametersMap) {
+function validateParametersInPath(path: string, parameters?: ParametersMap<string, 'json-schema'>) {
   const parametersMapInPath = getParameterFromPath(path).reduce((value, current) => {
     value[current] = false
     return value

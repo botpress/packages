@@ -17,8 +17,9 @@ import type { OpenApiPostProcessors } from './opapi'
 import { createOpenapi } from './openapi'
 import { operationBodyTypeGuard } from './operation'
 import type { Operation, State } from './state'
+import { SchemaObject } from 'openapi3-ts'
 
-export const generateServer = async (state: State<string, string>, dir: string, useExpressTypes: boolean) => {
+export const generateServer = async (state: State<string, string, string>, dir: string, useExpressTypes: boolean) => {
   initDirectory(dir)
 
   log.info('Generating openapi content')
@@ -41,7 +42,7 @@ export const generateServer = async (state: State<string, string>, dir: string, 
   log.info('Generating handlers code')
   const handlersCode = generateHandlers({
     operations: Object.entries(state.operations).map(([name, operation]) =>
-      mapOperationPropsToHandlerProps(name, operation)
+      mapOperationPropsToHandlerProps(name, operation),
     ),
     useExpressTypes,
   })
@@ -71,10 +72,10 @@ export const generateServer = async (state: State<string, string>, dir: string, 
 }
 
 export const generateClient = async (
-  state: State<string, string>,
+  state: State<string, string, string>,
   dir = '.',
   openApiGeneratorEndpoint: string,
-  postProcessors?: OpenApiPostProcessors
+  postProcessors?: OpenApiPostProcessors,
 ) => {
   initDirectory(dir)
 
@@ -91,7 +92,7 @@ export const generateClient = async (
   log.info('Generating client code')
   const clientCode = generateClientCode({
     operations: Object.entries(state.operations).map(([name, operation]) =>
-      mapOperationPropsToHandlerProps(name, operation)
+      mapOperationPropsToHandlerProps(name, operation),
     ),
   })
   log.info('')
@@ -118,7 +119,7 @@ export const generateClient = async (
   log.info('')
 }
 
-export function generateOpenapi(state: State<string, string>, dir = '.') {
+export function generateOpenapi(state: State<string, string, string>, dir = '.') {
   initDirectory(dir)
 
   log.info('Generating openapi content')
@@ -134,7 +135,10 @@ export function generateOpenapi(state: State<string, string>, dir = '.') {
   log.info('')
 }
 
-function mapOperationPropsToHandlerProps(operationName: string, operation: Operation<string, string>) {
+function mapOperationPropsToHandlerProps(
+  operationName: string,
+  operation: Operation<string, string, string, 'json-schema'>,
+) {
   const generateHandlerProps: GenerateHandlerProps = {
     operationName,
     operation,

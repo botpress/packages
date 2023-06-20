@@ -4,3 +4,4 @@ test/
 tsconfig.json
 tsconfig.tsbuildinfo
 vite.config.ts
+CONTRIBUTING.md

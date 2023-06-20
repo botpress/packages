@@ -1,14 +1,20 @@
-import type { OpenApiZodAny } from '@anatine/zod-openapi'
+import type { SchemaObject } from 'openapi3-ts'
 import { VError } from 'verror'
 import { z } from 'zod'
 import { schema } from './opapi'
 import type { PathParams } from './path-params'
 import { isAlphanumeric, isCapitalAlphabetical } from './util'
+import { generateSchemaFromZod } from './jsonschema'
+import { OpenApiZodAny } from '@anatine/zod-openapi'
+import { objects } from './objects'
 
-export type State<DefaultParameterName extends string, SectionName extends string> = {
+type SchemaType = 'zod-schema' | 'json-schema'
+type SchemaOfType<T extends SchemaType> = T extends 'zod-schema' ? OpenApiZodAny : SchemaObject
+
+export type State<SchemaName extends string, DefaultParameterName extends string, SectionName extends string> = {
   metadata: Metadata
   refs: RefMap
-  defaultParameters?: { [name in DefaultParameterName]: Parameter }
+  defaultParameters?: { [name in DefaultParameterName]: Parameter<'json-schema'> }
   sections: {
     name: SectionName
     title: string
@@ -16,26 +22,21 @@ export type State<DefaultParameterName extends string, SectionName extends strin
     schema?: string
     operations: string[]
   }[]
-  schemas: {
-    [name: string]: {
-      schema: OpenApiZodAny
-      section: SectionName
-    }
-  }
+  schemas: Record<SchemaName, { schema: SchemaObject; section: SectionName }>
   errors?: ApiError[]
-  operations: { [name: string]: Operation<DefaultParameterName, SectionName, string> }
+  operations: { [name: string]: Operation<DefaultParameterName, SectionName, string, 'json-schema'> }
 }
 
 const unknownError: ApiError = {
   status: 500,
   type: 'Unknown',
-  description: 'An unknown error occurred',
+  description: 'An unknown error occurred'
 }
 
 const internalError: ApiError = {
   status: 500,
   type: 'Internal',
-  description: 'An internal error occurred',
+  description: 'An internal error occurred'
 }
 
 export type ApiError = {
@@ -83,54 +84,75 @@ export type QueryParameterStringArray = BaseParameter & {
   in: 'query'
 }
 
-export type QueryParameterObject = BaseParameter & {
+export type QueryParameterObject<S extends SchemaType = 'zod-schema'> = BaseParameter & {
   type: 'object'
   in: 'query'
   required?: boolean
-  schema: OpenApiZodAny
+  schema: SchemaOfType<S>
 }
 
-export type Parameter = StandardParameter | PathParameter | QueryParameterObject | QueryParameterStringArray
+export type Parameter<S extends SchemaType = 'zod-schema'> =
+  | StandardParameter
+  | PathParameter
+  | QueryParameterObject<S>
+  | QueryParameterStringArray
 
+export type OperationWithBodyMethod = 'post' | 'put' | 'patch'
 export type OperationWithBodyProps<
   DefaultParameterName extends string,
   SectionName extends string,
-  Path extends string = string
+  Path extends string = string,
+  S extends SchemaType = 'zod-schema'
 > = {
   // Method of the operation
-  method: 'post' | 'put' | 'patch'
+  method: OperationWithBodyMethod
 
   // Request body of the operation
   requestBody: {
     description: string
-    schema: OpenApiZodAny
+    schema: SchemaOfType<S>
   }
-} & BaseOperationProps<DefaultParameterName, SectionName, Path>
+} & BaseOperationProps<DefaultParameterName, SectionName, Path, S>
 
+export type OperationWithoutBodyMethod = 'get' | 'delete' | 'options' | 'head' | 'trace'
 export type OperationWithoutBodyProps<
   DefaultParameterName extends string,
   SectionName extends string,
-  Path extends string = string
+  Path extends string = string,
+  S extends SchemaType = 'zod-schema'
 > = {
   // Method of the operation
-  method: 'get' | 'delete' | 'options' | 'head' | 'trace'
-} & BaseOperationProps<DefaultParameterName, SectionName, Path>
+  method: OperationWithoutBodyMethod
+} & BaseOperationProps<DefaultParameterName, SectionName, Path, S>
 
-export type Operation<DefaultParameterName extends string, SectionName extends string, Path extends string = string> =
-  | OperationWithBodyProps<DefaultParameterName, SectionName, Path>
-  | OperationWithoutBodyProps<DefaultParameterName, SectionName, Path>
+export type Operation<
+  DefaultParameterName extends string,
+  SectionName extends string,
+  Path extends string = string,
+  S extends SchemaType = 'zod-schema'
+> =
+  | OperationWithBodyProps<DefaultParameterName, SectionName, Path, S>
+  | OperationWithoutBodyProps<DefaultParameterName, SectionName, Path, S>
 
 export enum ComponentType {
   SCHEMAS = 'schemas',
   RESPONSES = 'responses',
   REQUESTS = 'requestBodies',
-  PARAMETERS = 'parameters',
+  PARAMETERS = 'parameters'
 }
 
-export type ParametersMap<Path extends string = string> = Record<PathParams<Path>, PathParameter> &
-  Record<string, Parameter> // flexible enough to allow bypassing type strictness
+export type ParametersMap<Path extends string = string, S extends SchemaType = 'zod-schema'> = Record<
+  PathParams<Path>,
+  PathParameter
+> &
+  Record<string, Parameter<S>> // flexible enough to allow bypassing type strictness
 
-type BaseOperationProps<DefaultParameterName extends string, SectionName extends string, Path extends string> = {
+type BaseOperationProps<
+  DefaultParameterName extends string,
+  SectionName extends string,
+  Path extends string = string,
+  S extends SchemaType = 'zod-schema'
+> = {
   // Name of the operation
   name: string
   // Path of the operation
@@ -138,7 +160,7 @@ type BaseOperationProps<DefaultParameterName extends string, SectionName extends
   // Description of the operation
   description: string
   // additional parameters from the headers, cookies, query or path
-  parameters?: ParametersMap<Path>
+  parameters?: ParametersMap<Path, S>
   disableDefaultParameters?: {
     [name in DefaultParameterName]?: boolean
   }
@@ -149,13 +171,13 @@ type BaseOperationProps<DefaultParameterName extends string, SectionName extends
     // Default is 200
     status?: 200 | 201 | 418
     description: string
-    schema: OpenApiZodAny
+    schema: SchemaOfType<S>
   }
 }
 
 type CreateStateProps<SchemaName extends string, DefaultParameterName extends string, SectionName extends string> = {
   metadata: Metadata
-  defaultParameters?: Record<DefaultParameterName, Parameter>
+  defaultParameters?: Record<DefaultParameterName, Parameter<'zod-schema'>>
   schemas?: Record<SchemaName, { schema: OpenApiZodAny; section: SectionName }>
   sections?: Record<SectionName, { title: string; description: string }>
   errors?: readonly ApiError[]
@@ -163,33 +185,33 @@ type CreateStateProps<SchemaName extends string, DefaultParameterName extends st
 
 export function createState<SchemaName extends string, DefaultParameterName extends string, SectionName extends string>(
   props: CreateStateProps<SchemaName, DefaultParameterName, SectionName>
-): State<DefaultParameterName, SectionName> {
+): State<SchemaName, DefaultParameterName, SectionName> {
   const schemaEntries = props.schemas
-    ? Object.entries<typeof props.schemas[SchemaName]>(props.schemas).map(([name, data]) => ({
-      name,
-      schema: data.schema,
-      section: data.section,
-    }))
+    ? Object.entries<(typeof props.schemas)[SchemaName]>(props.schemas).map(([name, data]) => ({
+        name,
+        schema: data.schema,
+        section: data.section
+      }))
     : []
 
-  const schemas: State<DefaultParameterName, SectionName>['schemas'] = {}
+  const schemas: Record<string, { schema: SchemaObject; section: SectionName }> = {}
 
-  const refs: State<DefaultParameterName, SectionName>['refs'] = {
+  const refs: State<SchemaName, DefaultParameterName, SectionName>['refs'] = {
     parameters: {},
     requestBodies: {},
     responses: {},
-    schemas: {},
+    schemas: {}
   }
 
   const toPairs = <K extends string, T>(obj: Record<K, T>): [K, T][] => Object.entries(obj) as [K, T][]
 
   const sections = props.sections
     ? toPairs(props.sections).map(([name, section]) => ({
-      ...section,
-      name,
-      operations: [],
-      schema: schemaEntries.find((schemaEntry) => schemaEntry.section === name)?.name,
-    }))
+        ...section,
+        name,
+        operations: [],
+        schema: schemaEntries.find((schemaEntry) => schemaEntry.section === name)?.name
+      }))
     : []
 
   schemaEntries.forEach((schemaEntry) => {
@@ -203,7 +225,10 @@ export function createState<SchemaName extends string, DefaultParameterName exte
       throw new VError(`Operation ${name} already exists`)
     }
 
-    schemas[name] = schemaEntry
+    schemas[name] = {
+      section: schemaEntry.section,
+      schema: generateSchemaFromZod(schemaEntry.schema)
+    }
     refs.schemas[name] = true
   })
 
@@ -231,18 +256,25 @@ export function createState<SchemaName extends string, DefaultParameterName exte
     }
   })
 
+  const defaultParameters = props.defaultParameters
+    ? (objects.mapValues(props.defaultParameters, mapParameter) satisfies Record<
+        DefaultParameterName,
+        Parameter<'json-schema'>
+      >)
+    : undefined
+
   return {
     operations: {},
     metadata: props.metadata,
-    defaultParameters: props.defaultParameters,
+    defaultParameters,
     errors,
     refs,
     schemas,
-    sections,
+    sections
   }
 }
 
-export function getRef(state: State<string, string>, type: ComponentType, name: string): OpenApiZodAny {
+export function getRef(state: State<string, string, string>, type: ComponentType, name: string): OpenApiZodAny {
   if (!state.refs[type][name]) {
     throw new VError(`${type} ${name} does not exist`)
   }
@@ -251,6 +283,16 @@ export function getRef(state: State<string, string>, type: ComponentType, name: 
     type: undefined,
     properties: undefined,
     required: undefined,
-    $ref: `#/components/${type}/${name}`,
+    $ref: `#/components/${type}/${name}`
   })
+}
+
+export const mapParameter = (param: Parameter<'zod-schema'>): Parameter<'json-schema'> => {
+  if ('schema' in param) {
+    return {
+      ...param,
+      schema: generateSchemaFromZod(param.schema)
+    }
+  }
+  return param
 }

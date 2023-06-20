@@ -5,7 +5,7 @@ import type { GenerateHandlersProps, GenerateHandlerProps } from './handlers'
 
 type Parameters = {
   name: string
-  parameter: OpenApiParameter
+  parameter: OpenApiParameter<'json-schema'>
 }[]
 
 type GenerateClientsProps = Omit<GenerateHandlersProps, 'useExpressTypes'>
@@ -55,9 +55,9 @@ function getError(err: Error) {
 function generateMethod(props: GenerateClientProps) {
   const { operationName } = props
   return `\tpublic ${operationName} = (${generateMethodProps(
-    props
+    props,
   )}) => this._innerClient.${operationName}(${generateClientProps(
-    props
+    props,
   )}).then((res) => res.data).catch((e) => { throw getError(e) })`
 }
 
@@ -102,7 +102,7 @@ function generateMethodProps({ operationName, body, parameters, hasParameters }:
   }
 
   return `{ ${generateParamProps(parameters)}...${generateBodyTypeName(operationName)} }: ${generatePropsName(
-    operationName
+    operationName,
   )}`
 }
 

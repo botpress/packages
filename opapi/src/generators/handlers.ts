@@ -29,11 +29,11 @@ type Parameter<P> = {
 
 export type GenerateHandlerProps = {
   operationName: string
-  operation: Operation<string, string>
+  operation: Operation<string, string, string, 'json-schema'>
   headers: Parameter<StandardParameter>[]
   cookies: Parameter<StandardParameter>[]
   params: Parameter<PathParameter>[]
-  queries: Parameter<StandardParameter | QueryParameterStringArray | QueryParameterObject>[]
+  queries: Parameter<StandardParameter | QueryParameterStringArray | QueryParameterObject<'json-schema'>>[]
   status: number
   body: boolean
 }
@@ -73,10 +73,10 @@ const generateParameterFields = ({
   [
     body ? generateBodyField(operationName) : undefined,
     ...cookies.map((cookie) =>
-      generateField(cookie.name, 'cookies', cookie.parameter, cookie.parameter.required !== false)
+      generateField(cookie.name, 'cookies', cookie.parameter, cookie.parameter.required !== false),
     ),
     ...headers.map((header) =>
-      generateField(header.name, 'headers', header.parameter, header.parameter.required !== false)
+      generateField(header.name, 'headers', header.parameter, header.parameter.required !== false),
     ),
     ...queries.map((query) => generateField(query.name, 'query', query.parameter, query.parameter.required !== false)),
     ...params.map((param) => generateField(param.name, 'params', param.parameter, true)),
@@ -86,10 +86,10 @@ const generateParameterFields = ({
 
 type FieldType = 'headers' | 'cookies' | 'params' | 'query'
 
-const generateField = (name: string, type: FieldType, parameter: OpenApiParameter, required: boolean) =>
+const generateField = (name: string, type: FieldType, parameter: OpenApiParameter<'json-schema'>, required: boolean) =>
   `\t\t'${name}': req.${type}['${name}'] ${generateTypeAnnotation(parameter, required)},`
 
-const generateTypeAnnotation = (parameter: OpenApiParameter, required: boolean) => {
+const generateTypeAnnotation = (parameter: OpenApiParameter<'json-schema'>, required: boolean) => {
   let typeAnnotation = 'as'
 
   const parameterType = parameter.type
@@ -141,7 +141,7 @@ const generateResolver = (operations: GenerateHandlerProps[]) => {
 
     if (handlerObject[operation.operation.path]![operation.operation.method]) {
       throw new Error(
-        `Duplicate operation ${operation.operationName}: ${operation.operation.method} ${operation.operation.path}`
+        `Duplicate operation ${operation.operationName}: ${operation.operation.method} ${operation.operation.path}`,
       )
     }
 

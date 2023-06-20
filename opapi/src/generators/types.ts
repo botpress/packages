@@ -1,5 +1,4 @@
 const typesCode = `
-export type Handler = (req: Request, res: Response) => Promise<void> | void;
 
 type RequestBody = { requestBody?: { content: { 'application/json': {} } } }
 type Responses = { responses: { default: { content: { 'application/json': {} } } } }
@@ -62,6 +61,8 @@ export type Response = {
   setHeader: (name: string, value: string) => void;
   send(data: string | Buffer): void;
 };
+
+export type Handler = (req: Request, res: Response) => Promise<void> | void;
 `
 
 export function generateTypes(useExpressTypes: boolean) {

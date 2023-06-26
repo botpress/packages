@@ -3,7 +3,7 @@
   "version": "0.0.2",
   "main": "./dist/index.js",
   "author": "Botpress, Inc.",
-  "license": "AGPL-3.0",
+  "license": "MIT",
   "scripts": {
     "build": "tsc --build",
     "clean": "rimraf ./dist && rimraf ./node_modules"

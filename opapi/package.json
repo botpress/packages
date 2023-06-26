@@ -52,6 +52,6 @@
   },
   "keywords": [],
   "author": "Botpress, Inc.",
-  "license": "AGPL-3.0",
+  "license": "MIT",
   "packageManager": "pnpm@8.6.0+"
 }

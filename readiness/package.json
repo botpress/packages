@@ -8,7 +8,7 @@
   },
   "keywords": [],
   "author": "Botpress, Inc.",
-  "license": "AGPL-3.0",
+  "license": "MIT",
   "bin": {
     "ready": "./bin.js"
   },

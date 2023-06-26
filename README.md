@@ -8,4 +8,6 @@ Therefore, if you wish to install this package feel absolutly free to do it. We 
 
 ## Licensing
 
-This software is protected by the same license as the [main Botpress repository](https://github.com/botpress/botpress). You can find the license file [here](https://github.com/botpress/botpress/blob/master/LICENSE).
+All packages in this repository are open-source software and licensed under the [MIT License](LICENSE). By contributing in this repository, you agree to release your code under this license as well.
+
+Let's build the future of chatbot development together! 🤖🚀

@@ -1,0 +1,36 @@
+{
+  "name": "@bpinternal/tunnel",
+  "version": "0.0.2",
+  "description": "Tunneling logic for client and server",
+  "main": "./dist/index.cjs",
+  "browser": "./dist/index.mjs",
+  "types": "./src/index.ts",
+  "license": "MIT",
+  "scripts": {
+    "type-check": "tsc --noEmit",
+    "build:nodejs": "esbuild src/index.ts --bundle --platform=node --target=node16 --outfile=dist/index.cjs",
+    "build:browser": "esbuild src/index.ts --bundle --platform=browser --target=es2017 --format=esm --outfile=dist/index.mjs",
+    "build": "npm run build:nodejs && npm run build:browser",
+    "test:e2e": "ts-node -T ./e2e",
+    "test": "npm run test:e2e"
+  },
+  "dependencies": {
+    "@types/ws": "^8.5.5",
+    "browser-or-node": "^2.1.1",
+    "isomorphic-ws": "^5.0.0",
+    "ws": "^8.13.0",
+    "zod": "^3.20.6"
+  },
+  "devDependencies": {
+    "@bpinternal/log4bot": "0.0.4",
+    "@bpinternal/yargs-extra": "0.0.3",
+    "@tsconfig/node18-strictest": "^1.0.0",
+    "@types/lodash": "^4.14.195",
+    "@types/node": "^18.11.17",
+    "@types/web": "^0.0.99",
+    "esbuild": "^0.16.10",
+    "puppeteer": "^20.7.2",
+    "ts-node": "^10.9.1",
+    "typescript": "^4.9.4"
+  }
+}

@@ -136,8 +136,6 @@ export function generateOpenapi(state: State<string, string, string>, dir = '.')
   log.info('')
 }
 
-
-
 function mapOperationPropsToHandlerProps(
   operationName: string,
   operation: Operation<string, string, string, 'json-schema'>,

@@ -1,5 +1,5 @@
 import { z } from 'zod'
-import { OpenApi } from '../src'
+import { OpenApi, schema } from '../src'
 
 const fooSchema = z.object({
   id: z.string(),
@@ -40,6 +40,31 @@ export const createApi = () => {
         type: 'string',
         description: 'Foo id',
       },
+    },
+    section: 'foo',
+    response: {
+      description: 'Foo information',
+      schema: z.object({
+        foo: api.getModelRef('Foo'),
+      }),
+    },
+  })
+
+  api.addOperation({
+    name: 'postFoo',
+    description: 'Post a foo',
+    method: 'post',
+    path: '/foos/{id}',
+    parameters: {
+      id: {
+        in: 'path',
+        type: 'string',
+        description: 'Foo id',
+      },
+    },
+    requestBody: {
+      description: 'Foo information',
+      schema: schema(z.object({}), { description: 'Foo information' }),
     },
     section: 'foo',
     response: {

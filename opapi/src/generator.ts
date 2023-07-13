@@ -18,6 +18,7 @@ import { createOpenapi } from './openapi'
 import { operationBodyTypeGuard } from './operation'
 import type { Operation, State } from './state'
 import { SchemaObject } from 'openapi3-ts'
+import { schemaIsEmptyObject } from './jsonschema'
 
 export const generateServer = async (state: State<string, string, string>, dir: string, useExpressTypes: boolean) => {
   initDirectory(dir)
@@ -135,6 +136,8 @@ export function generateOpenapi(state: State<string, string, string>, dir = '.')
   log.info('')
 }
 
+
+
 function mapOperationPropsToHandlerProps(
   operationName: string,
   operation: Operation<string, string, string, 'json-schema'>,
@@ -148,6 +151,7 @@ function mapOperationPropsToHandlerProps(
     queries: [],
     params: [],
     body: operationBodyTypeGuard(operation) ? true : false,
+    isEmptyBody: operationBodyTypeGuard(operation) ? schemaIsEmptyObject(operation.requestBody.schema) : true,
   }
 
   if (operation.parameters) {

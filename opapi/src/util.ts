@@ -15,3 +15,10 @@ export function formatResponseName(operationName: string) {
 export function formatBodyName(operationName: string) {
   return `${operationName}Body`
 }
+
+export function removeFromArray(array: string[], item: string) {
+  const index = array.indexOf(item)
+  if (index > -1) {
+    array.splice(index, 1)
+  }
+}

@@ -61,7 +61,7 @@ function generateMethod(props: GenerateClientProps) {
   )}).then((res) => res.data).catch((e) => { throw getError(e) })`
 }
 
-function generatePropsType({ operationName, body, hasParameters }: GenerateClientProps) {
+function generatePropsType({ operationName, body, hasParameters, isEmptyBody }: GenerateClientProps) {
   if (!body) {
     if (!hasParameters) {
       return ''
@@ -71,12 +71,12 @@ function generatePropsType({ operationName, body, hasParameters }: GenerateClien
   }
 
   return `export type ${generatePropsName(operationName)} = Merge<
-  Except<${generateRequestPropsName(operationName)}, '${generateBodyTypeName(operationName)}'>,
-  NonNullable<${generateRequestPropsName(operationName)}['${generateBodyTypeName(operationName)}']>
+  Except<${generateRequestPropsName(operationName)}, '${generateBodyTypeName(operationName, isEmptyBody)}'>,
+  NonNullable<${generateRequestPropsName(operationName)}['${generateBodyTypeName(operationName, isEmptyBody)}']>
 >\n`
 }
 
-function generateClientProps({ operationName, body, hasParameters, parameters }: GenerateClientProps) {
+function generateClientProps({ operationName, body, hasParameters, parameters, isEmptyBody }: GenerateClientProps) {
   if (!body) {
     if (!hasParameters) {
       return ''
@@ -85,10 +85,10 @@ function generateClientProps({ operationName, body, hasParameters, parameters }:
     return 'props'
   }
 
-  return `{ ${generateParamProps(parameters)}${generateBodyTypeName(operationName)} }`
+  return `{ ${generateParamProps(parameters)}${generateBodyTypeName(operationName, isEmptyBody)} }`
 }
 
-function generateMethodProps({ operationName, body, parameters, hasParameters }: GenerateClientProps) {
+function generateMethodProps({ operationName, body, parameters, hasParameters, isEmptyBody }: GenerateClientProps) {
   if (!body) {
     if (!hasParameters) {
       return ''
@@ -98,10 +98,10 @@ function generateMethodProps({ operationName, body, parameters, hasParameters }:
   }
 
   if (!hasParameters) {
-    return `${generateBodyTypeName(operationName)}: ${generatePropsName(operationName)}`
+    return `${generateBodyTypeName(operationName, isEmptyBody)}: ${generatePropsName(operationName)}`
   }
 
-  return `{ ${generateParamProps(parameters)}...${generateBodyTypeName(operationName)} }: ${generatePropsName(
+  return `{ ${generateParamProps(parameters)}...${generateBodyTypeName(operationName, isEmptyBody)} }: ${generatePropsName(
     operationName,
   )}`
 }
@@ -122,8 +122,8 @@ function generateRequestPropsName(operationName: string) {
   return `DefaultApi${title(operationName).split(' ').join('')}Request`
 }
 
-function generateBodyTypeName(operationName: string) {
-  return `${operationName}Body`
+function generateBodyTypeName(operationName: string, isEmptyBody: boolean) {
+  return isEmptyBody ? 'body' : `${operationName}Body`
 }
 
 function generateImport({ body, hasParameters, operationName }: GenerateClientProps) {

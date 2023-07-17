@@ -1,5 +1,6 @@
 import { OpenApiZodAny, generateSchema as generateJsonSchema } from '@anatine/zod-openapi'
 import type { SchemaObject } from 'openapi3-ts'
+import { removeFromArray } from './util'
 
 export const generateSchemaFromZod = (zodRef: OpenApiZodAny, useOutput?: boolean) => {
   const jsonSchema = generateJsonSchema(zodRef, useOutput)
@@ -31,4 +32,21 @@ export const formatJsonSchema = (jsonSchema: SchemaObject) => {
   if (jsonSchema.allOf || jsonSchema.anyOf || jsonSchema.oneOf) {
     throw new Error('allOf, anyOf and oneOf are not supported')
   }
+}
+
+export function schemaIsEmptyObject(schema: SchemaObject) {
+  const keys = Object.keys(schema)
+
+  removeFromArray(keys, 'title')
+  removeFromArray(keys, 'description')
+
+  if (keys.length === 0) {
+    return true
+  }
+
+  if (keys.length === 2 && keys.includes('type') && schema.type === 'object' && keys.includes('additionalProperties') && schema.additionalProperties === false) {
+    return true
+  }
+
+  return false
 }

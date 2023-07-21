@@ -5,6 +5,7 @@ export const tunnelHeaderSchema = z.union([z.undefined(), z.string(), z.string()
 
 export type TunnelRequest = z.infer<typeof tunnelRequestSchema>
 export const tunnelRequestSchema = z.object({
+  type: z.literal('request').optional(), // optional for backwards compatibility
   id: z.string(),
   method: z.string(),
   path: z.string(),
@@ -15,6 +16,7 @@ export const tunnelRequestSchema = z.object({
 
 export type TunnelResponse = z.infer<typeof tunnelResponseSchema>
 export const tunnelResponseSchema = z.object({
+  type: z.literal('response').optional(), // optional for backwards compatibility
   requestId: z.string(),
   status: z.number(),
   headers: z.record(tunnelHeaderSchema).optional(),

@@ -3,7 +3,18 @@ import WebSocket from 'isomorphic-ws'
 import * as errors from './errors'
 import { EventEmitter } from './event-emitter'
 import * as rooting from './rooting'
-import { TunnelRequest, TunnelResponse, tunnelRequestSchema, tunnelResponseSchema } from './types'
+import {
+  Ping,
+  Pong,
+  TunnelRequest,
+  TunnelResponse,
+  pingSchema,
+  pongSchema,
+  tunnelRequestSchema,
+  tunnelResponseSchema
+} from './types'
+
+const PING_PONG_INTERVAL = 10_000
 
 export type ClientCloseEvent = WebSocket.CloseEvent
 export type ClientErrorEvent = WebSocket.Event
@@ -18,6 +29,8 @@ export abstract class TunnelClient {
     open: WebSocket.Event
     request: TunnelRequest
     response: TunnelResponse
+    ping: Ping
+    pong: Pong
   }>()
 
   public constructor(protected _ws: WebSocket) {
@@ -25,7 +38,6 @@ export abstract class TunnelClient {
     _ws.addEventListener('error', this._wsError)
     _ws.addEventListener('message', this._wsMessage)
     _ws.addEventListener('open', this._wsOpen)
-
     this._ev.once('close', () => this._handleClose())
   }
 
@@ -78,6 +90,7 @@ export class TunnelTail extends TunnelClient {
     error: ClientErrorEvent
     request: TunnelRequest
     open: ClientOpenEvent
+    ping: Ping
   }> = this._ev
 
   public static new(host: string, tunnelId: string): Promise<TunnelTail> {
@@ -99,19 +112,46 @@ export class TunnelTail extends TunnelClient {
     super(socket)
 
     this._ev.on('message', (ev: WebSocket.MessageEvent) => {
-      const strData = ev.data.toString()
-      const parseResult = tunnelRequestSchema.safeParse(JSON.parse(strData))
-      if (!parseResult.success) {
+      const message = this._parseMessage(ev)
+      if (!message) {
         this.close(errors.CLOSE_CODES.INVALID_REQUEST_PAYLOAD, 'invalid request payload')
         return
       }
-      this.events.emit('request', parseResult.data)
+      if (message.type === 'ping') {
+        this.events.emit('ping', message.ping)
+        return
+      }
+      this.events.emit('request', message.request)
     })
   }
 
   public readonly send = (response: TunnelResponse) => {
     this._throwIfClosed()
     this._ws.send(JSON.stringify(response))
+  }
+
+  public readonly pong = () => {
+    this._throwIfClosed()
+    const pong: Pong = { type: 'pong' }
+    this._ws.send(JSON.stringify(pong))
+  }
+
+  private _parseMessage = (
+    ev: WebSocket.MessageEvent
+  ): { type: 'ping'; ping: Ping } | { type: 'request'; request: TunnelRequest } | undefined => {
+    const data = JSON.parse(ev.data.toString())
+
+    const responseParseResult = tunnelRequestSchema.safeParse(data)
+    if (responseParseResult.success) {
+      return { type: 'request', request: responseParseResult.data }
+    }
+
+    const pingParseResult = pingSchema.safeParse(data)
+    if (pingParseResult.success) {
+      return { type: 'ping', ping: pingParseResult.data }
+    }
+
+    return
   }
 }
 
@@ -121,24 +161,52 @@ export class TunnelHead extends TunnelClient {
     error: ClientErrorEvent
     response: TunnelResponse
     open: ClientOpenEvent
+    pong: Pong
   }> = this._ev
 
   public constructor(public readonly tunnelId: string, ws: WebSocket) {
     super(ws)
 
     this._ev.on('message', (ev: WebSocket.MessageEvent) => {
-      const strData = ev.data.toString()
-      const parseResult = tunnelResponseSchema.safeParse(JSON.parse(strData))
-      if (!parseResult.success) {
+      const message = this._parseMessage(ev)
+      if (!message) {
         this.close(errors.CLOSE_CODES.INVALID_RESPONSE_PAYLOAD, 'invalid response payload')
         return
       }
-      this.events.emit('response', parseResult.data)
+      if (message.type === 'pong') {
+        this.events.emit('pong', message.pong)
+        return
+      }
+      this.events.emit('response', message.reponse)
     })
   }
 
   public readonly send = (request: TunnelRequest) => {
     this._throwIfClosed()
     this._ws.send(JSON.stringify(request))
+  }
+
+  public readonly ping = () => {
+    this._throwIfClosed()
+    const ping: Ping = { type: 'ping' }
+    this._ws.send(JSON.stringify(ping))
+  }
+
+  private _parseMessage = (
+    ev: WebSocket.MessageEvent
+  ): { type: 'pong'; pong: Pong } | { type: 'response'; reponse: TunnelResponse } | undefined => {
+    const data = JSON.parse(ev.data.toString())
+
+    const responseParseResult = tunnelResponseSchema.safeParse(data)
+    if (responseParseResult.success) {
+      return { type: 'response', reponse: responseParseResult.data }
+    }
+
+    const pongParseResult = pongSchema.safeParse(data)
+    if (pongParseResult.success) {
+      return { type: 'pong', pong: pongParseResult.data }
+    }
+
+    return
   }
 }

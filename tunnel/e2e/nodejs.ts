@@ -25,6 +25,11 @@ export const testSuccess = async (port: number, logger: Logger) => {
   })
 
   const tunnelTail = await TunnelTail.new(`ws://localhost:${port}`, TUNNEL_ID)
+  tunnelTail.events.on('ping', () => {
+    logger.info('received ping, sending pong...')
+    tunnelTail.pong()
+  })
+
   const requestPromise = new Promise<TunnelRequest>((resolve) => {
     tunnelTail.events.on('request', (request) => {
       logger.debug(`received request: ${JSON.stringify(request, null, 2)}`)
@@ -32,7 +37,7 @@ export const testSuccess = async (port: number, logger: Logger) => {
         requestId: request.id,
         status: 200,
         headers: {},
-        body: RESPONSE_BODY,
+        body: RESPONSE_BODY
       })
       resolve(request)
     })
@@ -43,15 +48,23 @@ export const testSuccess = async (port: number, logger: Logger) => {
     throw new Error(`Tunnel ${TUNNEL_ID} not found`)
   }
 
+  const tunnelPongPromise = new Promise<void>((resolve) => {
+    tunnelHead.events.once('pong', () => {
+      logger.info('received pong')
+      resolve()
+    })
+  })
+  tunnelHead.ping()
+
   tunnelHead.send({
     id: REQUEST_ID,
     method: 'GET',
     path: '/hello',
     headers: {},
-    body: REQUEST_BODY,
+    body: REQUEST_BODY
   })
 
-  const successPromise = Promise.all([requestPromise, responsePromise])
+  const successPromise = Promise.all([requestPromise, responsePromise, tunnelPongPromise])
 
   const serverExitPromise = server.wait().then(() => {
     throw new Error('Server exited')
@@ -87,7 +100,7 @@ export const testInvalidRequest = async (port: number, logger: Logger) => {
         requestId: request.id,
         status: 200,
         headers: {},
-        body: RESPONSE_BODY,
+        body: RESPONSE_BODY
       })
       resolve(request)
     })
@@ -102,7 +115,7 @@ export const testInvalidRequest = async (port: number, logger: Logger) => {
   tunnelHead.send({
     id: REQUEST_ID,
     method: 'GET',
-    url: '/hello',
+    url: '/hello'
   } as any) // invalid request schema
 
   const requestReceivedPromise = requestPromise.then(() => {

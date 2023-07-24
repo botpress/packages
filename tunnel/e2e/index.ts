@@ -7,19 +7,19 @@ import { sleep } from './utils'
 const tests = [
   {
     name: 'nodejs-success',
-    port: 8080,
-    test: nodejs.testSuccess,
+    port: 9080,
+    test: nodejs.testSuccess
   },
   {
     name: 'browser',
-    port: 8081,
-    test: browser.test,
+    port: 9081,
+    test: browser.test
   },
   {
     name: 'nodejs-invalid-request',
-    port: 8082,
-    test: nodejs.testInvalidRequest,
-  },
+    port: 9082,
+    test: nodejs.testInvalidRequest
+  }
 ]
 
 const timeout = (ms: number) =>
@@ -32,16 +32,16 @@ const TIMEOUT = 4000
 const configSchema = {
   timeout: {
     type: 'number',
-    default: TIMEOUT,
+    default: TIMEOUT
   },
   verbose: {
     type: 'boolean',
     default: false,
-    alias: 'v',
+    alias: 'v'
   },
   filter: {
-    type: 'string',
-  },
+    type: 'string'
+  }
 } satisfies YargsSchema
 
 const main = async (argv: YargsArgv<typeof configSchema>): Promise<never> => {
@@ -52,7 +52,12 @@ const main = async (argv: YargsArgv<typeof configSchema>): Promise<never> => {
   logger.info(`Running ${filteredTests.length} / ${tests.length} tests`)
 
   for (const { name, port, test } of filteredTests) {
-    logger.info(`### Running test: "${name}" ###`)
+    const logLine = `### Running test: "${name}" ###`
+    const logPad = '#'.repeat(logLine.length)
+
+    logger.info(logPad)
+    logger.info(logLine)
+    logger.info(`${logPad}\n`)
 
     try {
       await Promise.race([test(port, logger), timeout(argv.timeout)])

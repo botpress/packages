@@ -3,7 +3,7 @@ import WebSocket from 'isomorphic-ws'
 import * as errors from './errors'
 import { EventEmitter } from './event-emitter'
 import * as rooting from './rooting'
-import { TunnelRequest, TunnelResponse, tunnelRequestSchema, tunnelResponseSchema } from './types'
+import { Hello, TunnelRequest, TunnelResponse, headSchema, tailSchema } from './types'
 
 export type ClientCloseEvent = WebSocket.CloseEvent
 export type ClientErrorEvent = WebSocket.Event
@@ -18,6 +18,7 @@ export abstract class TunnelClient {
     open: WebSocket.Event
     request: TunnelRequest
     response: TunnelResponse
+    hello: {}
   }>()
 
   public constructor(protected _ws: WebSocket) {
@@ -25,7 +26,6 @@ export abstract class TunnelClient {
     _ws.addEventListener('error', this._wsError)
     _ws.addEventListener('message', this._wsMessage)
     _ws.addEventListener('open', this._wsOpen)
-
     this._ev.once('close', () => this._handleClose())
   }
 
@@ -57,6 +57,12 @@ export abstract class TunnelClient {
     this._ws.close(code ?? errors.CLOSE_CODES.NORMAL_CLOSURE, reason)
   }
 
+  public readonly hello = () => {
+    this._throwIfClosed()
+    const hello: Hello = { type: 'hello' }
+    this._ws.send(JSON.stringify(hello))
+  }
+
   protected _throwIfClosed = () => {
     if (this._closed) {
       throw new Error('tunnel is closed')
@@ -78,6 +84,7 @@ export class TunnelTail extends TunnelClient {
     error: ClientErrorEvent
     request: TunnelRequest
     open: ClientOpenEvent
+    hello: {}
   }> = this._ev
 
   public static new(host: string, tunnelId: string): Promise<TunnelTail> {
@@ -99,19 +106,41 @@ export class TunnelTail extends TunnelClient {
     super(socket)
 
     this._ev.on('message', (ev: WebSocket.MessageEvent) => {
-      const strData = ev.data.toString()
-      const parseResult = tunnelRequestSchema.safeParse(JSON.parse(strData))
-      if (!parseResult.success) {
+      const message = this._parseMessage(ev)
+      if (!message) {
         this.close(errors.CLOSE_CODES.INVALID_REQUEST_PAYLOAD, 'invalid request payload')
         return
       }
-      this.events.emit('request', parseResult.data)
+      if (message.type === 'hello') {
+        this.events.emit('hello', {})
+        return
+      }
+      this.events.emit('request', message.request)
     })
   }
 
-  public readonly send = (response: TunnelResponse) => {
+  public readonly send = (response: Omit<TunnelResponse, 'type'>) => {
     this._throwIfClosed()
-    this._ws.send(JSON.stringify(response))
+
+    const res: TunnelResponse = { type: 'response', ...response }
+    this._ws.send(JSON.stringify(res))
+  }
+
+  private _parseMessage = (
+    ev: WebSocket.MessageEvent
+  ): { type: 'hello' } | { type: 'request'; request: TunnelRequest } | undefined => {
+    const data = JSON.parse(ev.data.toString())
+
+    const parseResult = tailSchema.safeParse(data)
+    if (!parseResult.success) {
+      return
+    }
+
+    if (parseResult.data.type === 'hello') {
+      return { type: 'hello' }
+    }
+
+    return { type: 'request', request: parseResult.data }
   }
 }
 
@@ -121,24 +150,47 @@ export class TunnelHead extends TunnelClient {
     error: ClientErrorEvent
     response: TunnelResponse
     open: ClientOpenEvent
+    hello: {}
   }> = this._ev
 
   public constructor(public readonly tunnelId: string, ws: WebSocket) {
     super(ws)
 
     this._ev.on('message', (ev: WebSocket.MessageEvent) => {
-      const strData = ev.data.toString()
-      const parseResult = tunnelResponseSchema.safeParse(JSON.parse(strData))
-      if (!parseResult.success) {
+      const message = this._parseMessage(ev)
+      if (!message) {
         this.close(errors.CLOSE_CODES.INVALID_RESPONSE_PAYLOAD, 'invalid response payload')
         return
       }
-      this.events.emit('response', parseResult.data)
+      if (message.type === 'hello') {
+        this.events.emit('hello', {})
+        return
+      }
+      this.events.emit('response', message.reponse)
     })
   }
 
-  public readonly send = (request: TunnelRequest) => {
+  public readonly send = (request: Omit<TunnelRequest, 'type'>) => {
     this._throwIfClosed()
-    this._ws.send(JSON.stringify(request))
+
+    const req: TunnelRequest = { type: 'request', ...request }
+    this._ws.send(JSON.stringify(req))
+  }
+
+  private _parseMessage = (
+    ev: WebSocket.MessageEvent
+  ): { type: 'hello' } | { type: 'response'; reponse: TunnelResponse } | undefined => {
+    const data = JSON.parse(ev.data.toString())
+
+    const parseResult = headSchema.safeParse(data)
+    if (!parseResult.success) {
+      return
+    }
+
+    if (parseResult.data.type === 'hello') {
+      return { type: 'hello' }
+    }
+
+    return { type: 'response', reponse: parseResult.data }
   }
 }

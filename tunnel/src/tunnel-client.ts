@@ -119,9 +119,11 @@ export class TunnelTail extends TunnelClient {
     })
   }
 
-  public readonly send = (response: TunnelResponse) => {
+  public readonly send = (response: Omit<TunnelResponse, 'type'>) => {
     this._throwIfClosed()
-    this._ws.send(JSON.stringify(response))
+
+    const res: TunnelResponse = { type: 'response', ...response }
+    this._ws.send(JSON.stringify(res))
   }
 
   private _parseMessage = (
@@ -169,9 +171,11 @@ export class TunnelHead extends TunnelClient {
     })
   }
 
-  public readonly send = (request: TunnelRequest) => {
+  public readonly send = (request: Omit<TunnelRequest, 'type'>) => {
     this._throwIfClosed()
-    this._ws.send(JSON.stringify(request))
+
+    const req: TunnelRequest = { type: 'request', ...request }
+    this._ws.send(JSON.stringify(req))
   }
 
   private _parseMessage = (

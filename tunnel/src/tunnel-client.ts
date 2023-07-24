@@ -3,7 +3,7 @@ import WebSocket from 'isomorphic-ws'
 import * as errors from './errors'
 import { EventEmitter } from './event-emitter'
 import * as rooting from './rooting'
-import { Hello, TunnelRequest, TunnelResponse, helloSchema, tunnelRequestSchema, tunnelResponseSchema } from './types'
+import { Hello, TunnelRequest, TunnelResponse, headSchema, tailSchema } from './types'
 
 export type ClientCloseEvent = WebSocket.CloseEvent
 export type ClientErrorEvent = WebSocket.Event
@@ -131,17 +131,16 @@ export class TunnelTail extends TunnelClient {
   ): { type: 'hello' } | { type: 'request'; request: TunnelRequest } | undefined => {
     const data = JSON.parse(ev.data.toString())
 
-    const responseParseResult = tunnelRequestSchema.safeParse(data)
-    if (responseParseResult.success) {
-      return { type: 'request', request: responseParseResult.data }
+    const parseResult = tailSchema.safeParse(data)
+    if (!parseResult.success) {
+      return
     }
 
-    const helloParseResult = helloSchema.safeParse(data)
-    if (helloParseResult.success) {
+    if (parseResult.data.type === 'hello') {
       return { type: 'hello' }
     }
 
-    return
+    return { type: 'request', request: parseResult.data }
   }
 }
 
@@ -183,16 +182,15 @@ export class TunnelHead extends TunnelClient {
   ): { type: 'hello' } | { type: 'response'; reponse: TunnelResponse } | undefined => {
     const data = JSON.parse(ev.data.toString())
 
-    const responseParseResult = tunnelResponseSchema.safeParse(data)
-    if (responseParseResult.success) {
-      return { type: 'response', reponse: responseParseResult.data }
+    const parseResult = headSchema.safeParse(data)
+    if (!parseResult.success) {
+      return
     }
 
-    const helloParseResult = helloSchema.safeParse(data)
-    if (helloParseResult.success) {
+    if (parseResult.data.type === 'hello') {
       return { type: 'hello' }
     }
 
-    return
+    return { type: 'response', reponse: parseResult.data }
   }
 }

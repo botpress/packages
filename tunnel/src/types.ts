@@ -26,3 +26,6 @@ export const tunnelResponseSchema = z.object({
 // dummy data to keep the connection alive
 export type Hello = z.infer<typeof helloSchema>
 export const helloSchema = z.object({ type: z.literal('hello') })
+
+export const tailSchema = z.union([tunnelRequestSchema, helloSchema])
+export const headSchema = z.union([tunnelResponseSchema, helloSchema])

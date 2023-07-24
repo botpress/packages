@@ -66,7 +66,7 @@ export const test = async (port: number, logger: Logger) => {
     throw new Error(`Tunnel ${TUNNEL_ID} not found`)
   }
 
-  const pongPromise = new Promise<void>((resolve) => {
+  const helloPromise = new Promise<void>((resolve) => {
     tunnelHead.events.once('hello', () => {
       logger.info('head received hello')
       resolve()
@@ -86,7 +86,7 @@ export const test = async (port: number, logger: Logger) => {
     throw new Error('Server exited')
   })
 
-  const successPromise = Promise.all([responsePromise, pongPromise])
+  const successPromise = Promise.all([responsePromise, helloPromise])
 
   const [response] = await Promise.race([successPromise, serverExitPromise])
 

@@ -48,7 +48,7 @@ export const testSuccess = async (port: number, logger: Logger) => {
     throw new Error(`Tunnel ${TUNNEL_ID} not found`)
   }
 
-  const tunnelPongPromise = new Promise<void>((resolve) => {
+  const helloPromise = new Promise<void>((resolve) => {
     tunnelHead.events.once('hello', () => {
       logger.info('head received hello')
       resolve()
@@ -64,7 +64,7 @@ export const testSuccess = async (port: number, logger: Logger) => {
     body: REQUEST_BODY
   })
 
-  const successPromise = Promise.all([requestPromise, responsePromise, tunnelPongPromise])
+  const successPromise = Promise.all([requestPromise, responsePromise, helloPromise])
 
   const serverExitPromise = server.wait().then(() => {
     throw new Error('Server exited')

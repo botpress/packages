@@ -17,9 +17,14 @@ const main = async () => {
         requestId: request.id,
         status: 200,
         headers: {},
-        body: RESPONSE_BODY,
+        body: RESPONSE_BODY
       })
       resolve()
+    })
+
+    tunnelTail.events.on('hello', () => {
+      console.info('tail received hello, sending hello back...')
+      tunnelTail.hello()
     })
   })
 }

@@ -21,13 +21,13 @@ const toJs = async (tsScript: string): Promise<string> => {
     stdin: {
       contents: tsScript,
       resolveDir: __dirname,
-      loader: 'ts',
+      loader: 'ts'
     },
     bundle: true,
     write: false,
     format: 'esm',
     platform: 'browser',
-    target: 'es2017',
+    target: 'es2017'
   })
   const jsScript = buildResult.outputFiles[0]!.text
   return jsScript
@@ -66,19 +66,29 @@ export const test = async (port: number, logger: Logger) => {
     throw new Error(`Tunnel ${TUNNEL_ID} not found`)
   }
 
+  const pongPromise = new Promise<void>((resolve) => {
+    tunnelHead.events.once('hello', () => {
+      logger.info('head received hello')
+      resolve()
+    })
+  })
+  tunnelHead.hello()
+
   tunnelHead.send({
     id: REQUEST_ID,
     method: 'GET',
     path: '/hello',
     headers: {},
-    body: REQUEST_BODY,
+    body: REQUEST_BODY
   })
 
   const serverExitPromise = server.wait().then(() => {
     throw new Error('Server exited')
   })
 
-  const response = await Promise.race([responsePromise, serverExitPromise])
+  const successPromise = Promise.all([responsePromise, pongPromise])
+
+  const [response] = await Promise.race([successPromise, serverExitPromise])
 
   await browser.close()
   server.close()

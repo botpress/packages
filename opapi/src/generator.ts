@@ -1,6 +1,4 @@
 import chalk from 'chalk'
-import { compile as compileSchemaToTypes } from 'json-schema-to-typescript'
-import { pascal, title } from 'radash'
 import { VError } from 'verror'
 import { defaultResponseStatus, invalidLine, tsFileHeader } from './const'
 import { appendHeaders, initDirectory, removeLineFromFiles, saveFile } from './file'
@@ -19,140 +17,11 @@ import log from './log'
 import type { OpenApiPostProcessors } from './opapi'
 import { createOpenapi } from './openapi'
 import { operationBodyTypeGuard } from './operation'
-import { isOperationWithBodyProps, type Operation, type State } from './state'
-type ValueOf<T> = T[keyof T]
+import { type Operation, type State } from './state'
+import { generateTypesBySection as sectionWiseTypesGenerator } from './section-types-generator'
 
-const pascalize = (str: string) => pascal(title(str))
-type DefaultState = State<string, string, string>
-export async function generateTypesBySection(state: DefaultState, targetDirectory: string) {
-  initDirectory(targetDirectory)
-
-  const operationExtensions: OperationExtension[] = [
-    generateFunctionDefinition,
-    generateParameterTypes,
-    generateRequestParameterTypes
-  ]
-  const sectionExtensions: SectionExtension[] = [generateSectionTypes]
-  state.sections.forEach((section) => {
-    const schema = state.schemas[section.title]
-    executeSectionExtensions(sectionExtensions, section, state).then((sectionContent) => {
-      if (schema) {
-        executeOperationExtensions(operationExtensions, section, state).then((operationContent) => {
-          saveFile(
-            targetDirectory,
-            `${section.title}.ts`,
-            `${sectionContent}\n${operationContent.map((item) => item.join('')).join('')}`
-          )
-        })
-      }
-    })
-  })
-}
-
-const generateSectionTypes: SectionExtension = async (section) => {
-  if (section.schema === undefined) return ''
-  return compileSchemaToTypes(section.schema, section.section)
-}
-
-function executeSectionExtensions(
-  sectionExtensions: SectionExtension[],
-  section: DefaultState['sections'][number],
-  state: DefaultState
-) {
-  const schema = state.schemas[section.title]
-  if (schema) {
-    const extensions = sectionExtensions.map((extension) => extension(schema))
-    return Promise.all(extensions)
-  } else {
-    return new Promise<string[]>((resolve) => resolve(['']))
-  }
-}
-
-function executeOperationExtensions(
-  operationExtensions: OperationExtension[],
-  section: DefaultState['sections'][number],
-  state: DefaultState
-): Promise<string[][]> {
-  return Promise.all(
-    section.operations.map((operationName) => {
-      const operation = state.operations[operationName]
-      if (operation) {
-        const extensions = operationExtensions.map((extension) => extension({ operationName, operation, section }))
-        return Promise.all(extensions)
-      } else {
-        return new Promise<string[]>((resolve) => resolve(['']))
-      }
-    })
-  )
-}
-type SectionExtension = (section: ValueOf<DefaultState['schemas']>) => Promise<string>
-type OperationExtension = (payload: {
-  section: DefaultState['sections'][number]
-  operationName: string
-  operation: Operation<string, string, string, 'json-schema'>
-}) => Promise<string>
-
-const generateFunctionDefinition: OperationExtension = async ({ operationName, operation }) => {
-  return `export type ${operationName} = (${getFunctionParams(operationName, operation)}) => void\n\n`
-}
-
-function getFunctionParams(
-  operationName: string,
-  operation: Operation<string, string, string, 'json-schema'> | undefined
-) {
-  if (!operation) {
-    return ''
-  }
-  const parameters = Object.entries(operation.parameters || {})
-  const operationHasBodyProps = isOperationWithBodyProps(operation)
-  let paramsString = ''
-  if (parameters.length || operationHasBodyProps) {
-    paramsString += 'params: '
-  }
-  if (parameters.length) {
-    paramsString += `${pascalize(operationName)}BaseParams`
-  }
-  if (parameters.length && operationHasBodyProps) {
-    paramsString += ' & '
-  }
-  if (operationHasBodyProps) {
-    paramsString += `${pascalize(operationName)}Body`
-  }
-  return paramsString
-}
-
-const generateRequestParameterTypes: OperationExtension = async ({ operationName, operation }) => {
-  if (!operation) {
-    return ''
-  }
-  if (isOperationWithBodyProps(operation)) {
-    const content = await compileSchemaToTypes(operation.requestBody.schema, `${operationName}Body`, {
-      bannerComment: ''
-    })
-    return content
-  }
-  return ``
-}
-const generateParameterTypes: OperationExtension = async ({ operationName, operation }) => {
-  if (!operation) {
-    return ''
-  }
-  const parameters = Object.entries(operation.parameters || {})
-  const operationHasBodyProps = isOperationWithBodyProps(operation)
-  if (parameters.length === 0) return ''
-  return parameters.reduce((stringifiedTypeDefinition, [name, parameter], index) => {
-    if (parameter.description) {
-      stringifiedTypeDefinition += `\n /**\n  * ${parameter.description}\n  */`
-    }
-    stringifiedTypeDefinition += `\n ${name}: ${parameter.type};`
-    if (index === parameters.length - 1) {
-      stringifiedTypeDefinition += '\n}\n\n'
-    }
-    return stringifiedTypeDefinition
-  }, `export type ${pascalize(operationName)}BaseParams = {`)
-}
-
-export const generateServer = async (state: DefaultState, dir: string, useExpressTypes: boolean) => {
+export const generateTypesBySection = sectionWiseTypesGenerator
+export const generateServer = async (state: State<string, string, string>, dir: string, useExpressTypes: boolean) => {
   initDirectory(dir)
 
   log.info('Generating openapi content')

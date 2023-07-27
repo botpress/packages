@@ -7,6 +7,7 @@ import {
   getBlankBlock
 } from './section-types-generator.parsers'
 import { Block, DefaultState, OperationParser, SectionParser, BlockComposer } from './section-types-generator.types'
+import { camel } from 'radash'
 
 const operationGenerators: OperationParser[] = [
   parseFunctionDefinition,
@@ -31,7 +32,9 @@ const composeFilesFromBlocks: BlockComposer = (blocks: Block[], targetDirectory:
     let content = ''
     content = getImportsForDependencies(block, blocks, content)
     content += block.content
-    saveFile(targetDirectory, `${block.title}.ts`, content)
+    if (Boolean(content) && Boolean(block.title)) {
+      saveFile(targetDirectory, `${camel(block.title)}.ts`, content)
+    }
   })
 }
 
@@ -39,7 +42,7 @@ function getImportsForDependencies(block: Block, blocks: Block[], content: strin
   if (Boolean(block.dependencies.length)) {
     const dependencies = blocks.filter((_block) => block.dependencies.includes(_block.title))
     dependencies.forEach((dependency) => {
-      content += `import { ${dependency.title} } from './${dependency.title}'\n`
+      content += `import { ${dependency.title} } from './${camel(dependency.title)}'\n`
     })
   }
   return content

@@ -1,32 +1,32 @@
 import { initDirectory, saveFile } from 'src/file'
 import {
-  generateFunctionDefinition,
-  generateParameterTypes,
-  generateRequestParameterTypes,
-  generateSectionTypes,
+  parseFunctionDefinition,
+  parseParameterTypes,
+  parseRequestParameterTypes,
+  parseSectionTypes,
   getBlankBlock
 } from './section-types-generator.parsers'
-import { Block, DefaultState, OperationParser, SectionParser } from './section-types-generator.types'
+import { Block, DefaultState, OperationParser, SectionParser, BlockComposer } from './section-types-generator.types'
 
 const operationGenerators: OperationParser[] = [
-  generateFunctionDefinition,
-  generateParameterTypes,
-  generateRequestParameterTypes
+  parseFunctionDefinition,
+  parseParameterTypes,
+  parseRequestParameterTypes
 ]
-const sectionGenerators: SectionParser[] = [generateSectionTypes]
+const sectionGenerators: SectionParser[] = [parseSectionTypes]
 
 export async function generateTypesBySection(state: DefaultState, targetDirectory: string) {
   initDirectory(targetDirectory)
   state.sections.forEach(async (section) => {
     const [sectionBlocks, operationBlocks] = await Promise.all([
-      executeSectionGenerators(sectionGenerators, section, state),
-      executeOperationGenerators(operationGenerators, section, state)
+      executeSectionParsers(sectionGenerators, section, state),
+      executeOperationParsers(operationGenerators, section, state)
     ])
     composeFilesFromBlocks([...sectionBlocks, ...operationBlocks], targetDirectory)
   })
 }
 
-function composeFilesFromBlocks(blocks: Block[], targetDirectory: string) {
+const composeFilesFromBlocks: BlockComposer = (blocks: Block[], targetDirectory: string) => {
   blocks.forEach((block) => {
     let content = ''
     content = getImportsForDependencies(block, blocks, content)
@@ -45,7 +45,7 @@ function getImportsForDependencies(block: Block, blocks: Block[], content: strin
   return content
 }
 
-function executeSectionGenerators(
+function executeSectionParsers(
   sectionExtensions: SectionParser[],
   section: DefaultState['sections'][number],
   state: DefaultState
@@ -59,7 +59,7 @@ function executeSectionGenerators(
   }
 }
 
-async function executeOperationGenerators(
+async function executeOperationParsers(
   operationExtensions: OperationParser[],
   section: DefaultState['sections'][number],
   state: DefaultState

@@ -1,16 +1,16 @@
+import { extendApi } from '@anatine/zod-openapi'
 import { VError } from 'verror'
+import { generateSchemaFromZod } from './jsonschema'
+import { objects } from './objects'
 import {
   Operation,
-  OperationWithBodyProps,
   OperationWithoutBodyMethod,
   ParametersMap,
   State,
+  isOperationWithBodyProps,
   mapParameter
 } from './state'
 import { formatBodyName, formatResponseName, isAlphanumeric } from './util'
-import { generateSchemaFromZod } from './jsonschema'
-import { extendApi } from '@anatine/zod-openapi'
-import { objects } from './objects'
 
 export const addOperation = <
   SchemaName extends string,
@@ -53,7 +53,7 @@ export const addOperation = <
   }
 
   let operation: Operation<DefaultParameterName, SectionName, string, 'json-schema'>
-  if (operationBodyTypeGuard(operationProps)) {
+  if (isOperationWithBodyProps(operationProps)) {
     state.refs.requestBodies[formatBodyName(name)] = true
     operation = {
       ...operationProps,
@@ -98,12 +98,6 @@ function createParameters<DefaultParameterNames extends string>(
   })
 
   return params
-}
-
-export function operationBodyTypeGuard<DefaultParameterNames extends string, Tag extends string>(
-  operation: Operation<DefaultParameterNames, Tag, string, 'json-schema' | 'zod-schema'>
-): operation is OperationWithBodyProps<DefaultParameterNames, Tag, string, 'json-schema'> {
-  return operation.method === 'put' || operation.method === 'post' || operation.method === 'patch'
 }
 
 function validateParametersInPath(path: string, parameters?: ParametersMap<string, 'json-schema'>) {

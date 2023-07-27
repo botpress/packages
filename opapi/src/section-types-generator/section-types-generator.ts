@@ -4,7 +4,8 @@ import {
   parseParameterTypes,
   parseRequestParameterTypes,
   parseSectionTypes,
-  getBlankBlock
+  getBlankBlock,
+  parseReturnTypes
 } from './section-types-generator.parsers'
 import { Block, DefaultState, OperationParser, SectionParser, BlockComposer } from './section-types-generator.types'
 import { camel } from 'radash'
@@ -12,7 +13,8 @@ import { camel } from 'radash'
 const operationGenerators: OperationParser[] = [
   parseFunctionDefinition,
   parseParameterTypes,
-  parseRequestParameterTypes
+  parseRequestParameterTypes,
+  parseReturnTypes
 ]
 const sectionGenerators: SectionParser[] = [parseSectionTypes]
 

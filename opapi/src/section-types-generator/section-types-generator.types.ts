@@ -14,5 +14,10 @@ export type OperationParser = (payload: {
 
 export type Block = {
   dependencies: string[]
+  /**
+   * title of the entity
+   * @example - 'Bar' if the function or interface is called Bar
+   */
+  title: string
   content: string
 }

@@ -4,14 +4,15 @@ import { pascalize } from './section-types-generator.helpers'
 import { Block, OperationParser, SectionParser } from './section-types-generator.types'
 
 export function getBlankBlock(): Block {
-  return { dependencies: [], content: '' }
+  return { dependencies: [], content: '', title: '' }
 }
 export const generateSectionTypes: SectionParser = async (section) => {
   if (section.schema === undefined) return getBlankBlock()
-  const content = await compileSchemaToTypes(section.schema, section.section)
+  const content = await compileSchemaToTypes(section.schema, section.section, { bannerComment: '' })
   return {
     dependencies: [],
-    content: content
+    content: content,
+    title: section.section
   }
 }
 
@@ -21,22 +22,21 @@ export const generateFunctionDefinition: OperationParser = async ({ operationNam
   }
   const requestBodyName = getFunctionRequestBodyName(operationName)
   const paramsName = getFunctionParamName(operationName)
+  const functionName = operationName
   return {
     dependencies: [requestBodyName, paramsName],
-    content: `export type ${operationName} = (${getFunctionParams(operationName, operation)}) => void\n\n`
+    title: functionName,
+    content: `export type ${functionName} = (${getFunctionParams(operationName, operation)}) => void\n\n`
   }
 }
 
 export const generateRequestParameterTypes: OperationParser = async ({ operationName, operation }) => {
   if (operation && isOperationWithBodyProps(operation)) {
-    const content = await compileSchemaToTypes(
-      operation.requestBody.schema,
-      getFunctionRequestBodyName(operationName),
-      {
-        bannerComment: ''
-      }
-    )
-    return { content, dependencies: [] }
+    const functionRequestBodyName = getFunctionRequestBodyName(operationName)
+    const content = await compileSchemaToTypes(operation.requestBody.schema, functionRequestBodyName, {
+      bannerComment: ''
+    })
+    return { content, dependencies: [], title: functionRequestBodyName }
   }
   return getBlankBlock()
 }
@@ -44,6 +44,7 @@ export const generateRequestParameterTypes: OperationParser = async ({ operation
 export const generateParameterTypes: OperationParser = async ({ operationName, operation }) => {
   const parameters = Object.entries(operation.parameters || {})
   if (operation && parameters.length > 0) {
+    const functionParamName = getFunctionParamName(operationName)
     const content = parameters.reduce((stringifiedTypeDefinition, [name, parameter], index) => {
       if (parameter.description) {
         stringifiedTypeDefinition += `\n /**\n  * ${parameter.description}\n  */`
@@ -53,8 +54,8 @@ export const generateParameterTypes: OperationParser = async ({ operationName, o
         stringifiedTypeDefinition += '\n}\n\n'
       }
       return stringifiedTypeDefinition
-    }, `export type ${getFunctionParamName(operationName)} = {`)
-    return { content, dependencies: [] }
+    }, `export type ${functionParamName} = {`)
+    return { content, dependencies: [], title: functionParamName }
   }
   return getBlankBlock()
 }

@@ -22,13 +22,27 @@ export async function generateTypesBySection(state: DefaultState, targetDirector
       executeSectionGenerators(sectionGenerators, section, state),
       executeOperationGenerators(operationGenerators, section, state)
     ])
-    const contentForFiles = composeFilesFromBlocks([...sectionBlocks, ...operationBlocks])
-    saveFile(targetDirectory, `${section.title}.ts`, contentForFiles.join('\n'))
+    composeFilesFromBlocks([...sectionBlocks, ...operationBlocks], targetDirectory)
   })
 }
 
-function composeFilesFromBlocks(blocks: Block[]) {
-  return blocks.map((block) => block.content)
+function composeFilesFromBlocks(blocks: Block[], targetDirectory: string) {
+  blocks.forEach((block) => {
+    let content = ''
+    content = getImportsForDependencies(block, blocks, content)
+    content += block.content
+    saveFile(targetDirectory, `${block.title}.ts`, content)
+  })
+}
+
+function getImportsForDependencies(block: Block, blocks: Block[], content: string) {
+  if (Boolean(block.dependencies.length)) {
+    const dependencies = blocks.filter((_block) => block.dependencies.includes(_block.title))
+    dependencies.forEach((dependency) => {
+      content += `import { ${dependency.title} } from './${dependency.title}'\n`
+    })
+  }
+  return content
 }
 
 function executeSectionGenerators(

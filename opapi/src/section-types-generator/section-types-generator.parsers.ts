@@ -1,17 +1,31 @@
 import { compile as compileSchemaToTypes } from 'json-schema-to-typescript'
-import type { SchemaObject } from 'openapi3-ts'
 import { title } from 'radash'
 import { Operation, isOperationWithBodyProps } from 'src/state'
-import { pascalize } from './section-types-generator.helpers'
-import { Block, OperationParser, SectionParser } from './section-types-generator.types'
+import {
+  addPropertyToBlock,
+  getBlankBlock,
+  pascalize,
+  remove$RefPropertiesFromSchema
+} from './section-types-generator.helpers'
+import { OperationParser, SectionParser } from './section-types-generator.types'
 
 export const parseReturnTypes: OperationParser = async ({ operationName, operation }) => {
-  const { stringified, processedProperties } = await getFunctionReturnType(operationName, operation)
-  return {
-    dependencies: processedProperties.map((property) => pascalize(property)),
-    title: getReturnTypeName(operationName),
-    content: stringified
+  const response = operation.response
+  if (!operation.response) return { ...getBlankBlock(), content: 'void' }
+  // since we are using only a partial schema here and the refs will not resolve, we need to process the $ref properties differently
+  const { schema, propertyNamesWith$Ref } = remove$RefPropertiesFromSchema(response.schema)
+  const returnTypeString = await compileSchemaToTypes(schema, getReturnTypeName(operationName), {
+    bannerComment: ''
+  })
+  const block = {
+    dependencies: propertyNamesWith$Ref.map((property) => pascalize(property)),
+    content: returnTypeString,
+    title: getReturnTypeName(operationName)
   }
+  return addPropertyToBlock(
+    block,
+    propertyNamesWith$Ref.map((property) => `\n  ${property}: ${title(property)};`).join('')
+  )
 }
 
 export const parseSectionTypes: SectionParser = async (section) => {
@@ -69,50 +83,6 @@ export const parseParameterTypes: OperationParser = async ({ operationName, oper
   return getBlankBlock()
 }
 
-export function getBlankBlock(): Block {
-  return { dependencies: [], content: '', title: '' }
-}
-
-async function getFunctionReturnType(
-  operationName: string,
-  operation: Operation<string, string, string, 'json-schema'>
-) {
-  const response = operation.response
-  if (!operation.response) return { stringified: 'void', processedProperties: [] }
-  const { schema, processedProperties } = processRefProperties(response.schema)
-  const returnTypeString = await compileSchemaToTypes(schema, getReturnTypeName(operationName), {
-    bannerComment: ''
-  })
-  return {
-    stringified: addInsideBrackets(
-      returnTypeString,
-      processedProperties.map((property) => `\n  ${property}: ${title(property)};`).join('')
-    ),
-    processedProperties
-  }
-}
-function addInsideBrackets(target: string, content: string): string {
-  return `${target.replace('}', content + '\n}')}`
-}
-function processRefProperties(schema: SchemaObject): {
-  schema: SchemaObject
-  processedProperties: string[]
-} {
-  const processedProperties: string[] = []
-  const parsedSchema = Object.entries(schema.properties || {}).reduce(
-    (withPropertiesWithoutRef, [propertyKey, propertyValue]) => {
-      if (propertyValue.$ref) {
-        processedProperties.push(propertyKey)
-      } else {
-        ;(withPropertiesWithoutRef as any).properties[propertyKey] = propertyValue
-      }
-      return withPropertiesWithoutRef
-    },
-    { ...schema, properties: {} } as SchemaObject
-  )
-  return { schema: parsedSchema, processedProperties }
-}
-
 function getReturnTypeName(operationName: string): string {
   return `${pascalize(operationName)}Response`
 }
@@ -120,7 +90,7 @@ function getReturnTypeName(operationName: string): string {
 function getFunctionParams(
   operationName: string,
   operation: Operation<string, string, string, 'json-schema'> | undefined
-) {
+): string {
   if (!operation) {
     return ''
   }

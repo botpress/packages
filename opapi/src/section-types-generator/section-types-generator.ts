@@ -4,11 +4,11 @@ import {
   parseParameterTypes,
   parseRequestParameterTypes,
   parseSectionTypes,
-  getBlankBlock,
   parseReturnTypes
 } from './section-types-generator.parsers'
 import { Block, DefaultState, OperationParser, SectionParser, BlockComposer } from './section-types-generator.types'
 import { camel } from 'radash'
+import { getBlankBlock } from './section-types-generator.helpers'
 
 const operationGenerators: OperationParser[] = [
   parseFunctionDefinition,

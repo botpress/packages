@@ -4,10 +4,15 @@ export type DefaultState = State<string, string, string>
 
 export type ValueOf<T> = T[keyof T]
 
-export type SectionExtension = (section: ValueOf<DefaultState['schemas']>) => Promise<string>
+export type SectionParser = (section: ValueOf<DefaultState['schemas']>) => Promise<Block>
 
 export type OperationParser = (payload: {
   section: DefaultState['sections'][number]
   operationName: string
   operation: Operation<string, string, string, 'json-schema'>
-}) => Promise<string>
+}) => Promise<Block>
+
+export type Block = {
+  dependencies: string[]
+  content: string
+}

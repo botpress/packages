@@ -46,7 +46,7 @@ const createOpapiFromState = <
     ) => addOperation(state, operationProps),
     exportClient: (dir = '.', openapiGeneratorEndpoint: string, postProcessors?: OpenApiPostProcessors) =>
       generateClient(state, dir, openapiGeneratorEndpoint, postProcessors),
-    exportTypes: (dir = '.') => generateTypesBySection(state, dir),
+    exportTypesBySection: (dir = '.') => generateTypesBySection(state, dir),
     exportServer: (dir = '.', useExpressTypes: boolean) => generateServer(state, dir, useExpressTypes),
     exportOpenapi: (dir = '.') => generateOpenapi(state, dir),
     exportState: (dir = '.') => exportStateAsTypescript(state, dir)

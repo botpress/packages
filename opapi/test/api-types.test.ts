@@ -4,13 +4,13 @@ import { join } from 'path'
 import { getFiles } from '../src/file'
 import { validateTypescriptFile } from './util'
 
-describe('types generator', () => {
-  it('should be able to generate a client', async () => {
+describe('api types generator', () => {
+  it('should be able to generate valid typescript files for section wise types', async () => {
     const genClientFolder = join(__dirname, 'gen/api-types')
 
     const api = createApi()
 
-    await api.exportTypes(genClientFolder)
+    await api.exportTypesBySection(genClientFolder)
 
     const files = getFiles(genClientFolder)
 

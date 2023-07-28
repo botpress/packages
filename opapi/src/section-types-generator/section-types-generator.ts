@@ -18,6 +18,9 @@ const operationGenerators: OperationParser[] = [
 ]
 const sectionGenerators: SectionParser[] = [parseSectionTypes]
 
+/**
+ * Generates files containing typescript types for each item in the state object - Sections, Operations, Responses, etc.
+ */
 export async function generateTypesBySection(state: DefaultState, targetDirectory: string) {
   initDirectory(targetDirectory)
   state.sections.forEach(async (section) => {

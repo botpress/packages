@@ -101,9 +101,10 @@ function generateMethodProps({ operationName, body, parameters, hasParameters, i
     return `${generateBodyTypeName(operationName, isEmptyBody)}: ${generatePropsName(operationName)}`
   }
 
-  return `{ ${generateParamProps(parameters)}...${generateBodyTypeName(operationName, isEmptyBody)} }: ${generatePropsName(
+  return `{ ${generateParamProps(parameters)}...${generateBodyTypeName(
     operationName,
-  )}`
+    isEmptyBody,
+  )} }: ${generatePropsName(operationName)}`
 }
 
 function generateParamProps(parameters: Parameters) {

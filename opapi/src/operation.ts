@@ -8,17 +8,17 @@ import {
   ParametersMap,
   State,
   isOperationWithBodyProps,
-  mapParameter
+  mapParameter,
 } from './state'
 import { formatBodyName, formatResponseName, isAlphanumeric } from './util'
 
 export const addOperation = <
   SchemaName extends string,
   DefaultParameterName extends string,
-  SectionName extends string
+  SectionName extends string,
 >(
   state: State<SchemaName, DefaultParameterName, SectionName>,
-  operationProps: Operation<DefaultParameterName, SectionName, string, 'zod-schema'>
+  operationProps: Operation<DefaultParameterName, SectionName, string, 'zod-schema'>,
 ) => {
   const { name } = operationProps
   const responseName = formatResponseName(name)
@@ -27,7 +27,7 @@ export const addOperation = <
   const parameters = createParameters(
     operationProps.parameters ? objects.mapValues(operationProps.parameters, mapParameter) : undefined,
     state.defaultParameters,
-    operationProps.disableDefaultParameters
+    operationProps.disableDefaultParameters,
   )
 
   if (operationProps.path[0] !== '/') {
@@ -49,7 +49,7 @@ export const addOperation = <
   const response = {
     description: operationProps.response.description,
     status: operationProps.response.status,
-    schema: generateSchemaFromZod(extendApi(operationProps.response.schema, { title: responseName }))
+    schema: generateSchemaFromZod(extendApi(operationProps.response.schema, { title: responseName })),
   }
 
   let operation: Operation<DefaultParameterName, SectionName, string, 'json-schema'>
@@ -62,8 +62,8 @@ export const addOperation = <
       response,
       requestBody: {
         description: operationProps.requestBody.description,
-        schema: generateSchemaFromZod(extendApi(operationProps.requestBody.schema, { title: bodyName }))
-      }
+        schema: generateSchemaFromZod(extendApi(operationProps.requestBody.schema, { title: bodyName })),
+      },
     }
   } else {
     operation = {
@@ -71,7 +71,7 @@ export const addOperation = <
       method: operationProps.method as OperationWithoutBodyMethod,
       parameters,
       path,
-      response
+      response,
     }
   }
 
@@ -85,7 +85,7 @@ export const addOperation = <
 function createParameters<DefaultParameterNames extends string>(
   parameters: ParametersMap<string, 'json-schema'> = {},
   defaultParameters: ParametersMap<string, 'json-schema'> = {},
-  disableDefaultParameters: { [name in DefaultParameterNames]?: boolean } = {}
+  disableDefaultParameters: { [name in DefaultParameterNames]?: boolean } = {},
 ): ParametersMap<string, 'json-schema'> {
   const params: ParametersMap<string, 'json-schema'> = parameters
 

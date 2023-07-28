@@ -92,7 +92,7 @@ export const createApi = () => {
       description: 'Bar information',
       schema: z.object({
         test: z.string(),
-      })
+      }),
     },
     section: 'bar',
     response: {

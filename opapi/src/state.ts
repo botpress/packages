@@ -30,13 +30,13 @@ export type State<SchemaName extends string, DefaultParameterName extends string
 const unknownError: ApiError = {
   status: 500,
   type: 'Unknown',
-  description: 'An unknown error occurred'
+  description: 'An unknown error occurred',
 }
 
 const internalError: ApiError = {
   status: 500,
   type: 'Internal',
-  description: 'An internal error occurred'
+  description: 'An internal error occurred',
 }
 
 export type ApiError = {
@@ -107,7 +107,7 @@ export type OperationWithBodyProps<
   DefaultParameterName extends string,
   SectionName extends string,
   Path extends string = string,
-  S extends SchemaType = 'zod-schema'
+  S extends SchemaType = 'zod-schema',
 > = {
   // Method of the operation
   method: OperationsWithBodyMethod
@@ -124,7 +124,7 @@ export type OperationWithoutBodyProps<
   DefaultParameterName extends string,
   SectionName extends string,
   Path extends string = string,
-  S extends SchemaType = 'zod-schema'
+  S extends SchemaType = 'zod-schema',
 > = {
   // Method of the operation
   method: OperationWithoutBodyMethod
@@ -134,7 +134,7 @@ export type Operation<
   DefaultParameterName extends string,
   SectionName extends string,
   Path extends string = string,
-  S extends SchemaType = 'zod-schema'
+  S extends SchemaType = 'zod-schema',
 > =
   | OperationWithBodyProps<DefaultParameterName, SectionName, Path, S>
   | OperationWithoutBodyProps<DefaultParameterName, SectionName, Path, S>
@@ -156,7 +156,7 @@ export enum ComponentType {
   SCHEMAS = 'schemas',
   RESPONSES = 'responses',
   REQUESTS = 'requestBodies',
-  PARAMETERS = 'parameters'
+  PARAMETERS = 'parameters',
 }
 
 export type ParametersMap<Path extends string = string, S extends SchemaType = 'zod-schema'> = Record<
@@ -169,7 +169,7 @@ type BaseOperationProps<
   DefaultParameterName extends string,
   SectionName extends string,
   Path extends string = string,
-  S extends SchemaType = 'zod-schema'
+  S extends SchemaType = 'zod-schema',
 > = {
   // Name of the operation
   name: string
@@ -202,13 +202,13 @@ type CreateStateProps<SchemaName extends string, DefaultParameterName extends st
 }
 
 export function createState<SchemaName extends string, DefaultParameterName extends string, SectionName extends string>(
-  props: CreateStateProps<SchemaName, DefaultParameterName, SectionName>
+  props: CreateStateProps<SchemaName, DefaultParameterName, SectionName>,
 ): State<SchemaName, DefaultParameterName, SectionName> {
   const schemaEntries = props.schemas
     ? Object.entries<(typeof props.schemas)[SchemaName]>(props.schemas).map(([name, data]) => ({
         name,
         schema: data.schema,
-        section: data.section
+        section: data.section,
       }))
     : []
 
@@ -218,7 +218,7 @@ export function createState<SchemaName extends string, DefaultParameterName exte
     parameters: {},
     requestBodies: {},
     responses: {},
-    schemas: {}
+    schemas: {},
   }
 
   const toPairs = <K extends string, T>(obj: Record<K, T>): [K, T][] => Object.entries(obj) as [K, T][]
@@ -228,7 +228,7 @@ export function createState<SchemaName extends string, DefaultParameterName exte
         ...section,
         name,
         operations: [],
-        schema: schemaEntries.find((schemaEntry) => schemaEntry.section === name)?.name
+        schema: schemaEntries.find((schemaEntry) => schemaEntry.section === name)?.name,
       }))
     : []
 
@@ -245,7 +245,7 @@ export function createState<SchemaName extends string, DefaultParameterName exte
 
     schemas[name] = {
       section: schemaEntry.section,
-      schema: generateSchemaFromZod(schemaEntry.schema)
+      schema: generateSchemaFromZod(schemaEntry.schema),
     }
     refs.schemas[name] = true
   })
@@ -288,7 +288,7 @@ export function createState<SchemaName extends string, DefaultParameterName exte
     errors,
     refs,
     schemas,
-    sections
+    sections,
   }
 }
 
@@ -301,7 +301,7 @@ export function getRef(state: State<string, string, string>, type: ComponentType
     type: undefined,
     properties: undefined,
     required: undefined,
-    $ref: `#/components/${type}/${name}`
+    $ref: `#/components/${type}/${name}`,
   })
 }
 
@@ -309,7 +309,7 @@ export const mapParameter = (param: Parameter<'zod-schema'>): Parameter<'json-sc
   if ('schema' in param) {
     return {
       ...param,
-      schema: generateSchemaFromZod(param.schema)
+      schema: generateSchemaFromZod(param.schema),
     }
   }
   return param

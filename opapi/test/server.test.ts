@@ -5,7 +5,15 @@ import { existsSync } from 'fs'
 import { getFiles } from '../src/file'
 import { validateTypescriptFile } from './util'
 
-const serverFiles = ['definition.ts', 'handlers.ts', 'schema.ts', 'type.ts', 'metadata.json', 'openapi.json', 'errors.ts']
+const serverFiles = [
+  'definition.ts',
+  'handlers.ts',
+  'schema.ts',
+  'type.ts',
+  'metadata.json',
+  'openapi.json',
+  'errors.ts',
+]
 
 describe('server generator', () => {
   it('should be able to generate a server', async () => {

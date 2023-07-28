@@ -47,8 +47,9 @@ const generateRequestResponseTypes = (useExpressTypes: boolean) => {
   }
 }
 
-const generateHandler = (props: GenerateHandlerProps) => `const ${props.operationName
-  }Handler = (operation: Operations['${props.operationName}']) => async (req: Request, res: Response) => {
+const generateHandler = (props: GenerateHandlerProps) => `const ${
+  props.operationName
+}Handler = (operation: Operations['${props.operationName}']) => async (req: Request, res: Response) => {
   const input = {
 ${generateParameterFields(props)}
   }
@@ -150,15 +151,15 @@ const generateResolver = (operations: GenerateHandlerProps[]) => {
 
   return `export const Resolver = (operations: Operations): Handlers => ({
 ${Object.entries(handlerObject)
-      .map(([path, methods]) => generatePathResolver(path, methods))
-      .join('\n')}
+  .map(([path, methods]) => generatePathResolver(path, methods))
+  .join('\n')}
 })`
 }
 
 const generatePathResolver = (path: string, methods: { [method: string]: string }) => `\t'${path}': {
 ${Object.entries(methods)
-    .map(([method, operationName]) => generateMethodResolver(method, operationName))
-    .join('\n')}
+  .map(([method, operationName]) => generateMethodResolver(method, operationName))
+  .join('\n')}
 \t},`
 
 const generateMethodResolver = (method: string, operationName: string) =>

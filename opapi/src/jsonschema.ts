@@ -44,7 +44,13 @@ export function schemaIsEmptyObject(schema: SchemaObject) {
     return true
   }
 
-  if (keys.length === 2 && keys.includes('type') && schema.type === 'object' && keys.includes('additionalProperties') && schema.additionalProperties === false) {
+  if (
+    keys.length === 2 &&
+    keys.includes('type') &&
+    schema.type === 'object' &&
+    keys.includes('additionalProperties') &&
+    schema.additionalProperties === false
+  ) {
     return true
   }
 

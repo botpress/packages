@@ -9,14 +9,14 @@ export const runOpenApiCodeGenerator = async (
   dir: string,
   endpoint: string,
   openapiSpect: any,
-  openApiPostProcessor?: CodePostProcessor
+  openApiPostProcessor?: CodePostProcessor,
 ) => {
   const client = OpenapiGeneratorClient(endpoint)
 
   const id = await client.generateClient(openapiSpect, {
     supportsES6: true,
     useSingleRequestParameter: true,
-    withNodeImports: false
+    withNodeImports: false,
   })
 
   const buffer = await client.downloadClient(id)

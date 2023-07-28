@@ -16,14 +16,14 @@ const api = OpenApi({
     description: 'Description of this api', // This is the description of the API
     server: 'https://api.example.com', // This is the base URL of the API
     version: '0.1.0', // This is the version of the API
-    prefix: 'v1' // This prefix will be added to all routes
+    prefix: 'v1', // This prefix will be added to all routes
   },
   // This is metadata to be used in the documentation
   section: {
     User: {
       tilte: 'User',
-      description: 'User related endpoints'
-    }
+      description: 'User related endpoints',
+    },
   },
   // This is where you define your schemas that will be used in the API
   // You can use the `ref` function to reference a schema
@@ -33,32 +33,32 @@ const api = OpenApi({
       schema: schema(
         z.object({
           id: z.string(),
-          name: z.string()
+          name: z.string(),
         }),
         {
-          description: 'User schema'
-        }
-      )
-    }
+          description: 'User schema',
+        },
+      ),
+    },
   },
   // This is the error definitions that will be used in the API
   errors: [
     {
       status: 403,
       type: 'Forbidden',
-      description: "The requested action can't be peform by this resource."
+      description: "The requested action can't be peform by this resource.",
     },
     {
       status: 400,
       type: 'InvalidPayload',
-      description: "The request payload isn't invalid."
+      description: "The request payload isn't invalid.",
     },
     {
       status: 405,
       type: 'MethodNotFound',
-      description: 'The requested method does not exist.'
-    }
-  ]
+      description: 'The requested method does not exist.',
+    },
+  ],
 })
 
 api.addOperation({
@@ -71,15 +71,15 @@ api.addOperation({
     name: {
       in: 'query',
       type: 'string',
-      description: 'Name filter for the users'
-    }
+      description: 'Name filter for the users',
+    },
   },
   response: {
     description: 'Returns a list of User objects.',
     schema: z.object({
-      users: openapi.getModelRef('User')
-    })
-  }
+      users: openapi.getModelRef('User'),
+    }),
+  },
 })
 
 api.exportServer('./gen/server') // This will generate a server that can be used with any framework

@@ -4,7 +4,7 @@ import {
   parseParameterTypes,
   parseRequestParameterTypes,
   parseSectionTypes,
-  parseReturnTypes
+  parseReturnTypes,
 } from './section-types-generator.parsers'
 import { Block, DefaultState, OperationParser, SectionParser, BlockComposer } from './section-types-generator.types'
 import { camel } from 'radash'
@@ -14,7 +14,7 @@ const operationGenerators: OperationParser[] = [
   parseFunctionDefinition,
   parseParameterTypes,
   parseRequestParameterTypes,
-  parseReturnTypes
+  parseReturnTypes,
 ]
 const sectionGenerators: SectionParser[] = [parseSectionTypes]
 
@@ -26,7 +26,7 @@ export async function generateTypesBySection(state: DefaultState, targetDirector
   state.sections.forEach(async (section) => {
     const [sectionBlocks, operationBlocks] = await Promise.all([
       executeSectionParsers(sectionGenerators, section, state),
-      executeOperationParsers(operationGenerators, section, state)
+      executeOperationParsers(operationGenerators, section, state),
     ])
     composeFilesFromBlocks([...sectionBlocks, ...operationBlocks], targetDirectory)
   })
@@ -56,7 +56,7 @@ function getImportsForDependencies(block: Block, blocks: Block[], content: strin
 function executeSectionParsers(
   sectionExtensions: SectionParser[],
   section: DefaultState['sections'][number],
-  state: DefaultState
+  state: DefaultState,
 ): Promise<Block[]> {
   const schema = state.schemas[section.title]
   if (schema) {
@@ -70,7 +70,7 @@ function executeSectionParsers(
 async function executeOperationParsers(
   operationExtensions: OperationParser[],
   section: DefaultState['sections'][number],
-  state: DefaultState
+  state: DefaultState,
 ): Promise<Block[]> {
   const blocks = await Promise.all(
     section.operations.map((operationName) => {
@@ -81,7 +81,7 @@ async function executeOperationParsers(
       } else {
         return new Promise<Block[]>((resolve) => resolve([getBlankBlock()]))
       }
-    })
+    }),
   )
   return blocks.flat()
 }

@@ -100,7 +100,7 @@ export type Parameter<S extends SchemaType = 'zod-schema'> =
 export enum OperationsWithBodyMethod {
   POST = 'post',
   PUT = 'put',
-  PATCH = 'patch'
+  PATCH = 'patch',
 }
 
 export type OperationWithBodyProps<
@@ -143,9 +143,9 @@ export function isOperationWithBodyProps<
   DefaultParameterName extends string,
   SectionName extends string,
   Path extends string,
-  TypeOfSchema extends SchemaType = 'json-schema'
+  TypeOfSchema extends SchemaType = 'json-schema',
 >(
-  operation: Operation<DefaultParameterName, SectionName, Path, TypeOfSchema>
+  operation: Operation<DefaultParameterName, SectionName, Path, TypeOfSchema>,
 ): operation is OperationWithBodyProps<DefaultParameterName, SectionName, Path, TypeOfSchema> {
   if (Object.values(OperationsWithBodyMethod).includes(operation.method as any)) {
     return true

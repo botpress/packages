@@ -8,7 +8,7 @@ import {
   generateDefinition,
   generateHandlers,
   generateTypes,
-  runOpenApiCodeGenerator
+  runOpenApiCodeGenerator,
 } from './generators'
 import { generateErrors } from './generators/errors'
 import { generateOpenapiTypescript } from './generators/openapi-typescript'
@@ -43,9 +43,9 @@ export const generateServer = async (state: State<string, string, string>, dir: 
   log.info('Generating handlers code')
   const handlersCode = generateHandlers({
     operations: Object.entries(state.operations).map(([name, operation]) =>
-      mapOperationPropsToHandlerProps(name, operation)
+      mapOperationPropsToHandlerProps(name, operation),
     ),
-    useExpressTypes
+    useExpressTypes,
   })
   log.info('')
 
@@ -76,7 +76,7 @@ export const generateClient = async (
   state: State<string, string, string>,
   dir = '.',
   openApiGeneratorEndpoint: string,
-  postProcessors?: OpenApiPostProcessors
+  postProcessors?: OpenApiPostProcessors,
 ) => {
   initDirectory(dir)
 
@@ -93,8 +93,8 @@ export const generateClient = async (
   log.info('Generating client code')
   const clientCode = generateClientCode({
     operations: Object.entries(state.operations).map(([name, operation]) =>
-      mapOperationPropsToHandlerProps(name, operation)
-    )
+      mapOperationPropsToHandlerProps(name, operation),
+    ),
   })
   log.info('')
 
@@ -138,7 +138,7 @@ export function generateOpenapi(state: State<string, string, string>, dir = '.')
 
 function mapOperationPropsToHandlerProps(
   operationName: string,
-  operation: Operation<string, string, string, 'json-schema'>
+  operation: Operation<string, string, string, 'json-schema'>,
 ) {
   const generateHandlerProps: GenerateHandlerProps = {
     operationName,
@@ -149,7 +149,7 @@ function mapOperationPropsToHandlerProps(
     queries: [],
     params: [],
     body: isOperationWithBodyProps(operation) ? true : false,
-    isEmptyBody: isOperationWithBodyProps(operation) ? schemaIsEmptyObject(operation.requestBody.schema) : true
+    isEmptyBody: isOperationWithBodyProps(operation) ? schemaIsEmptyObject(operation.requestBody.schema) : true,
   }
 
   if (operation.parameters) {

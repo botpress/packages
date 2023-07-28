@@ -38,7 +38,7 @@ export function remove$RefPropertiesFromSchema(schema: SchemaObject): {
       }
       return withPropertiesWithoutRef
     },
-    { ...schema, properties: {} } as SchemaObject
+    { ...schema, properties: {} } as SchemaObject,
   )
   return { schema: parsedSchema, propertyNamesWith$Ref: processedProperties }
 }

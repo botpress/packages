@@ -5,7 +5,7 @@ import {
   addPropertyToBlock,
   getBlankBlock,
   pascalize,
-  remove$RefPropertiesFromSchema
+  remove$RefPropertiesFromSchema,
 } from './section-types-generator.helpers'
 import { OperationParser, SectionParser } from './section-types-generator.types'
 
@@ -15,16 +15,16 @@ export const parseReturnTypes: OperationParser = async ({ operationName, operati
   // since we are using only a partial schema here and the refs will not resolve, we need to process the $ref properties differently
   const { schema, propertyNamesWith$Ref } = remove$RefPropertiesFromSchema(response.schema)
   const returnTypeString = await compileSchemaToTypes(schema, getReturnTypeName(operationName), {
-    bannerComment: ''
+    bannerComment: '',
   })
   const block = {
     dependencies: propertyNamesWith$Ref.map((property) => pascalize(property)),
     content: returnTypeString,
-    title: getReturnTypeName(operationName)
+    title: getReturnTypeName(operationName),
   }
   return addPropertyToBlock(
     block,
-    propertyNamesWith$Ref.map((property) => `\n  ${property}: ${title(property)};`).join('')
+    propertyNamesWith$Ref.map((property) => `\n  ${property}: ${title(property)};`).join(''),
   )
 }
 
@@ -34,7 +34,7 @@ export const parseSectionTypes: SectionParser = async (section) => {
   return {
     dependencies: [],
     content: content,
-    title: pascalize(section.section)
+    title: pascalize(section.section),
   }
 }
 
@@ -49,7 +49,7 @@ export const parseFunctionDefinition: OperationParser = async ({ operationName, 
   return {
     dependencies: [requestBodyName, paramsName, returnTypeName],
     title: functionName,
-    content: `export type ${functionName} = (${getFunctionParams(operationName, operation)}) => ${returnTypeName}\n\n`
+    content: `export type ${functionName} = (${getFunctionParams(operationName, operation)}) => ${returnTypeName}\n\n`,
   }
 }
 
@@ -57,7 +57,7 @@ export const parseRequestParameterTypes: OperationParser = async ({ operationNam
   if (operation && isOperationWithBodyProps(operation)) {
     const functionRequestBodyName = getFunctionRequestBodyName(operationName)
     const content = await compileSchemaToTypes(operation.requestBody.schema, functionRequestBodyName, {
-      bannerComment: ''
+      bannerComment: '',
     })
     return { content, dependencies: [], title: functionRequestBodyName }
   }
@@ -89,7 +89,7 @@ function getReturnTypeName(operationName: string): string {
 
 function getFunctionParams(
   operationName: string,
-  operation: Operation<string, string, string, 'json-schema'> | undefined
+  operation: Operation<string, string, string, 'json-schema'> | undefined,
 ): string {
   if (!operation) {
     return ''

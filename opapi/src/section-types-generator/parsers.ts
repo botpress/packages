@@ -1,13 +1,8 @@
 import { compile as compileSchemaToTypes } from 'json-schema-to-typescript'
 import { title } from 'radash'
 import { Operation, isOperationWithBodyProps } from 'src/state'
-import {
-  addPropertyToBlock,
-  getBlankBlock,
-  pascalize,
-  remove$RefPropertiesFromSchema,
-} from './section-types-generator.helpers'
-import { OperationParser, SectionParser } from './section-types-generator.types'
+import { addPropertyToBlock, getBlankBlock, pascalize, remove$RefPropertiesFromSchema } from './helpers'
+import { OperationParser, SectionParser } from './types'
 
 export const parseReturnTypes: OperationParser = async ({ operationName, operation }) => {
   const response = operation.response

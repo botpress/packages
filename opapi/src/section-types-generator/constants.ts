@@ -4,8 +4,8 @@ import {
   parseRequestParameterTypes,
   parseReturnTypes,
   parseSectionTypes,
-} from './section-types-generator.parsers'
-import { OperationParser, SectionParser } from './section-types-generator.types'
+} from './parsers'
+import { OperationParser, SectionParser } from './types'
 
 export const operationParsers: OperationParser[] = [
   parseFunctionDefinition,

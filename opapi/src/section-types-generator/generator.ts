@@ -1,7 +1,7 @@
 import { camel } from 'radash'
 import { saveFile } from 'src/file'
-import { getBlankBlock } from './section-types-generator.helpers'
-import { Block, BlockComposer, DefaultState, OperationParser, SectionParser } from './section-types-generator.types'
+import { getBlankBlock } from './helpers'
+import { Block, BlockComposer, DefaultState, OperationParser, SectionParser } from './types'
 
 export const composeFilesFromBlocks: BlockComposer = (blocks: Block[], targetDirectory: string) => {
   blocks.forEach((block) => {

@@ -1,5 +1,5 @@
 import { pascal, title } from 'radash'
-import { Block } from './section-types-generator.types'
+import { Block } from './types'
 import { SchemaObject } from 'openapi3-ts'
 
 export const pascalize = (str: string) => pascal(title(str))

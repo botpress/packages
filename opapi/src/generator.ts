@@ -31,13 +31,13 @@ import {
  */
 export async function generateTypesBySection(state: DefaultState, targetDirectory: string) {
   initDirectory(targetDirectory)
-  state.sections.forEach(async (section) => {
+  for (const section of state.sections) {
     const [sectionBlocks, operationBlocks] = await Promise.all([
       executeSectionParsers(sectionParsers, section, state),
       executeOperationParsers(operationParsers, section, state),
     ])
     composeFilesFromBlocks([...sectionBlocks, ...operationBlocks], targetDirectory)
-  })
+  }
 }
 
 export const generateServer = async (state: State<string, string, string>, dir: string, useExpressTypes: boolean) => {

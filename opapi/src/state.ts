@@ -97,11 +97,8 @@ export type Parameter<S extends SchemaType = 'zod-schema'> =
   | QueryParameterObject<S>
   | QueryParameterStringArray
 
-export enum OperationsWithBodyMethod {
-  POST = 'post',
-  PUT = 'put',
-  PATCH = 'patch',
-}
+const operationsWithBodyMethod = ['post', 'put', 'patch'] as const
+type OperationsWithBodyMethod = (typeof operationsWithBodyMethod)[number]
 
 export type OperationWithBodyProps<
   DefaultParameterName extends string,
@@ -147,7 +144,7 @@ export function isOperationWithBodyProps<
 >(
   operation: Operation<DefaultParameterName, SectionName, Path, TypeOfSchema>,
 ): operation is OperationWithBodyProps<DefaultParameterName, SectionName, Path, TypeOfSchema> {
-  if (Object.values(OperationsWithBodyMethod).includes(operation.method as any)) {
+  if ((operationsWithBodyMethod as any as string[]).includes(operation.method)) {
     return true
   } else return false
 }

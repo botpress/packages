@@ -5,8 +5,7 @@ import { Block, BlockComposer, DefaultState, OperationParser, SectionParser } fr
 
 export const composeFilesFromBlocks: BlockComposer = (blocks: Block[], targetDirectory: string) => {
   blocks.forEach((block) => {
-    let content = ''
-    content = getImportsForDependencies(block, blocks, content)
+    let content = getImportsForDependencies(block, blocks)
     content += block.content
     if (Boolean(content) && Boolean(block.title)) {
       saveFile(targetDirectory, `${camel(block.title)}.ts`, content)
@@ -14,7 +13,8 @@ export const composeFilesFromBlocks: BlockComposer = (blocks: Block[], targetDir
   })
 }
 
-function getImportsForDependencies(block: Block, blocks: Block[], content: string) {
+export const getImportsForDependencies = (block: Block, blocks: Block[]) => {
+  let content = ''
   if (Boolean(block.dependencies.length)) {
     const dependencies = blocks.filter((_block) => block.dependencies.includes(_block.title))
     dependencies.forEach((dependency) => {
@@ -24,11 +24,11 @@ function getImportsForDependencies(block: Block, blocks: Block[], content: strin
   return content
 }
 
-export function executeSectionParsers(
+export const executeSectionParsers = (
   sectionExtensions: SectionParser[],
   section: DefaultState['sections'][number],
   state: DefaultState,
-): Promise<Block[]> {
+): Promise<Block[]> => {
   const schema = state.schemas[section.title]
   if (schema) {
     const extensions = sectionExtensions.map((extension) => extension(schema))
@@ -38,11 +38,11 @@ export function executeSectionParsers(
   }
 }
 
-export async function executeOperationParsers(
+export const executeOperationParsers = async (
   operationExtensions: OperationParser[],
   section: DefaultState['sections'][number],
   state: DefaultState,
-): Promise<Block[]> {
+): Promise<Block[]> => {
   const blocks = await Promise.all(
     section.operations.map((operationName) => {
       const operation = state.operations[operationName]

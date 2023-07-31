@@ -28,17 +28,16 @@ export function remove$RefPropertiesFromSchema(schema: SchemaObject): {
    */
   propertyNamesWith$Ref: string[]
 } {
-  const processedProperties: string[] = []
-  const parsedSchema = Object.entries(schema.properties || {}).reduce(
-    (withPropertiesWithoutRef, [propertyKey, propertyValue]) => {
+  const processed: ReturnType<typeof remove$RefPropertiesFromSchema> = Object.entries(schema.properties ?? {}).reduce(
+    (_processed, [propertyKey, propertyValue]) => {
       if (propertyValue.$ref) {
-        processedProperties.push(propertyKey)
+        _processed.propertyNamesWith$Ref.push(propertyKey)
       } else {
-        ;(withPropertiesWithoutRef as any).properties[propertyKey] = propertyValue
+        _processed.schema.properties[propertyKey] = propertyValue
       }
-      return withPropertiesWithoutRef
+      return _processed
     },
-    { ...schema, properties: {} } as SchemaObject,
+    { schema: { ...schema, properties: {} as Record<string, SchemaObject> }, propertyNamesWith$Ref: [] as string[] },
   )
-  return { schema: parsedSchema, propertyNamesWith$Ref: processedProperties }
+  return processed
 }

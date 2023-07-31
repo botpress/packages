@@ -1,38 +1,9 @@
-import { initDirectory, saveFile } from 'src/file'
-import {
-  parseFunctionDefinition,
-  parseParameterTypes,
-  parseRequestParameterTypes,
-  parseSectionTypes,
-  parseReturnTypes,
-} from './section-types-generator.parsers'
-import { Block, DefaultState, OperationParser, SectionParser, BlockComposer } from './section-types-generator.types'
 import { camel } from 'radash'
+import { saveFile } from 'src/file'
 import { getBlankBlock } from './section-types-generator.helpers'
+import { Block, BlockComposer, DefaultState, OperationParser, SectionParser } from './section-types-generator.types'
 
-const operationGenerators: OperationParser[] = [
-  parseFunctionDefinition,
-  parseParameterTypes,
-  parseRequestParameterTypes,
-  parseReturnTypes,
-]
-const sectionGenerators: SectionParser[] = [parseSectionTypes]
-
-/**
- * Generates files containing typescript types for each item in the state object - Sections, Operations, Responses, etc.
- */
-export async function generateTypesBySection(state: DefaultState, targetDirectory: string) {
-  initDirectory(targetDirectory)
-  state.sections.forEach(async (section) => {
-    const [sectionBlocks, operationBlocks] = await Promise.all([
-      executeSectionParsers(sectionGenerators, section, state),
-      executeOperationParsers(operationGenerators, section, state),
-    ])
-    composeFilesFromBlocks([...sectionBlocks, ...operationBlocks], targetDirectory)
-  })
-}
-
-const composeFilesFromBlocks: BlockComposer = (blocks: Block[], targetDirectory: string) => {
+export const composeFilesFromBlocks: BlockComposer = (blocks: Block[], targetDirectory: string) => {
   blocks.forEach((block) => {
     let content = ''
     content = getImportsForDependencies(block, blocks, content)
@@ -53,7 +24,7 @@ function getImportsForDependencies(block: Block, blocks: Block[], content: strin
   return content
 }
 
-function executeSectionParsers(
+export function executeSectionParsers(
   sectionExtensions: SectionParser[],
   section: DefaultState['sections'][number],
   state: DefaultState,
@@ -67,7 +38,7 @@ function executeSectionParsers(
   }
 }
 
-async function executeOperationParsers(
+export async function executeOperationParsers(
   operationExtensions: OperationParser[],
   section: DefaultState['sections'][number],
   state: DefaultState,

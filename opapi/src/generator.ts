@@ -16,10 +16,30 @@ import { schemaIsEmptyObject } from './jsonschema'
 import log from './log'
 import type { OpenApiPostProcessors } from './opapi'
 import { createOpenapi } from './openapi'
-import { generateTypesBySection as sectionWiseTypesGenerator } from './section-types-generator'
 import { isOperationWithBodyProps, type Operation, type State } from './state'
+import {
+  DefaultState,
+  composeFilesFromBlocks,
+  executeOperationParsers,
+  executeSectionParsers,
+  operationParsers,
+  sectionParsers,
+} from './section-types-generator'
 
-export const generateTypesBySection = sectionWiseTypesGenerator
+/**
+ * Generates files containing typescript types for each item in the state object - Sections, Operations, Responses, etc.
+ */
+export async function generateTypesBySection(state: DefaultState, targetDirectory: string) {
+  initDirectory(targetDirectory)
+  state.sections.forEach(async (section) => {
+    const [sectionBlocks, operationBlocks] = await Promise.all([
+      executeSectionParsers(sectionParsers, section, state),
+      executeOperationParsers(operationParsers, section, state),
+    ])
+    composeFilesFromBlocks([...sectionBlocks, ...operationBlocks], targetDirectory)
+  })
+}
+
 export const generateServer = async (state: State<string, string, string>, dir: string, useExpressTypes: boolean) => {
   initDirectory(dir)
 

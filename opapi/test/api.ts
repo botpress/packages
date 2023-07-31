@@ -6,7 +6,7 @@ const fooSchema = z.object({
   name: z.string(),
 })
 
-export const createApi = () => {
+export const getMockApi = () => {
   const api = OpenApi({
     metadata: {
       title: 'Test API',

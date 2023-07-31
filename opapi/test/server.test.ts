@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { createApi } from './api'
+import { getMockApi } from './api'
 import { join } from 'path'
 import { existsSync } from 'fs'
 import { getFiles } from '../src/file'
@@ -19,7 +19,7 @@ describe('server generator', () => {
   it('should be able to generate a server', async () => {
     const genServerFolder = join(__dirname, 'gen/server')
 
-    const api = createApi()
+    const api = getMockApi()
 
     await api.exportServer(genServerFolder, true)
 

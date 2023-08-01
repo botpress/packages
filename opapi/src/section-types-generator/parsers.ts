@@ -1,68 +1,48 @@
 import { compile as compileSchemaToTypes } from 'json-schema-to-typescript'
-import { title } from 'radash'
 import { Operation, isOperationWithBodyProps } from 'src/state'
 import { addPropertyToBlock, getBlankBlock, pascalize, remove$RefPropertiesFromSchema } from './helpers'
-import { OperationParser, SectionParser } from './types'
+import { Block, DefaultState, OperationParser, SectionParser } from './types'
+import { title } from 'radash'
+import { SchemaObject } from 'openapi3-ts'
 
-export const parseReturnTypes: OperationParser = async ({ operationName, operation }) => {
+const parseReturnTypes: OperationParser = async ({ operation, state }) => {
   const response = operation.response
   if (!operation.response) return { ...getBlankBlock(), content: 'void' }
-  // since we are using only a partial schema here and the refs will not resolve, we need to process the $ref properties differently
-  const { schema, propertyNamesWith$Ref } = remove$RefPropertiesFromSchema(response.schema)
-  const returnTypeString = await compileSchemaToTypes(schema, getReturnTypeName(operationName), {
-    bannerComment: '',
-  })
-  const block = {
-    dependencies: propertyNamesWith$Ref.map((property) => pascalize(property)),
-    content: returnTypeString,
-    title: getReturnTypeName(operationName),
-  }
-  return addPropertyToBlock(
-    block,
-    propertyNamesWith$Ref.map((property) => `\n  ${property}: ${title(property)};`).join(''),
-  )
+  return getBlockWithDependenciesForSchema(getReturnTypeName(operation.name), response.schema, state.refs.schemas)
 }
 
-export const parseSectionTypes: SectionParser = async (section) => {
+const parseSectionTypes: SectionParser = async (section, state) => {
   if (section.schema === undefined) return getBlankBlock()
-  const content = await compileSchemaToTypes(section.schema, section.section, { bannerComment: '' })
-  return {
-    dependencies: [],
-    content: content,
-    title: pascalize(section.section),
-  }
+  return getBlockWithDependenciesForSchema(pascalize(section.section), section.schema, state.refs.schemas)
 }
 
-export const parseFunctionDefinition: OperationParser = async ({ operationName, operation }) => {
+const parseFunctionDefinition: OperationParser = async ({ operation }) => {
   if (!operation) {
     return getBlankBlock()
   }
-  const requestBodyName = getFunctionRequestBodyName(operationName)
-  const paramsName = getFunctionParamName(operationName)
-  const functionName = operationName
-  const returnTypeName = getReturnTypeName(operationName)
+  const requestBodyName = getFunctionRequestBodyName(operation.name)
+  const paramsName = getFunctionParamName(operation.name)
+  const functionName = operation.name
+  const returnTypeName = getReturnTypeName(operation.name)
   return {
     dependencies: [requestBodyName, paramsName, returnTypeName],
     title: functionName,
-    content: `export type ${functionName} = (${getFunctionParams(operationName, operation)}) => ${returnTypeName}\n\n`,
+    content: `export type ${functionName} = (${getFunctionParams(operation.name, operation)}) => ${returnTypeName}\n\n`,
   }
 }
 
-export const parseRequestParameterTypes: OperationParser = async ({ operationName, operation }) => {
+const parseRequestParameterTypes: OperationParser = async ({ operation, state }) => {
   if (operation && isOperationWithBodyProps(operation)) {
-    const functionRequestBodyName = getFunctionRequestBodyName(operationName)
-    const content = await compileSchemaToTypes(operation.requestBody.schema, functionRequestBodyName, {
-      bannerComment: '',
-    })
-    return { content, dependencies: [], title: functionRequestBodyName }
+    const functionRequestBodyName = getFunctionRequestBodyName(operation.name)
+    return getBlockWithDependenciesForSchema(functionRequestBodyName, operation.requestBody.schema, state.refs.schemas)
   }
   return getBlankBlock()
 }
 
-export const parseParameterTypes: OperationParser = async ({ operationName, operation }) => {
+const parseParameterTypes: OperationParser = async ({ operation }) => {
   const parameters = Object.entries(operation.parameters || {})
   if (operation && parameters.length > 0) {
-    const functionParamName = getFunctionParamName(operationName)
+    const functionParamName = getFunctionParamName(operation.name)
     const content = parameters.reduce((stringifiedTypeDefinition, [name, parameter], index) => {
       if (parameter.description) {
         stringifiedTypeDefinition += `\n /**\n  * ${parameter.description}\n  */`
@@ -114,3 +94,31 @@ function getFunctionRequestBodyName(operationName: string): string {
 function getFunctionParamName(operationName: string): string {
   return `${pascalize(operationName)}BaseParams`
 }
+
+const getBlockWithDependenciesForSchema = async (
+  blockTitle: string,
+  schema: SchemaObject,
+  schemas: DefaultState['refs']['schemas'],
+): Promise<Block> => {
+  // since the schema is dereferenced, i.e., ref properties replaced, we need to process the $ref properties differently
+  const { schema: processedSchema, propertyNamesWith$Ref } = remove$RefPropertiesFromSchema(schema, schemas)
+  const content = await compileSchemaToTypes(processedSchema, blockTitle, { bannerComment: '' })
+  const block = {
+    dependencies: propertyNamesWith$Ref.map((name) => title(name)) as string[],
+    content: content,
+    title: blockTitle,
+  }
+
+  return addPropertyToBlock(
+    block,
+    propertyNamesWith$Ref.map((property) => `\n  ${property}: ${title(property)};`).join(''),
+  )
+}
+
+export const operationParsers: OperationParser[] = [
+  parseFunctionDefinition,
+  parseParameterTypes,
+  parseRequestParameterTypes,
+  parseReturnTypes,
+]
+export const sectionParsers: SectionParser[] = [parseSectionTypes]

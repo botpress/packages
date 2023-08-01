@@ -7,12 +7,12 @@ export type ValueOf<T> = T[keyof T]
 /**
  * Operates on a section, returns a block
  */
-export type SectionParser = (section: ValueOf<DefaultState['schemas']>) => Promise<Block>
+export type SectionParser = (section: ValueOf<DefaultState['schemas']>, state: DefaultState) => Promise<Block>
 
 export type OperationParser = (payload: {
   section: DefaultState['sections'][number]
-  operationName: string
   operation: Operation<string, string, string, 'json-schema'>
+  state: DefaultState
 }) => Promise<Block>
 
 /**

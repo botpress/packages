@@ -6,6 +6,19 @@ const fooSchema = z.object({
   name: z.string(),
 })
 
+const nestedSchema = z.object({
+  id: z.string(),
+  properties: z.object({
+    name: z.string(),
+    propertiesL2: z.object({
+      name: z.string(),
+      propertiesL3: z.object({
+        name: z.string(),
+      }),
+    }),
+  }),
+})
+
 export const getMockApi = () => {
   const api = OpenApi({
     metadata: {
@@ -24,11 +37,19 @@ export const getMockApi = () => {
         title: 'Bar',
         description: 'Bar section',
       },
+      nested: {
+        title: 'Nested',
+        description: 'Nested section',
+      },
     },
     schemas: {
       Foo: {
         section: 'foo',
         schema: fooSchema,
+      },
+      Nested: {
+        section: 'nested',
+        schema: nestedSchema,
       },
       Bar: {
         section: 'bar',
@@ -79,6 +100,31 @@ export const getMockApi = () => {
       description: 'Foo information',
       schema: z.object({
         foo: api.getModelRef('Foo'),
+      }),
+    },
+  })
+
+  api.addOperation({
+    name: 'addNested',
+    description: 'Post a nested',
+    method: 'post',
+    path: '/nested/{id}',
+    parameters: {
+      id: {
+        in: 'path',
+        type: 'string',
+        description: 'Nested id',
+      },
+    },
+    requestBody: {
+      description: 'Nested information',
+      schema: nestedSchema,
+    },
+    section: 'nested',
+    response: {
+      description: 'The nested object that was created',
+      schema: z.object({
+        nested: api.getModelRef('Nested'),
       }),
     },
   })

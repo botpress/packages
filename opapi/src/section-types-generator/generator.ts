@@ -25,13 +25,13 @@ export const getImportsForDependencies = (block: Block, blocks: Block[]) => {
 }
 
 export const executeSectionParsers = (
-  sectionExtensions: SectionParser[],
+  sectionParsers: SectionParser[],
   section: DefaultState['sections'][number],
   state: DefaultState,
 ): Promise<Block[]> => {
   const schema = state.schemas[section.title]
   if (schema) {
-    const extensions = sectionExtensions.map((extension) => extension(schema))
+    const extensions = sectionParsers.map((extension) => extension(schema, state))
     return Promise.all(extensions)
   } else {
     return new Promise<Block[]>((resolve) => resolve([getBlankBlock()]))
@@ -39,7 +39,7 @@ export const executeSectionParsers = (
 }
 
 export const executeOperationParsers = async (
-  operationExtensions: OperationParser[],
+  operationParsers: OperationParser[],
   section: DefaultState['sections'][number],
   state: DefaultState,
 ): Promise<Block[]> => {
@@ -47,7 +47,7 @@ export const executeOperationParsers = async (
     section.operations.map((operationName) => {
       const operation = state.operations[operationName]
       if (operation) {
-        const extensions = operationExtensions.map((extension) => extension({ operationName, operation, section }))
+        const extensions = operationParsers.map((extension) => extension({ operation, section, state }))
         return Promise.all(extensions)
       } else {
         return new Promise<Block[]>((resolve) => resolve([getBlankBlock()]))

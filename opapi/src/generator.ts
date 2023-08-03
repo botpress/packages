@@ -26,6 +26,7 @@ import {
   sectionParsers,
 } from './section-types-generator'
 import { isOperationWithBodyProps, type Operation, type State } from './state'
+import { Block } from './section-types-generator/types'
 
 /**
  * Generates files containing typescript types for each item in the state object - Sections, Operations, Responses, etc.
@@ -33,17 +34,21 @@ import { isOperationWithBodyProps, type Operation, type State } from './state'
 export async function generateTypesBySection(state: DefaultState, targetDirectory: string) {
   initDirectory(targetDirectory)
   // this doesn't do a deep clone, which helps us in the dereference step
+  saveFile(targetDirectory, 'openapi.json', JSON.stringify(state, null, 2))
   // in other words, openapi still has references to the original objects in state
   const openapi = createOpenapi(state).getSpec()
   // this dereferences those objects in place
   await OpenAPIParser.dereference(openapi as any)
+  const allBlocks: Block[] = []
   for (const section of state.sections) {
     const [sectionBlocks, operationBlocks] = await Promise.all([
       executeSectionParsers(sectionParsers, section, state),
       executeOperationParsers(operationParsers, section, state),
     ])
-    composeFilesFromBlocks([...sectionBlocks, ...operationBlocks], targetDirectory)
+    const blocks = [...sectionBlocks, ...operationBlocks]
+    allBlocks.push(...blocks)
   }
+  composeFilesFromBlocks(allBlocks, targetDirectory)
 }
 
 export const generateServer = async (state: State<string, string, string>, dir: string, useExpressTypes: boolean) => {

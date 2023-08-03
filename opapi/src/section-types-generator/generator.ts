@@ -3,6 +3,10 @@ import { saveFile } from 'src/file'
 import { getBlankBlock } from './helpers'
 import { Block, BlockComposer, DefaultState, OperationParser, SectionParser } from './types'
 
+/**
+ * @param blocks all the blocks generated until now
+ * @param targetDirectory
+ */
 export const composeFilesFromBlocks: BlockComposer = (blocks: Block[], targetDirectory: string) => {
   blocks.forEach((block) => {
     let content = getImportsForDependencies(block, blocks)

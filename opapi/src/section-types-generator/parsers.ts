@@ -27,7 +27,10 @@ const parseFunctionDefinition: OperationParser = async ({ operation }) => {
   return {
     dependencies: [requestBodyName, paramsName, returnTypeName],
     title: functionName,
-    content: `export type ${functionName} = (${getFunctionParams(operation.name, operation)}) => ${returnTypeName}\n\n`,
+    content: `${wrapWithJsDocComment(operation.description)}\n export type ${functionName} = (${getFunctionParams(
+      operation.name,
+      operation,
+    )}) => ${returnTypeName}\n\n`,
   }
 }
 
@@ -87,6 +90,9 @@ function getFunctionParams(
   return paramsString
 }
 
+function wrapWithJsDocComment(content: string): string {
+  return `/**\n * ${content}\n */\n`
+}
 function getFunctionRequestBodyName(operationName: string): string {
   return `${pascalize(operationName)}Body`
 }

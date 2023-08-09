@@ -7,12 +7,21 @@ export type ValueOf<T> = T[keyof T]
 /**
  * Operates on a section, returns a block
  */
-export type SectionParser = (section: ValueOf<DefaultState['schemas']>, state: DefaultState) => Promise<Block>
+export type SectionParser = (
+  section: ValueOf<DefaultState['schemas']>,
+  /**
+   * schema that has been dereferenced by the `OpenAPIParser`
+   */
+  dereferencedSection: ValueOf<DefaultState['schemas']>,
+) => Promise<Block>
 
 export type OperationParser = (payload: {
   section: DefaultState['sections'][number]
   operation: Operation<string, string, string, 'json-schema'>
-  state: DefaultState
+  /**
+   * schema that has been dereferenced by the `OpenAPIParser`
+   */
+  dereferencedOperation: Operation<string, string, string, 'json-schema'>
 }) => Promise<Block>
 
 /**

@@ -6,6 +6,21 @@ const fooSchema = z.object({
   name: z.string(),
 })
 
+const Bar = schema(
+  z.object({
+    tags: z.record(
+      schema(
+        z.object({
+          title: schema(z.string().max(20).optional(), { description: 'Title of the tag' }),
+          description: schema(z.string().max(100).optional(), { description: 'Description of the tag' }),
+        }),
+        { description: 'Definition of a tag that can be provided on the object' },
+      ),
+    ),
+  }),
+  { description: 'Conversation object configuration' },
+)
+
 const nestedSchema = z.object({
   id: z.string(),
   properties: z.object({
@@ -17,6 +32,7 @@ const nestedSchema = z.object({
       }),
     }),
   }),
+  bar: Bar.optional(),
 })
 
 export const getMockApi = () => {

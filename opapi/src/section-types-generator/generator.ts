@@ -1,6 +1,6 @@
 import { camel } from 'radash'
 import { saveFile } from 'src/file'
-import { getBlankBlock } from './helpers'
+import * as helpers from './helpers'
 import { Block, BlockComposer, DefaultState, OperationParser, SectionParser } from './types'
 
 /**
@@ -28,17 +28,19 @@ export const getImportsForDependencies = (block: Block, blocks: Block[]) => {
   return content
 }
 
-export const executeSectionParsers = (
+export const executeSectionParsers = async (
   sectionParsers: SectionParser[],
   section: DefaultState['sections'][number],
   state: DefaultState,
 ): Promise<Block[]> => {
+  const dereferencedState = await helpers.getDereferencedSchema(state)
   const schema = state.schemas[section.title]
+  const dereferencedSchema = dereferencedState.schemas[section.title]
   if (schema) {
-    const extensions = sectionParsers.map((extension) => extension(schema, state))
+    const extensions = sectionParsers.map((parser) => parser(schema, dereferencedSchema))
     return Promise.all(extensions)
   } else {
-    return new Promise<Block[]>((resolve) => resolve([getBlankBlock()]))
+    return new Promise<Block[]>((resolve) => resolve([helpers.getBlankBlock()]))
   }
 }
 
@@ -47,14 +49,17 @@ export const executeOperationParsers = async (
   section: DefaultState['sections'][number],
   state: DefaultState,
 ): Promise<Block[]> => {
+  const dereferencedState = await helpers.getDereferencedSchema(state)
+
   const blocks = await Promise.all(
     section.operations.map((operationName) => {
       const operation = state.operations[operationName]
+      const dereferencedOperation = dereferencedState.operations[operationName]
       if (operation) {
-        const extensions = operationParsers.map((extension) => extension({ operation, section, state }))
+        const extensions = operationParsers.map((parser) => parser({ operation, section, dereferencedOperation }))
         return Promise.all(extensions)
       } else {
-        return new Promise<Block[]>((resolve) => resolve([getBlankBlock()]))
+        return new Promise<Block[]>((resolve) => resolve([helpers.getBlankBlock()]))
       }
     }),
   )

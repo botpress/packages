@@ -1,4 +1,3 @@
-import OpenAPIParser from '@readme/openapi-parser'
 import chalk from 'chalk'
 import { VError } from 'verror'
 import { defaultResponseStatus, invalidLine, tsFileHeader } from './const'
@@ -25,20 +24,14 @@ import {
   operationParsers,
   sectionParsers,
 } from './section-types-generator'
-import { isOperationWithBodyProps, type Operation, type State } from './state'
 import { Block } from './section-types-generator/types'
+import { isOperationWithBodyProps, type Operation, type State } from './state'
 
 /**
  * Generates files containing typescript types for each item in the state object - Sections, Operations, Responses, etc.
  */
 export async function generateTypesBySection(state: DefaultState, targetDirectory: string) {
   initDirectory(targetDirectory)
-  // this doesn't do a deep clone, which helps us in the dereference step
-  saveFile(targetDirectory, 'openapi.json', JSON.stringify(state, null, 2))
-  // in other words, openapi still has references to the original objects in state
-  const openapi = createOpenapi(state).getSpec()
-  // this dereferences those objects in place
-  await OpenAPIParser.dereference(openapi as any)
   const allBlocks: Block[] = []
   for (const section of state.sections) {
     const [sectionBlocks, operationBlocks] = await Promise.all([

@@ -1,19 +1,23 @@
 import { compile as compileSchemaToTypes } from 'json-schema-to-typescript'
+import { SchemaObject } from 'openapi3-ts'
+import { title } from 'radash'
 import { Operation, isOperationWithBodyProps } from 'src/state'
 import { addPropertyToBlock, getBlankBlock, pascalize, remove$RefPropertiesFromSchema } from './helpers'
-import { Block, DefaultState, OperationParser, SectionParser } from './types'
-import { title } from 'radash'
-import { SchemaObject } from 'openapi3-ts'
+import { Block, OperationParser, SectionParser } from './types'
 
-const parseReturnTypes: OperationParser = async ({ operation, state }) => {
+const parseReturnTypes: OperationParser = async ({ operation, dereferencedOperation }) => {
   const response = operation.response
   if (!operation.response) return { ...getBlankBlock(), content: 'void' }
-  return getBlockWithDependenciesForSchema(getReturnTypeName(operation.name), response.schema, state.refs.schemas)
+  return getBlockWithDependenciesForSchema(
+    getReturnTypeName(operation.name),
+    response.schema,
+    dereferencedOperation.response.schema,
+  )
 }
 
-const parseSectionTypes: SectionParser = async (section, state) => {
+const parseSectionTypes: SectionParser = async (section, dereferencedSection) => {
   if (section.schema === undefined) return getBlankBlock()
-  return getBlockWithDependenciesForSchema(pascalize(section.section), section.schema, state.refs.schemas)
+  return getBlockWithDependenciesForSchema(pascalize(section.section), section.schema, dereferencedSection.schema)
 }
 
 const parseFunctionDefinition: OperationParser = async ({ operation }) => {
@@ -27,14 +31,27 @@ const parseFunctionDefinition: OperationParser = async ({ operation }) => {
   return {
     dependencies: [requestBodyName, paramsName, returnTypeName],
     title: functionName,
-    content: `export type ${functionName} = (${getFunctionParams(operation.name, operation)}) => ${returnTypeName}\n\n`,
+    content: `${wrapWithJsDocComment(operation.description)}\n export type ${functionName} = (${getFunctionParams(
+      operation.name,
+      operation,
+    )}) => ${returnTypeName}\n\n`,
   }
 }
 
-const parseRequestParameterTypes: OperationParser = async ({ operation, state }) => {
-  if (operation && isOperationWithBodyProps(operation)) {
+const parseRequestParameterTypes: OperationParser = async ({ operation, dereferencedOperation }) => {
+  if (
+    operation &&
+    isOperationWithBodyProps(operation) &&
+    // repeating but ¯\_(ツ)_/¯
+    dereferencedOperation &&
+    isOperationWithBodyProps(dereferencedOperation)
+  ) {
     const functionRequestBodyName = getFunctionRequestBodyName(operation.name)
-    return getBlockWithDependenciesForSchema(functionRequestBodyName, operation.requestBody.schema, state.refs.schemas)
+    return getBlockWithDependenciesForSchema(
+      functionRequestBodyName,
+      operation.requestBody.schema,
+      dereferencedOperation.requestBody.schema,
+    )
   }
   return getBlankBlock()
 }
@@ -87,6 +104,9 @@ function getFunctionParams(
   return paramsString
 }
 
+function wrapWithJsDocComment(content: string): string {
+  return `/**\n * ${content}\n */\n`
+}
 function getFunctionRequestBodyName(operationName: string): string {
   return `${pascalize(operationName)}Body`
 }
@@ -98,10 +118,10 @@ function getFunctionParamName(operationName: string): string {
 const getBlockWithDependenciesForSchema = async (
   blockTitle: string,
   schema: SchemaObject,
-  schemas: DefaultState['refs']['schemas'],
+  dereferencedSchema: SchemaObject,
 ): Promise<Block> => {
   // since the schema is dereferenced, i.e., ref properties replaced, we need to process the $ref properties differently
-  const { schema: processedSchema, propertyNamesWith$Ref } = remove$RefPropertiesFromSchema(schema, schemas)
+  const { schema: processedSchema, propertyNamesWith$Ref } = remove$RefPropertiesFromSchema(schema, dereferencedSchema)
   const content = await compileSchemaToTypes(processedSchema, blockTitle, { bannerComment: '' })
   const block = {
     dependencies: propertyNamesWith$Ref.map((name) => title(name)) as string[],

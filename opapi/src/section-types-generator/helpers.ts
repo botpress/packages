@@ -1,6 +1,8 @@
-import { last, pascal, title } from 'radash'
-import { Block } from './types'
+import OpenAPIParser from '@readme/openapi-parser'
 import { SchemaObject } from 'openapi3-ts'
+import { pascal, title } from 'radash'
+import { createOpenapi } from 'src/openapi'
+import { Block, DefaultState } from './types'
 
 export const pascalize = (str: string) => pascal(title(str))
 
@@ -36,7 +38,7 @@ function insertValueAtIndex(originalString: string, index: number, valueToInsert
  */
 export function remove$RefPropertiesFromSchema(
   schema: SchemaObject,
-  schemaRefs: Record<string, boolean>,
+  dereferencedSchema: SchemaObject,
 ): {
   /**
    * the schema without the properties that have a $ref property
@@ -47,17 +49,33 @@ export function remove$RefPropertiesFromSchema(
    */
   propertyNamesWith$Ref: string[]
 } {
-  const schemaRefNames = Object.keys(schemaRefs).map((refName) => refName.toLowerCase())
-  const processed: ReturnType<typeof remove$RefPropertiesFromSchema> = Object.entries(schema.properties ?? {}).reduce(
-    (_processed, [propertyKey, propertyValue]) => {
-      if (schemaRefNames.includes(propertyKey.toLowerCase())) {
-        _processed.propertyNamesWith$Ref.push(propertyKey)
+  const processed: ReturnType<typeof remove$RefPropertiesFromSchema> = Object.entries(
+    dereferencedSchema.properties ?? {},
+  ).reduce(
+    (_processed, [dereferencedPropertyKey, dereferencedPropertyValue]) => {
+      const propertyValue = schema.properties?.[dereferencedPropertyKey]
+      if (propertyValue?.$ref) {
+        _processed.propertyNamesWith$Ref.push(dereferencedPropertyKey)
       } else {
-        _processed.schema.properties[propertyKey] = propertyValue
+        _processed.schema.properties[dereferencedPropertyKey] = dereferencedPropertyValue
       }
       return _processed
     },
     { schema: { ...schema, properties: {} as Record<string, SchemaObject> }, propertyNamesWith$Ref: [] as string[] },
   )
   return processed
+}
+
+/**
+ * Returns a deep clone of the state with the schemas dereferenced
+ */
+export async function getDereferencedSchema(state: DefaultState) {
+  // this doesn't do a deep clone, which helps us in the dereference step
+  // in other words, openapi still has references to the original objects in state
+  const clonedState = JSON.parse(JSON.stringify(state))
+  const openapi = createOpenapi(clonedState).getSpec()
+  // this dereferences those objects in place
+  await OpenAPIParser.dereference(openapi as any)
+
+  return clonedState
 }

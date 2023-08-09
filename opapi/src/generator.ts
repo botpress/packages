@@ -1,4 +1,3 @@
-import OpenAPIParser from '@readme/openapi-parser'
 import chalk from 'chalk'
 import { VError } from 'verror'
 import { defaultResponseStatus, invalidLine, tsFileHeader } from './const'

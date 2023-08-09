@@ -2,12 +2,14 @@ import { camel } from 'radash'
 import { saveFile } from 'src/file'
 import * as helpers from './helpers'
 import { Block, BlockComposer, DefaultState, OperationParser, SectionParser } from './types'
+import log from 'src/log'
 
 /**
  * @param blocks all the blocks generated until now
  * @param targetDirectory
  */
 export const composeFilesFromBlocks: BlockComposer = (blocks: Block[], targetDirectory: string) => {
+  log.info('Composing files from blocks')
   blocks.forEach((block) => {
     let content = getImportsForDependencies(block, blocks)
     content += block.content
@@ -33,6 +35,7 @@ export const executeSectionParsers = async (
   section: DefaultState['sections'][number],
   state: DefaultState,
 ): Promise<Block[]> => {
+  log.info('Executing section parsers')
   const dereferencedState = await helpers.getDereferencedSchema(state)
   const schema = state.schemas[section.title]
   const dereferencedSchema = dereferencedState.schemas[section.title]
@@ -49,6 +52,7 @@ export const executeOperationParsers = async (
   section: DefaultState['sections'][number],
   state: DefaultState,
 ): Promise<Block[]> => {
+  log.info('Executing section parsers')
   const dereferencedState = await helpers.getDereferencedSchema(state)
 
   const blocks = await Promise.all(

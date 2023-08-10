@@ -47,7 +47,7 @@ export async function generateTypesBySection(state: DefaultState, targetDirector
 export const generateServer = async (state: State<string, string, string>, dir: string, useExpressTypes: boolean) => {
   initDirectory(dir)
 
-  log.info('Generating openapi content')
+  log.info('Generating OpenAPI content')
   const openapi = createOpenapi(state)
   const openapiSpecString = openapi.getSpecAsJson()
   const openapiSpec = JSON.parse(openapiSpecString)

@@ -23,6 +23,8 @@ export function generateErrors(errors: ApiError[]) {
   const types = errors.map((error) => error.type)
 
   return `
+import crypto from 'crypto'
+  
 const codes = {
 ${Object.entries(codes)
   .map(([name, code]) => `  ${name}: ${code},`)
@@ -39,17 +41,32 @@ abstract class BaseApiError<Code extends ErrorCode, Type extends string, Descrip
     public readonly description: Description,
     public readonly type: Type,
     public override readonly message: string,
-    public readonly error?: Error
+    public readonly error?: Error,
+    public readonly id?: string
   ) {
     super(message)
+
+    if (!this.id) {
+      this.id = BaseApiError.generateId()
+    }
   }
 
   toJSON() {
     return {
+      id: this.id,
       code: this.code,
       type: this.type,
       message: this.message,
     }
+  }
+  
+  static generateId() {
+    const randomSuffixByteLength = 4
+    const randomHexSuffix = Array.from(crypto.getRandomValues(new Uint8Array(randomSuffixByteLength)))
+      .map(x => x.toString(16).padStart(2, '0'))
+      .join('')
+      .toUpperCase()
+    return \`err_\${Date.now()}x\${randomHexSuffix}\`
   }
 }
 
@@ -67,46 +84,29 @@ export const errorFrom = (err: unknown): ApiError => {
   if (isApiError(err)) {
     return err
   }
-
-  if (err instanceof Error) {
+  else if (err instanceof Error) {
     return new UnknownError(err.message, err)
   }
-
-  if (err === null) {
-    return new UnknownError('An unknown error occurred')
-  }
-
-  if (typeof err === 'string') {
+  else if (typeof err === 'string') {
     return new UnknownError(err)
   }
-
-  if (typeof err !== 'object') {
-    return new UnknownError('An unknown error occurred')
+  else {
+    return getApiErrorFromObject(err)
   }
-
-  return getErrorFromObject(err)
 }
 
-function getErrorFromObject(err: object) {
-  if ('code' in err && 'type' in err && 'message' in err) {
-    if (typeof err.message !== 'string') {
-      return new UnknownError('An unknown error occurred')
-    }
-
-    if (typeof err.type !== 'string') {
-      return new UnknownError(err.message)
-    }
-
+function getApiErrorFromObject(err: any) {
+  // Check if it's an deserialized API error object
+  if (typeof err === 'object' && 'code' in err && 'type' in err && 'id' in err && 'message' in err && typeof err.type === 'string' && typeof err.message === 'string') {
     const ErrorClass = errorTypes[err.type]
-
     if (!ErrorClass) {
-      return new UnknownError(err.message)
+      return new UnknownError(\`An unclassified API error occurred: \${err.message} (Type: \${err.type}, Code: \${err.code})\`)
     }
-
-    return new ErrorClass(err.message)
+    
+    return new ErrorClass(err.message, undefined, <string>err.id || 'UNKNOWN') // If error ID was not received do not pass undefined to generate a new one, flag it as UNKNOWN so we can fix the issue.
   }
 
-  return new UnknownError('An unknown error occurred')
+  return new UnknownError('An invalid error occurred: ' + JSON.stringify(err))
 }
 `
 }
@@ -120,8 +120,8 @@ function generateError(error: ApiError) {
  *  ${description}
  */
 export class ${error.type}Error extends BaseApiError<${error.status}, ${error.type}Type, '${description}'> {
-  constructor(message: string, error?: Error) {
-    super(${error.status}, '${description}', '${error.type}', message, error)
+  constructor(message: string, error?: Error, id?: string) {
+    super(${error.status}, '${description}', '${error.type}', message, error, id)
   }
 }\n`
 }
@@ -135,7 +135,7 @@ function generateApiError(types: string[]) {
 }
 
 function generateErrorTypeMap(types: string[]) {
-  return `const errorTypes: { [type: string]: new (message: string, error?: Error) => ApiError } = {
+  return `const errorTypes: { [type: string]: new (message: string, error?: Error, id?: string) => ApiError } = {
 ${types.map((type) => `  ${type}: ${type}Error,`).join('\n')}
 }\n`
 }

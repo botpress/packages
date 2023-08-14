@@ -100,7 +100,7 @@ function getApiErrorFromObject(err: any) {
   if (typeof err === 'object' && 'code' in err && 'type' in err && 'id' in err && 'message' in err && typeof err.type === 'string' && typeof err.message === 'string') {
     const ErrorClass = errorTypes[err.type]
     if (!ErrorClass) {
-      return new UnknownError(\`An unclassified error occurred: \${err.message} (Type: \${err.type}, Code: \${err.code})\`)
+      return new UnknownError(\`An unclassified API error occurred: \${err.message} (Type: \${err.type}, Code: \${err.code})\`)
     }
     
     return new ErrorClass(err.message, undefined, <string>err.id ?? 'UNKNOWN')

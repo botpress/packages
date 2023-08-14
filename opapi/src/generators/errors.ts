@@ -51,12 +51,12 @@ abstract class BaseApiError<Code extends ErrorCode, Type extends string, Descrip
     }
   }
 
-  toJSON(includeErrorIdInMessage: boolean = false) {
+  toJSON() {
     return {
       code: this.code,
       type: this.type,
       id: this.id,
-      message: this.message + (includeErrorIdInMessage ? \` (Error ID: \${this.id})\` : '')
+      message: this.message
     }
   }
   
@@ -84,35 +84,26 @@ export const errorFrom = (err: unknown): ApiError => {
   if (isApiError(err)) {
     return err
   }
-
-  if (err === null) {
-    return new UnknownError('An unknown error occurred')
+  else if (err instanceof Error) {
+    return new UnknownError(err.message, err)
   }
-
-  if (typeof err === 'string') {
+  else if (typeof err === 'string') {
     return new UnknownError(err)
   }
-
-  if (typeof err !== 'object') {
-    return new UnknownError('An unknown error occurred')
+  else {
+    return getApiErrorFromObject(err)
   }
-
-  return getErrorFromObject(err)
 }
 
-function getErrorFromObject(err: object) {
+function getApiErrorFromObject(err: any) {
   // Check if it's an deserialized API error object
-  if ('code' in err && 'type' in err && 'id' in err && 'message' in err && typeof err.type === 'string' && typeof err.message === 'string') {
+  if (typeof err === 'object' && 'code' in err && 'type' in err && 'id' in err && 'message' in err && typeof err.type === 'string' && typeof err.message === 'string') {
     const ErrorClass = errorTypes[err.type]
     if (!ErrorClass) {
       return new UnknownError(\`An unclassified error occurred: \${err.message} (Type: \${err.type}, Code: \${err.code})\`)
     }
     
     return new ErrorClass(err.message, undefined, <string>err.id ?? 'UNKNOWN')
-  }
-
-  if (err instanceof Error) {
-    return new UnknownError(err.message, err)
   }
 
   return new UnknownError('An invalid error occurred: ' + JSON.stringify(err))

@@ -103,7 +103,7 @@ function getApiErrorFromObject(err: any) {
       return new UnknownError(\`An unclassified API error occurred: \${err.message} (Type: \${err.type}, Code: \${err.code})\`)
     }
     
-    return new ErrorClass(err.message, undefined, <string>err.id ?? 'UNKNOWN')
+    return new ErrorClass(err.message, undefined, <string>err.id ?? 'UNKNOWN') // If error ID was not received do not pass undefined to generate a new one, flag it as UNKNOWN so we can fix the issue.
   }
 
   return new UnknownError('An invalid error occurred: ' + JSON.stringify(err))

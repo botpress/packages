@@ -101,26 +101,21 @@ export const errorFrom = (err: unknown): ApiError => {
 }
 
 function getErrorFromObject(err: object) {
-  const invalidError = new UnknownError('An invalid error occurred: ' + JSON.stringify(err))
-
-  if ('code' in err && 'type' in err && 'id' in err && 'message' in err) {
-    if (typeof err.type !== 'string' || typeof err.message !== 'string') {
-      return invalidError
-    }
-
+  // Check if it's an deserialized API error object
+  if ('code' in err && 'type' in err && 'id' in err && 'message' in err && typeof err.type === 'string' && typeof err.message === 'string') {
     const ErrorClass = errorTypes[err.type]
-    if (ErrorClass) {
-      return new ErrorClass(err.message, undefined, <string>err.id ?? 'UNKNOWN')
+    if (!ErrorClass) {
+      return new UnknownError(\`An unclassified error occurred: \${err.message} (Type: \${err.type}, Code: \${err.code})\`)
     }
     
-    return new UnknownError(\`An unclassified error occurred: \${err.message} (Type: \${err.type}, Code: \${err.code})\`)
+    return new ErrorClass(err.message, undefined, <string>err.id ?? 'UNKNOWN')
   }
 
   if (err instanceof Error) {
     return new UnknownError(err.message, err)
   }
-  
-  return invalidError
+
+  return new UnknownError('An invalid error occurred: ' + JSON.stringify(err))
 }
 `
 }

@@ -53,10 +53,10 @@ abstract class BaseApiError<Code extends ErrorCode, Type extends string, Descrip
 
   toJSON() {
     return {
+      id: this.id,
       code: this.code,
       type: this.type,
-      id: this.id,
-      message: this.message
+      message: this.message,
     }
   }
   

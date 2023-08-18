@@ -24,11 +24,11 @@ export function generateErrors(errors: ApiError[]) {
 
   return `
 import crypto from 'crypto'
-  
+
 const codes = {
 ${Object.entries(codes)
-  .map(([name, code]) => `  ${name}: ${code},`)
-  .join('\n')}
+      .map(([name, code]) => `  ${name}: ${code},`)
+      .join('\n')}
 } as const
 
 type ErrorCode = typeof codes[keyof typeof codes]
@@ -51,6 +51,10 @@ abstract class BaseApiError<Code extends ErrorCode, Type extends string, Descrip
     }
   }
 
+  toString() {
+    return \`[\${this.type}] \${this.message} (Error ID: \${this.id})\`
+  }
+
   toJSON() {
     return {
       id: this.id,
@@ -59,7 +63,7 @@ abstract class BaseApiError<Code extends ErrorCode, Type extends string, Descrip
       message: this.message,
     }
   }
-  
+
   static generateId() {
     const randomSuffixByteLength = 4
     const randomHexSuffix = Array.from(crypto.getRandomValues(new Uint8Array(randomSuffixByteLength)))
@@ -102,7 +106,7 @@ function getApiErrorFromObject(err: any) {
     if (!ErrorClass) {
       return new UnknownError(\`An unclassified API error occurred: \${err.message} (Type: \${err.type}, Code: \${err.code})\`)
     }
-    
+
     return new ErrorClass(err.message, undefined, <string>err.id || 'UNKNOWN') // If error ID was not received do not pass undefined to generate a new one, flag it as UNKNOWN so we can fix the issue.
   }
 

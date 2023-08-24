@@ -43,10 +43,9 @@ ${operations.map((operation) => generateMethod(operation)).join('\n')}
 ${operations.map((operation) => generatePropsType(operation)).join('\n')}
 
 function getError(err: Error) {
-  if (axios.isAxiosError(err)) {
-    return errorFrom(err.response?.data)
+  if (axios.isAxiosError(err) && err.response?.data) {
+    return errorFrom(err.response.data)
   }
-
   return errorFrom(err)
 }
 `

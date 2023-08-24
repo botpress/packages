@@ -33,6 +33,19 @@ ${Object.entries(codes)
 
 type ErrorCode = typeof codes[keyof typeof codes]
 
+declare const window: any
+type CryptoLib = { getRandomValues(array: Uint8Array): number[] }
+
+let cryptoLib: CryptoLib =
+  typeof window !== 'undefined' && typeof window.document !== 'undefined'
+    ? window.crypto
+      ? window.crypto // Note: On browsers we need to use window.crypto instead of the imported crypto module as the latter is externalized and doesn't have getRandomValues().
+      : {
+          // Fallback in case crypto isn't available.
+          getRandomValues: (array: Uint8Array) => new Uint8Array(array.map(() => Math.floor(Math.random() * 256))),
+        }
+    : crypto
+
 abstract class BaseApiError<Code extends ErrorCode, Type extends string, Description extends string> extends Error {
   public readonly isApiError = true
 

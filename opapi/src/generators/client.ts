@@ -41,6 +41,13 @@ ${operations.map((operation) => generateMethod(operation)).join('\n')}
 }
 
 ${operations.map((operation) => generatePropsType(operation)).join('\n')}
+
+function getError(err: Error) {
+  if (axios.isAxiosError(err) && err.response?.data) {
+    return errorFrom(err.response.data)
+  }
+  return errorFrom(err)
+}
 `
 }
 
@@ -50,7 +57,7 @@ function generateMethod(props: GenerateClientProps) {
     props,
   )}) => this._innerClient.${operationName}(${generateClientProps(
     props,
-  )}).then((res) => res.data).catch((e) => { throw errorFrom(e) })`
+  )}).then((res) => res.data).catch((e) => { throw getError(e) })`
 }
 
 function generatePropsType({ operationName, body, hasParameters, isEmptyBody }: GenerateClientProps) {

@@ -42,7 +42,7 @@ let cryptoLib: CryptoLib =
       ? window.crypto // Note: On browsers we need to use window.crypto instead of the imported crypto module as the latter is externalized and doesn't have getRandomValues().
       : {
           // Fallback in case crypto isn't available.
-          getRandomValues: (array: Uint8Array) => array.map(() => Math.floor(Math.random() * 256)),
+          getRandomValues: (array: Uint8Array) => new Uint8Array(array.map(() => Math.floor(Math.random() * 256))),
         }
     : crypto
 

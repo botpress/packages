@@ -75,7 +75,7 @@ abstract class BaseApiError<Code extends ErrorCode, Type extends string, Descrip
   
   static generateId() {
     const randomSuffixByteLength = 4
-    const randomHexSuffix = Array.from(crypto.getRandomValues(new Uint8Array(randomSuffixByteLength)))
+    const randomHexSuffix = Array.from(cryptoLib.getRandomValues(new Uint8Array(randomSuffixByteLength)))
       .map(x => x.toString(16).padStart(2, '0'))
       .join('')
       .toUpperCase()

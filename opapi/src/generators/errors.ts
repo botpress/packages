@@ -34,17 +34,22 @@ ${Object.entries(codes)
 type ErrorCode = typeof codes[keyof typeof codes]
 
 declare const window: any
-type CryptoLib = { getRandomValues(array: Uint8Array): number[] }
+type CryptoLib = { getRandomValues(array: Uint8Array): Uint8Array }
+
+const cryptoLibPolyfill: CryptoLib = {
+  // Fallback in case crypto isn't available.
+  getRandomValues: (array: Uint8Array) => new Uint8Array(array.map(() => Math.floor(Math.random() * 256))),
+}
 
 let cryptoLib: CryptoLib =
   typeof window !== 'undefined' && typeof window.document !== 'undefined'
-    ? window.crypto
-      ? window.crypto // Note: On browsers we need to use window.crypto instead of the imported crypto module as the latter is externalized and doesn't have getRandomValues().
-      : {
-          // Fallback in case crypto isn't available.
-          getRandomValues: (array: Uint8Array) => new Uint8Array(array.map(() => Math.floor(Math.random() * 256))),
-        }
+    ? window.crypto // Note: On browsers we need to use window.crypto instead of the imported crypto module as the latter is externalized and doesn't have getRandomValues().
     : crypto
+
+if (!cryptoLib.getRandomValues) {
+  // Use a polyfill in older environments that have a crypto implementaton missing getRandomValues()
+  cryptoLib = cryptoLibPolyfill
+}
 
 abstract class BaseApiError<Code extends ErrorCode, Type extends string, Description extends string> extends Error {
   public readonly isApiError = true

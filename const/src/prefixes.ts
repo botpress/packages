@@ -1,0 +1,72 @@
+export const prefixToObjectMap = {
+  bak: 'botApiKey',
+  act: 'action',
+  alts: 'analytics',
+  aud: 'audit',
+  bot: 'bot',
+  card: 'card',
+  chn: 'channel',
+  cnv: 'conversation',
+  cfg: 'configuration',
+  evt: 'event',
+  file: 'file',
+  flow: 'workflow',
+  iak: 'integrationApiKey',
+  int: 'integration',
+  kb: 'knowledgeBase',
+  lmt: 'limit',
+  med: 'media',
+  msg: 'message',
+  node: 'node',
+  pat: 'personalAccessToken',
+  revt: 'recurringEvent',
+  sbx: 'sandbox',
+  sch: 'schema',
+  ste: 'state',
+  tag: 'tag',
+  tbl: 'table',
+  user: 'user',
+  usg: 'usage',
+  wbh: 'webhook',
+  wks: 'workspace'
+} as const
+
+export const objectToPrefixMap: Reverser<typeof prefixToObjectMap> = {
+  personalAccessToken: 'pat',
+  botApiKey: 'bak',
+  integrationApiKey: 'iak',
+  user: 'user',
+  conversation: 'cnv',
+  message: 'msg',
+  limit: 'lmt',
+  usage: 'usg',
+  webhook: 'wbh',
+  analytics: 'alts',
+  event: 'evt',
+  file: 'file',
+  state: 'ste',
+  bot: 'bot',
+  integration: 'int',
+  workspace: 'wks',
+  workflow: 'flow',
+  tag: 'tag',
+  configuration: 'cfg',
+  action: 'act',
+  channel: 'chn',
+  recurringEvent: 'revt',
+  schema: 'sch',
+  audit: 'aud',
+  sandbox: 'sbx',
+  knowledgeBase: 'kb',
+  table: 'tbl',
+  card: 'card',
+  node: 'node',
+  media: 'med',
+} as const
+
+export type Prefixes = typeof objectToPrefixMap[keyof typeof objectToPrefixMap]
+export type Objects = keyof typeof objectToPrefixMap
+
+type Reverser<T extends Record<PropertyKey, PropertyKey>> = {
+  [P in keyof T as T[P]]: P
+}

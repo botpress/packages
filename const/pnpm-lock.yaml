@@ -5,6 +5,9 @@ settings:
   excludeLinksFromLockfile: false
 
 devDependencies:
+  '@tsconfig/node18-strictest':
+    specifier: ^1.0.0
+    version: 1.0.0
   esbuild:
     specifier: ^0.19.2
     version: 0.19.2
@@ -252,6 +255,11 @@ packages:
 
   /@tsconfig/node16@1.0.4:
     resolution: {integrity: sha512-vxhUy4J8lyeyinH7Azl1pdd43GJhZH/tP2weN8TntQblOY+A0XbT8DJk1/oCPuOOyg/Ja757rG0CgHcWC8OfMA==}
+    dev: true
+
+  /@tsconfig/node18-strictest@1.0.0:
+    resolution: {integrity: sha512-bOuNKwO4Fzbt+Su5wqI9zNHwx5C25gLnutwVQA1sBZk0cW8UjVPVcwzIUhJIIJDUx7zDEbAwdCD2HfvIsV8dYg==}
+    deprecated: TypeScript 5.0 supports combining TSConfigs using array syntax in extends
     dev: true
 
   /@types/node@20.5.1:

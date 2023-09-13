@@ -5,9 +5,7 @@ import { existsSync } from 'fs'
 import { getFiles } from '../src/file'
 import { validateTypescriptFile } from './util'
 
-const errorFiles = [
-  'errors.ts',
-]
+const errorFiles = ['errors.ts']
 
 describe('server generator', () => {
   it('should be able to generate a server', async () => {

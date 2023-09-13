@@ -42,7 +42,7 @@ export const getMockApi = () => {
         description: 'Foo not found',
         status: 404,
         type: 'FooNotFound',
-      }
+      },
     ],
     metadata: {
       title: 'Test API',

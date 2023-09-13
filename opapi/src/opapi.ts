@@ -1,5 +1,5 @@
 import { extendApi, OpenApiZodAny } from '@anatine/zod-openapi'
-import { generateClient, generateOpenapi, generateServer, generateTypesBySection } from './generator'
+import { generateClient, generateErrorsFile, generateOpenapi, generateServer, generateTypesBySection } from './generator'
 import { addOperation } from './operation'
 import { ApiError, ComponentType, createState, getRef, Metadata, Operation, Parameter, State } from './state'
 import { exportStateAsTypescript } from './generators/ts-state'
@@ -50,6 +50,7 @@ const createOpapiFromState = <
     exportServer: (dir = '.', useExpressTypes: boolean) => generateServer(state, dir, useExpressTypes),
     exportOpenapi: (dir = '.') => generateOpenapi(state, dir),
     exportState: (dir = '.') => exportStateAsTypescript(state, dir),
+    exportErrors: (dir = '.') => generateErrorsFile(state, dir),
   }
 }
 

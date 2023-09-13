@@ -144,6 +144,30 @@ export const generateClient = async (
   log.info('')
 }
 
+export function generateErrorsFile(state: State<string, string, string>, dir = '.') {
+  initDirectory(dir)
+
+  log.info('Generating error types')
+  if (!state.errors || state.errors.length === 0) {
+    throw new VError('No errors defined')
+  }
+
+  const errorCode = generateErrors(state.errors)
+  log.info('')
+
+  log.info('Saving generated files')
+  saveFile(dir, 'errors.ts', errorCode)
+  log.info('')
+
+  log.info(`Appending header to typescript files in ${chalk.blue(dir)}`)
+  appendHeaders(dir, tsFileHeader)
+  log.info('')
+
+  log.info('Removing invalid line from typescript files')
+  removeLineFromFiles(dir, invalidLine)
+  log.info('')
+}
+
 export function generateOpenapi(state: State<string, string, string>, dir = '.') {
   initDirectory(dir)
 

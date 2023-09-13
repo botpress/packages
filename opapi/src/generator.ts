@@ -25,7 +25,7 @@ import {
   sectionParsers,
 } from './section-types-generator'
 import { Block } from './section-types-generator/types'
-import { isOperationWithBodyProps, type Operation, type State } from './state'
+import { ApiError, isOperationWithBodyProps, type Operation, type State } from './state'
 
 /**
  * Generates files containing typescript types for each item in the state object - Sections, Operations, Responses, etc.
@@ -144,15 +144,15 @@ export const generateClient = async (
   log.info('')
 }
 
-export function generateErrorsFile(state: State<string, string, string>, dir = '.') {
+export function generateErrorsFile(errors: ApiError[], dir = '.') {
   initDirectory(dir)
 
   log.info('Generating error types')
-  if (!state.errors || state.errors.length === 0) {
+  if (!errors || errors.length === 0) {
     throw new VError('No errors defined')
   }
 
-  const errorCode = generateErrors(state.errors)
+  const errorCode = generateErrors(errors)
   log.info('')
 
   log.info('Saving generated files')

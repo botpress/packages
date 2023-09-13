@@ -3,7 +3,6 @@ import { generateClient, generateErrorsFile, generateOpenapi, generateServer, ge
 import { addOperation } from './operation'
 import { ApiError, ComponentType, createState, getRef, Metadata, Operation, Parameter, State } from './state'
 import { exportStateAsTypescript } from './generators/ts-state'
-import { generateTypes } from './generators'
 export { Operation, Parameter } from './state'
 
 export const schema = extendApi
@@ -50,7 +49,7 @@ const createOpapiFromState = <
     exportServer: (dir = '.', useExpressTypes: boolean) => generateServer(state, dir, useExpressTypes),
     exportOpenapi: (dir = '.') => generateOpenapi(state, dir),
     exportState: (dir = '.') => exportStateAsTypescript(state, dir),
-    exportErrors: (dir = '.') => generateErrorsFile(state, dir),
+    exportErrors: (dir = '.') => generateErrorsFile(state.errors ?? [], dir),
   }
 }
 

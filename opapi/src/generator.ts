@@ -26,6 +26,7 @@ import {
 } from './section-types-generator'
 import { Block } from './section-types-generator/types'
 import { ApiError, isOperationWithBodyProps, type Operation, type State } from './state'
+import { generateSectionsFile } from './section-types-generator/generator'
 
 /**
  * Generates files containing typescript types for each item in the state object - Sections, Operations, Responses, etc.
@@ -42,6 +43,7 @@ export async function generateTypesBySection(state: DefaultState, targetDirector
     allBlocks.push(...blocks)
   }
   composeFilesFromBlocks(allBlocks, targetDirectory)
+  generateSectionsFile(state, targetDirectory)
 }
 
 export const generateServer = async (state: State<string, string, string>, dir: string, useExpressTypes: boolean) => {

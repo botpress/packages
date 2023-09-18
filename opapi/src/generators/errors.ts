@@ -51,7 +51,7 @@ abstract class BaseApiError<Code extends ErrorCode, Type extends string, Descrip
     }
   }
 
-  toString() {
+  format() {
     return \`[\${this.type}] \${this.message} (Error ID: \${this.id})\`
   }
 

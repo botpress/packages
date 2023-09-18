@@ -97,7 +97,7 @@ export type Parameter<S extends SchemaType = 'zod-schema'> =
   | QueryParameterObject<S>
   | QueryParameterStringArray
 
-const operationsWithBodyMethod = ['post', 'put', 'patch'] as const
+export const operationsWithBodyMethod = ['post', 'put', 'patch'] as const
 type OperationsWithBodyMethod = (typeof operationsWithBodyMethod)[number]
 
 export type OperationWithBodyProps<
@@ -116,7 +116,8 @@ export type OperationWithBodyProps<
   }
 } & BaseOperationProps<DefaultParameterName, SectionName, Path, S>
 
-export type OperationWithoutBodyMethod = 'get' | 'delete' | 'options' | 'head' | 'trace'
+export const operationsWithoutBodyMethod = ['get', 'delete', 'options', 'head', 'trace'] as const
+export type OperationWithoutBodyMethod = (typeof operationsWithoutBodyMethod)[number]
 export type OperationWithoutBodyProps<
   DefaultParameterName extends string,
   SectionName extends string,

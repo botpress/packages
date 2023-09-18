@@ -1,8 +1,8 @@
 import { camel } from 'radash'
 import { saveFile } from 'src/file'
+import log from 'src/log'
 import * as helpers from './helpers'
 import { Block, BlockComposer, DefaultState, OperationParser, SectionParser } from './types'
-import log from 'src/log'
 
 /**
  * @param blocks all the blocks generated until now
@@ -17,6 +17,16 @@ export const composeFilesFromBlocks: BlockComposer = (blocks: Block[], targetDir
       saveFile(targetDirectory, `${camel(block.title)}.ts`, content)
     }
   })
+}
+
+export const generateSectionsFile = (state: DefaultState, targetDirectory: string) => {
+  log.info('Generating sections file')
+  const sections = state.sections.map((section) => section.name)
+  saveFile(
+    targetDirectory,
+    'sections.ts',
+    `export const sections = ${JSON.stringify(sections)} as const;\n export type Sections = typeof sections[number];`,
+  )
 }
 
 export const getImportsForDependencies = (block: Block, blocks: Block[]) => {

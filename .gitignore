@@ -79,3 +79,4 @@ gen/
 # Other
 *.config.json
 .ignore.me.*
+/.vscode

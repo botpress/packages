@@ -1,0 +1,25 @@
+{
+  "name": "@bpinternal/const",
+  "version": "0.0.1",
+  "description": "Constant utilities for Botpress",
+  "main": "./dist/index.cjs",
+  "browser": "./dist/index.mjs",
+  "types": "./src/index.ts",
+  "license": "MIT",
+  "scripts": {
+    "type-check": "tsc --noEmit",
+    "build:nodejs": "esbuild src/index.ts --bundle --platform=node --target=node16 --outfile=dist/index.cjs",
+    "build:browser": "esbuild src/index.ts --bundle --platform=browser --target=es2017 --format=esm --outfile=dist/index.mjs",
+    "build": "npm run build:nodejs && npm run build:browser",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "vitest": "^0.34.4"
+  },
+  "devDependencies": {
+    "@tsconfig/node18-strictest": "^1.0.0",
+    "esbuild": "^0.19.2",
+    "ts-node": "^10.9.1",
+    "typescript": "^5.1.6"
+  }
+}

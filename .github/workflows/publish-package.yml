@@ -8,6 +8,7 @@ on:
         description: 'Package to publish'
         required: true
         options:
+          - const
           - expresso
           - log4bot
           - opapi

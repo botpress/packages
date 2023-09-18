@@ -227,7 +227,7 @@ export function createState<SchemaName extends string, DefaultParameterName exte
 
     schemas[name] = {
       section: schemaEntry.section,
-      schema: generateSchemaFromZod(schemaEntry.schema),
+      schema: generateSchemaFromZod(schemaEntry.schema, { allowUnions: true }),
     }
     refs.schemas[name] = true
   })

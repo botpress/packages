@@ -27,8 +27,8 @@ import crypto from 'crypto'
 
 const codes = {
 ${Object.entries(codes)
-      .map(([name, code]) => `  ${name}: ${code},`)
-      .join('\n')}
+  .map(([name, code]) => `  ${name}: ${code},`)
+  .join('\n')}
 } as const
 
 type ErrorCode = typeof codes[keyof typeof codes]

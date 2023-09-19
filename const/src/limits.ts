@@ -1,20 +1,80 @@
+type Limit = {
+  /**
+   * The maximum value for the limit.
+   */
+  value: number
+  /**
+   * The unit of the limit.
+   */
+  unit: LimitUnit
+}
+
 export type LimitType = keyof typeof limitConfigs
+export type LimitUnit = 'count' | 'bytes'
 
 export const limitConfigs = {
-  bot_configuration_bytes: 20480, // 20 KB
-  bot_installed_integrations_count: 30,
-  bot_integration_configuration_bytes: 20480, // 20 KB
-  bot_recurring_event_count: 5,
-  bot_recurring_event_payload_bytes: 131072, // 128 KB
-  event_definition_count: 20,
-  integration_channel_count: 10,
-  integration_channel_message_type_count: 20,
-  integration_identifier_count: 50,
-  integration_version_count: 50,
-  integrations_owned_count: 20,
-  message_payload_bytes: 131072, // 128 KB
-  schema_bytes: 102400, // 100 KB
-  state_definition_count: 5,
-  state_item_payload_bytes: 131072, // 128 KB
-  tag_definition_count: 50,
-} as const satisfies Record<string, number>
+  bot_configuration_bytes: {
+    value: 20480, // 20 KB
+    unit: 'bytes',
+  },
+  bot_installed_integrations_count: {
+    value: 30,
+    unit: 'count',
+  },
+  bot_integration_configuration_bytes: {
+    value: 20480, // 20 KB
+    unit: 'bytes',
+  },
+  bot_recurring_event_count: {
+    value: 5,
+    unit: 'count',
+  },
+  bot_recurring_event_payload_bytes: {
+    value: 131072, // 128 KB
+    unit: 'bytes',
+  },
+  event_definition_count: {
+    value: 20,
+    unit: 'count',
+  },
+  integration_channel_count: {
+    value: 10,
+    unit: 'count',
+  },
+  integration_channel_message_type_count: {
+    value: 20,
+    unit: 'count',
+  },
+  integration_identifier_count: {
+    value: 50,
+    unit: 'count',
+  },
+  integration_version_count: {
+    value: 50,
+    unit: 'count',
+  },
+  integrations_owned_count: {
+    value: 20,
+    unit: 'count',
+  },
+  message_payload_bytes: {
+    value: 131072, // 128 KB
+    unit: 'bytes',
+  },
+  schema_bytes: {
+    value: 102400, // 100 KB
+    unit: 'bytes',
+  },
+  state_definition_count: {
+    value: 5,
+    unit: 'count',
+  },
+  state_item_payload_bytes: {
+    value: 131072, // 128 KB
+    unit: 'bytes',
+  },
+  tag_definition_count: {
+    value: 50,
+    unit: 'count',
+  },
+} as const satisfies Record<string, Limit>

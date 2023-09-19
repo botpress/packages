@@ -11,6 +11,9 @@ import { objects } from './objects'
 type SchemaType = 'zod-schema' | 'json-schema'
 type SchemaOfType<T extends SchemaType> = T extends 'zod-schema' ? OpenApiZodAny : SchemaObject
 
+export type Options = { allowUnions: boolean }
+const DEFAULT_OPTIONS: Options = { allowUnions: false }
+
 export type State<SchemaName extends string, DefaultParameterName extends string, SectionName extends string> = {
   metadata: Metadata
   refs: RefMap
@@ -25,6 +28,7 @@ export type State<SchemaName extends string, DefaultParameterName extends string
   schemas: Record<SchemaName, { schema: SchemaObject; section: SectionName }>
   errors?: ApiError[]
   operations: { [name: string]: Operation<DefaultParameterName, SectionName, string, 'json-schema'> }
+  options: Options
 }
 
 const unknownError: ApiError = {
@@ -185,7 +189,10 @@ type CreateStateProps<SchemaName extends string, DefaultParameterName extends st
 
 export function createState<SchemaName extends string, DefaultParameterName extends string, SectionName extends string>(
   props: CreateStateProps<SchemaName, DefaultParameterName, SectionName>,
+  opts: Partial<Options> = {},
 ): State<SchemaName, DefaultParameterName, SectionName> {
+  const options = { ...DEFAULT_OPTIONS, ...opts }
+
   const schemaEntries = props.schemas
     ? Object.entries<(typeof props.schemas)[SchemaName]>(props.schemas).map(([name, data]) => ({
         name,
@@ -227,7 +234,7 @@ export function createState<SchemaName extends string, DefaultParameterName exte
 
     schemas[name] = {
       section: schemaEntry.section,
-      schema: generateSchemaFromZod(schemaEntry.schema, { allowUnions: true }),
+      schema: generateSchemaFromZod(schemaEntry.schema, options),
     }
     refs.schemas[name] = true
   })
@@ -271,6 +278,7 @@ export function createState<SchemaName extends string, DefaultParameterName exte
     refs,
     schemas,
     sections,
+    options,
   }
 }
 

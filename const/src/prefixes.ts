@@ -63,11 +63,15 @@ export const objectToPrefixMap: Reverser<typeof prefixToObjectMap> = {
   usage: 'usage',
   user: 'user',
   webhook: 'webhook',
-  workspace: 'wkspace',
+  workspace: 'wkspace'
 } as const
 
-export type Prefixes = typeof objectToPrefixMap[keyof typeof objectToPrefixMap]
+export type Prefixes = (typeof objectToPrefixMap)[keyof typeof objectToPrefixMap]
 export type Objects = keyof typeof objectToPrefixMap
+
+export type Ids = {
+  [Id in Objects as `${Capitalize<Id>}Id`]: `${Id}_${string}`
+}
 
 type Reverser<T extends Record<PropertyKey, PropertyKey>> = {
   [P in keyof T as T[P]]: P

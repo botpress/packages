@@ -69,9 +69,41 @@ export const objectToPrefixMap: Reverser<typeof prefixToObjectMap> = {
 export type Prefixes = (typeof objectToPrefixMap)[keyof typeof objectToPrefixMap]
 export type Objects = keyof typeof objectToPrefixMap
 
-export type Ids = {
-  [Id in Objects as `${Capitalize<Id>}Id`]: `${Id}_${string}`
+type Ids = {
+  [Id in Objects as `${Capitalize<Id>}Id`]: `${(typeof objectToPrefixMap)[Id]}_${string}`
 }
+
+export type ActionId = Ids['ActionId']
+export type AnalyticsId = Ids['AnalyticsId']
+export type AuditId = Ids['AuditId']
+export type BotId = Ids['BotId']
+export type BotApiKeyId = Ids['BotApiKeyId']
+export type CardId = Ids['CardId']
+export type ChannelId = Ids['ChannelId']
+export type ConfigurationId = Ids['ConfigurationId']
+export type ConversationId = Ids['ConversationId']
+export type EventId = Ids['EventId']
+export type FileId = Ids['FileId']
+export type FlowId = Ids['FlowId']
+export type IntegrationId = Ids['IntegrationId']
+export type IntegrationApiKeyId = Ids['IntegrationApiKeyId']
+export type KnowledgeBaseId = Ids['KnowledgeBaseId']
+export type LimitId = Ids['LimitId']
+export type MediaId = Ids['MediaId']
+export type MessageId = Ids['MessageId']
+export type NodeId = Ids['NodeId']
+export type PersonalAccessTokenId = Ids['PersonalAccessTokenId']
+export type QuotaId = Ids['QuotaId']
+export type RecurringEventId = Ids['RecurringEventId']
+export type SandboxId = Ids['SandboxId']
+export type SchemaId = Ids['SchemaId']
+export type StateId = Ids['StateId']
+export type TableId = Ids['TableId']
+export type TagId = Ids['TagId']
+export type UsageId = Ids['UsageId']
+export type UserId = Ids['UserId']
+export type WebhookId = Ids['WebhookId']
+export type WorkspaceId = Ids['WorkspaceId']
 
 type Reverser<T extends Record<PropertyKey, PropertyKey>> = {
   [P in keyof T as T[P]]: P

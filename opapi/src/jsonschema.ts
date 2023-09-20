@@ -2,13 +2,18 @@ import { OpenApiZodAny, generateSchema as generateJsonSchema } from '@anatine/zo
 import type { SchemaObject } from 'openapi3-ts'
 import { removeFromArray } from './util'
 
-export const generateSchemaFromZod = (zodRef: OpenApiZodAny, useOutput?: boolean) => {
-  const jsonSchema = generateJsonSchema(zodRef, useOutput)
-  formatJsonSchema(jsonSchema)
+export type GenerateSchemaFromZodOpts = {
+  useOutput?: boolean
+  allowUnions?: boolean
+}
+
+export const generateSchemaFromZod = (zodRef: OpenApiZodAny, opts?: GenerateSchemaFromZodOpts) => {
+  const jsonSchema = generateJsonSchema(zodRef, opts?.useOutput)
+  formatJsonSchema(jsonSchema, opts?.allowUnions ?? false)
   return jsonSchema
 }
 
-export const formatJsonSchema = (jsonSchema: SchemaObject) => {
+export const formatJsonSchema = (jsonSchema: SchemaObject, allowUnions: boolean) => {
   if (jsonSchema.type === 'object') {
     if (jsonSchema.additionalProperties === undefined) {
       jsonSchema.additionalProperties = false
@@ -23,13 +28,13 @@ export const formatJsonSchema = (jsonSchema: SchemaObject) => {
     }
 
     if (typeof jsonSchema.additionalProperties === 'object') {
-      formatJsonSchema(jsonSchema.additionalProperties)
+      formatJsonSchema(jsonSchema.additionalProperties, allowUnions)
     }
 
-    Object.entries(jsonSchema.properties ?? {}).forEach(([_, value]) => formatJsonSchema(value))
+    Object.entries(jsonSchema.properties ?? {}).forEach(([_, value]) => formatJsonSchema(value, allowUnions))
   }
 
-  if (jsonSchema.allOf || jsonSchema.anyOf || jsonSchema.oneOf) {
+  if (!allowUnions && (jsonSchema.allOf || jsonSchema.anyOf || jsonSchema.oneOf)) {
     throw new Error('allOf, anyOf and oneOf are not supported')
   }
 }

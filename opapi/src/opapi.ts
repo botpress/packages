@@ -7,7 +7,7 @@ import {
   generateTypesBySection,
 } from './generator'
 import { addOperation } from './operation'
-import { ApiError, ComponentType, createState, getRef, Metadata, Operation, Parameter, State } from './state'
+import { ApiError, ComponentType, createState, getRef, Metadata, Operation, Options, Parameter, State } from './state'
 import { exportStateAsTypescript } from './generators/ts-state'
 export { Operation, Parameter } from './state'
 
@@ -61,8 +61,9 @@ const createOpapiFromState = <
 
 export function OpenApi<SchemaName extends string, DefaultParameterName extends string, SectionName extends string>(
   props: OpenApiProps<SchemaName, DefaultParameterName, SectionName>,
+  opts: Partial<Options> = {},
 ) {
-  const state = createState(props)
+  const state = createState(props, opts)
   return createOpapiFromState(state)
 }
 

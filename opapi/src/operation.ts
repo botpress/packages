@@ -49,7 +49,7 @@ export const addOperation = <
   const response = {
     description: operationProps.response.description,
     status: operationProps.response.status,
-    schema: generateSchemaFromZod(extendApi(operationProps.response.schema, { title: responseName })),
+    schema: generateSchemaFromZod(extendApi(operationProps.response.schema, { title: responseName }), state.options),
   }
 
   let operation: Operation<DefaultParameterName, SectionName, string, 'json-schema'>
@@ -62,7 +62,7 @@ export const addOperation = <
       response,
       requestBody: {
         description: operationProps.requestBody.description,
-        schema: generateSchemaFromZod(extendApi(operationProps.requestBody.schema, { title: bodyName })),
+        schema: generateSchemaFromZod(extendApi(operationProps.requestBody.schema, { title: bodyName }), state.options),
       },
     }
   } else {

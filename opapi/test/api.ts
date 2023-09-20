@@ -6,8 +6,44 @@ const fooSchema = z.object({
   name: z.string(),
 })
 
-export const createApi = () => {
+const Bar = schema(
+  z.object({
+    tags: z.record(
+      schema(
+        z.object({
+          title: schema(z.string().max(20).optional(), { description: 'Title of the tag' }),
+          description: schema(z.string().max(100).optional(), { description: 'Description of the tag' }),
+        }),
+        { description: 'Definition of a tag that can be provided on the object' },
+      ),
+    ),
+  }),
+  { description: 'Conversation object configuration' },
+)
+
+const nestedSchema = z.object({
+  id: z.string(),
+  properties: z.object({
+    name: z.string(),
+    propertiesL2: z.object({
+      name: z.string(),
+      propertiesL3: z.object({
+        name: z.string(),
+      }),
+    }),
+  }),
+  bar: Bar.optional(),
+})
+
+export const getMockApi = () => {
   const api = OpenApi({
+    errors: [
+      {
+        description: 'Foo not found',
+        status: 404,
+        type: 'FooNotFound',
+      },
+    ],
     metadata: {
       title: 'Test API',
       description: 'Test API',
@@ -24,11 +60,19 @@ export const createApi = () => {
         title: 'Bar',
         description: 'Bar section',
       },
+      nested: {
+        title: 'Nested',
+        description: 'Nested section',
+      },
     },
     schemas: {
       Foo: {
         section: 'foo',
         schema: fooSchema,
+      },
+      Nested: {
+        section: 'nested',
+        schema: nestedSchema,
       },
       Bar: {
         section: 'bar',
@@ -79,6 +123,31 @@ export const createApi = () => {
       description: 'Foo information',
       schema: z.object({
         foo: api.getModelRef('Foo'),
+      }),
+    },
+  })
+
+  api.addOperation({
+    name: 'addNested',
+    description: 'Post a nested',
+    method: 'post',
+    path: '/nested/{id}',
+    parameters: {
+      id: {
+        in: 'path',
+        type: 'string',
+        description: 'Nested id',
+      },
+    },
+    requestBody: {
+      description: 'Nested information',
+      schema: nestedSchema,
+    },
+    section: 'nested',
+    response: {
+      description: 'The nested object that was created',
+      schema: z.object({
+        nested: api.getModelRef('Nested'),
       }),
     },
   })

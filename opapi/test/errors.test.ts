@@ -5,25 +5,17 @@ import { existsSync } from 'fs'
 import { getFiles } from '../src/file'
 import { validateTypescriptFile } from './util'
 
-const serverFiles = [
-  'definition.ts',
-  'handlers.ts',
-  'schema.ts',
-  'type.ts',
-  'metadata.json',
-  'openapi.json',
-  'errors.ts',
-]
+const errorFiles = ['errors.ts']
 
 describe('server generator', () => {
   it('should be able to generate a server', async () => {
-    const genServerFolder = join(__dirname, 'gen/server')
+    const genServerFolder = join(__dirname, 'gen/errors')
 
     const api = getMockApi()
 
-    await api.exportServer(genServerFolder, true)
+    api.exportErrors(genServerFolder)
 
-    serverFiles.forEach((file) => {
+    errorFiles.forEach((file) => {
       const filename = join(genServerFolder, file)
       expect(existsSync(filename), `${filename} should exist`).toBe(true)
 
@@ -33,6 +25,6 @@ describe('server generator', () => {
     })
 
     const files = getFiles(genServerFolder)
-    expect(files.length).toBe(serverFiles.length)
+    expect(files.length).toBe(errorFiles.length)
   })
 })

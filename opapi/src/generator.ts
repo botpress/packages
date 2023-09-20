@@ -3,27 +3,53 @@ import { VError } from 'verror'
 import { defaultResponseStatus, invalidLine, tsFileHeader } from './const'
 import { appendHeaders, initDirectory, removeLineFromFiles, saveFile } from './file'
 import {
+  GenerateHandlerProps,
   generateClientCode,
   generateDefinition,
-  GenerateHandlerProps,
   generateHandlers,
   generateTypes,
   runOpenApiCodeGenerator,
 } from './generators'
 import { generateErrors } from './generators/errors'
 import { generateOpenapiTypescript } from './generators/openapi-typescript'
+import { schemaIsEmptyObject } from './jsonschema'
 import log from './log'
 import type { OpenApiPostProcessors } from './opapi'
 import { createOpenapi } from './openapi'
-import { operationBodyTypeGuard } from './operation'
-import type { Operation, State } from './state'
-import { SchemaObject } from 'openapi3-ts'
-import { schemaIsEmptyObject } from './jsonschema'
+import {
+  DefaultState,
+  composeFilesFromBlocks,
+  executeOperationParsers,
+  executeSectionParsers,
+  operationParsers,
+  sectionParsers,
+} from './section-types-generator'
+import { Block } from './section-types-generator/types'
+import { ApiError, isOperationWithBodyProps, type Operation, type State } from './state'
+import { generateSectionsFile } from './section-types-generator/generator'
+
+/**
+ * Generates files containing typescript types for each item in the state object - Sections, Operations, Responses, etc.
+ */
+export async function generateTypesBySection(state: DefaultState, targetDirectory: string) {
+  initDirectory(targetDirectory)
+  const allBlocks: Block[] = []
+  for (const section of state.sections) {
+    const [sectionBlocks, operationBlocks] = await Promise.all([
+      executeSectionParsers(sectionParsers, section, state),
+      executeOperationParsers(operationParsers, section, state),
+    ])
+    const blocks = [...sectionBlocks, ...operationBlocks]
+    allBlocks.push(...blocks)
+  }
+  composeFilesFromBlocks(allBlocks, targetDirectory)
+  generateSectionsFile(state, targetDirectory)
+}
 
 export const generateServer = async (state: State<string, string, string>, dir: string, useExpressTypes: boolean) => {
   initDirectory(dir)
 
-  log.info('Generating openapi content')
+  log.info('Generating OpenAPI content')
   const openapi = createOpenapi(state)
   const openapiSpecString = openapi.getSpecAsJson()
   const openapiSpec = JSON.parse(openapiSpecString)
@@ -120,6 +146,30 @@ export const generateClient = async (
   log.info('')
 }
 
+export function generateErrorsFile(errors: ApiError[], dir = '.') {
+  initDirectory(dir)
+
+  log.info('Generating error types')
+  if (!errors || errors.length === 0) {
+    throw new VError('No errors defined')
+  }
+
+  const errorCode = generateErrors(errors)
+  log.info('')
+
+  log.info('Saving generated files')
+  saveFile(dir, 'errors.ts', errorCode)
+  log.info('')
+
+  log.info(`Appending header to typescript files in ${chalk.blue(dir)}`)
+  appendHeaders(dir, tsFileHeader)
+  log.info('')
+
+  log.info('Removing invalid line from typescript files')
+  removeLineFromFiles(dir, invalidLine)
+  log.info('')
+}
+
 export function generateOpenapi(state: State<string, string, string>, dir = '.') {
   initDirectory(dir)
 
@@ -148,8 +198,8 @@ function mapOperationPropsToHandlerProps(
     cookies: [],
     queries: [],
     params: [],
-    body: operationBodyTypeGuard(operation) ? true : false,
-    isEmptyBody: operationBodyTypeGuard(operation) ? schemaIsEmptyObject(operation.requestBody.schema) : true,
+    body: isOperationWithBodyProps(operation) ? true : false,
+    isEmptyBody: isOperationWithBodyProps(operation) ? schemaIsEmptyObject(operation.requestBody.schema) : true,
   }
 
   if (operation.parameters) {

@@ -4,13 +4,13 @@ import { join } from 'path'
 import { getFiles } from '../src/file'
 import { validateTypescriptFile } from './util'
 
-describe('client generator', () => {
-  it('should be able to generate a client', async () => {
-    const genClientFolder = join(__dirname, 'gen/client')
+describe('api types generator', () => {
+  it('should be able to generate valid typescript files for section wise types', async () => {
+    const genClientFolder = join(__dirname, 'gen/api-types')
 
     const api = getMockApi()
 
-    await api.exportClient(genClientFolder, 'https://api.openapi-generator.tech')
+    await api.exportTypesBySection(genClientFolder)
 
     const files = getFiles(genClientFolder)
 

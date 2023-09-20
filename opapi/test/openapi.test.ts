@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { createApi } from './api'
+import { getMockApi } from './api'
 import { join } from 'path'
 import { getFiles } from '../src/file'
 import { existsSync } from 'fs'
@@ -10,7 +10,7 @@ describe('openapi generator', () => {
   it('should be able to generate a openapi', async () => {
     const genOpenapiFolder = join(__dirname, 'gen/openapi')
 
-    const api = createApi()
+    const api = getMockApi()
 
     api.exportOpenapi(genOpenapiFolder)
 

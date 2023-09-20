@@ -1,11 +1,10 @@
-import { OpenApiBuilder, OperationObject, ReferenceObject, SchemaObject } from 'openapi3-ts'
+import { OpenApiBuilder, OperationObject, ReferenceObject } from 'openapi3-ts'
 import VError from 'verror'
 import { defaultResponseStatus } from './const'
 import { generateSchemaFromZod } from './jsonschema'
-import { operationBodyTypeGuard } from './operation'
-import { ComponentType, getRef, State } from './state'
-import { formatBodyName, formatResponseName } from './util'
 import { objects } from './objects'
+import { ComponentType, State, getRef, isOperationWithBodyProps } from './state'
+import { formatBodyName, formatResponseName } from './util'
 
 export const createOpenapi = <
   SchemaName extends string,
@@ -67,7 +66,7 @@ export const createOpenapi = <
       },
     }
 
-    if (operationBodyTypeGuard(operationObject)) {
+    if (isOperationWithBodyProps(operationObject)) {
       const requestBody = operationObject.requestBody
 
       openapi.addRequestBody(bodyName, {

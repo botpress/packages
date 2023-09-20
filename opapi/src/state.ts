@@ -28,7 +28,7 @@ export type State<SchemaName extends string, DefaultParameterName extends string
   schemas: Record<SchemaName, { schema: SchemaObject; section: SectionName }>
   errors?: ApiError[]
   operations: { [name: string]: Operation<DefaultParameterName, SectionName, string, 'json-schema'> }
-  options: Options
+  options?: Options
 }
 
 const unknownError: ApiError = {

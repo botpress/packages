@@ -9,8 +9,9 @@
     "build": "tsc -p ./tsconfig.build.json",
     "dev": "ts-node -T ./src/index.ts",
     "start": "node ./dist/index.js",
-    "test": "jest --roots ./dist --testPathIgnorePatterns \\.util\\.test\\.js",
-    "test:e2e": "ts-node -T ./e2e/index.ts"
+    "test": "pnpm test:node && pnpm test:browser",
+    "test:node": "jest --roots ./dist --testPathIgnorePatterns \\.util\\.test\\.js",
+    "test:browser": "ts-node -T ./e2e/index.ts"
   },
   "dependencies": {
     "entities-wasm": "link:/Users/charlesc/code/bp-packages/entities-wasm",

@@ -1,0 +1,10 @@
+lockfileVersion: '6.0'
+
+settings:
+  autoInstallPeers: true
+  excludeLinksFromLockfile: false
+
+dependencies:
+  '@bpinternal/entities':
+    specifier: link:/Users/charlesc/code/bp-packages/entities
+    version: link:../entities

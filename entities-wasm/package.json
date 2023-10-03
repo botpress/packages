@@ -1,0 +1,24 @@
+{
+  "name": "entities-wasm",
+  "collaborators": [
+    "Francois Levasseur <francois.levasseur@botpress.com>"
+  ],
+  "scripts": {
+    "build": "build:node && build:web",
+    "build:node": "wasm-pack build --target nodejs --out-dir node",
+    "build:web": "wasm-pack build --target web --out-dir web",
+    "test": "cargo test"
+  },
+  "version": "0.1.0",
+  "files": [
+    "node/entities_bg.wasm",
+    "node/entities.js",
+    "node/entities.d.ts",
+    "web/entities_bg.wasm",
+    "web/entities.js",
+    "web/entities.d.ts"
+  ],
+  "module": "web/entities.js",
+  "types": "web/entities.d.ts",
+  "main": "node/entities.js"
+}

@@ -1,4 +1,4 @@
-import * as pkg from '../../../../pkg/entities'
+import * as pkg from 'entities-wasm'
 import { ListEntityExtraction, ListEntityModel } from '../typings'
 import { WasmVec } from './wasm-vec'
 import { wasmBin } from './bin'
@@ -12,8 +12,9 @@ const toArrayBuffer = (base64Str: string): ArrayBuffer => {
   }
   return bytes.buffer
 }
-const wasmBuff = toArrayBuffer(wasmBin)
-pkg.initSync(wasmBuff)
+
+const wasmBytes = toArrayBuffer(wasmBin)
+pkg.initSync(wasmBytes)
 
 /**
  * IMPORTANT:

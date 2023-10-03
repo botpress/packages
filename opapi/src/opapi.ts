@@ -45,6 +45,7 @@ const createOpapiFromState = <
   state: State<SchemaName, DefaultParameterName, SectionName>,
 ) => {
   return {
+    getState: (): State<SchemaName, DefaultParameterName, SectionName> => state,
     getModelRef: (name: SchemaName): OpenApiZodAny => getRef(state, ComponentType.SCHEMAS, name),
     addOperation: <Path extends string>(
       operationProps: Operation<DefaultParameterName, SectionName, Path, 'zod-schema'>,

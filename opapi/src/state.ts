@@ -3,7 +3,7 @@ import { VError } from 'verror'
 import { z } from 'zod'
 import { schema } from './opapi'
 import type { PathParams } from './path-params'
-import { isAlphanumeric, isCapitalAlphabetical } from './util'
+import { isAlphanumeric, isCapitalAlphabetical, uniqueBy } from './util'
 import { generateSchemaFromZod } from './jsonschema'
 import { OpenApiZodAny } from '@anatine/zod-openapi'
 import { objects } from './objects'
@@ -255,17 +255,11 @@ export function createState<SchemaName extends string, DefaultParameterName exte
     refs.schemas[name] = true
   })
 
-  const errors = [unknownError, internalError, ...(props.errors ?? [])]
-
-  const existingErrors = new Set<string>()
+  const userErrors = props.errors ?? []
+  const defaultErrors = [unknownError, internalError]
+  const errors = uniqueBy([...defaultErrors, ...userErrors], 'type')
 
   errors.forEach((error) => {
-    if (existingErrors.has(error.type)) {
-      throw new VError(`Error ${error.type} already exists`)
-    }
-
-    existingErrors.add(error.type)
-
     if (!isCapitalAlphabetical(error.type)) {
       throw new VError(`Invalid error type ${error.type}. It must be alphabetical and start with a capital letter`)
     }

@@ -9,6 +9,7 @@ on:
         required: true
         options:
           - const
+          - entities
           - expresso
           - log4bot
           - opapi

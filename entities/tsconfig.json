@@ -17,9 +17,7 @@
     "forceConsistentCasingInFileNames": true,
     "typeRoots": ["./node_modules/@types"],
     "types": ["jest", "node"],
-    "outDir": "./dist",
-    "rootDir": "./src",
     "baseUrl": "."
   },
-  "exclude": ["**/dist/", "**/node_modules/**/*.(ts|js)"]
+  "include": ["src/**/*", "e2e/**/*", "**/*.ts"]
 }

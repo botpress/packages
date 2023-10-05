@@ -13,9 +13,8 @@ const toArrayBuffer = (base64Str: string): ArrayBuffer => {
   return bytes.buffer
 }
 
-const wasmBytes = toArrayBuffer(wasmBin)
-
 if (pkg.initSync != undefined) {
+  const wasmBytes = toArrayBuffer(wasmBin)
   pkg.initSync(wasmBytes)
 }
 

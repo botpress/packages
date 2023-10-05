@@ -6,7 +6,7 @@
   "module": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
-    "build": "tsc -p ./tsconfig.build.json",
+    "build": "ts-node -T ./build.ts && tsc -p ./tsconfig.build.json",
     "dev": "ts-node -T ./src/index.ts",
     "start": "node ./dist/index.js",
     "test": "pnpm test:node && pnpm test:browser",

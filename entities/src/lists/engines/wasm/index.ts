@@ -1,4 +1,4 @@
-import * as pkg from '../../../../pkg/entities'
+import * as pkg from '../../../../pkg'
 import { ListEntityExtraction, ListEntityModel } from '../typings'
 import { WasmVec } from './wasm-vec'
 

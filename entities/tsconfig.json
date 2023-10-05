@@ -17,9 +17,8 @@
     "forceConsistentCasingInFileNames": true,
     "typeRoots": ["./node_modules/@types"],
     "types": ["jest", "node"],
-    "outDir": "./dist",
-    "rootDir": "./src",
+    "resolveJsonModule": true,
     "baseUrl": "."
   },
-  "exclude": ["**/dist/", "**/node_modules/**/*.(ts|js)"]
+  "include": ["src/**/*", "./build.ts", "./package.json"]
 }

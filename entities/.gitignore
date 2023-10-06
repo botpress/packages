@@ -3,5 +3,6 @@
 Cargo.lock
 bin/
 wasm-pack.log
-pkg/*
-!pkg/package.json
+pkg/node
+pkg/web
+

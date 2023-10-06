@@ -10,7 +10,7 @@ defaults:
     working-directory: ./const
 
 jobs:
-  entities:
+  const:
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:

@@ -1,3 +1,4 @@
+import { describe, expect, test } from 'vitest'
 import { ListEntityDef, ListEntityEngine, ListEntityExtractor } from './lists'
 import { EntityExpectations, ListEntityAssert } from './lists.util.test'
 

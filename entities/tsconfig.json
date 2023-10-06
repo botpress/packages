@@ -1,25 +1,19 @@
 {
   "compilerOptions": {
-    "incremental": true,
-    "target": "es2019",
+    "lib": ["es2022"],
     "module": "commonjs",
-    "declaration": true,
-    "sourceMap": true,
+    "target": "es2022",
     "composite": true,
     "strict": true,
     "noImplicitAny": false,
     "strictNullChecks": true,
     "moduleResolution": "node",
     "esModuleInterop": true,
-    "experimentalDecorators": true,
-    "emitDecoratorMetadata": true,
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
-    "typeRoots": ["./node_modules/@types"],
-    "types": ["jest", "node"],
-    "outDir": "./dist",
-    "rootDir": "./src",
+    "resolveJsonModule": true,
     "baseUrl": "."
   },
-  "exclude": ["**/dist/", "**/node_modules/**/*.(ts|js)"]
+  "include": ["src/**/*", "e2e/**/*", "./build.ts", "./package.json"],
+  "exclude": ["node_modules"]
 }

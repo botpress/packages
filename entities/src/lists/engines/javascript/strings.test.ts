@@ -1,3 +1,4 @@
+import { describe, expect, test } from 'vitest'
 import * as stringUtils from './strings'
 
 const expectRounded = (a: number) => ({

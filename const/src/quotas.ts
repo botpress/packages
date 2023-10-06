@@ -33,8 +33,9 @@ export const quotaTypes = [
   'knowledgebase_vector_count',
   'bot_ratelimit',
   'table_row_count',
-  'workspace_member_count'
-] as const
+  'workspace_member_count',
+  'integrations_owned_count'
+] as const satisfies Readonly<string[]>
 
 export const quotaConfigs = {
   invocation_timeout: {
@@ -92,5 +93,12 @@ export const quotaConfigs = {
     default: 100,
     kind: 'bot',
     category: 'ratelimit'
+  },
+  integrations_owned_count: {
+    name: 'Owned Integrations Count',
+    description: 'Maximum number of integrations that can be created.',
+    default: 20,
+    kind: 'workspace',
+    category: 'count'
   }
 } as const satisfies Record<QuotaType, Quota>

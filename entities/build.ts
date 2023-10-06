@@ -2,47 +2,65 @@ import _ from 'lodash'
 import esbuild from 'esbuild'
 import fs from 'fs'
 import pathlib from 'path'
+import * as childProcess from 'child_process'
+
+type WasmPackProps = {
+  outdir: string
+  target: 'nodejs' | 'web'
+}
+const wasmPack = ({ outdir, target }: WasmPackProps) => {
+  return childProcess.spawnSync(
+    'pnpm',
+    ['wasm-pack', 'build', '--verbose', '--out-dir', outdir, '--target', target, '--release', '--no-pack'],
+    {
+      stdio: 'inherit'
+    }
+  )
+}
 
 const rootDir = __dirname
+
 const srcDir = pathlib.join(rootDir, 'src')
 const srcEntryPoint = pathlib.join(srcDir, 'index.ts')
+
 const pkgDir = pathlib.join(rootDir, 'pkg')
+const pkgNodeDir = pathlib.join(pkgDir, 'node')
+const pkgWebDir = pathlib.join(pkgDir, 'web')
+const wasmFileName = 'entities_bg.wasm'
+const gitIgnoreFileName = '.gitignore'
+const indexJsFileName = 'index.js'
+
 const distDir = pathlib.join(rootDir, 'dist')
+const distNodeDir = pathlib.join(distDir, 'node')
+const distWebDir = pathlib.join(distDir, 'web')
 
 const buildNodeJs = async () => {
-  const nodeDir = pathlib.join(pkgDir, 'node')
-  const gitIgnore = pathlib.join(nodeDir, '.gitignore')
-  const entryPoint = pathlib.join(nodeDir, 'index.js')
-  const wasmFileName = 'entities_bg.wasm'
-  const wasmSrc = pathlib.join(nodeDir, wasmFileName)
-  const wasmDest = pathlib.join(distDir, 'node', 'entities_bg.wasm')
-  const distEntryPoint = pathlib.join(distDir, 'node', 'index.js')
+  wasmPack({ outdir: pkgNodeDir, target: 'nodejs' })
 
   const entryPointContent = "module.exports = require('./entities.js')"
 
-  fs.mkdirSync(nodeDir, { recursive: true })
-  fs.rmSync(gitIgnore, { force: true })
-  fs.writeFileSync(entryPoint, entryPointContent)
-  fs.cpSync(wasmSrc, wasmDest) // this is a hack, but it works
+  fs.mkdirSync(pkgNodeDir, { recursive: true })
+  fs.rmSync(pathlib.join(pkgNodeDir, gitIgnoreFileName), { force: true })
+  fs.writeFileSync(pathlib.join(pkgNodeDir, indexJsFileName), entryPointContent)
+
+  const from = pathlib.join(pkgNodeDir, wasmFileName)
+  const to = pathlib.join(distNodeDir, wasmFileName)
+  fs.cpSync(from, to) // this is a hack, but it works
 
   await esbuild.build({
     entryPoints: [srcEntryPoint],
     bundle: true,
     platform: 'node',
     format: 'cjs',
-    outfile: distEntryPoint,
+    outfile: pathlib.join(distNodeDir, indexJsFileName),
     sourcemap: false
   })
 }
 
 const buildWeb = async () => {
-  const webDir = pathlib.join(pkgDir, 'web')
-  const gitIgnore = pathlib.join(webDir, '.gitignore')
-  const entryPoint = pathlib.join(webDir, 'index.js')
-  const wasm = pathlib.join(webDir, 'entities_bg.wasm')
-  const distEntryPoint = pathlib.join(distDir, 'web', 'index.js')
+  wasmPack({ outdir: pkgWebDir, target: 'web' })
 
-  const wasmBin: Buffer = fs.readFileSync(wasm)
+  const wasmBin: Buffer = fs.readFileSync(pathlib.join(pkgWebDir, wasmFileName))
   const wasmB64 = wasmBin.toString('base64')
   const wasmB64Chunked = _.chunk(wasmB64, 100)
   const entryPointContent = [
@@ -59,16 +77,16 @@ const buildWeb = async () => {
     "export * from './entities.js'"
   ].join('\n')
 
-  fs.mkdirSync(webDir, { recursive: true })
-  fs.rmSync(gitIgnore, { force: true })
-  fs.writeFileSync(entryPoint, entryPointContent)
+  fs.mkdirSync(pkgWebDir, { recursive: true })
+  fs.rmSync(pathlib.join(pkgWebDir, gitIgnoreFileName), { force: true })
+  fs.writeFileSync(pathlib.join(pkgWebDir, indexJsFileName), entryPointContent)
 
   await esbuild.build({
     entryPoints: [srcEntryPoint],
     bundle: true,
     platform: 'browser',
     format: 'esm',
-    outfile: distEntryPoint,
+    outfile: pathlib.join(distWebDir, indexJsFileName),
     sourcemap: false
   })
 }

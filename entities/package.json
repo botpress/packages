@@ -4,31 +4,28 @@
   "description": "Botpress Entities Extractor",
   "main": "./dist/node/index.js",
   "module": "./dist/web/index.js",
-  "types": ".dist/types/index.d.ts",
+  "types": "./dist/types/index.d.ts",
   "scripts": {
+    "type:check": "tsc --noEmit",
     "build": "pnpm run build:type && pnpm run build:node && pnpm run build:web",
-    "build:node": "pnpm run pack:node && pnpm run bundle:node",
-    "build:web": "pnpm run pack:web && pnpm run bundle:web",
     "build:type": "tsc -p tsconfig.build.json",
-    "pack:node": "wasm-pack build --verbose --out-dir ./pkg/node --target nodejs --release --no-pack",
-    "pack:web": "wasm-pack build --verbose --out-dir ./pkg/web --target web --release --no-pack",
-    "bundle:node": "ts-node -T ./build.ts nodejs",
-    "bundle:web": "ts-node -T ./build.ts web",
-    "dev": "ts-node -T ./src/index.ts",
-    "start": "node ./dist/index.js",
-    "test": "jest --roots ./dist --testPathIgnorePatterns \\.util\\.test\\.js && cargo test",
-    "type:check": "tsc --noEmit"
+    "build:node": "ts-node -T ./build.ts nodejs",
+    "build:web": "ts-node -T ./build.ts web",
+    "test": "pnpm run unit:test && pnpm run e2e:test && pnpm run rust:test",
+    "unit:test": "pnpm vitest --run",
+    "e2e:test": "ts-node -T ./e2e/node.ts && ts-node -T ./e2e/browser/index.ts",
+    "rust:test": "cargo test"
   },
   "dependencies": {
     "lodash": "^4.17.19"
   },
   "devDependencies": {
-    "@types/jest": "^26.0.14",
     "@types/lodash": "^4.14.195",
     "@types/node": "^20.2.1",
     "esbuild": "^0.19.4",
-    "jest": "^26.6.3",
+    "puppeteer": "^21.3.7",
     "typescript": "^5.0.4",
+    "vitest": "^0.34.6",
     "wasm-pack": "^0.12.1"
   },
   "keywords": [],

@@ -3,7 +3,7 @@
  *
  * This file has extension `.util.test.ts`.
  * It is meant to contain test utilities, not to be tested itself.
- * It is ignored by jest.
+ * It is ignored by vitest.
  *
  * # Span Assertions
  *

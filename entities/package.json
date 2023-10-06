@@ -7,7 +7,7 @@
   "types": "./dist/types/index.d.ts",
   "scripts": {
     "type:check": "tsc --noEmit",
-    "build": "pnpm run build:type && pnpm run build:node && pnpm run build:web",
+    "build": "pnpm run build:node && pnpm run build:web && pnpm run build:type",
     "build:type": "tsc -p tsconfig.build.json",
     "build:node": "ts-node -T ./build.ts nodejs",
     "build:web": "ts-node -T ./build.ts web",

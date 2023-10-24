@@ -53,6 +53,10 @@ export const limitConfigs = {
     value: 50,
     unit: 'count'
   },
+  issue_event_item_payload_bytes: {
+    value: 131072, // 128 KB
+    unit: 'bytes'
+  },
   message_payload_bytes: {
     value: 131072, // 128 KB
     unit: 'bytes'

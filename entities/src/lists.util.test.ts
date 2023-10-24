@@ -29,9 +29,9 @@ export type EntityExpectations<T extends string> = MapSpans<T, EntityExpectation
 export class ListEntityAssert {
   constructor(private _extractor: ListEntityExtractor) {}
 
-  public expectSpans = <T extends string>(templateStr: T) => {
+  public expectSpans = async <T extends string>(templateStr: T) => {
     const { text, spans } = parseSpans(templateStr)
-    const entities = this._extractor.extract(text)
+    const entities = await this._extractor.extract(text)
 
     return {
       toBe: (...expected: EntityExpectations<T>) => {

@@ -11,5 +11,5 @@ export type Entity = {
 }
 
 export type EntityExtractor = {
-  extract: (text: string) => Entity[]
+  extract: (text: string) => Promise<Entity[]>
 }

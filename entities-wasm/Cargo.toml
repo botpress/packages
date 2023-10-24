@@ -6,7 +6,7 @@ edition = "2018"
 
 [lib]
 crate-type = ["cdylib", "rlib"]
-path = "./rssrc/lib.rs"
+path = "./src/lib.rs"
 
 [features]
 default = ["console_error_panic_hook"]
@@ -30,5 +30,10 @@ wasm-bindgen-test = "0.3.13"
 
 
 [profile.release]
-# Tell `rustc` to optimize for small code size.
-opt-level = "s"
+incremental = true
+opt-level = 's'     # Optimize for size
+lto = true          # Enable link-time optimization
+codegen-units = 1   # Reduce number of codegen units to increase optimizations
+panic = 'abort'     # Abort on panic
+strip = true        # Strip symbols from binary*
+

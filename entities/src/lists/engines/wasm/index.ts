@@ -1,6 +1,31 @@
-import * as pkg from '../../../../pkg'
+import * as wasmData from '@bpinternal/entities-wasm/entities_bg.wasm'
+import { init } from '@bpinternal/entities-wasm/init'
+import {
+  SynonymDefinition,
+  StringArray,
+  SynonymArray,
+  ValueDefinition,
+  ExtractionArray,
+  ValueArray,
+  EntityDefinition,
+  EntityExtraction,
+  EntityArray,
+  extract_multiple
+} from '@bpinternal/entities-wasm'
 import { ListEntityExtraction, ListEntityModel } from '../typings'
 import { WasmVec } from './wasm-vec'
+
+const importWASM = async () => {
+  try {
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    await init((imports) => WebAssembly.instantiate(wasmData.default, imports))
+  } catch (err) {
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    return import('@bpinternal/entities-wasm/entities_bg.wasm')
+  }
+}
 
 /**
  * IMPORTANT:
@@ -17,22 +42,22 @@ type Value = Model['values'][number]
 type Synonym = Value['synonyms'][number]
 
 namespace fromJs {
-  export const mapEntitySynonym = (synonym: Synonym): pkg.SynonymDefinition => {
-    const wasmTokens = new WasmVec(pkg.StringArray).fill(synonym.tokens)
-    return new pkg.SynonymDefinition(wasmTokens.x)
+  export const mapEntitySynonym = (synonym: Synonym): SynonymDefinition => {
+    const wasmTokens = new WasmVec(StringArray).fill(synonym.tokens)
+    return new SynonymDefinition(wasmTokens.x)
   }
-  export const mapEntityValue = (value: Value): pkg.ValueDefinition => {
-    const wasmSynonyms = new WasmVec(pkg.SynonymArray).fill(value.synonyms.map(mapEntitySynonym))
-    return new pkg.ValueDefinition(value.name, wasmSynonyms.x)
+  export const mapEntityValue = (value: Value): ValueDefinition => {
+    const wasmSynonyms = new WasmVec(SynonymArray).fill(value.synonyms.map(mapEntitySynonym))
+    return new ValueDefinition(value.name, wasmSynonyms.x)
   }
-  export const mapEntityModel = (listModel: ListEntityModel): pkg.EntityDefinition => {
-    const wasmValues = new WasmVec(pkg.ValueArray).fill(listModel.values.map(mapEntityValue))
-    return new pkg.EntityDefinition(listModel.name, listModel.fuzzy, wasmValues.x)
+  export const mapEntityModel = (listModel: ListEntityModel): EntityDefinition => {
+    const wasmValues = new WasmVec(ValueArray).fill(listModel.values.map(mapEntityValue))
+    return new EntityDefinition(listModel.name, listModel.fuzzy, wasmValues.x)
   }
 }
 
 namespace fromRust {
-  export const mapEntityExtraction = (wasmExtraction: pkg.EntityExtraction): ListEntityExtraction => {
+  export const mapEntityExtraction = (wasmExtraction: EntityExtraction): ListEntityExtraction => {
     const extraction = {
       name: wasmExtraction.name,
       confidence: wasmExtraction.confidence,
@@ -48,7 +73,7 @@ namespace fromRust {
     return extraction
   }
 
-  export const mapEntityExtractions = (listExtractions: pkg.ExtractionArray): ListEntityExtraction[] => {
+  export const mapEntityExtractions = (listExtractions: ExtractionArray): ListEntityExtraction[] => {
     const extractions: ListEntityExtraction[] = []
     for (let i = 0; i < listExtractions.len(); i++) {
       const extraction = listExtractions.get(i)
@@ -62,13 +87,14 @@ namespace fromRust {
   }
 }
 
-export const extractForListModels = (
+export const extractForListModels = async (
   strTokens: string[],
   listDefinitions: ListEntityModel[]
-): ListEntityExtraction[] => {
-  const wasmStrTokens = new WasmVec(pkg.StringArray).fill(strTokens)
-  const wasmListDefinitions = new WasmVec(pkg.EntityArray).fill(listDefinitions.map(fromJs.mapEntityModel))
-  const wasmListExtractions = pkg.extract_multiple(wasmStrTokens.x, wasmListDefinitions.x)
+): Promise<ListEntityExtraction[]> => {
+  await importWASM()
+  const wasmStrTokens = new WasmVec(StringArray).fill(strTokens)
+  const wasmListDefinitions = new WasmVec(EntityArray).fill(listDefinitions.map(fromJs.mapEntityModel))
+  const wasmListExtractions = extract_multiple(wasmStrTokens.x, wasmListDefinitions.x)
   const listExtractions = fromRust.mapEntityExtractions(wasmListExtractions)
   return listExtractions
 }

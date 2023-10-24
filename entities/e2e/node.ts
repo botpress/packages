@@ -15,7 +15,7 @@ const main = async () => {
   ]
   const ex = new lists.ListEntityExtractor(entities, { engine: 'wasm' })
 
-  const extracted = ex.extract('I like appels and oranges')
+  const extracted = await ex.extract('I like appels and oranges')
 
   console.log(extracted)
   if (extracted.length !== 1) {

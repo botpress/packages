@@ -1,0 +1,21 @@
+{
+  "name": "@bpinternal/entities-wasm",
+  "version": "0.0.1",
+  "description": "WASM binding for @bpinternal/entities",
+  "license": "MIT",
+  "scripts": {
+    "clean": "rm -rf ./dist",
+    "build": "wasm-pack build --target bundler --weak-refs --release --out-dir dist && rm -rf dist/.gitignore dist/README.md",
+    "postprocess": "ts-node -T ./scripts/postprocess.ts",
+    "test": "cargo test"
+  },
+  "devDependencies": {
+    "outdent": "^0.8.0",
+    "ts-morph": "^17.0.1",
+    "ts-node": "^10.9.1"
+  },
+  "publishConfig": {
+    "directory": "./dist",
+    "access": "public"
+  }
+}

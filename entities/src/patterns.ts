@@ -75,7 +75,7 @@ export type PatternEntity = {
 export class PatternEntityExtractor implements EntityExtractor {
   public constructor(private pattern_entities: any[]) {}
 
-  public extract(utterance: string): Entity[] {
+  public async extract(utterance: string): Promise<Entity[]> {
     const invalidPattern = this.pattern_entities.find((ent) => !isPatternValid(ent.pattern))
     if (invalidPattern) {
       throw new Error(`Invalid pattern: ${invalidPattern.pattern}`)

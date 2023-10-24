@@ -11,6 +11,6 @@
     "allowSyntheticDefaultImports": true,
     "resolveJsonModule": true
   },
-  "include": ["src/**/*", "e2e/**/*", "./build.ts", "./package.json"],
+  "include": ["src/**/*", "scripts/**/*.ts", "./package.json"],
   "exclude": ["node_modules", "dist"]
 }

@@ -14,6 +14,8 @@ export const prefixToObjectMap = {
   iak: 'integrationApiKey',
   int: 'integration',
   intver: 'integrationVersion',
+  iss: 'issue',
+  issevt: 'issueEvent',
   kb: 'knowledgeBase',
   limit: 'limit',
   media: 'media',
@@ -49,6 +51,8 @@ export const objectToPrefixMap: Reverser<typeof prefixToObjectMap> = {
   integration: 'int',
   integrationVersion: 'intver',
   integrationApiKey: 'iak',
+  issue: 'iss',
+  issueEvent: 'issevt',
   knowledgeBase: 'kb',
   limit: 'limit',
   media: 'media',
@@ -89,6 +93,8 @@ export type FileId = Ids['FileId']
 export type FlowId = Ids['FlowId']
 export type IntegrationId = Ids['IntegrationId']
 export type IntegrationApiKeyId = Ids['IntegrationApiKeyId']
+export type Issue = Ids['IssueId']
+export type IssueEvent = Ids['IssueEventId']
 export type KnowledgeBaseId = Ids['KnowledgeBaseId']
 export type LimitId = Ids['LimitId']
 export type MediaId = Ids['MediaId']

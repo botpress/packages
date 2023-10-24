@@ -18,6 +18,25 @@ const wasmPack = ({ outdir, target }: WasmPackProps) => {
   )
 }
 
+const getBinChunks = (wasmBinPath: string): string[] => {
+  const wasmBin: Buffer = fs.readFileSync(wasmBinPath)
+  const wasmB64 = wasmBin.toString('base64')
+  const wasmB64Chunked = _.chunk(wasmB64, 100).map((chunk) => chunk.join(''))
+  return wasmB64Chunked
+}
+
+const replaceInFile = (filePath: string, searchValue: string, replaceValue: string) => {
+  const fileContent = fs.readFileSync(filePath, 'utf-8')
+  if (!fileContent.includes(searchValue)) {
+    const maxLen = 10
+    const searchValueSummary = searchValue.length > maxLen ? `${searchValue.slice(0, maxLen)}...` : searchValue
+    throw new Error(`File ${filePath} does not contain the search value: "${searchValueSummary}"`)
+  }
+
+  const newFileContent = fileContent.replace(searchValue, replaceValue)
+  fs.writeFileSync(filePath, newFileContent)
+}
+
 const rootDir = __dirname
 
 const srcDir = pathlib.join(rootDir, 'src')
@@ -36,16 +55,31 @@ const distWebDir = pathlib.join(distDir, 'web')
 
 const buildNodeJs = async () => {
   wasmPack({ outdir: pkgNodeDir, target: 'nodejs' })
+  fs.mkdirSync(pkgNodeDir, { recursive: true })
+  fs.rmSync(pathlib.join(pkgNodeDir, gitIgnoreFileName), { force: true })
+
+  const wasmB64Chunked = getBinChunks(pathlib.join(pkgNodeDir, wasmFileName))
+
+  const currentCode = [
+    "const path = require('path').join(__dirname, 'entities_bg.wasm');",
+    "const bytes = require('fs').readFileSync(path);"
+  ].join('\n')
+
+  const newCode = [
+    'const bin = [',
+    ...wasmB64Chunked.map((chunk) => `  "${chunk}",`),
+    "].join('')",
+    '',
+    'const bytes = Buffer.from(bin, "base64")',
+    '',
+    'module.exports = require("./entities.js")'
+  ].join('\n')
+
+  replaceInFile(pathlib.join(pkgNodeDir, 'entities.js'), currentCode, newCode)
 
   const entryPointContent = "module.exports = require('./entities.js')"
 
-  fs.mkdirSync(pkgNodeDir, { recursive: true })
-  fs.rmSync(pathlib.join(pkgNodeDir, gitIgnoreFileName), { force: true })
   fs.writeFileSync(pathlib.join(pkgNodeDir, indexJsFileName), entryPointContent)
-
-  const from = pathlib.join(pkgNodeDir, wasmFileName)
-  const to = pathlib.join(distNodeDir, wasmFileName)
-  fs.cpSync(from, to) // this is a hack, but it works
 
   await esbuild.build({
     entryPoints: [srcEntryPoint],
@@ -60,14 +94,12 @@ const buildNodeJs = async () => {
 const buildWeb = async () => {
   wasmPack({ outdir: pkgWebDir, target: 'web' })
 
-  const wasmBin: Buffer = fs.readFileSync(pathlib.join(pkgWebDir, wasmFileName))
-  const wasmB64 = wasmBin.toString('base64')
-  const wasmB64Chunked = _.chunk(wasmB64, 100)
+  const wasmB64Chunked = getBinChunks(pathlib.join(pkgWebDir, wasmFileName))
   const entryPointContent = [
     "import { initSync } from './entities.js'",
     '',
     'const bin = [',
-    ...wasmB64Chunked.map((chunk) => `  "${chunk.join('')}",`),
+    ...wasmB64Chunked.map((chunk) => `  "${chunk}",`),
     "].join('')",
     '',
     'const wasmBin = Uint8Array.from(atob(bin), c => c.charCodeAt(0))',

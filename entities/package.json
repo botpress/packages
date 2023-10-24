@@ -1,6 +1,6 @@
 {
   "name": "@bpinternal/entities",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "Botpress Entities Extractor",
   "main": "./dist/node/index.js",
   "module": "./dist/web/index.js",

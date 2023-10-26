@@ -22,7 +22,7 @@ export type Quota = {
 }
 
 export type QuotaKind = 'workspace' | 'bot'
-export type QuotaCategory = 'ratelimit' | 'count' | 'calls' | 'timeout'
+export type QuotaCategory = 'ratelimit' | 'count' | 'calls' | 'timeout' | 'credit'
 export type QuotaType = (typeof quotaTypes)[number]
 
 export const quotaTypes = [
@@ -34,7 +34,9 @@ export const quotaTypes = [
   'bot_ratelimit',
   'table_row_count',
   'workspace_member_count',
-  'integrations_owned_count'
+  'integrations_owned_count',
+  'cognitive_calls',
+  'model_credit',
 ] as const satisfies Readonly<string[]>
 
 export const quotaConfigs = {
@@ -87,6 +89,13 @@ export const quotaConfigs = {
     kind: 'bot',
     category: 'calls'
   },
+  cognitive_calls: {
+    name: 'Cognitive Calls',
+    description: 'Maximum number of times a cognitive service can be called in a month.',
+    default: 4_000,
+    kind: 'bot',
+    category: 'calls'
+  },
   bot_ratelimit: {
     name: 'Bot Ratelimit',
     description: 'Maximum number of times a bot can be invoked in a minute.',
@@ -100,5 +109,12 @@ export const quotaConfigs = {
     default: 20,
     kind: 'workspace',
     category: 'count'
-  }
+  },
+  model_credit: {
+    name: 'Model Credit',
+    description: 'Maximum amount of ai model credit that can be used in a month.',
+    default: 5000,
+    kind: 'bot',
+    category: 'credit'
+  },
 } as const satisfies Record<QuotaType, Quota>

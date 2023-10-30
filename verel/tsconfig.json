@@ -21,12 +21,8 @@
     "noPropertyAccessFromIndexSignature": false,
     "noUnusedLocals": false,
     "noImplicitOverride": false,
-    "checkJs": false,
-
-    "baseUrl": ".",
-    "rootDir": "./src",
-    "outDir": "./dist"
+    "checkJs": false
   },
-  "include": ["src/**/*.ts"],
+  "include": ["src/**/*.ts", "e2e/**/*.ts"],
   "exclude": ["node_modules"]
 }

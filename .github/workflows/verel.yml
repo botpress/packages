@@ -1,16 +1,16 @@
-name: Const
+name: VeReL
 
 on:
   pull_request:
     paths:
-      - 'const/**'
+      - 'verel/**'
 
 defaults:
   run:
-    working-directory: ./const
+    working-directory: ./verel
 
 jobs:
-  const:
+  verel:
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:

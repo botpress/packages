@@ -26,6 +26,7 @@ export const prefixToObjectMap = {
   recevt: 'recurringEvent',
   sandbox: 'sandbox',
   schema: 'schema',
+  script: 'script',
   state: 'state',
   table: 'table',
   tag: 'tag',
@@ -49,8 +50,8 @@ export const objectToPrefixMap: Reverser<typeof prefixToObjectMap> = {
   file: 'file',
   flow: 'flow',
   integration: 'int',
-  integrationVersion: 'intver',
   integrationApiKey: 'iak',
+  integrationVersion: 'intver',
   issue: 'iss',
   issueEvent: 'issevt',
   knowledgeBase: 'kb',
@@ -63,6 +64,7 @@ export const objectToPrefixMap: Reverser<typeof prefixToObjectMap> = {
   recurringEvent: 'recevt',
   sandbox: 'sandbox',
   schema: 'schema',
+  script: 'script',
   state: 'state',
   table: 'table',
   tag: 'tag',
@@ -82,8 +84,8 @@ type Ids = {
 export type ActionId = Ids['ActionId']
 export type AnalyticsId = Ids['AnalyticsId']
 export type AuditId = Ids['AuditId']
-export type BotId = Ids['BotId']
 export type BotApiKeyId = Ids['BotApiKeyId']
+export type BotId = Ids['BotId']
 export type CardId = Ids['CardId']
 export type ChannelId = Ids['ChannelId']
 export type ConfigurationId = Ids['ConfigurationId']
@@ -91,8 +93,8 @@ export type ConversationId = Ids['ConversationId']
 export type EventId = Ids['EventId']
 export type FileId = Ids['FileId']
 export type FlowId = Ids['FlowId']
-export type IntegrationId = Ids['IntegrationId']
 export type IntegrationApiKeyId = Ids['IntegrationApiKeyId']
+export type IntegrationId = Ids['IntegrationId']
 export type Issue = Ids['IssueId']
 export type IssueEvent = Ids['IssueEventId']
 export type KnowledgeBaseId = Ids['KnowledgeBaseId']

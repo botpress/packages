@@ -43,7 +43,7 @@ function extractPattern(
   return extractPattern(nextCandidate, pattern, extracted, nextPadding)
 }
 
-const extractPatternEntities = (utterance: string, pattern_entities: any[]): Entity[] => {
+const extractPatternEntities = (utterance: string, pattern_entities: PatternEntityDef[]): Entity[] => {
   const input = utterance.toString()
 
   return _.flatMap(pattern_entities, (ent) => {
@@ -64,6 +64,12 @@ const extractPatternEntities = (utterance: string, pattern_entities: any[]): Ent
   })
 }
 
+export type PatternEntityDef = {
+  name: string
+  pattern: string
+  matchCase?: boolean
+}
+
 export type PatternEntity = {
   name: string
   pattern: string
@@ -73,13 +79,13 @@ export type PatternEntity = {
 }
 
 export class PatternEntityExtractor implements EntityExtractor {
-  public constructor(private pattern_entities: any[]) {}
+  public constructor(private entities: PatternEntityDef[]) {}
 
   public extract(utterance: string): Entity[] {
-    const invalidPattern = this.pattern_entities.find((ent) => !isPatternValid(ent.pattern))
+    const invalidPattern = this.entities.find((ent) => !isPatternValid(ent.pattern))
     if (invalidPattern) {
       throw new Error(`Invalid pattern: ${invalidPattern.pattern}`)
     }
-    return extractPatternEntities(utterance, this.pattern_entities)
+    return extractPatternEntities(utterance, this.entities)
   }
 }

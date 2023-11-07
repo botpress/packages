@@ -17,6 +17,9 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
+  "dependencies": {
+    "browser-or-node": "^2.1.1"
+  },
   "devDependencies": {
     "@types/lodash": "^4.14.200",
     "@types/node": "^20.8.9",

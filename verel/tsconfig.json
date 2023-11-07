@@ -23,6 +23,6 @@
     "noImplicitOverride": false,
     "checkJs": false
   },
-  "include": ["src/**/*.ts", "e2e/**/*.ts"],
+  "include": ["src/**/*.ts", "e2e/**/*.ts", "build.ts"],
   "exclude": ["node_modules"]
 }

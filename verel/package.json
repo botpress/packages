@@ -1,6 +1,6 @@
 {
   "name": "@bpinternal/verel",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Vector Remap Language for JavaScript",
   "main": "./dist/node/index.js",
   "module": "./dist/web/index.js",
@@ -17,6 +17,9 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
+  "dependencies": {
+    "browser-or-node": "^2.1.1"
+  },
   "devDependencies": {
     "@types/lodash": "^4.14.200",
     "@types/node": "^20.8.9",

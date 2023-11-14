@@ -1,6 +1,6 @@
 {
   "name": "@bpinternal/entities",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "description": "Botpress Entities Extractor",
   "main": "./dist/node/index.js",
   "module": "./dist/web/index.js",
@@ -17,6 +17,7 @@
     "rust:test": "cargo test"
   },
   "dependencies": {
+    "browser-or-node": "^2.1.1",
     "lodash": "^4.17.19"
   },
   "devDependencies": {

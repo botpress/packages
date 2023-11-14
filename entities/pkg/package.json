@@ -2,6 +2,6 @@
   "name": "pkg",
   "main": "./node/index.js",
   "module": "./web/index.js",
-  "types": "./node/entities.d.ts",
+  "types": "./web/entities.d.ts",
   "private": true
 }

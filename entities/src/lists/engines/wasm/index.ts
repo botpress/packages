@@ -1,6 +1,18 @@
 import * as pkg from '../../../../pkg'
 import { ListEntityExtraction, ListEntityModel } from '../typings'
 import { WasmVec } from './wasm-vec'
+import { isBrowser } from 'browser-or-node'
+
+let initialized = false
+const maybeInitialize = () => {
+  if (initialized) {
+    return
+  }
+  if (isBrowser) {
+    pkg.init() // this might break on some browsers
+  }
+  initialized = true
+}
 
 /**
  * IMPORTANT:
@@ -66,6 +78,7 @@ export const extractForListModels = (
   strTokens: string[],
   listDefinitions: ListEntityModel[]
 ): ListEntityExtraction[] => {
+  maybeInitialize()
   const wasmStrTokens = new WasmVec(pkg.StringArray).fill(strTokens)
   const wasmListDefinitions = new WasmVec(pkg.EntityArray).fill(listDefinitions.map(fromJs.mapEntityModel))
   const wasmListExtractions = pkg.extract_multiple(wasmStrTokens.x, wasmListDefinitions.x)

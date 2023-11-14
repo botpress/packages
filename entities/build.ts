@@ -48,6 +48,7 @@ const pkgWebDir = pathlib.join(pkgDir, 'web')
 const wasmFileName = 'entities_bg.wasm'
 const gitIgnoreFileName = '.gitignore'
 const indexJsFileName = 'index.js'
+const typeDeclarationFileName = 'entities.d.ts'
 
 const distDir = pathlib.join(rootDir, 'dist')
 const distNodeDir = pathlib.join(distDir, 'node')
@@ -104,7 +105,11 @@ const buildWeb = async () => {
     '',
     'const wasmBin = Uint8Array.from(atob(bin), c => c.charCodeAt(0))',
     '',
-    'initSync(wasmBin)',
+    'export const init = () => {',
+    '  console.log("[START] init wasm")', // TODO: delete this in a few months when we get confident that everything works
+    '  initSync(wasmBin)',
+    '  console.log("[END] init wasm")',
+    '}',
     '',
     "export * from './entities.js'"
   ].join('\n')
@@ -112,6 +117,8 @@ const buildWeb = async () => {
   fs.mkdirSync(pkgWebDir, { recursive: true })
   fs.rmSync(pathlib.join(pkgWebDir, gitIgnoreFileName), { force: true })
   fs.writeFileSync(pathlib.join(pkgWebDir, indexJsFileName), entryPointContent)
+
+  fs.appendFileSync(pathlib.join(pkgWebDir, typeDeclarationFileName), ['', 'export function init(): void;'].join('\n'))
 
   await esbuild.build({
     entryPoints: [srcEntryPoint],

@@ -37,6 +37,7 @@ export const quotaTypes = [
   'integrations_owned_count',
   'cognitive_calls',
   'model_credit',
+  'token_spend'
 ] as const satisfies Readonly<string[]>
 
 export const quotaConfigs = {
@@ -117,4 +118,12 @@ export const quotaConfigs = {
     kind: 'bot',
     category: 'credit'
   },
+  token_spend: {
+    name: 'Token Spend',
+    description:
+      'Maximum amount of token spend, expressed in nano-dollars (1 nano-dollar = $0.000000001) that can be used in a month.',
+    default: 5_000_000_000,
+    kind: 'workspace',
+    category: 'credit'
+  }
 } as const satisfies Record<QuotaType, Quota>

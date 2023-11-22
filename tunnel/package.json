@@ -1,6 +1,6 @@
 {
   "name": "@bpinternal/tunnel",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Tunneling logic for client and server",
   "main": "./dist/index.cjs",
   "browser": "./dist/index.mjs",

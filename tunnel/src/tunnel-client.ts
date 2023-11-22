@@ -21,6 +21,10 @@ export abstract class TunnelClient {
     hello: {}
   }>()
 
+  public get closed() {
+    return this._closed
+  }
+
   public constructor(protected _ws: WebSocket) {
     _ws.addEventListener('close', this._wsClose)
     _ws.addEventListener('error', this._wsError)

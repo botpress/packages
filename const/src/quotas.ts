@@ -37,7 +37,8 @@ export const quotaTypes = [
   'integrations_owned_count',
   'cognitive_calls',
   'model_credit',
-  'token_spend'
+  'token_spend',
+  'document_count',
 ] as const satisfies Readonly<string[]>
 
 export const quotaConfigs = {
@@ -67,6 +68,13 @@ export const quotaConfigs = {
     description: 'Maximum number of members that can be added to a workspace.',
     default: 3,
     kind: 'workspace',
+    category: 'count'
+  },
+  document_count: {
+    name: 'Document Count',
+    description: 'Maximum number of documents in bytes that can be stored.',
+    default: 104_857_600, // 100 MB
+    kind: 'bot',
     category: 'count'
   },
   knowledgebase_vector_count: {

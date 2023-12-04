@@ -83,12 +83,24 @@ abstract class BaseApiError<Code extends ErrorCode, Type extends string, Descrip
   }
 
   static generateId() {
+    const prefix = this.getPrefix();
+    const timestamp = new Date().toISOString().replace(/[\:\-TZ]/g, "").split(".")[0] // UTC time in YYMMDDHHMMSS format
+
     const randomSuffixByteLength = 4
     const randomHexSuffix = Array.from(cryptoLib.getRandomValues(new Uint8Array(randomSuffixByteLength)))
       .map(x => x.toString(16).padStart(2, '0'))
       .join('')
       .toUpperCase()
-    return \`err_\${Date.now()}x\${randomHexSuffix}\`
+    
+    return \`\${prefix}_\${timestamp}x\${randomHexSuffix}\`
+  }
+
+  private static getPrefix() {
+    if (typeof window !== 'undefined' && typeof window.document !== 'undefined') {
+      // Browser environment
+      return 'err_bwsr'
+    }
+    return 'err'
   }
 }
 

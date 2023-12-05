@@ -30,13 +30,11 @@ export const quotaTypes = [
   'invocation_calls',
   'storage_count',
   'bot_count',
-  'knowledgebase_vector_count',
-  'bot_ratelimit',
+  'knowledgebase_vector_storage',
+  'workspace_ratelimit',
   'table_row_count',
   'workspace_member_count',
   'integrations_owned_count',
-  'cognitive_calls',
-  'model_credit',
   'token_spend'
 ] as const satisfies Readonly<string[]>
 
@@ -51,8 +49,8 @@ export const quotaConfigs = {
   storage_count: {
     name: 'Storage Count',
     description: 'Maximum number of storage bytes that can be stored.',
-    default: 104_857_600, // 100 MB
-    kind: 'bot',
+    default: 524_288_000, // 500 MB
+    kind: 'workspace',
     category: 'count'
   },
   bot_count: {
@@ -69,39 +67,32 @@ export const quotaConfigs = {
     kind: 'workspace',
     category: 'count'
   },
-  knowledgebase_vector_count: {
-    name: 'Knowledgebase Vector Count',
-    description: 'Maximum number of knowledgebase vectors that can be created.',
-    default: 5_000,
-    kind: 'bot',
+  knowledgebase_vector_storage: {
+    name: 'Knowledgebase Vector Storage',
+    description: 'Maximum size knowledge base documents',
+    default: 104_857_600, // 100 MB
+    kind: 'workspace',
     category: 'count'
   },
   table_row_count: {
     name: 'Table Row Count',
     description: 'Maximum number of rows that can be stored in a table.',
     default: 5_000,
-    kind: 'bot',
+    kind: 'workspace',
     category: 'count'
   },
   invocation_calls: {
     name: 'Invocation Calls',
     description: 'Maximum number of times a bot can be invoked in a month.',
-    default: 25_000,
-    kind: 'bot',
+    default: 2_000,
+    kind: 'workspace',
     category: 'calls'
   },
-  cognitive_calls: {
-    name: 'Cognitive Calls',
-    description: 'Maximum number of times a cognitive service can be called in a month.',
-    default: 4_000,
-    kind: 'bot',
-    category: 'calls'
-  },
-  bot_ratelimit: {
-    name: 'Bot Ratelimit',
-    description: 'Maximum number of times a bot can be invoked in a minute.',
+  workspace_ratelimit: {
+    name: 'Workspace Ratelimit',
+    description: 'Maximum number of API calls per second for a workspace.',
     default: 100,
-    kind: 'bot',
+    kind: 'workspace',
     category: 'ratelimit'
   },
   integrations_owned_count: {
@@ -110,13 +101,6 @@ export const quotaConfigs = {
     default: 20,
     kind: 'workspace',
     category: 'count'
-  },
-  model_credit: {
-    name: 'Model Credit',
-    description: 'Maximum amount of ai model credit that can be used in a month.',
-    default: 5000,
-    kind: 'bot',
-    category: 'credit'
   },
   token_spend: {
     name: 'Token Spend',

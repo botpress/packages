@@ -22,7 +22,7 @@ export type Quota = {
   /**
    * If true, the usage is tracked per bot. This is only applicable if the kind is workspace.
    */
-  trackUsagePerBot?: boolean
+  trackUsagePerBot: boolean
 }
 
 export type QuotaKind = 'workspace' | 'bot'
@@ -48,7 +48,8 @@ export const quotaConfigs = {
     description: 'Maximum time in milliseconds a bot can run before timing out.',
     default: 60_000,
     kind: 'bot',
-    category: 'timeout'
+    category: 'timeout',
+    trackUsagePerBot: false
   },
   storage_count: {
     name: 'Storage Count',
@@ -63,14 +64,16 @@ export const quotaConfigs = {
     description: 'Maximum number of bots that can be created.',
     default: 5,
     kind: 'workspace',
-    category: 'count'
+    category: 'count',
+    trackUsagePerBot: false
   },
   workspace_member_count: {
     name: 'Workspace Member Count',
     description: 'Maximum number of members that can be added to a workspace.',
     default: 3,
     kind: 'workspace',
-    category: 'count'
+    category: 'count',
+    trackUsagePerBot: false
   },
   knowledgebase_vector_storage: {
     name: 'Knowledgebase Vector Storage',
@@ -101,14 +104,16 @@ export const quotaConfigs = {
     description: 'Maximum number of API calls per second for a workspace.',
     default: 100,
     kind: 'workspace',
-    category: 'ratelimit'
+    category: 'ratelimit',
+    trackUsagePerBot: false
   },
   integrations_owned_count: {
     name: 'Owned Integrations Count',
     description: 'Maximum number of integrations that can be created.',
     default: 20,
     kind: 'workspace',
-    category: 'count'
+    category: 'count',
+    trackUsagePerBot: false
   },
   token_spend: {
     name: 'Token Spend',

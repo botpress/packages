@@ -19,6 +19,10 @@ export type Quota = {
    * The usage category determine how the usage is calculated.
    */
   category: QuotaCategory
+  /**
+   * If true, the usage is tracked per bot. This is only applicable if the kind is workspace.
+   */
+  trackUsagePerBot?: boolean
 }
 
 export type QuotaKind = 'workspace' | 'bot'
@@ -51,7 +55,8 @@ export const quotaConfigs = {
     description: 'Maximum number of storage bytes that can be stored.',
     default: 524_288_000, // 500 MB
     kind: 'workspace',
-    category: 'count'
+    category: 'count',
+    trackUsagePerBot: true
   },
   bot_count: {
     name: 'Bot Count',
@@ -72,21 +77,24 @@ export const quotaConfigs = {
     description: 'Maximum size knowledge base documents',
     default: 104_857_600, // 100 MB
     kind: 'workspace',
-    category: 'count'
+    category: 'count',
+    trackUsagePerBot: true
   },
   table_row_count: {
     name: 'Table Row Count',
     description: 'Maximum number of rows that can be stored in a table.',
     default: 5_000,
     kind: 'workspace',
-    category: 'count'
+    category: 'count',
+    trackUsagePerBot: true
   },
   invocation_calls: {
     name: 'Invocation Calls',
     description: 'Maximum number of times a bot can be invoked in a month.',
     default: 2_000,
     kind: 'workspace',
-    category: 'calls'
+    category: 'calls',
+    trackUsagePerBot: true
   },
   workspace_ratelimit: {
     name: 'Workspace Ratelimit',
@@ -108,6 +116,7 @@ export const quotaConfigs = {
       'Maximum amount of token spend, expressed in nano-dollars (1 nano-dollar = $0.000000001) that can be used in a month.',
     default: 5_000_000_000,
     kind: 'workspace',
-    category: 'credit'
+    category: 'credit',
+    trackUsagePerBot: true
   }
 } as const satisfies Record<QuotaType, Quota>

@@ -1,10 +1,11 @@
-import type {
-  Parameter as OpenApiParameter,
-  StandardParameter,
-  QueryParameterStringArray,
-  QueryParameterObject,
-  PathParameter,
-  Operation,
+import {
+  type Parameter as OpenApiParameter,
+  type StandardParameter,
+  type QueryParameterStringArray,
+  type QueryParameterObject,
+  type PathParameter,
+  type Operation,
+  type BooleanParameter,
 } from '../state'
 
 export type GenerateHandlersProps = {
@@ -30,10 +31,12 @@ type Parameter<P> = {
 export type GenerateHandlerProps = {
   operationName: string
   operation: Operation<string, string, string, 'json-schema'>
-  headers: Parameter<StandardParameter>[]
-  cookies: Parameter<StandardParameter>[]
+  headers: Parameter<StandardParameter | BooleanParameter>[]
+  cookies: Parameter<StandardParameter | BooleanParameter>[]
   params: Parameter<PathParameter>[]
-  queries: Parameter<StandardParameter | QueryParameterStringArray | QueryParameterObject<'json-schema'>>[]
+  queries: Parameter<
+    StandardParameter | BooleanParameter | QueryParameterStringArray | QueryParameterObject<'json-schema'>
+  >[]
   status: number
   body: boolean
   isEmptyBody: boolean

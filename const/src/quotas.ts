@@ -39,7 +39,7 @@ export const quotaTypes = [
   'table_row_count',
   'workspace_member_count',
   'integrations_owned_count',
-  'token_spend'
+  'ai_spend'
 ] as const satisfies Readonly<string[]>
 
 export const quotaConfigs = {
@@ -115,10 +115,10 @@ export const quotaConfigs = {
     category: 'count',
     trackUsagePerBot: false
   },
-  token_spend: {
-    name: 'Token Spend',
+  ai_spend: {
+    name: 'AI Spend',
     description:
-      'Maximum amount of token spend, expressed in nano-dollars (1 nano-dollar = $0.000000001) that can be used in a month.',
+      'Maximum amount of AI spend, expressed in nano-dollars (1 nano-dollar = $0.000000001) that can be used in a month.',
     default: 5_000_000_000,
     kind: 'workspace',
     category: 'credit',

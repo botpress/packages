@@ -113,6 +113,9 @@ const generateTypeAnnotation = (parameter: OpenApiParameter<'json-schema'>, requ
     case 'object':
       typeAnnotation += ' any'
       break
+    case 'boolean':
+      typeAnnotation += ' boolean'
+      break
     default:
       throw new Error(`Unsupported parameter type: ${parameterType}`)
   }

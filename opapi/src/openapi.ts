@@ -124,6 +124,17 @@ export const createOpenapi = <
               schema: parameter.schema,
             })
             break
+          case 'boolean':
+            operation.parameters?.push({
+              name: parameterName,
+              in: parameter.in,
+              description: parameter.description,
+              required: parameter.required,
+              schema: {
+                type: 'boolean',
+              },
+            })
+            break
           default:
             throw new VError(`Parameter type ${parameterType} is not supported`)
         }

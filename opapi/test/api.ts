@@ -172,5 +172,26 @@ export const getMockApi = () => {
     },
   })
 
+  api.addOperation({
+    name: 'listBars',
+    description: 'list bars',
+    method: 'get',
+    path: '/bars',
+    parameters: {
+      enabled: {
+        type: 'boolean',
+        in: 'query',
+        description: 'Bar id',
+      },
+    },
+    section: 'bar',
+    response: {
+      description: 'Bar information',
+      schema: z.object({
+        bar: api.getModelRef('Bar'),
+      }),
+    },
+  })
+
   return api
 }

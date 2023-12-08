@@ -23,6 +23,10 @@ export type Quota = {
    * If true, the usage is tracked per bot. This is only applicable if the kind is workspace.
    */
   trackUsagePerBot: boolean
+  /**
+   * Parent quota type. This is used to determine the object linked to the usage type.
+   */
+  parent?: QuotaType
 }
 
 export type QuotaKind = 'workspace' | 'bot'
@@ -133,7 +137,8 @@ export const quotaConfigs = {
     default: 5_000_000_000,
     kind: 'workspace',
     category: 'credit',
-    trackUsagePerBot: true
+    trackUsagePerBot: true,
+    parent: 'ai_spend'
   },
   bing_search_spend: {
     name: 'Bing Search Spend',
@@ -142,6 +147,7 @@ export const quotaConfigs = {
     default: 5_000_000_000,
     kind: 'workspace',
     category: 'credit',
-    trackUsagePerBot: true
+    trackUsagePerBot: true,
+    parent: 'ai_spend'
   },
 } as const satisfies Record<QuotaType, Quota>

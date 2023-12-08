@@ -39,7 +39,9 @@ export const quotaTypes = [
   'table_row_count',
   'workspace_member_count',
   'integrations_owned_count',
-  'ai_spend'
+  'ai_spend',
+  'openai_spend',
+  'bing_search_spend',
 ] as const satisfies Readonly<string[]>
 
 export const quotaConfigs = {
@@ -123,5 +125,23 @@ export const quotaConfigs = {
     kind: 'workspace',
     category: 'credit',
     trackUsagePerBot: true
-  }
+  },
+  openai_spend: {
+    name: 'OpenAI Spend',
+    description:
+      'Maximum amount of OpenAI spend, expressed in nano-dollars (1 nano-dollar = $0.000000001) that can be used in a month.',
+    default: 5_000_000_000,
+    kind: 'workspace',
+    category: 'credit',
+    trackUsagePerBot: true
+  },
+  bing_search_spend: {
+    name: 'Bing Search Spend',
+    description:
+      'Maximum amount of Bing Search spend, expressed in nano-dollars (1 nano-dollar = $0.000000001) that can be used in a month.',
+    default: 5_000_000_000,
+    kind: 'workspace',
+    category: 'credit',
+    trackUsagePerBot: true
+  },
 } as const satisfies Record<QuotaType, Quota>

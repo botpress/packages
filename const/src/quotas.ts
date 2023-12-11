@@ -60,7 +60,7 @@ export const quotaConfigs = {
   storage_count: {
     name: 'Storage Count',
     description: 'Maximum number of storage bytes that can be stored.',
-    default: 524_288_000, // 500 MB
+    default: 500_000_000, // 500 MB
     kind: 'workspace',
     category: 'count',
     trackUsagePerBot: true
@@ -84,7 +84,7 @@ export const quotaConfigs = {
   knowledgebase_vector_storage: {
     name: 'Knowledgebase Vector Storage',
     description: 'Maximum size of knowledge base documents',
-    default: 104_857_600, // 100 MB
+    default: 100_000_000, // 100 MB
     kind: 'workspace',
     category: 'count',
     trackUsagePerBot: true

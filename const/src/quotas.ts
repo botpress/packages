@@ -83,7 +83,7 @@ export const quotaConfigs = {
   },
   knowledgebase_vector_storage: {
     name: 'Knowledgebase Vector Storage',
-    description: 'Maximum size knowledge base documents',
+    description: 'Maximum size of knowledge base documents',
     default: 104_857_600, // 100 MB
     kind: 'workspace',
     category: 'count',

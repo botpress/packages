@@ -157,6 +157,6 @@ export const quotaConfigs = {
     default: 0,
     kind: 'workspace',
     category: 'count',
-    trackUsagePerBot: true
+    trackUsagePerBot: false,
   },
 } as const satisfies Record<QuotaType, Quota>

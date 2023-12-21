@@ -46,6 +46,7 @@ export const quotaTypes = [
   'ai_spend',
   'openai_spend',
   'bing_search_spend',
+  'always_alive',
 ] as const satisfies Readonly<string[]>
 
 export const quotaConfigs = {
@@ -149,5 +150,13 @@ export const quotaConfigs = {
     category: 'credit',
     trackUsagePerBot: true,
     parent: 'ai_spend'
+  },
+  always_alive: {
+    name: 'Always Alive',
+    description: 'Maximum number of bots that can be in always alive mode.',
+    default: 0,
+    kind: 'workspace',
+    category: 'count',
+    trackUsagePerBot: false,
   },
 } as const satisfies Record<QuotaType, Quota>

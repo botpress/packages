@@ -8,7 +8,7 @@ import {
 } from './generator'
 import { addOperation } from './operation'
 import { ApiError, ComponentType, createState, getRef, Metadata, Operation, Options, Parameter, State } from './state'
-import { exportStateAsTypescript } from './generators/ts-state'
+import { exportStateAsTypescript, ExportStateAsTypescriptOptions } from './generators/ts-state'
 export { Operation, Parameter } from './state'
 
 export const schema = extendApi
@@ -45,7 +45,6 @@ const createOpapiFromState = <
   state: State<SchemaName, DefaultParameterName, SectionName>,
 ) => {
   return {
-    getState: (): State<SchemaName, DefaultParameterName, SectionName> => state,
     getModelRef: (name: SchemaName): OpenApiZodAny => getRef(state, ComponentType.SCHEMAS, name),
     addOperation: <Path extends string>(
       operationProps: Operation<DefaultParameterName, SectionName, Path, 'zod-schema'>,
@@ -55,7 +54,7 @@ const createOpapiFromState = <
     exportTypesBySection: (dir = '.') => generateTypesBySection(state, dir),
     exportServer: (dir = '.', useExpressTypes: boolean) => generateServer(state, dir, useExpressTypes),
     exportOpenapi: (dir = '.') => generateOpenapi(state, dir),
-    exportState: (dir = '.') => exportStateAsTypescript(state, dir),
+    exportState: (dir = '.', opts?: ExportStateAsTypescriptOptions) => exportStateAsTypescript(state, dir, opts),
     exportErrors: (dir = '.') => generateErrorsFile(state.errors ?? [], dir),
   }
 }

@@ -1,6 +1,9 @@
 import { describe, expect, it } from 'vitest'
 import z from 'zod'
 import { OpenApi, OpenApiProps } from '../src'
+import { join } from 'path'
+import { getFiles } from '../src/file'
+import { validateTypescriptFile } from './util'
 
 type AnyProps = OpenApiProps<string, string, string>
 
@@ -148,6 +151,35 @@ describe('openapi generator with unions allowed', () => {
         description: 'Tree information',
         schema: z.object({}),
       },
+    })
+  })
+})
+
+describe('openapi state generator', () => {
+  it('should export state', async () => {
+    const api = OpenApi(
+      {
+        metadata,
+        sections,
+        schemas: {
+          Tree: {
+            section: 'trees',
+            schema: tree,
+          },
+        },
+      },
+      { allowUnions: true },
+    )
+
+    const genStateFolder = join(__dirname, 'gen/state')
+    api.exportState(genStateFolder, { importPath: '../../../src' })
+
+    const files = getFiles(genStateFolder)
+
+    files.forEach((file) => {
+      if (file.endsWith('.ts')) {
+        validateTypescriptFile(file)
+      }
     })
   })
 })

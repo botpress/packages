@@ -211,6 +211,46 @@ describe('zuiToJsonSchema', () => {
     `)
   })
 
+  test('validate array of objects', async () => {
+    const arrayWithObjects = zui
+      .array(
+        zui.object({
+          id: zui.number(),
+          title: zui.string().min(5)
+        })
+      )
+      .min(1)
+      .describe('Array of objects with validation')
+
+    const jsonSchema = getZuiSchemas(arrayWithObjects)
+    expect(jsonSchema.schema).toMatchInlineSnapshot(`
+      {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "description": "Array of objects with validation",
+        "items": {
+          "additionalProperties": false,
+          "properties": {
+            "id": {
+              "type": "number",
+            },
+            "title": {
+              "minLength": 5,
+              "type": "string",
+            },
+          },
+          "required": [
+            "id",
+            "title",
+          ],
+          "type": "object",
+        },
+        "minItems": 1,
+        "type": "array",
+        "x-zui": {},
+      }
+    `)
+  })
+
   test('oneOf', () => {
     const schema = zui.discriminatedUnion('kek', [
       zui.object({ kek: zui.literal('A'), lel: zui.boolean() }),

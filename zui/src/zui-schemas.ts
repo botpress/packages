@@ -17,7 +17,8 @@ export type ZuiSchemaOptions = {
    * Removes the $schema property
    */
   stripSchemaProps?: boolean
-} & Partial<Pick<Options, 'target' | 'unionStrategy'>>
+  target?: 'jsonSchema7' | 'openApi3'
+} & Partial<Pick<Options, 'unionStrategy' | 'discriminator'>>
 
 /**
  * This is a recursive schema that describes the UI of a Zod schema.

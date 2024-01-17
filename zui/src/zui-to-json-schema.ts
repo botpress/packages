@@ -44,7 +44,7 @@ const mergeZuiIntoJsonSchema = (
 
   if (isObject(jsonSchema)) {
     for (const [key, value] of Object.entries(jsonSchema.properties)) {
-      const shape = zuiSchema._def.shape?.()
+      const shape = zuiSchema?._def.shape?.()
 
       if (shape?.[key]) {
         const innerZui = shape[key].ui as ZuiExtension<ToZodType<ZuiTypeAny>>['ui']

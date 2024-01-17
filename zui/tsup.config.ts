@@ -6,7 +6,7 @@ export default defineConfig({
   format: ['esm', 'cjs'],
   sourcemap: true,
   keepNames: true,
-  experimentalDts: true,
+  dts: true,
   platform: 'browser',
   clean: true,
   shims: true,

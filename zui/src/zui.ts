@@ -210,6 +210,20 @@ type RecordArgs = Parameters<typeof z.record>
 type OptionalArgs = Parameters<typeof z.optional>
 type EnumArgs = Parameters<typeof z.enum>
 
+function record<Keys extends ZodTypeAny, Value extends ZodTypeAny>(
+  keySchema: Keys,
+  valueSchema: Value,
+  params?: RecordArgs[2]
+)
+function record<Value extends ZodTypeAny>(valueSchema: Value, params?: RecordArgs[2])
+function record(arg1: any, arg2?: any, arg3?: any) {
+  if (arg1 && arg2?._def) {
+    return z.record(arg1, arg2, arg3) as unknown as ZuiType<ZodRecord<typeof arg1, typeof arg2>>
+  } else {
+    return z.record(arg1, arg3) as unknown as ZuiType<ZodRecord<typeof arg1>>
+  }
+}
+
 const zui = {
   string: (params?: StringArgs[0]) => z.string(params) as unknown as ZuiType<ZodString>,
   number: (params?: NumberArgs[0]) => z.number(params) as unknown as ZuiType<ZodNumber>,
@@ -239,11 +253,7 @@ const zui = {
       ZodDiscriminatedUnion<Discriminator, Types>
     >,
 
-  record: <Keys extends ZodTypeAny, Value extends ZodTypeAny>(
-    keySchema: Keys,
-    valueSchema: Value,
-    params?: RecordArgs[2]
-  ) => z.record(keySchema, valueSchema, params) as unknown as ZuiType<ZodRecord<Keys, Value>>,
+  record,
 
   optional: (type: OptionalArgs[0], params?: OptionalArgs[1]) =>
     z.optional(type, params) as unknown as ZuiType<ZodOptional<any>>,

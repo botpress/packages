@@ -2,6 +2,7 @@ import { describe, test, expect } from 'vitest'
 import { zui } from '.'
 import { getZuiSchemas } from '.'
 import { zuiKey } from './zui'
+import { z } from 'zod'
 
 describe('zuiToJsonSchema', () => {
   test('should work', () => {
@@ -137,6 +138,52 @@ describe('zuiToJsonSchema', () => {
         ],
         "type": "object",
         "x-zui": {},
+      }
+    `)
+  })
+
+  test('examples are available on json schema', () => {
+    const schema = zui.string().examples(['Example 1'])
+
+    const jsonSchema = getZuiSchemas(schema, { stripZuiProps: true, stripSchemaProps: true })
+    expect(jsonSchema.schema).toMatchInlineSnapshot(`
+      {
+        "examples": [
+          "Example 1",
+        ],
+        "type": "string",
+      }
+    `)
+  })
+
+  test('record with a value works', () => {
+    const schema = zui.record(z.string().max(30)).describe('hello')
+
+    const jsonSchema = getZuiSchemas(schema, { stripZuiProps: true, stripSchemaProps: true })
+    expect(jsonSchema.schema).toMatchInlineSnapshot(`
+      {
+        "additionalProperties": {
+          "maxLength": 30,
+          "type": "string",
+        },
+        "description": "hello",
+        "type": "object",
+      }
+    `)
+  })
+
+  test('record with second parameter', () => {
+    const schema = zui.record(z.string(), z.number().max(30), {}).describe('hello')
+
+    const jsonSchema = getZuiSchemas(schema, { stripZuiProps: true, stripSchemaProps: true })
+    expect(jsonSchema.schema).toMatchInlineSnapshot(`
+      {
+        "additionalProperties": {
+          "maximum": 30,
+          "type": "number",
+        },
+        "description": "hello",
+        "type": "object",
       }
     `)
   })

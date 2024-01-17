@@ -1,6 +1,23 @@
 import { ZuiTypeAny } from './zui'
 import { zuiToJsonSchema } from './zui-to-json-schema'
 
+export type ZuiSchemaOptions = {
+  /**
+   * The scope is the full path to the property defined in the JSON schema, the root node being represented by #
+   * Objects doesn't have any scope, only  its child does
+   * @default "#/properties/"
+   * */
+  rootScope?: string
+  /**
+   * Removes the "x-zui" property from the generated schema
+   */
+  stripZuiProps?: boolean
+  /**
+   * Removes the $schema property
+   */
+  stripSchemaProps?: boolean
+}
+
 /**
  * This is a recursive schema that describes the UI of a Zod schema.
  */
@@ -45,8 +62,8 @@ const processConfiguration = (config: Record<string, ZuiTypeAny>, currentRoot: s
   })
 }
 
-export const getZuiSchemas = (input: ZuiTypeAny, rootScope = BASE_SCOPE) => {
-  const schema = zuiToJsonSchema(input)
+export const getZuiSchemas = (input: ZuiTypeAny, opts: ZuiSchemaOptions = { rootScope: BASE_SCOPE }) => {
+  const schema = zuiToJsonSchema(input, opts)
 
   let uischema: UISchema = {}
 
@@ -56,7 +73,7 @@ export const getZuiSchemas = (input: ZuiTypeAny, rootScope = BASE_SCOPE) => {
       elements: []
     }
 
-    processConfiguration(input._def.shape(), rootScope, uischema)
+    processConfiguration(input._def.shape(), opts.rootScope || BASE_SCOPE, uischema)
   }
 
   return { schema, uischema }

@@ -10,7 +10,7 @@ type JsonSchemaWithZui = JsonSchema7 & {
 }
 
 export const zuiToJsonSchema = (zuiType: ZuiTypeAny, opts: ZuiSchemaOptions): JsonSchemaWithZui => {
-  const jsonSchema = zodToJsonSchema(zuiType as ToZodType<ZuiTypeAny>, {})
+  const jsonSchema = zodToJsonSchema(zuiType as ToZodType<ZuiTypeAny>, opts)
 
   if (opts.stripSchemaProps) {
     delete jsonSchema.$schema

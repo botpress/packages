@@ -1,4 +1,5 @@
-import { ZuiTypeAny } from './zui'
+import type { ZuiTypeAny } from './zui'
+import type { Options } from '@bpinternal/zod-to-json-schema'
 import { zuiToJsonSchema } from './zui-to-json-schema'
 
 export type ZuiSchemaOptions = {
@@ -16,7 +17,7 @@ export type ZuiSchemaOptions = {
    * Removes the $schema property
    */
   stripSchemaProps?: boolean
-}
+} & Partial<Pick<Options, 'target' | 'unionStrategy'>>
 
 /**
  * This is a recursive schema that describes the UI of a Zod schema.

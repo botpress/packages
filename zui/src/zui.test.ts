@@ -147,3 +147,25 @@ test('ZuiTypeAny', () => {
   const result = func(schema)
   result.tooltip(true)
 })
+
+test('Record 1', () => {
+  const schema = zui.record(zui.number().title('Age'))
+
+  type Schema = Infer<typeof schema>
+  const type: Schema = {
+    a: 666
+  }
+
+  schema.parse(type)
+})
+
+test('Record 2', () => {
+  const schema = zui.record(zui.string().title('Name'), zui.number().title('Age'))
+
+  type Schema = Infer<typeof schema>
+  const type: Schema = {
+    a: 666
+  }
+
+  schema.parse(type)
+})

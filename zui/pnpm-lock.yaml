@@ -6,8 +6,8 @@ settings:
 
 dependencies:
   '@bpinternal/zod-to-json-schema':
-    specifier: ^3.21.4
-    version: 3.21.4(zod@3.22.4)
+    specifier: ^3.22.4
+    version: 3.22.4(zod@3.22.4)
 
 devDependencies:
   tsup:
@@ -25,10 +25,10 @@ devDependencies:
 
 packages:
 
-  /@bpinternal/zod-to-json-schema@3.21.4(zod@3.22.4):
-    resolution: {integrity: sha512-kWCUrBu+CwODPEH2cleuJ59+D2w+WvA4SlhbpqXYS/bH9k2bsBAOrFa0x/Sz99dBKnMJ6uxVLX0bv53VLOzmKg==}
+  /@bpinternal/zod-to-json-schema@3.22.4(zod@3.22.4):
+    resolution: {integrity: sha512-PyFjMNOrE6r2gSc2qjytE8Z0f9Cffde/n0SwMKJJxL7TNrPCArjLbzi80BRKrzS61l2aXWR9ak7TATW3oNn79A==}
     peerDependencies:
-      zod: ^3.21.4
+      zod: ^3.22.4
     dependencies:
       zod: 3.22.4
     dev: false

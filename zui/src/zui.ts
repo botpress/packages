@@ -22,15 +22,13 @@ import type {
 import z from 'zod'
 import { JsonFormElement } from './components'
 
-// this is a copy-paste of z.infer, necessary otherwise it breaks typings when bundled
-type zinfer<T extends ZodType<any, any, any>> = T['_output']
-
 export type Infer<
   T extends ZodType | ZuiType<any> | ZuiTypeAny,
   Out = T extends ZodType ? T['_output'] : T extends ZuiType<infer Z> ? Z['_output'] : never
 > = Out
 
 export type ToZodType<T extends ZuiTypeAny> = T extends ZuiType<infer Z> ? Z : never
+
 export type ZuiRawShape = { [k: string]: ZuiTypeAny }
 export type ZuiTypeAny = ZuiType<any>
 export type ZuiType<O extends ZodType, N extends ZuiExtension<O> = ZuiExtension<O>> = N & {
@@ -48,7 +46,7 @@ export type ZuiType<O extends ZodType, N extends ZuiExtension<O> = ZuiExtension<
     : O[P]
 }
 
-export type ZuiExtension<Z extends ZodType, Out = zinfer<Z>> = {
+export type ZuiExtension<Z extends ZodType, Out = z.infer<Z>> = {
   /**
    * The type of component to use to display the field and its options
    */

@@ -1,6 +1,6 @@
 import { describe, test, expect } from 'vitest'
 import { zui } from '.'
-import { Infer } from './zui'
+import { Infer, ZuiTypeAny } from './zui'
 
 describe('zui', () => {
   test('vanially zui gives me a zui def', () => {
@@ -82,4 +82,68 @@ test('Type inference', () => {
     age: 10,
     name: 'hello'
   }
+})
+
+test('Unions', () => {
+  const schema = zui.union([
+    zui.object({
+      type: zui.literal('a'),
+      a: zui.string()
+    }),
+    zui.object({
+      type: zui.literal('b'),
+      b: zui.number()
+    })
+  ])
+
+  type Schema = Infer<typeof schema>
+  const type_a: Schema = {
+    type: 'a',
+    a: 'hello'
+  }
+
+  const type_b: Schema = {
+    type: 'b',
+    b: 5
+  }
+
+  schema.parse(type_a)
+  schema.parse(type_b)
+})
+
+test('Discriminated Unions', () => {
+  const schema = zui.discriminatedUnion('type', [
+    zui.object({
+      type: zui.literal('a'),
+      a: zui.string()
+    }),
+    zui.object({
+      type: zui.literal('b'),
+      b: zui.number()
+    })
+  ])
+
+  type Schema = Infer<typeof schema>
+  const type_a: Schema = {
+    type: 'a',
+    a: 'hello'
+  }
+
+  const type_b: Schema = {
+    type: 'b',
+    b: 5
+  }
+
+  schema.parse(type_a)
+  schema.parse(type_b)
+})
+
+test('ZuiTypeAny', () => {
+  const func = (type: ZuiTypeAny) => {
+    return type
+  }
+
+  const schema = zui.string().title('Name')
+  const result = func(schema)
+  result.tooltip(true)
 })

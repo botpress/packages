@@ -157,7 +157,7 @@ describe('zuiToJsonSchema', () => {
   })
 
   test('record with a value works', () => {
-    const schema = zui.record(z.string().max(30)).describe('hello')
+    const schema = zui.record(zui.string().max(30)).describe('hello')
 
     const jsonSchema = getZuiSchemas(schema, { stripZuiProps: true, stripSchemaProps: true })
     expect(jsonSchema.schema).toMatchInlineSnapshot(`
@@ -173,7 +173,7 @@ describe('zuiToJsonSchema', () => {
   })
 
   test('record with second parameter', () => {
-    const schema = zui.record(z.string(), z.number().max(30), {}).describe('hello')
+    const schema = zui.record(zui.string(), zui.number().max(30), {}).describe('hello')
 
     const jsonSchema = getZuiSchemas(schema, { stripZuiProps: true, stripSchemaProps: true })
     expect(jsonSchema.schema).toMatchInlineSnapshot(`
@@ -188,55 +188,77 @@ describe('zuiToJsonSchema', () => {
     `)
   })
 
-  // TODO: fix typings
-  // test('oneOf', () => {
-  //   const schema = zui.discriminatedUnion('kek', [
-  //     zui.object({ kek: zui.literal('A'), lel: zui.boolean() }),
-  //     zui.object({ kek: zui.literal('B'), lel: zui.number() })
-  //   ])
+  test('record with second parameter', () => {
+    const schema = zui.object({ multipleTypes: z.union([z.string(), z.number()]) })
 
-  //   const jsonSchema = getZuiSchemas(schema)
-  //   expect(jsonSchema.schema).toMatchInlineSnapshot(`
-  //     {
-  //       "$schema": "http://json-schema.org/draft-07/schema#",
-  //       "anyOf": [
-  //         {
-  //           "additionalProperties": false,
-  //           "properties": {
-  //             "kek": {
-  //               "const": "A",
-  //               "type": "string",
-  //             },
-  //             "lel": {
-  //               "type": "boolean",
-  //             },
-  //           },
-  //           "required": [
-  //             "kek",
-  //             "lel",
-  //           ],
-  //           "type": "object",
-  //         },
-  //         {
-  //           "additionalProperties": false,
-  //           "properties": {
-  //             "kek": {
-  //               "const": "B",
-  //               "type": "string",
-  //             },
-  //             "lel": {
-  //               "type": "number",
-  //             },
-  //           },
-  //           "required": [
-  //             "kek",
-  //             "lel",
-  //           ],
-  //           "type": "object",
-  //         },
-  //       ],
-  //       "x-zui": {},
-  //     }
-  //   `)
-  // })
+    const jsonSchema = getZuiSchemas(schema, { stripZuiProps: true, stripSchemaProps: true })
+    expect(jsonSchema.schema).toMatchInlineSnapshot(`
+      {
+        "additionalProperties": false,
+        "properties": {
+          "multipleTypes": {
+            "type": [
+              "string",
+              "number",
+            ],
+          },
+        },
+        "required": [
+          "multipleTypes",
+        ],
+        "type": "object",
+      }
+    `)
+  })
+
+  test('oneOf', () => {
+    const schema = zui.discriminatedUnion('kek', [
+      zui.object({ kek: zui.literal('A'), lel: zui.boolean() }),
+      zui.object({ kek: zui.literal('B'), lel: zui.number() })
+    ])
+
+    const jsonSchema = getZuiSchemas(schema)
+    expect(jsonSchema.schema).toMatchInlineSnapshot(`
+      {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "anyOf": [
+          {
+            "additionalProperties": false,
+            "properties": {
+              "kek": {
+                "const": "A",
+                "type": "string",
+              },
+              "lel": {
+                "type": "boolean",
+              },
+            },
+            "required": [
+              "kek",
+              "lel",
+            ],
+            "type": "object",
+          },
+          {
+            "additionalProperties": false,
+            "properties": {
+              "kek": {
+                "const": "B",
+                "type": "string",
+              },
+              "lel": {
+                "type": "number",
+              },
+            },
+            "required": [
+              "kek",
+              "lel",
+            ],
+            "type": "object",
+          },
+        ],
+        "x-zui": {},
+      }
+    `)
+  })
 })

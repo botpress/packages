@@ -1,27 +1,24 @@
 {
   "name": "@bpinternal/zui",
-  "private": true,
-  "version": "0.1.0",
+  "version": "1.0.0",
   "description": "An extension of Zod for working nicely with UIs and JSON Schemas",
   "type": "module",
-  "source": "src/index.ts",
+  "source": "./src/index.ts",
   "main": "./dist/index.js",
   "types": "./dist/src/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs",
+      "types": "./dist/src/index.d.ts"
+    }
+  },
   "scripts": {
     "build": "tsup",
     "watch": "tsup --watch",
     "test": "vitest run",
     "test:watch": "vitest "
   },
-  "exports": {
-    ".": {
-      "import": "./dist/index.js",
-      "require": "./dist/index.cjs"
-    }
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
   "devDependencies": {
     "@microsoft/api-extractor": "^7.39.1",
     "tsup": "^8.0.1",
@@ -34,5 +31,9 @@
   },
   "bundledDependencies": [
     "zod"
-  ]
+  ],
+  "keywords": [],
+  "author": "Botpress, Inc.",
+  "license": "MIT",
+  "packageManager": "pnpm@8.6.0+"
 }

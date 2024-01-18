@@ -1,4 +1,4 @@
-import type { SchemaObject } from 'openapi3-ts/oas31'
+import type { SchemaObject } from 'openapi3-ts'
 import { VError } from 'verror'
 import { z } from 'zod'
 import { schema } from './opapi'
@@ -308,9 +308,8 @@ export function getRef(state: State<string, string, string>, type: ComponentType
     type: undefined,
     properties: undefined,
     required: undefined,
-    // the $ref property didn't exist either in the original one, it's either SchemaObject or ReferenceObject. Not sure where it's handled
     $ref: `#/components/${type}/${name}`,
-  } as SchemaObject)
+  })
 }
 
 export const mapParameter = (param: Parameter<'zod-schema'>): Parameter<'json-schema'> => {

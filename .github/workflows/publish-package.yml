@@ -20,6 +20,7 @@ on:
           - tunnel
           - verel
           - yargs-extra
+          - zui
 
 permissions:
   id-token: write

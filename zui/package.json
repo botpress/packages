@@ -16,7 +16,8 @@
     "build": "tsup",
     "watch": "tsup --watch",
     "test": "vitest run",
-    "test:watch": "vitest "
+    "test:watch": "vitest",
+    "dry-run": "pnpm build && pnpm publish --dry-run"
   },
   "devDependencies": {
     "tsup": "^8.0.1",
@@ -31,6 +32,10 @@
   "bundledDependencies": [
     "zod"
   ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/botpress/packages"
+  },
   "keywords": [],
   "author": "Botpress, Inc.",
   "license": "MIT",

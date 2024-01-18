@@ -1,4 +1,4 @@
-import type { ApiError } from '../state'
+import type { ApiError } from '../create-state'
 
 const codes = {
   HTTP_STATUS_BAD_REQUEST: 400,

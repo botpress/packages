@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest'
 import z from 'zod'
 import { OpenApi, OpenApiProps } from '../src'
 import { join } from 'path'
-import { getFiles } from '../src/file'
+import { getFiles } from '../src/utils/file'
 import { validateTypescriptFile } from './util'
 
 type AnyProps = OpenApiProps<string, string, string>

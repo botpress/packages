@@ -1,7 +1,7 @@
 import chalk from 'chalk'
 import { VError } from 'verror'
 import { defaultResponseStatus, invalidLine, tsFileHeader } from './const'
-import { appendHeaders, initDirectory, removeLineFromFiles, saveFile } from './file'
+import { appendHeaders, initDirectory, removeLineFromFiles, saveFile } from './utils/file'
 import {
   GenerateHandlerProps,
   generateClientCode,
@@ -12,10 +12,10 @@ import {
 } from './generators'
 import { generateErrors } from './generators/errors'
 import { generateOpenapiTypescript } from './generators/openapi-typescript'
-import { schemaIsEmptyObject } from './jsonschema'
-import log from './log'
+import { schemaIsEmptyObject } from './generate-schema-from-zod'
+import log from './utils/log'
 import type { OpenApiPostProcessors } from './opapi'
-import { createOpenapi } from './openapi'
+import { createOpenapi } from './create-openapi'
 import {
   DefaultState,
   composeFilesFromBlocks,
@@ -25,7 +25,7 @@ import {
   sectionParsers,
 } from './section-types-generator'
 import { Block } from './section-types-generator/types'
-import { ApiError, isOperationWithBodyProps, type Operation, type State } from './state'
+import { ApiError, isOperationWithBodyProps, type Operation, type State } from './create-state'
 import { generateSectionsFile } from './section-types-generator/generator'
 
 /**

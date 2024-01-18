@@ -1,4 +1,4 @@
-import { Operation, State } from 'src/state'
+import { Operation, State } from '../create-state'
 export type BlockComposer = (blocks: Block[], targetDirectory: string) => void
 export type DefaultState = State<string, string, string>
 

@@ -1,7 +1,7 @@
 import { extendApi } from '@anatine/zod-openapi'
 import { VError } from 'verror'
-import { generateSchemaFromZod } from './jsonschema'
-import { objects } from './objects'
+import { generateSchemaFromZod } from './generate-schema-from-zod'
+import { objects } from './utils/objects'
 import {
   Operation,
   OperationWithoutBodyMethod,
@@ -9,8 +9,8 @@ import {
   State,
   isOperationWithBodyProps,
   mapParameter,
-} from './state'
-import { formatBodyName, formatResponseName, isAlphanumeric } from './util'
+} from './create-state'
+import { formatBodyName, formatResponseName, isAlphanumeric } from './utils/util'
 
 export const addOperation = <
   SchemaName extends string,

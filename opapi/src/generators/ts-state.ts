@@ -1,6 +1,6 @@
 import pathlib from 'path'
 import fs from 'fs'
-import { State } from '../state'
+import { State } from '../create-state'
 import { tsFileHeader } from '../const'
 import prettier from 'prettier'
 

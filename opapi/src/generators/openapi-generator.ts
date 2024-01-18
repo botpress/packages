@@ -1,9 +1,9 @@
 import decompress from 'decompress'
 import fs from 'fs'
 import fsAsync from 'fs/promises'
-import log from '../log'
+import log from '../utils/log'
 import type { CodePostProcessor } from '../opapi'
-import { OpenapiGeneratorClient } from '../openapi-generator-client'
+import { OpenapiGeneratorClient } from '../utils/openapi-generator-client'
 
 export const runOpenApiCodeGenerator = async (
   dir: string,

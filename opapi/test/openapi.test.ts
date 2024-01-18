@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { getMockApi } from './api'
 import { join } from 'path'
-import { getFiles } from '../src/file'
+import { getFiles } from '../src/utils/file'
 import { existsSync } from 'fs'
 
 const openapiFiles = ['metadata.json', 'openapi.json']

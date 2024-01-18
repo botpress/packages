@@ -1,7 +1,7 @@
 import OpenAPIParser from '@readme/openapi-parser'
 import { SchemaObject, isReferenceObject } from 'openapi3-ts/oas31'
 import { pascal, title } from 'radash'
-import { createOpenapi } from 'src/openapi'
+import { createOpenapi } from '../create-openapi'
 import { Block, DefaultState } from './types'
 
 export const pascalize = (str: string) => pascal(title(str))

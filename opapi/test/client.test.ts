@@ -1,7 +1,7 @@
 import { describe, it } from 'vitest'
 import { getMockApi } from './api'
 import { join } from 'path'
-import { getFiles } from '../src/file'
+import { getFiles } from '../src/utils/file'
 import { validateTypescriptFile } from './util'
 
 describe('client generator', () => {

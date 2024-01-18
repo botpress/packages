@@ -1,5 +1,5 @@
 import { title, sift, camel } from 'radash'
-import type { Parameter as OpenApiParameter } from '../state'
+import type { Parameter as OpenApiParameter } from '../create-state'
 
 import type { GenerateHandlersProps, GenerateHandlerProps } from './handlers'
 

@@ -6,10 +6,20 @@ import {
   generateServer,
   generateTypesBySection,
 } from './generator'
-import { addOperation } from './operation'
-import { ApiError, ComponentType, createState, getRef, Metadata, Operation, Options, Parameter, State } from './state'
+import { addOperation } from './add-operation'
+import {
+  ApiError,
+  ComponentType,
+  createState,
+  getRef,
+  Metadata,
+  Operation,
+  Options,
+  Parameter,
+  State,
+} from './create-state'
 import { exportStateAsTypescript, ExportStateAsTypescriptOptions } from './generators/ts-state'
-export { Operation, Parameter } from './state'
+export { Operation, Parameter } from './create-state'
 
 export const schema = extendApi
 export type OpenApi<

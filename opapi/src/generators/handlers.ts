@@ -6,7 +6,7 @@ import {
   type PathParameter,
   type Operation,
   type BooleanParameter,
-} from '../state'
+} from '../create-state'
 
 export type GenerateHandlersProps = {
   operations: GenerateHandlerProps[]

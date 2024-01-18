@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest'
 import { getMockApi } from './api'
 import { join } from 'path'
 import { existsSync } from 'fs'
-import { getFiles } from '../src/file'
+import { getFiles } from '../src/utils/file'
 import { validateTypescriptFile } from './util'
 
 const serverFiles = [

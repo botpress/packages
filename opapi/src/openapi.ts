@@ -1,4 +1,4 @@
-import { OpenApiBuilder, OperationObject, ReferenceObject } from 'openapi3-ts'
+import { OpenApiBuilder, OperationObject, isReferenceObject } from 'openapi3-ts/oas31'
 import VError from 'verror'
 import { defaultResponseStatus } from './const'
 import { generateSchemaFromZod } from './jsonschema'
@@ -52,17 +52,16 @@ export const createOpenapi = <
       },
     })
 
-    const responseRefSchema = generateSchemaFromZod(
-      getRef(state, ComponentType.RESPONSES, responseName),
-    ) as ReferenceObject
+    const responseRefSchema = generateSchemaFromZod(getRef(state, ComponentType.RESPONSES, responseName))
+    const responseSchema = isReferenceObject(responseRefSchema) ? responseRefSchema : undefined
 
     const operation: OperationObject = {
       operationId: operationName,
       description: operationObject.description,
       parameters: [],
       responses: {
-        default: responseRefSchema as ReferenceObject,
-        [response.status ?? defaultResponseStatus]: responseRefSchema as ReferenceObject,
+        default: responseSchema,
+        [response.status ?? defaultResponseStatus]: responseSchema,
       },
     }
 
@@ -78,9 +77,8 @@ export const createOpenapi = <
         },
       })
 
-      const bodyRefSchema = generateSchemaFromZod(getRef(state, ComponentType.REQUESTS, bodyName)) as ReferenceObject
-
-      operation.requestBody = bodyRefSchema
+      const bodyRefSchema = generateSchemaFromZod(getRef(state, ComponentType.REQUESTS, bodyName))
+      operation.requestBody = isReferenceObject(bodyRefSchema) ? bodyRefSchema : undefined
     }
 
     if (operationObject.parameters) {
@@ -141,15 +139,14 @@ export const createOpenapi = <
       })
     }
 
-    if (!openapi.rootDoc.paths[path]) {
-      openapi.rootDoc.paths[path] = {}
-    }
+    const { paths } = openapi.rootDoc
+    const currentPath = paths?.[path] || {}
 
-    if (openapi.rootDoc.paths[path][method]) {
+    if (currentPath?.[method]) {
       throw new VError(`Operation ${method} ${path} already exists`)
     }
 
-    openapi.rootDoc.paths[path][method] = operation
+    openapi.rootDoc.paths = { ...paths, [path]: { ...currentPath, [method]: operation } }
   })
 
   return openapi

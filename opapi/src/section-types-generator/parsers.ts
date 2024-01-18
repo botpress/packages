@@ -1,5 +1,5 @@
 import { compile as compileSchemaToTypes } from 'json-schema-to-typescript'
-import { SchemaObject } from 'openapi3-ts'
+import { SchemaObject } from 'openapi3-ts/oas31'
 import { title } from 'radash'
 import { Operation, isOperationWithBodyProps } from 'src/state'
 import { addPropertyToBlock, getBlankBlock, pascalize, remove$RefPropertiesFromSchema } from './helpers'
@@ -122,7 +122,7 @@ const getBlockWithDependenciesForSchema = async (
 ): Promise<Block> => {
   // since the schema is dereferenced, i.e., ref properties replaced, we need to process the $ref properties differently
   const { schema: processedSchema, propertyNamesWith$Ref } = remove$RefPropertiesFromSchema(schema, dereferencedSchema)
-  const content = await compileSchemaToTypes(processedSchema, blockTitle, { bannerComment: '' })
+  const content = await compileSchemaToTypes(processedSchema as any, blockTitle, { bannerComment: '' })
   const block = {
     dependencies: propertyNamesWith$Ref.map((name) => title(name)) as string[],
     content: content,

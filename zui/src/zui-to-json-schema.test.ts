@@ -301,4 +301,61 @@ describe('zuiToJsonSchema', () => {
       }
     `)
   })
+
+  test('oneOf with discriminator', () => {
+    const schema = zui.discriminatedUnion('kek', [
+      zui.object({ kek: zui.literal('A'), lel: zui.boolean() }),
+      zui.object({ kek: zui.literal('B'), lel: zui.number() })
+    ])
+
+    const jsonSchema = getZuiSchemas(schema, { target: 'openApi3', discriminator: true, unionStrategy: 'oneOf' })
+    expect(jsonSchema.schema).toMatchInlineSnapshot(`
+      {
+        "discriminator": {
+          "propertyName": "kek",
+        },
+        "oneOf": [
+          {
+            "additionalProperties": false,
+            "properties": {
+              "kek": {
+                "enum": [
+                  "A",
+                ],
+                "type": "string",
+              },
+              "lel": {
+                "type": "boolean",
+              },
+            },
+            "required": [
+              "kek",
+              "lel",
+            ],
+            "type": "object",
+          },
+          {
+            "additionalProperties": false,
+            "properties": {
+              "kek": {
+                "enum": [
+                  "B",
+                ],
+                "type": "string",
+              },
+              "lel": {
+                "type": "number",
+              },
+            },
+            "required": [
+              "kek",
+              "lel",
+            ],
+            "type": "object",
+          },
+        ],
+        "x-zui": {},
+      }
+    `)
+  })
 })

@@ -1,5 +1,5 @@
 import { OpenApiZodAny, generateSchema as generateJsonSchema } from '@anatine/zod-openapi'
-import { isReferenceObject, type SchemaObject } from 'openapi3-ts/oas31'
+import type { SchemaObject } from 'openapi3-ts'
 import { removeFromArray } from './util'
 
 export type GenerateSchemaFromZodOpts = {
@@ -27,13 +27,11 @@ export const formatJsonSchema = (jsonSchema: SchemaObject, allowUnions: boolean)
       delete jsonSchema.required
     }
 
-    if (typeof jsonSchema.additionalProperties === 'object' && !isReferenceObject(jsonSchema.additionalProperties)) {
+    if (typeof jsonSchema.additionalProperties === 'object') {
       formatJsonSchema(jsonSchema.additionalProperties, allowUnions)
     }
 
-    Object.entries(jsonSchema.properties ?? {}).forEach(
-      ([_, value]) => !isReferenceObject(value) && formatJsonSchema(value, allowUnions),
-    )
+    Object.entries(jsonSchema.properties ?? {}).forEach(([_, value]) => formatJsonSchema(value, allowUnions))
   }
 
   if (!allowUnions && (jsonSchema.allOf || jsonSchema.anyOf || jsonSchema.oneOf)) {

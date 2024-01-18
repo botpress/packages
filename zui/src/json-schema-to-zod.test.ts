@@ -25,12 +25,12 @@ describe('jsonSchemaToZod', () => {
     const zuiObject = zui.discriminatedUnion('type', [
       zui.object({
         type: zui.literal('a'),
-        a: zui.string()
+        a: zui.string(),
       }),
       zui.object({
         type: zui.literal('b'),
-        b: zui.number()
-      })
+        b: zui.number(),
+      }),
     ])
     testZodConversion(zuiObject)
   })
@@ -39,12 +39,12 @@ describe('jsonSchemaToZod', () => {
     const zuiObject = zui.union([
       zui.object({
         type: zui.literal('a'),
-        a: zui.string()
+        a: zui.string(),
       }),
       zui.object({
         type: zui.literal('b'),
-        b: zui.number()
-      })
+        b: zui.number(),
+      }),
     ])
     testZodConversion(zuiObject)
   })
@@ -58,7 +58,7 @@ describe('jsonSchemaToZod', () => {
     const complexEnumRecord = zui
       .object({
         status: zui.enum(['Active', 'Inactive', 'Pending']),
-        data: zui.record(zui.string(), zui.union([zui.number(), zui.boolean()]))
+        data: zui.record(zui.string(), zui.union([zui.number(), zui.boolean()])),
       })
       .describe('Complex enum and record types')
     testZodConversion(complexEnumRecord)
@@ -67,7 +67,7 @@ describe('jsonSchemaToZod', () => {
   test('convert complex enum record', () => {
     const zuiSchema = zui.discriminatedUnion('kek', [
       zui.object({ kek: zui.literal('A'), lel: zui.boolean() }),
-      zui.object({ kek: zui.literal('B'), lel: zui.number() })
+      zui.object({ kek: zui.literal('B'), lel: zui.number() }),
     ])
     const strategy = { discriminator: true, unionStrategy: 'oneOf' } as const
 

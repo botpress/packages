@@ -4,7 +4,7 @@ import { ZodTypeAny, z } from 'zod'
 const jsonSchemaToZodStr = (schema: any): string => {
   return parseSchema(schema, {
     seen: new Map(),
-    path: []
+    path: [],
   })
 }
 

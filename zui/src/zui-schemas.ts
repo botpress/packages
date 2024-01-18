@@ -72,7 +72,7 @@ export const getZuiSchemas = (input: ZuiTypeAny, opts: ZuiSchemaOptions = { root
   if (input?._def?.shape) {
     uischema = {
       type: input.ui?.layout ?? 'VerticalLayout',
-      elements: []
+      elements: [],
     }
 
     processConfiguration(input._def.shape(), opts.rootScope || BASE_SCOPE, uischema)

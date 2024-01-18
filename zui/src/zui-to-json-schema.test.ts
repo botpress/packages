@@ -8,7 +8,7 @@ describe('zuiToJsonSchema', () => {
   test('should work', () => {
     const schema = zui.object({
       name: zui.string().title('Name').default('No Name'),
-      age: zui.number().max(100).min(0).title('Age').describe('Age in years').default(20)
+      age: zui.number().max(100).min(0).title('Age').describe('Age in years').default(20),
     })
 
     const jsonSchema = getZuiSchemas(schema)
@@ -72,9 +72,9 @@ describe('zuiToJsonSchema', () => {
     expect(
       getZuiSchemas(
         zui.object({
-          fruit: zui.enum(['Apple', 'Banana', 'Orange'])
-        })
-      )
+          fruit: zui.enum(['Apple', 'Banana', 'Orange']),
+        }),
+      ),
     ).toMatchInlineSnapshot(`
       {
         "schema": {
@@ -112,7 +112,7 @@ describe('zuiToJsonSchema', () => {
 
   test('supported properties are avaialble in the json schema', () => {
     const schema = zui.object({
-      testExample: zui.string().examples(['hello'])
+      testExample: zui.string().examples(['hello']),
     })
 
     const jsonSchema = getZuiSchemas(schema)
@@ -216,8 +216,8 @@ describe('zuiToJsonSchema', () => {
       .array(
         zui.object({
           id: zui.number(),
-          title: zui.string().min(5)
-        })
+          title: zui.string().min(5),
+        }),
       )
       .min(1)
       .describe('Array of objects with validation')
@@ -254,7 +254,7 @@ describe('zuiToJsonSchema', () => {
   test('oneOf', () => {
     const schema = zui.discriminatedUnion('kek', [
       zui.object({ kek: zui.literal('A'), lel: zui.boolean() }),
-      zui.object({ kek: zui.literal('B'), lel: zui.number() })
+      zui.object({ kek: zui.literal('B'), lel: zui.number() }),
     ])
 
     const jsonSchema = getZuiSchemas(schema)
@@ -305,7 +305,7 @@ describe('zuiToJsonSchema', () => {
   test('oneOf with discriminator', () => {
     const schema = zui.discriminatedUnion('kek', [
       zui.object({ kek: zui.literal('A'), lel: zui.boolean() }),
-      zui.object({ kek: zui.literal('B'), lel: zui.number() })
+      zui.object({ kek: zui.literal('B'), lel: zui.number() }),
     ])
 
     const jsonSchema = getZuiSchemas(schema, { target: 'openApi3', discriminator: true, unionStrategy: 'oneOf' })

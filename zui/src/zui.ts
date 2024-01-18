@@ -15,7 +15,7 @@ import type {
   ZodOptional,
   ZodEnum,
   ZodDefault,
-  ZodRecord
+  ZodRecord,
 } from 'zod'
 
 // eslint-disable-next-line no-duplicate-imports
@@ -24,7 +24,7 @@ import { JsonFormElement } from './components'
 
 export type Infer<
   T extends ZodType | ZuiType<any> | ZuiTypeAny,
-  Out = T extends ZodType ? T['_output'] : T extends ZuiType<infer Z> ? Z['_output'] : never
+  Out = T extends ZodType ? T['_output'] : T extends ZuiType<infer Z> ? Z['_output'] : never,
 > = Out
 
 export type ToZodType<T extends ZuiTypeAny> = T extends ZuiType<infer Z> ? Z : never
@@ -128,7 +128,7 @@ const Extensions: ReadonlyArray<keyof ZuiExtension<any>> = [
   'title',
   'placeholder',
   'overridable',
-  'layout'
+  'layout',
 ] as const
 
 type ZCreate = { create: (...args: any) => ZodType } & (
@@ -162,7 +162,7 @@ function extend<T extends ZCreate>(zType: T) {
       get() {
         this._def[zuiKey] ??= {}
         return this._def[zuiKey]
-      }
+      },
     })
   }
 
@@ -212,7 +212,7 @@ type ZuiRecord = {
   <Keys extends ZodTypeAny, Value extends ZodTypeAny>(
     keySchema: ZodTypeAny,
     valueSchema: ZodTypeAny,
-    params?: RecordArgs[2]
+    params?: RecordArgs[2],
   ): ZuiType<ZodRecord<Keys, Value>>
   <Value extends ZodTypeAny>(valueSchema: ZodTypeAny, params?: RecordArgs[2]): ZuiType<ZodRecord<ZodString, Value>>
 }
@@ -226,21 +226,21 @@ type Zui = {
   object: <T extends ZodRawShape>(shape: T, params?: ObjectArgs[1]) => ZuiType<ZodObject<T>> & ZodObject<T>
   union: <T extends readonly [ZodTypeAny, ZodTypeAny, ...ZodTypeAny[]]>(
     types: T,
-    params?: UnionArgs[1]
+    params?: UnionArgs[1],
   ) => ZuiType<ZodUnion<T>>
   discriminatedUnion: <
     Discriminator extends string,
-    Types extends [ZodDiscriminatedUnionOption<Discriminator>, ...ZodDiscriminatedUnionOption<Discriminator>[]]
+    Types extends [ZodDiscriminatedUnionOption<Discriminator>, ...ZodDiscriminatedUnionOption<Discriminator>[]],
   >(
     discriminator: Discriminator,
     options: Types,
-    params?: DiscriminatedUnionArgs[2]
+    params?: DiscriminatedUnionArgs[2],
   ) => ZuiType<ZodDiscriminatedUnion<Discriminator, Types>>
   record: ZuiRecord
   optional: (type: OptionalArgs[0], params?: OptionalArgs[1]) => ZuiType<ZodOptional<any>>
   enum: <U extends string, T extends Readonly<[U, ...U[]]>>(
     values: T,
-    params?: EnumArgs[1]
+    params?: EnumArgs[1],
   ) => ZuiType<ZodEnum<Writeable<T>>>
 }
 
@@ -262,11 +262,11 @@ const zui: Zui = {
 
   discriminatedUnion: <
     Discriminator extends string,
-    Types extends [ZodDiscriminatedUnionOption<Discriminator>, ...ZodDiscriminatedUnionOption<Discriminator>[]]
+    Types extends [ZodDiscriminatedUnionOption<Discriminator>, ...ZodDiscriminatedUnionOption<Discriminator>[]],
   >(
     discriminator: Discriminator,
     options: Types,
-    params?: DiscriminatedUnionArgs[2]
+    params?: DiscriminatedUnionArgs[2],
   ) =>
     z.discriminatedUnion(discriminator, options as any, params) as unknown as ZuiType<
       ZodDiscriminatedUnion<Discriminator, Types>
@@ -275,11 +275,11 @@ const zui: Zui = {
   record: <Keys extends ZodTypeAny, Value extends ZodTypeAny>(
     keySchema: Keys,
     valueSchema: Value,
-    params?: RecordArgs[2]
+    params?: RecordArgs[2],
   ) => z.record(keySchema, valueSchema, params) as unknown as ZuiType<ZodRecord<Keys, Value>>,
 
   enum: <U extends string, T extends Readonly<[U, ...U[]]>>(values: T, params?: EnumArgs[1]) =>
-    z.enum(values as any, params) as unknown as ZuiType<ZodEnum<Writeable<T>>>
+    z.enum(values as any, params) as unknown as ZuiType<ZodEnum<Writeable<T>>>,
 }
 
 export { zui }

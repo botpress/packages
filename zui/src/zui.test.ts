@@ -13,7 +13,7 @@ describe('zui', () => {
     expect(schema.ui).toEqual({
       title: 'Title',
       examples: ['Example 1'],
-      readonly: true
+      readonly: true,
     })
   })
 
@@ -23,7 +23,7 @@ describe('zui', () => {
     expect(schema.ui).toEqual({
       title: 'Title',
       examples: [10],
-      readonly: true
+      readonly: true,
     })
   })
 
@@ -33,7 +33,7 @@ describe('zui', () => {
     expect(schema.ui).toEqual({
       title: 'Title',
       examples: [true],
-      readonly: true
+      readonly: true,
     })
   })
 
@@ -70,17 +70,17 @@ test('Type inference', () => {
     name: zui.string().title('Name'),
     age: zui.number().title('Age'),
     employer: zui.object({
-      name: zui.string().title('Employer Name')
-    })
+      name: zui.string().title('Employer Name'),
+    }),
   })
 
   type Schema = Infer<typeof schema>
   const typingsInfer: Schema = {
     employer: {
-      name: 'hello'
+      name: 'hello',
     },
     age: 10,
-    name: 'hello'
+    name: 'hello',
   }
 })
 
@@ -88,23 +88,23 @@ test('Unions', () => {
   const schema = zui.union([
     zui.object({
       type: zui.literal('a'),
-      a: zui.string()
+      a: zui.string(),
     }),
     zui.object({
       type: zui.literal('b'),
-      b: zui.number()
-    })
+      b: zui.number(),
+    }),
   ])
 
   type Schema = Infer<typeof schema>
   const type_a: Schema = {
     type: 'a',
-    a: 'hello'
+    a: 'hello',
   }
 
   const type_b: Schema = {
     type: 'b',
-    b: 5
+    b: 5,
   }
 
   schema.parse(type_a)
@@ -115,23 +115,23 @@ test('Discriminated Unions', () => {
   const schema = zui.discriminatedUnion('type', [
     zui.object({
       type: zui.literal('a'),
-      a: zui.string()
+      a: zui.string(),
     }),
     zui.object({
       type: zui.literal('b'),
-      b: zui.number()
-    })
+      b: zui.number(),
+    }),
   ])
 
   type Schema = Infer<typeof schema>
   const type_a: Schema = {
     type: 'a',
-    a: 'hello'
+    a: 'hello',
   }
 
   const type_b: Schema = {
     type: 'b',
-    b: 5
+    b: 5,
   }
 
   schema.parse(type_a)
@@ -153,7 +153,7 @@ test('Record 1', () => {
 
   type Schema = Infer<typeof schema>
   const type: Schema = {
-    a: 666
+    a: 666,
   }
 
   schema.parse(type)
@@ -164,7 +164,7 @@ test('Record 2', () => {
 
   type Schema = Infer<typeof schema>
   const type: Schema = {
-    a: 666
+    a: 666,
   }
 
   schema.parse(type)

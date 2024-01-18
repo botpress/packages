@@ -30,7 +30,7 @@ const isArray = (schema: JsonSchema7): schema is JsonSchema7ArrayType =>
 const mergeZuiIntoJsonSchema = (
   jsonSchema: JsonSchemaWithZui,
   zuiSchema: ZuiType<any>,
-  opts: ZuiSchemaOptions
+  opts: ZuiSchemaOptions,
 ): JsonSchema7 => {
   const assignZuiProps = (value: JsonSchemaWithZui, ui: ZuiExtension<ToZodType<ZuiTypeAny>>['ui']) => {
     if (ui?.examples) {

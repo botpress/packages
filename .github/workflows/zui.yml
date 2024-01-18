@@ -10,7 +10,7 @@ defaults:
     working-directory: ./zui
 
 jobs:
-  opapi:
+  zui:
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:

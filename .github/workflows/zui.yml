@@ -1,4 +1,4 @@
-name: Opapi
+name: Zui
 
 on:
   pull_request:

@@ -1,6 +1,6 @@
 export const prefixToObjectMap = {
-  account: 'account',
-  accountpref: 'accountPreference',
+  accnt: 'account',
+  accntpf: 'accountPreference',
   action: 'action',
   anlytic: 'analytics',
   audit: 'audit',
@@ -42,8 +42,8 @@ export const prefixToObjectMap = {
 } as const
 
 export const objectToPrefixMap: Reverser<typeof prefixToObjectMap> = {
-  account: 'account',
-  accountPreference: 'accountpref',
+  account: 'accnt',
+  accountPreference: 'accntpf',
   action: 'action',
   analytics: 'anlytic',
   audit: 'audit',
@@ -91,6 +91,8 @@ type Ids = {
   [Id in Objects as `${Capitalize<Id>}Id`]: `${(typeof objectToPrefixMap)[Id]}_${string}`
 }
 
+export type AccountId = Ids['AccountId']
+export type AccountPreferenceId = Ids['AccountPreferenceId']
 export type ActionId = Ids['ActionId']
 export type AnalyticsId = Ids['AnalyticsId']
 export type AuditId = Ids['AuditId']

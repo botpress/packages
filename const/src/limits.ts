@@ -76,5 +76,9 @@ export const limitConfigs = {
   tag_definition_count: {
     value: 50,
     unit: 'count'
+  },
+  bot_integration_secret_count: {
+    value: 25,
+    unit: 'count'
   }
 } as const satisfies Record<string, Limit>

@@ -1,4 +1,6 @@
 export const prefixToObjectMap = {
+  account: 'account',
+  accountpref: 'accountPreference',
   action: 'action',
   anlytic: 'analytics',
   audit: 'audit',
@@ -40,6 +42,8 @@ export const prefixToObjectMap = {
 } as const
 
 export const objectToPrefixMap: Reverser<typeof prefixToObjectMap> = {
+  account: 'account',
+  accountPreference: 'accountpref',
   action: 'action',
   analytics: 'anlytic',
   audit: 'audit',

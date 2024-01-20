@@ -7,6 +7,7 @@ export const prefixToObjectMap = {
   bak: 'botApiKey',
   bot: 'bot',
   card: 'card',
+  col: 'column',
   cfg: 'configuration',
   channel: 'channel',
   conv: 'conversation',
@@ -51,6 +52,7 @@ export const objectToPrefixMap: Reverser<typeof prefixToObjectMap> = {
   botApiKey: 'bak',
   card: 'card',
   channel: 'channel',
+  column: 'col',
   configuration: 'cfg',
   conversation: 'conv',
   devBot: 'devbot',
@@ -100,6 +102,7 @@ export type BotApiKeyId = Ids['BotApiKeyId']
 export type BotId = Ids['BotId']
 export type CardId = Ids['CardId']
 export type ChannelId = Ids['ChannelId']
+export type ColumnId = Ids['ColumnId']
 export type ConfigurationId = Ids['ConfigurationId']
 export type ConversationId = Ids['ConversationId']
 export type EventId = Ids['EventId']

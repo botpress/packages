@@ -103,7 +103,7 @@ describe('jsonSchemaToZui', () => {
 
     const converted = testZuiConversion(zuiSchema)
 
-    expect(converted.properties?.name['x-zui']).toHaveProperty('title')
-    expect(converted.properties?.isAdmin['x-zui']).toHaveProperty('displayAs')
+    expect(converted.properties?.name[zuiKey]).toHaveProperty('title')
+    expect(converted.properties?.isAdmin[zuiKey]).toHaveProperty('displayAs')
   })
 })

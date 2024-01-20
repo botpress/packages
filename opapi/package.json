@@ -1,6 +1,6 @@
 {
   "name": "@bpinternal/opapi",
-  "version": "0.7.1",
+  "version": "0.7.2",
   "description": "",
   "main": "./dist/index.js",
   "module": "./dist/index.mjs",
@@ -45,7 +45,7 @@
     "execa": "^6.1.0",
     "json-schema-to-typescript": "^13.0.2",
     "nodemon": "^2.0.20",
-    "openapi-typescript": "^6.1.0",
+    "openapi-typescript": "6.7.4",
     "openapi3-ts": "^2.0.2",
     "radash": "^9.5.0",
     "tsconfig-paths": "^4.1.1",

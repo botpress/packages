@@ -47,6 +47,8 @@ export type ZuiType<O extends ZodType, N extends ZuiExtension<O> = ZuiExtension<
 }
 
 export type ZuiExtension<Z extends ZodType, Out = z.infer<Z>> = {
+  // Sets the id of the field
+  id: (id: string) => ZuiType<Z>
   /**
    * The type of component to use to display the field and its options
    */
@@ -81,6 +83,11 @@ export type ZuiExtension<Z extends ZodType, Out = z.infer<Z>> = {
    */
   overridable: (overridable: boolean) => ZuiType<Z>
   /**
+   * Mark the field as searchable, when applicable
+   * @default true
+   */
+  searchable: (searchable: boolean) => ZuiType<Z>
+  /**
    * Whether the field is disabled
    * @default false
    */
@@ -103,7 +110,6 @@ export type ZuiExtension<Z extends ZodType, Out = z.infer<Z>> = {
    * Choose how the field & its childs are displayed
    */
   layout: (layout: 'HorizontalLayout' | 'VerticalLayout' | 'CollapsiblePanel') => ZuiType<Z>
-
   /**
    * Returns the ZUI schema for the field
    */
@@ -117,6 +123,7 @@ export type ZuiExtension<Z extends ZodType, Out = z.infer<Z>> = {
 export const zuiKey = 'x-zui' as const
 
 const Extensions: ReadonlyArray<keyof ZuiExtension<any>> = [
+  'id',
   'tooltip',
   'disabled',
   'displayAs',
@@ -128,6 +135,7 @@ const Extensions: ReadonlyArray<keyof ZuiExtension<any>> = [
   'title',
   'placeholder',
   'overridable',
+  'searchable',
   'layout',
 ] as const
 

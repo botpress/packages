@@ -24,6 +24,8 @@ import type {
 // eslint-disable-next-line no-duplicate-imports
 import z from 'zod'
 import { JsonFormElement } from './components'
+import { getZuiSchemas } from './zui-schemas'
+import { JsonSchema7, jsonSchemaToZui } from '.'
 
 export type Infer<
   T extends ZodType | ZuiType<any> | ZuiTypeAny,
@@ -121,6 +123,7 @@ export type ZuiExtension<Z extends ZodType, Out = z.infer<Z>> = {
       ? Parameters<ZuiExtension<Z>[P]>[0]
       : never
   }
+  toJsonSchema(): JsonSchema7
 }
 
 export const zuiKey = 'x-zui' as const
@@ -178,6 +181,18 @@ function extend<T extends ZCreate>(zType: T) {
         return this._def[zuiKey]
       },
     })
+  }
+
+  if (!instance.toJsonSchema) {
+    instance.toJsonSchema = function () {
+      return getZuiSchemas(this).schema
+    }
+  }
+
+  if (!instance.fromJsonSchema) {
+    instance.fromJsonSchema = (schema: JsonSchema7) => {
+      return jsonSchemaToZui(schema)
+    }
   }
 
   const stubWrapper = (name: string) => {
@@ -265,6 +280,7 @@ type Zui = {
   any: (params?: AnyArgs[0]) => ZuiType<ZodAny>
   unknown: (params?: UnknownArgs[0]) => ZuiType<ZodUnknown>
   null: (params?: NullArgs[0]) => ZuiType<ZodNull>
+  fromJsonSchema(schema: JsonSchema7): ZuiExtension<ToZodType<ZuiTypeAny>>
 }
 
 const zui: Zui = {
@@ -307,6 +323,7 @@ const zui: Zui = {
   any: (params) => z.any(params) as unknown as ZuiType<ZodAny>,
   unknown: (params) => z.unknown(params) as unknown as ZuiType<ZodUnknown>,
   null: (params) => z.null(params) as unknown as ZuiType<ZodNull>,
+  fromJsonSchema: (schema) => jsonSchemaToZui(schema),
 }
 
 export { zui }

@@ -97,13 +97,16 @@ describe('jsonSchemaToZui', () => {
           name: zui.string().title('City Name').optional(),
           synonyms: zui.array(zui.string().title('One synonyms')).title('All synonyms').optional(),
         }),
-        street: zui.string().optional(),
+        street: zui.string().title('Street name').optional(),
       }),
     })
 
-    const converted = testZuiConversion(zuiSchema)
+    const converted = testZuiConversion(zuiSchema) as any
 
     expect(converted.properties?.name[zuiKey]).toHaveProperty('title')
     expect(converted.properties?.isAdmin[zuiKey]).toHaveProperty('displayAs')
+    expect(converted.properties?.address.properties.street[zuiKey]).toHaveProperty('title')
+    expect(converted.properties?.address.properties.city.properties.name[zuiKey]).toHaveProperty('title')
+    expect(converted.properties.address.properties.city.properties.synonyms[zuiKey]).toHaveProperty('title')
   })
 })

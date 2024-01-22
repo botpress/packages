@@ -26,6 +26,7 @@ import z from 'zod'
 import { JsonFormElement } from './components'
 import { getZuiSchemas } from './zui-schemas'
 import { JsonSchema7, jsonSchemaToZui } from '.'
+import { objectToZui } from './object-to-zui'
 
 export type Infer<
   T extends ZodType | ZuiType<any> | ZuiTypeAny,
@@ -123,7 +124,7 @@ export type ZuiExtension<Z extends ZodType, Out = z.infer<Z>> = {
       ? Parameters<ZuiExtension<Z>[P]>[0]
       : never
   }
-  toJsonSchema(): JsonSchema7
+  toJsonSchema(): any //TODO: fix typings, JsonSchema7 doesn't work well when consuming it
 }
 
 export const zuiKey = 'x-zui' as const
@@ -186,12 +187,6 @@ function extend<T extends ZCreate>(zType: T) {
   if (!instance.toJsonSchema) {
     instance.toJsonSchema = function () {
       return getZuiSchemas(this).schema
-    }
-  }
-
-  if (!instance.fromJsonSchema) {
-    instance.fromJsonSchema = (schema: JsonSchema7) => {
-      return jsonSchemaToZui(schema)
     }
   }
 
@@ -280,7 +275,8 @@ type Zui = {
   any: (params?: AnyArgs[0]) => ZuiType<ZodAny>
   unknown: (params?: UnknownArgs[0]) => ZuiType<ZodUnknown>
   null: (params?: NullArgs[0]) => ZuiType<ZodNull>
-  fromJsonSchema(schema: JsonSchema7): ZuiExtension<ToZodType<ZuiTypeAny>>
+  fromJsonSchema(schema: JsonSchema7): ZuiType<ZodAny>
+  fromObject(object: any): ZuiType<ZodAny>
 }
 
 const zui: Zui = {
@@ -323,7 +319,8 @@ const zui: Zui = {
   any: (params) => z.any(params) as unknown as ZuiType<ZodAny>,
   unknown: (params) => z.unknown(params) as unknown as ZuiType<ZodUnknown>,
   null: (params) => z.null(params) as unknown as ZuiType<ZodNull>,
-  fromJsonSchema: (schema) => jsonSchemaToZui(schema),
+  fromJsonSchema: (schema) => jsonSchemaToZui(schema) as unknown as ZuiType<ZodAny>,
+  fromObject: (object) => objectToZui(object) as unknown as ZuiType<ZodAny>,
 }
 
 export { zui }

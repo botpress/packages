@@ -17,14 +17,13 @@ const jsonSchemaToZod = (schema: any): ZodTypeAny => {
 }
 
 const applyZuiPropsRecursively = (zodField: ZodTypeAny, jsonSchemaField: any) => {
-  if (jsonSchemaField[zuiKey]) {
+  if (jsonSchemaField[zuiKey] && zodField._def) {
     zodField._def[zuiKey] = jsonSchemaField[zuiKey]
   }
 
-  if (jsonSchemaField.type === 'object' && jsonSchemaField.properties) {
-    Object.keys(jsonSchemaField.properties).forEach((key) => {
-      const nestedField = jsonSchemaField.properties[key]
-      const shape = zodField._def.shape()
+  if (zodField._def?.typeName === 'ZodObject' && jsonSchemaField.type === 'object' && jsonSchemaField.properties) {
+    Object.entries(jsonSchemaField.properties).forEach(([key, nestedField]) => {
+      const shape = typeof zodField._def.shape === 'function' ? zodField._def.shape() : zodField._def.shape
 
       if (shape[key]) {
         applyZuiPropsRecursively(shape[key], nestedField)

@@ -5,3 +5,4 @@ export type { JsonSchema7Type as JsonSchema7 } from '@bpinternal/zod-to-json-sch
 export type { JsonSchema7ObjectType as JsonSchema7Object } from '@bpinternal/zod-to-json-schema/src/parsers/object'
 export type { JsonFormElement } from './components'
 export { jsonSchemaToZui } from './json-schema-to-zui'
+export { ZodError as ZuiError } from 'zod'

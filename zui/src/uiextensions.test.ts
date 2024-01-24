@@ -1,7 +1,7 @@
 import { z } from 'zod'
 import { createComponent } from './uiextensions'
-import { extendZod } from './zui'
 import { describe, test } from 'vitest'
+import { Zui, zui } from './zui'
 
 const testExtensions = {
   string: [
@@ -61,12 +61,11 @@ const testExtensions = {
 
 describe('ZUI UI Extensions', () => {
   test('should be able to extend zod', () => {
-    const zui = extendZod<typeof testExtensions>(z)
+    const myZui = zui as Zui<typeof testExtensions>
 
-    zui.number().displayAs({
-      name: 'SuperNumber',
-      min: 0,
-      max: 100,
+    myZui.string().displayAs({
+      name: 'SuperInput',
+      allowVariables: true,
     })
   })
 })

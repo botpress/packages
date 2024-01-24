@@ -16,12 +16,18 @@ import type {
   ZodEnum,
   ZodDefault,
   ZodRecord,
+  ZodAny,
+  ZodUnknown,
+  ZodNull,
 } from 'zod'
 
 // eslint-disable-next-line no-duplicate-imports
 import { z } from 'zod'
 import { UIExtension, ZodToBaseType } from './uiextensions'
-
+import { JsonFormElement } from './components'
+import { getZuiSchemas } from './zui-schemas'
+import { JsonSchema7, jsonSchemaToZui } from '.'
+import { objectToZui } from './object-to-zui'
 export type Infer<
   T extends ZodType | ZuiType<any> | ZuiTypeAny,
   Out = T extends ZodType ? T['_output'] : T extends ZuiType<infer Z> ? Z['_output'] : never,
@@ -52,6 +58,7 @@ export type ZuiType<
 }
 
 export type ZuiExtension<Z extends ZodType, UI extends UIExtension, Out = z.infer<Z>> = {
+  id: (id: string) => ZuiType<Z, UI>
   /**
    * The type of component to use to display the field and its options
    */
@@ -86,6 +93,11 @@ export type ZuiExtension<Z extends ZodType, UI extends UIExtension, Out = z.infe
    */
   overridable: (overridable: boolean) => ZuiType<Z, UI>
   /**
+   * Mark the field as searchable, when applicable
+   * @default true
+   */
+  searchable: (searchable: boolean) => ZuiType<Z>
+  /**
    * Whether the field is disabled
    * @default false
    */
@@ -108,7 +120,6 @@ export type ZuiExtension<Z extends ZodType, UI extends UIExtension, Out = z.infe
    * Choose how the field & its childs are displayed
    */
   layout: (layout: 'HorizontalLayout' | 'VerticalLayout' | 'CollapsiblePanel') => ZuiType<Z, UI>
-
   /**
    * Returns the ZUI schema for the field
    */
@@ -117,11 +128,14 @@ export type ZuiExtension<Z extends ZodType, UI extends UIExtension, Out = z.infe
       ? Parameters<ZuiExtension<Z, UI>[P]>[0]
       : never
   }
+  toJsonSchema(): any //TODO: fix typings, JsonSchema7 doesn't work well when consuming it
 }
 
 export const zuiKey = 'x-zui' as const
 
+
 const Extensions: ReadonlyArray<keyof ZuiExtension<any, any>> = [
+  'id',
   'tooltip',
   'disabled',
   'displayAs',
@@ -133,6 +147,7 @@ const Extensions: ReadonlyArray<keyof ZuiExtension<any, any>> = [
   'title',
   'placeholder',
   'overridable',
+  'searchable',
   'layout',
 ] as const
 
@@ -149,6 +164,9 @@ type ZCreate = { create: (...args: any) => ZodType } & (
   | typeof z.ZodOptional
   | typeof z.ZodDefault
   | typeof z.ZodLiteral
+  | typeof z.ZodAny
+  | typeof z.ZodUnknown
+  | typeof z.ZodNull
 )
 
 function extend<T extends ZCreate>(zType: T) {
@@ -169,6 +187,12 @@ function extend<T extends ZCreate>(zType: T) {
         return this._def[zuiKey]
       },
     })
+  }
+
+  if (!instance.toJsonSchema) {
+    instance.toJsonSchema = function () {
+      return getZuiSchemas(this).schema
+    }
   }
 
   const stubWrapper = (name: string) => {
@@ -200,6 +224,9 @@ extend(z.ZodLiteral)
 extend(z.ZodEnum)
 extend(z.ZodOptional)
 extend(z.ZodDefault)
+extend(z.ZodAny)
+extend(z.ZodUnknown)
+extend(z.ZodNull)
 
 type StringArgs = Parameters<typeof z.string>
 type NumberArgs = Parameters<typeof z.number>
@@ -212,6 +239,9 @@ type DiscriminatedUnionArgs = Parameters<typeof z.discriminatedUnion>
 type RecordArgs = Parameters<typeof z.record>
 type OptionalArgs = Parameters<typeof z.optional>
 type EnumArgs = Parameters<typeof z.enum>
+type AnyArgs = Parameters<typeof z.any>
+type UnknownArgs = Parameters<typeof z.unknown>
+type NullArgs = Parameters<typeof z.null>
 
 type ZuiRecord = {
   <Keys extends ZodTypeAny, Value extends ZodTypeAny>(
@@ -247,6 +277,11 @@ type Zui<UI extends UIExtension> = {
     values: T,
     params?: EnumArgs[1],
   ) => ZuiType<ZodEnum<Writeable<T>>, UI>
+  any: (params?: AnyArgs[0]) => ZuiType<ZodAny>
+  unknown: (params?: UnknownArgs[0]) => ZuiType<ZodUnknown>
+  null: (params?: NullArgs[0]) => ZuiType<ZodNull>
+  fromJsonSchema(schema: JsonSchema7): ZuiType<ZodAny>
+  fromObject(object: any): ZuiType<ZodAny>
 }
 
 export const extendZod = <UI extends UIExtension>(zod: typeof z) => {
@@ -285,8 +320,14 @@ export const extendZod = <UI extends UIExtension>(zod: typeof z) => {
       params?: RecordArgs[2],
     ) => zod.record(keySchema, valueSchema, params) as unknown as ZuiType<ZodRecord<Keys, Value>, UI>,
 
-    enum: <U extends string, T extends Readonly<[U, ...U[]]>>(values: T, params?: EnumArgs[1]) =>
-      zod.enum(values as any, params) as unknown as ZuiType<ZodEnum<Writeable<T>>, UI>,
+  enum: <U extends string, T extends Readonly<[U, ...U[]]>>(values: T, params?: EnumArgs[1]) =>
+    z.enum(values as any, params) as unknown as ZuiType<ZodEnum<Writeable<T>>>,
+
+  any: (params) => z.any(params) as unknown as ZuiType<ZodAny>,
+  unknown: (params) => z.unknown(params) as unknown as ZuiType<ZodUnknown>,
+  null: (params) => z.null(params) as unknown as ZuiType<ZodNull>,
+  fromJsonSchema: (schema) => jsonSchemaToZui(schema) as unknown as ZuiType<ZodAny>,
+  fromObject: (object) => objectToZui(object) as unknown as ZuiType<ZodAny>,
   }
   return zui
 }

@@ -2,6 +2,10 @@ export { getZuiSchemas } from './zui-schemas'
 export { createComponent } from './uiextensions'
 export { zui, extendZod } from './zui'
 export type { ZuiType, Infer, ZuiExtension, ZuiRawShape, ZuiTypeAny } from './zui'
-export type { JsonSchema7Type as JsonSchema7 } from '@bpinternal/zod-to-json-schema/src/parseDef'
+export type {
+  JsonSchema7Type as JsonSchema7,
+  JsonSchema7ObjectType as JsonSchema7Object,
+} from '@bpinternal/zod-to-json-schema'
 export type { JsonFormElement } from './components'
-export { jsonSchemaToZod } from './json-schema-to-zod'
+export { jsonSchemaToZui } from './json-schema-to-zui'
+export { ZodError as ZuiError } from 'zod'

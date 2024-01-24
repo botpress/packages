@@ -13,7 +13,7 @@ export const commonHTMLInputSchema = z.object({
 export const defaultExtensions = {
   string: [
     createComponent(
-      'html:input',
+      'input',
       commonHTMLInputSchema.extend({
         type: z.enum(['text', 'password', 'email', 'tel', 'url']).default('text'),
         default: z.string().optional(),
@@ -26,7 +26,7 @@ export const defaultExtensions = {
   ],
   number: [
     createComponent(
-      'html:numberinput',
+      'number',
       commonHTMLInputSchema.extend({
         type: z.enum(['number', 'range']).default('number'),
         default: z.number().optional(),
@@ -38,7 +38,7 @@ export const defaultExtensions = {
   ],
   boolean: [
     createComponent(
-      'html:checkbox',
+      'checkbox',
       commonHTMLInputSchema.extend({
         default: z.boolean().default(false).optional(),
       }),

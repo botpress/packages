@@ -99,8 +99,8 @@ export const quotaConfigs = {
     trackUsagePerBot: true
   },
   invocation_calls: {
-    name: 'Invocation Calls',
-    description: 'Maximum number of times a bot can be invoked in a month.',
+    name: 'Messages',
+    description: 'Maximum number of messages sent to a bot in a month.',
     default: 2_000,
     kind: 'workspace',
     category: 'calls',

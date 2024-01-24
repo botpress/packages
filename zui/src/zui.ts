@@ -24,7 +24,6 @@ import type {
 // eslint-disable-next-line no-duplicate-imports
 import { z } from 'zod'
 import { UIExtension, ZodToBaseType } from './uiextensions'
-import { JsonFormElement } from './components'
 import { getZuiSchemas } from './zui-schemas'
 import { JsonSchema7, jsonSchemaToZui } from '.'
 import { objectToZui } from './object-to-zui'
@@ -96,7 +95,7 @@ export type ZuiExtension<Z extends ZodType, UI extends UIExtension, Out = z.infe
    * Mark the field as searchable, when applicable
    * @default true
    */
-  searchable: (searchable: boolean) => ZuiType<Z>
+  searchable: (searchable: boolean) => ZuiType<Z, UI>
   /**
    * Whether the field is disabled
    * @default false
@@ -132,7 +131,6 @@ export type ZuiExtension<Z extends ZodType, UI extends UIExtension, Out = z.infe
 }
 
 export const zuiKey = 'x-zui' as const
-
 
 const Extensions: ReadonlyArray<keyof ZuiExtension<any, any>> = [
   'id',
@@ -252,7 +250,7 @@ type ZuiRecord = {
   <Value extends ZodTypeAny>(valueSchema: ZodTypeAny, params?: RecordArgs[2]): ZuiType<ZodRecord<ZodString, Value>>
 }
 
-type Zui<UI extends UIExtension> = {
+export type Zui<UI extends UIExtension> = {
   string: (params?: StringArgs[0]) => ZuiType<ZodString, UI>
   number: (params?: NumberArgs[0]) => ZuiType<ZodNumber, UI>
   boolean: (params?: BooleanArgs[0]) => ZuiType<ZodBoolean, UI>
@@ -284,41 +282,39 @@ type Zui<UI extends UIExtension> = {
   fromObject(object: any): ZuiType<ZodAny>
 }
 
-export const extendZod = <UI extends UIExtension>(zod: typeof z) => {
-  const zui: Zui<UI> = {
-    string: (params) => zod.string(params) as unknown as ZuiType<ZodString, UI>,
-    number: (params) => zod.number(params) as unknown as ZuiType<ZodNumber, UI>,
-    boolean: (params) => zod.boolean(params) as unknown as ZuiType<ZodBoolean, UI>,
-    literal: (value, params) => zod.literal(value, params) as unknown as ZuiType<ZodLiteral<any>>,
-    optional: (type, params) => zod.optional(type, params) as unknown as ZuiType<ZodOptional<any>>,
+const zui: Zui<UIExtension> = {
+  string: (params) => z.string(params) as unknown as ZuiType<ZodString>,
+  number: (params) => z.number(params) as unknown as ZuiType<ZodNumber>,
+  boolean: (params) => z.boolean(params) as unknown as ZuiType<ZodBoolean>,
+  literal: (value, params) => z.literal(value, params) as unknown as ZuiType<ZodLiteral<any>>,
+  optional: (type, params) => z.optional(type, params) as unknown as ZuiType<ZodOptional<any>>,
 
-    array: <T extends ZodTypeAny>(schema: T, params?: ArrayArgs[1]) =>
-      zod.array(schema, params) as unknown as ZuiType<ZodArray<T>, UI>,
+  array: <T extends ZodTypeAny>(schema: T, params?: ArrayArgs[1]) =>
+    z.array(schema, params) as unknown as ZuiType<ZodArray<T>>,
 
-    object: <T extends ZodRawShape>(shape: T, params?: ObjectArgs[1]) =>
-      zod.object(shape as ZodRawShape, params) as ZodObject<T> & ZuiType<ZodObject<T>, UI>,
+  object: <T extends ZodRawShape>(shape: T, params?: ObjectArgs[1]) =>
+    z.object(shape as ZodRawShape, params) as ZodObject<T> & ZuiType<ZodObject<T>>,
 
-    union: <T extends readonly [ZodTypeAny, ZodTypeAny, ...ZodTypeAny[]]>(types: T, params?: UnionArgs[1]) =>
-      zod.union(types, params) as unknown as ZuiType<ZodUnion<T>, UI>,
+  union: <T extends readonly [ZodTypeAny, ZodTypeAny, ...ZodTypeAny[]]>(types: T, params?: UnionArgs[1]) =>
+    z.union(types, params) as unknown as ZuiType<ZodUnion<T>>,
 
-    discriminatedUnion: <
-      Discriminator extends string,
-      Types extends [ZodDiscriminatedUnionOption<Discriminator>, ...ZodDiscriminatedUnionOption<Discriminator>[]],
-    >(
-      discriminator: Discriminator,
-      options: Types,
-      params?: DiscriminatedUnionArgs[2],
-    ) =>
-      zod.discriminatedUnion(discriminator, options as any, params) as unknown as ZuiType<
-        ZodDiscriminatedUnion<Discriminator, Types>,
-        UI
-      >,
+  discriminatedUnion: <
+    Discriminator extends string,
+    Types extends [ZodDiscriminatedUnionOption<Discriminator>, ...ZodDiscriminatedUnionOption<Discriminator>[]],
+  >(
+    discriminator: Discriminator,
+    options: Types,
+    params?: DiscriminatedUnionArgs[2],
+  ) =>
+    z.discriminatedUnion(discriminator, options as any, params) as unknown as ZuiType<
+      ZodDiscriminatedUnion<Discriminator, Types>
+    >,
 
-    record: <Keys extends ZodTypeAny, Value extends ZodTypeAny>(
-      keySchema: Keys,
-      valueSchema: Value,
-      params?: RecordArgs[2],
-    ) => zod.record(keySchema, valueSchema, params) as unknown as ZuiType<ZodRecord<Keys, Value>, UI>,
+  record: <Keys extends ZodTypeAny, Value extends ZodTypeAny>(
+    keySchema: Keys,
+    valueSchema: Value,
+    params?: RecordArgs[2],
+  ) => z.record(keySchema, valueSchema, params) as unknown as ZuiType<ZodRecord<Keys, Value>>,
 
   enum: <U extends string, T extends Readonly<[U, ...U[]]>>(values: T, params?: EnumArgs[1]) =>
     z.enum(values as any, params) as unknown as ZuiType<ZodEnum<Writeable<T>>>,
@@ -328,10 +324,6 @@ export const extendZod = <UI extends UIExtension>(zod: typeof z) => {
   null: (params) => z.null(params) as unknown as ZuiType<ZodNull>,
   fromJsonSchema: (schema) => jsonSchemaToZui(schema) as unknown as ZuiType<ZodAny>,
   fromObject: (object) => objectToZui(object) as unknown as ZuiType<ZodAny>,
-  }
-  return zui
 }
-
-const zui = extendZod(z)
 
 export { zui }

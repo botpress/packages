@@ -11,6 +11,17 @@ const testExtensions = {
         allowVariables: z.boolean().optional(),
       }),
     ),
+    createComponent(
+      'SuperPasswordInput',
+      z.object({
+        requireSpecialCharacters: z.boolean().default(false).optional(),
+        requireNumbers: z.boolean().default(false).optional(),
+        requireLowercase: z.boolean().default(false).optional(),
+        requireUppercase: z.boolean().default(false).optional(),
+        minLength: z.number().default(8).optional(),
+        maxLength: z.number().optional(),
+      }),
+    ),
   ],
   number: [
     createComponent(

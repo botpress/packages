@@ -26,4 +26,4 @@ export type ZodToBaseType<T extends ZodType> = T extends z.ZodString
   ? 'array'
   : T extends z.ZodObject<any, any>
   ? 'object'
-  : never
+  : any

@@ -63,9 +63,22 @@ describe('ZUI UI Extensions', () => {
   test('should be able to extend zod', () => {
     const myZui = zui as Zui<typeof testExtensions>
 
-    myZui.string().displayAs({
-      name: 'SuperInput',
-      allowVariables: true,
+    myZui.string().displayAs('SuperPasswordInput', {
+      requireNumbers: true,
+      maxLength: 500,
+    })
+
+    myZui.number().displayAs('SuperNumber', {
+      max: 100,
+    })
+
+    myZui.boolean().displayAs('SuperCheckbox', {
+      label: 'This is a checkbox',
+    })
+
+    myZui.array(myZui.string()).displayAs('SuperArray', {
+      minItems: 1,
+      maxItems: 10,
     })
   })
 })

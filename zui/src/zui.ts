@@ -61,7 +61,10 @@ export type ZuiExtension<Z extends ZodType, UI extends UIExtension, Out = z.infe
   /**
    * The type of component to use to display the field and its options
    */
-  displayAs: (options: UI[ZodToBaseType<Z>][number]) => ZuiType<Z, UI>
+  displayAs: (
+    type: UI[ZodToBaseType<Z>][number]['type'],
+    options: UI[ZodToBaseType<Z>][number]['schema'],
+  ) => ZuiType<Z, UI>
   /**
    * Examples of valid values for the field
    * @default []

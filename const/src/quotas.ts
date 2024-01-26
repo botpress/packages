@@ -54,7 +54,7 @@ export const quotaConfigs = {
     name: 'Invocation Timeout',
     description: 'Maximum time in milliseconds a bot can run before timing out.',
     default: 60_000,
-    kind: 'bot',
+    kind: 'workspace',
     category: 'timeout',
     trackUsagePerBot: false
   },

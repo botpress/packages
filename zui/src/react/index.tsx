@@ -1,4 +1,4 @@
-import { type FC } from 'react'
+import React, { type FC } from 'react'
 import { z } from 'zod'
 import { BaseType, UIExtension } from '../uiextensions'
 import { ExtensionDefinitions, zuiKey } from '../zui'
@@ -63,7 +63,6 @@ export const ZuiForm = <T extends UIExtension = ExtensionDefinitions>({ schema, 
       {Object.entries(schema.properties).map(([_, propertyObject]: any[]) => {
         const dataType = propertyObject.type
         const [componentID, params] = propertyObject[zuiKey]['displayAs']
-        console.log(params)
         const Component = getComponent(components, dataType, componentID) as ZUIReactComponent<any, any>
         return <Component key={`${dataType}:${componentID}`} type={dataType} id={componentID} params={params} />
       })}

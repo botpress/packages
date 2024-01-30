@@ -1,3 +1,4 @@
+import React from 'react'
 import { ZUIReactComponentLibrary, ZUIReactComponent } from '.'
 import { defaultExtensions } from '../uiextensions/defaults'
 

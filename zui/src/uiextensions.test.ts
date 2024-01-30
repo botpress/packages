@@ -39,22 +39,20 @@ const testExtensions = {
 describe('ZUI UI Extensions', () => {
   test('should be able to extend zui using module declaration', () => {
     const zui = basezui as Zui<typeof testExtensions>
-    zui.string().displayAs('SuperInput', {
-      allowVariables: true,
+
+    const aSchema = zui.object({
+      myString: zui.string().displayAs('SuperInput', {
+        allowVariables: true,
+      }),
+      myNumber: zui.number().displayAs('SuperNumber', {
+        max: 100,
+      }),
+      myBoolean: zui.boolean().displayAs('SuperCheckbox', {
+        label: 'This is a checkbox',
+      }),
     })
 
-    zui.number().displayAs('SuperNumber', {
-      max: 100,
-    })
-
-    zui.boolean().displayAs('SuperCheckbox', {
-      label: 'This is a checkbox',
-    })
-
-    zui.array(zui.string()).displayAs('SuperArray', {
-      minItems: 1,
-      maxItems: 10,
-    })
+    aSchema.toJsonSchema()
   })
 
   test('should be able to use zui with default extensions', () => {

@@ -61,11 +61,13 @@ describe('ZUI UI Extensions', () => {
     const zui = basezui as Zui<typeof defaultExtensions>
 
     zui.string().displayAs('textbox', {
+      name: 'username',
       type: 'text',
       default: 'hello',
     })
 
     zui.number().displayAs('numberinput', {
+      name: 'age',
       type: 'number',
       default: 5,
       min: 0,
@@ -73,6 +75,7 @@ describe('ZUI UI Extensions', () => {
     })
 
     zui.boolean().displayAs('checkbox', {
+      name: 'isAwesome',
       default: true,
     })
   })

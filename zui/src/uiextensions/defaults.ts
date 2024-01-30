@@ -16,12 +16,21 @@ export const defaultExtensions = {
     textbox: {
       id: 'textbox',
       schema: commonHTMLInputSchema.extend({
-        type: z.enum(['text', 'password', 'email', 'tel', 'url', 'color', 'time']).default('text'),
+        type: z.enum(['text', 'password', 'email', 'tel', 'url']).default('text'),
         default: z.string().optional(),
         maxLength: z.number().optional(),
         minLength: z.number().optional(),
         pattern: z.string().optional(),
         placeholder: z.string().optional(),
+      }),
+    },
+    datetimeinput: {
+      id: 'datetimeinput',
+      schema: commonHTMLInputSchema.extend({
+        type: z.enum(['datetime-local', 'date', 'week']).default('datetime-local'),
+        default: z.string().optional(),
+        min: z.string().optional(),
+        max: z.string().optional(),
       }),
     },
   },

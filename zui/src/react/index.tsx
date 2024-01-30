@@ -1,7 +1,7 @@
 import { type FC } from 'react'
 import { z } from 'zod'
 import { BaseType, UIExtension } from '../uiextensions'
-import { ExtensionDefinitions } from '../zui'
+import { ExtensionDefinitions, zuiKey } from '../zui'
 
 export type ZUIReactComponent<
   Type extends BaseType,
@@ -31,7 +31,42 @@ export const NotImplementedComponent: ZUIReactComponent<any, any> = ({ type, id 
   )
 }
 
-// TODO: implement
-export const ZUIForm: FC<{ components: ZUIReactComponentLibrary; schema: any }> = ({ schema }) => {
-  return <form>return null</form>
+export const NotFoundComponent: ZUIReactComponent<any, any> = ({ type, id }) => {
+  return (
+    <div>
+      <p>
+        {type || null} {id || null} component not found
+      </p>
+    </div>
+  )
+}
+
+export { defaultComponentLibrary } from './defaults'
+
+export interface ZuiFormProps<UI extends UIExtension = ExtensionDefinitions> {
+  components: ZUIReactComponentLibrary<UI>
+  schema: any
+}
+
+const getComponent = (components: ZUIReactComponentLibrary<any>, type: BaseType, id: string) => {
+  const component = components[type][id]
+  if (!component) {
+    console.warn(`Component ${type}.${id} not found`)
+    return NotImplementedComponent
+  }
+  return component
+}
+
+export const ZuiForm = <T extends UIExtension = ExtensionDefinitions>({ schema, components }: ZuiFormProps<T>) => {
+  return (
+    <>
+      {Object.entries(schema.properties).map(([_, propertyObject]: any[]) => {
+        const dataType = propertyObject.type
+        const [componentID, params] = propertyObject[zuiKey]['displayAs']
+        console.log(params)
+        const Component = getComponent(components, dataType, componentID) as ZUIReactComponent<any, any>
+        return <Component key={`${dataType}:${componentID}`} type={dataType} id={componentID} params={params} />
+      })}
+    </>
+  )
 }

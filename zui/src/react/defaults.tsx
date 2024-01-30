@@ -9,6 +9,10 @@ const NumberSlider: ZUIReactComponent<'number', 'slider', typeof defaultExtensio
   return <input {...params} />
 }
 
+const DatetimeInput: ZUIReactComponent<'string', 'datetimeinput', typeof defaultExtensions> = ({ params }) => {
+  return <input {...params} />
+}
+
 const NumberInput: ZUIReactComponent<'number', 'numberinput', typeof defaultExtensions> = ({ params }) => {
   return <input {...params} />
 }
@@ -27,9 +31,10 @@ const SelectList: ZUIReactComponent<'array', 'select', typeof defaultExtensions>
   )
 }
 
-export const defaultExtensionComponents: ZUIReactComponentLibrary<typeof defaultExtensions> = {
+export const defaultComponentLibrary: ZUIReactComponentLibrary<typeof defaultExtensions> = {
   string: {
     textbox: TextBox,
+    datetimeinput: DatetimeInput,
   },
   number: {
     slider: NumberSlider,

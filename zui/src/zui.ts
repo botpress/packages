@@ -174,7 +174,7 @@ function extend<T extends ZCreate>(zType: T) {
   const instance = ((zType as any).prototype as any) ?? (zType as any)
 
   for (const extension of Extensions) {
-    instance[extension] = function (props: unknown) {
+    instance[extension] = function (...props: unknown[]) {
       this._def[zuiKey] ??= {}
       this._def[zuiKey][extension] = props
       return this

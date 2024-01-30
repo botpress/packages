@@ -23,9 +23,9 @@ import type {
 
 // eslint-disable-next-line no-duplicate-imports
 import { z } from 'zod'
-import { getZuiSchemas } from './zui-schemas'
+import { ZuiSchemaOptions, getZuiSchemas } from './zui-schemas'
 import { JsonSchema7, jsonSchemaToZui } from '.'
-import { objectToZui } from './object-to-zui'
+import { ObjectToZuiOptions, objectToZui } from './object-to-zui'
 import { UIExtension, ZodToBaseType } from './uiextensions'
 export type Infer<
   T extends ZodType | ZuiType<any> | ZuiTypeAny,
@@ -130,7 +130,7 @@ export type ZuiExtension<Z extends ZodType, UI extends UIExtension, Out = z.infe
       ? Parameters<ZuiExtension<Z, UI>[P]>[0]
       : never
   }
-  toJsonSchema(): any //TODO: fix typings, JsonSchema7 doesn't work well when consuming it
+  toJsonSchema(options?: ZuiSchemaOptions): any //TODO: fix typings, JsonSchema7 doesn't work well when consuming it
 }
 
 export const zuiKey = 'x-zui' as const
@@ -191,8 +191,8 @@ function extend<T extends ZCreate>(zType: T) {
   }
 
   if (!instance.toJsonSchema) {
-    instance.toJsonSchema = function () {
-      return getZuiSchemas(this).schema
+    instance.toJsonSchema = function (options?: ZuiSchemaOptions) {
+      return getZuiSchemas(this, options).schema
     }
   }
 
@@ -258,7 +258,10 @@ export type Zui<UI extends UIExtension> = {
   number: (params?: NumberArgs[0]) => ZuiType<ZodNumber, UI>
   boolean: (params?: BooleanArgs[0]) => ZuiType<ZodBoolean, UI>
   literal: (value: LiteralArgs[0], params?: LiteralArgs[1]) => ZuiType<ZodLiteral<any>, UI>
-  array: <T extends ZodTypeAny>(schema: T, params?: ArrayArgs[1]) => ZuiType<ZodArray<T>, UI>
+  array: <T extends ZodTypeAny>(
+    schema: T,
+    params?: ArrayArgs[1],
+  ) => ZuiType<ZodArray<T, 'many'>, UI> & ZodArray<T, 'many'>
   object: <T extends ZodRawShape>(shape: T, params?: ObjectArgs[1]) => ZuiType<ZodObject<T>, UI> & ZodObject<T>
   union: <T extends readonly [ZodTypeAny, ZodTypeAny, ...ZodTypeAny[]]>(
     types: T,
@@ -282,7 +285,7 @@ export type Zui<UI extends UIExtension> = {
   unknown: (params?: UnknownArgs[0]) => ZuiType<ZodUnknown>
   null: (params?: NullArgs[0]) => ZuiType<ZodNull>
   fromJsonSchema(schema: JsonSchema7): ZuiType<ZodAny>
-  fromObject(object: any): ZuiType<ZodAny>
+  fromObject(object: any, options?: ObjectToZuiOptions): ZuiType<ZodAny>
 }
 
 export interface ZUIDisplayExtensions {}
@@ -301,7 +304,7 @@ const zui: Zui<ExtensionDefinitions> = {
   optional: (type, params) => z.optional(type, params) as unknown as ZuiType<ZodOptional<any>>,
 
   array: <T extends ZodTypeAny>(schema: T, params?: ArrayArgs[1]) =>
-    z.array(schema, params) as unknown as ZuiType<ZodArray<T>>,
+    z.array(schema, params) as unknown as ZuiType<ZodArray<T, 'many'>> & ZodArray<T, 'many'>,
 
   object: <T extends ZodRawShape>(shape: T, params?: ObjectArgs[1]) =>
     z.object(shape as ZodRawShape, params) as ZodObject<T> & ZuiType<ZodObject<T>>,
@@ -334,7 +337,7 @@ const zui: Zui<ExtensionDefinitions> = {
   unknown: (params) => z.unknown(params) as unknown as ZuiType<ZodUnknown>,
   null: (params) => z.null(params) as unknown as ZuiType<ZodNull>,
   fromJsonSchema: (schema) => jsonSchemaToZui(schema) as unknown as ZuiType<ZodAny>,
-  fromObject: (object) => objectToZui(object) as unknown as ZuiType<ZodAny>,
+  fromObject: (object, options) => objectToZui(object, options) as unknown as ZuiType<ZodAny>,
 }
 
 export { zui }

@@ -23,10 +23,10 @@ import type {
 
 // eslint-disable-next-line no-duplicate-imports
 import { z } from 'zod'
-import { UIExtension, ZodToBaseType } from './uiextensions'
 import { getZuiSchemas } from './zui-schemas'
 import { JsonSchema7, jsonSchemaToZui } from '.'
 import { objectToZui } from './object-to-zui'
+import { UIExtension, ZodToBaseType } from './uiextensions'
 export type Infer<
   T extends ZodType | ZuiType<any> | ZuiTypeAny,
   Out = T extends ZodType ? T['_output'] : T extends ZuiType<infer Z> ? Z['_output'] : never,
@@ -61,9 +61,9 @@ export type ZuiExtension<Z extends ZodType, UI extends UIExtension, Out = z.infe
   /**
    * The type of component to use to display the field and its options
    */
-  displayAs: (
-    type: UI[ZodToBaseType<Z>][number]['type'],
-    options: UI[ZodToBaseType<Z>][number]['schema'],
+  displayAs: <K extends keyof UI[ZodToBaseType<Z>]>(
+    id: K,
+    options: z.infer<UI[ZodToBaseType<Z>][K]['schema']>,
   ) => ZuiType<Z, UI>
   /**
    * Examples of valid values for the field
@@ -174,7 +174,7 @@ function extend<T extends ZCreate>(zType: T) {
   const instance = ((zType as any).prototype as any) ?? (zType as any)
 
   for (const extension of Extensions) {
-    instance[extension] = function (props: unknown) {
+    instance[extension] = function (...props: unknown[]) {
       this._def[zuiKey] ??= {}
       this._def[zuiKey][extension] = props
       return this
@@ -285,7 +285,15 @@ export type Zui<UI extends UIExtension> = {
   fromObject(object: any): ZuiType<ZodAny>
 }
 
-const zui: Zui<UIExtension> = {
+export interface ZUIDisplayExtensions {}
+
+export type ExtensionDefinitions = ZUIDisplayExtensions extends {
+  extensions: infer TExtensions extends UIExtension
+}
+  ? TExtensions
+  : UIExtension
+
+const zui: Zui<ExtensionDefinitions> = {
   string: (params) => z.string(params) as unknown as ZuiType<ZodString>,
   number: (params) => z.number(params) as unknown as ZuiType<ZodNumber>,
   boolean: (params) => z.boolean(params) as unknown as ZuiType<ZodBoolean>,

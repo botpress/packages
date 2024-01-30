@@ -1,19 +1,15 @@
 import { z } from 'zod'
-import { createComponent } from './uiextensions'
 import { describe, test } from 'vitest'
-import { Zui, zui } from './zui'
+import { type Zui, zui as basezui } from './zui'
+import { UIExtension } from './uiextensions'
+import { defaultExtensions } from './uiextensions/defaults'
 
 const testExtensions = {
-  string: [
-    createComponent(
-      'SuperInput',
-      z.object({
-        allowVariables: z.boolean().optional(),
-      }),
-    ),
-    createComponent(
-      'SuperPasswordInput',
-      z.object({
+  string: {
+    SuperInput: { id: 'SuperInput', schema: z.object({ allowVariables: z.boolean().optional() }) },
+    SuperPasswordInput: {
+      id: 'SuperPasswordInput',
+      schema: z.object({
         requireSpecialCharacters: z.boolean().default(false).optional(),
         requireNumbers: z.boolean().default(false).optional(),
         requireLowercase: z.boolean().default(false).optional(),
@@ -21,64 +17,66 @@ const testExtensions = {
         minLength: z.number().default(8).optional(),
         maxLength: z.number().optional(),
       }),
-    ),
-  ],
-  number: [
-    createComponent(
-      'SuperNumber',
-      z.object({
-        min: z.number().optional(),
-        max: z.number().optional(),
-      }),
-    ),
-  ],
-  boolean: [
-    createComponent(
-      'SuperCheckbox',
-      z.object({
-        label: z.string().optional(),
-      }),
-    ),
-  ],
-  array: [
-    createComponent(
-      'SuperArray',
-      z.object({
-        minItems: z.number().optional(),
-        maxItems: z.number().optional(),
-      }),
-    ),
-  ],
-  object: [
-    createComponent(
-      'SuperObject',
-      z.object({
-        label: z.string().optional(),
-      }),
-    ),
-  ],
-}
+    },
+  },
+  number: {
+    SuperNumber: { id: 'SuperNumber', schema: z.object({ min: z.number().optional(), max: z.number().optional() }) },
+  },
+  boolean: {
+    SuperCheckbox: { id: 'SuperCheckbox', schema: z.object({ label: z.string().optional() }) },
+  },
+  array: {
+    SuperArray: {
+      id: 'SuperArray',
+      schema: z.object({ minItems: z.number().optional(), maxItems: z.number().optional() }),
+    },
+  },
+  object: {
+    SuperObject: { id: 'SuperObject', schema: z.object({ label: z.string().optional() }) },
+  },
+} satisfies UIExtension
 
 describe('ZUI UI Extensions', () => {
-  test('should be able to extend zod', () => {
-    const myZui = zui as Zui<typeof testExtensions>
-
-    myZui.string().displayAs('SuperPasswordInput', {
-      requireNumbers: true,
-      maxLength: 500,
+  test('should be able to extend zui using module declaration', () => {
+    const zui = basezui as Zui<typeof testExtensions>
+    zui.string().displayAs('SuperInput', {
+      allowVariables: true,
     })
 
-    myZui.number().displayAs('SuperNumber', {
+    zui.number().displayAs('SuperNumber', {
       max: 100,
     })
 
-    myZui.boolean().displayAs('SuperCheckbox', {
+    zui.boolean().displayAs('SuperCheckbox', {
       label: 'This is a checkbox',
     })
 
-    myZui.array(myZui.string()).displayAs('SuperArray', {
+    zui.array(zui.string()).displayAs('SuperArray', {
       minItems: 1,
       maxItems: 10,
+    })
+  })
+
+  test('should be able to use zui with default extensions', () => {
+    const zui = basezui as Zui<typeof defaultExtensions>
+
+    zui.string().displayAs('textbox', {
+      name: 'username',
+      type: 'text',
+      default: 'hello',
+    })
+
+    zui.number().displayAs('numberinput', {
+      name: 'age',
+      type: 'number',
+      default: 5,
+      min: 0,
+      max: 10,
+    })
+
+    zui.boolean().displayAs('checkbox', {
+      name: 'isAwesome',
+      default: true,
     })
   })
 })

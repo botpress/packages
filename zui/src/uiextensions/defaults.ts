@@ -55,6 +55,19 @@ export const defaultExtensions = {
       }),
     },
   },
-  array: {},
+  array: {
+    select: {
+      id: 'select',
+      schema: commonHTMLInputSchema.extend({
+        default: z.string().optional(),
+        options: z.array(
+          z.object({
+            label: z.string(),
+            value: z.string(),
+          }),
+        ),
+      }),
+    },
+  },
   object: {},
 } as const satisfies UIExtension

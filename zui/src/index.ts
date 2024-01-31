@@ -5,7 +5,13 @@ export {
   type UIExtensionDefinition,
   defaultExtensions,
 } from './uiextensions'
-export { type ZUIReactComponent, type ZUIReactComponentLibrary, defaultComponentLibrary } from './react'
+export {
+  type ZUIReactComponent,
+  type ZUIReactComponentLibrary,
+  type ZuiFormProps,
+  defaultComponentLibrary,
+  ZuiForm,
+} from './react'
 export type { Zui, ZuiType, Infer, ZuiExtension, ZuiRawShape, ZuiTypeAny } from './zui'
 export type {
   JsonSchema7Type as JsonSchema7,

@@ -1,6 +1,6 @@
 import React from 'react'
-import { ZUIReactComponentLibrary, ZUIReactComponent } from '.'
-import { defaultExtensions } from '../uiextensions/defaults'
+import type { ZUIReactComponentLibrary, ZUIReactComponent } from '.'
+import { defaultExtensions } from '../uiextensions'
 
 const TextBox: ZUIReactComponent<'string', 'textbox', typeof defaultExtensions> = ({ params }) => {
   return <input {...params} />

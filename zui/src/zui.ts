@@ -26,7 +26,8 @@ import { z } from 'zod'
 import { ZuiSchemaOptions, getZuiSchemas } from './zui-schemas'
 import { JsonSchema7, jsonSchemaToZui } from '.'
 import { ObjectToZuiOptions, objectToZui } from './object-to-zui'
-import { UIExtension, ZodToBaseType } from './uiextensions'
+import type { GlobalExtensionDefinition, UIExtension, ZodToBaseType } from './uiextensions'
+
 export type Infer<
   T extends ZodType | ZuiType<any> | ZuiTypeAny,
   Out = T extends ZodType ? T['_output'] : T extends ZuiType<infer Z> ? Z['_output'] : never,
@@ -258,7 +259,7 @@ type ZuiRecord = {
   <Value extends ZodTypeAny>(valueSchema: ZodTypeAny, params?: RecordArgs[2]): ZuiType<ZodRecord<ZodString, Value>>
 }
 
-export type Zui<UI extends UIExtension> = {
+export type Zui<UI extends UIExtension = GlobalExtensionDefinition> = {
   string: (params?: StringArgs[0]) => ZuiType<ZodString, UI>
   number: (params?: NumberArgs[0]) => ZuiType<ZodNumber, UI>
   boolean: (params?: BooleanArgs[0]) => ZuiType<ZodBoolean, UI>
@@ -293,15 +294,7 @@ export type Zui<UI extends UIExtension> = {
   fromObject(object: any, options?: ObjectToZuiOptions): ZuiType<ZodAny>
 }
 
-export interface ZUIDisplayExtensions {}
-
-export type ExtensionDefinitions = ZUIDisplayExtensions extends {
-  extensions: infer TExtensions extends UIExtension
-}
-  ? TExtensions
-  : UIExtension
-
-const zui: Zui<ExtensionDefinitions> = {
+const zui: Zui<GlobalExtensionDefinition> = {
   string: (params) => z.string(params) as unknown as ZuiType<ZodString>,
   number: (params) => z.number(params) as unknown as ZuiType<ZodNumber>,
   boolean: (params) => z.boolean(params) as unknown as ZuiType<ZodBoolean>,

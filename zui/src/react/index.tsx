@@ -1,12 +1,12 @@
 import React, { type FC } from 'react'
 import { z } from 'zod'
-import { BaseType, UIExtension } from '../uiextensions'
-import { ExtensionDefinitions, zuiKey } from '../zui'
+import { BaseType, GlobalExtensionDefinition, UIExtension } from '../uiextensions'
+import { zuiKey } from '../zui'
 
 export type ZUIReactComponent<
   Type extends BaseType,
   ID extends keyof UI[Type],
-  UI extends UIExtension = ExtensionDefinitions,
+  UI extends UIExtension = GlobalExtensionDefinition,
 > = FC<{
   type: Type
   id: ID
@@ -15,7 +15,7 @@ export type ZUIReactComponent<
 
 type AsBaseType<T> = T extends BaseType ? T : never
 
-export type ZUIReactComponentLibrary<UI extends UIExtension = ExtensionDefinitions> = {
+export type ZUIReactComponentLibrary<UI extends UIExtension = GlobalExtensionDefinition> = {
   [Type in keyof UI]: {
     [ID in keyof UI[Type]]: ZUIReactComponent<AsBaseType<Type>, ID, UI>
   }
@@ -43,7 +43,7 @@ export const NotFoundComponent: ZUIReactComponent<any, any> = ({ type, id }) => 
 
 export { defaultComponentLibrary } from './defaults'
 
-export interface ZuiFormProps<UI extends UIExtension = ExtensionDefinitions> {
+export interface ZuiFormProps<UI extends UIExtension = GlobalExtensionDefinition> {
   components: ZUIReactComponentLibrary<UI>
   schema: any
 }
@@ -57,7 +57,7 @@ const getComponent = (components: ZUIReactComponentLibrary<any>, type: BaseType,
   return component
 }
 
-export const ZuiForm = <T extends UIExtension = ExtensionDefinitions>({ schema, components }: ZuiFormProps<T>) => {
+export const ZuiForm = <T extends UIExtension = GlobalExtensionDefinition>({ schema, components }: ZuiFormProps<T>) => {
   return (
     <>
       {Object.entries(schema.properties).map(([_, propertyObject]: any[]) => {

@@ -41,8 +41,8 @@ const exampleExtensions = {
 Override the `ZUIDisplayExtensions` interface definition to have zui typecheck your extensions:
 
 ```typescript
-declare module 'zui' {
-  export interface ZUIDisplayExtensions {
+declare module '@bpinternal/zui' {
+  interface UIExtensionDefinition {
     extensions: typeof exampleExtensions
   }
 }

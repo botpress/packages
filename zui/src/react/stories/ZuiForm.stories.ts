@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react'
 import { ZuiForm, defaultComponentLibrary } from '..'
-import { defaultExtensions } from '../../uiextensions/defaults'
+import { defaultExtensions } from '../../uiextensions'
 import { Zui, zui as zuiImport } from '../../zui'
 
 const meta = {

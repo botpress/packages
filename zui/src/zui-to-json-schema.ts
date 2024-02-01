@@ -5,7 +5,7 @@ import type { ZuiSchemaOptions } from './zui-schemas'
 import { z } from 'zod'
 
 type JsonSchemaWithZui = JsonSchema7 & {
-  [zuiKey]?: ZuiExtension<ToZodType<ZuiTypeAny>>
+  [zuiKey]?: ZuiExtension<ToZodType<ZuiTypeAny>, any>
   properties?: { [key: string]: any }
 }
 
@@ -34,7 +34,7 @@ const mergeZuiIntoJsonSchema = (
   zuiSchema: ZuiType<any> | z.ZodTypeAny,
   opts: ZuiSchemaOptions,
 ): JsonSchema7 => {
-  const assignZuiProps = (value: JsonSchemaWithZui, ui: ZuiExtension<ToZodType<ZuiTypeAny>>['ui']) => {
+  const assignZuiProps = (value: JsonSchemaWithZui, ui: ZuiExtension<ToZodType<ZuiTypeAny>, any>['ui']) => {
     if (ui?.examples) {
       Object.assign(value, { examples: ui.examples })
     }
@@ -49,7 +49,7 @@ const mergeZuiIntoJsonSchema = (
       const shape = zuiSchema?._def.shape?.()
 
       if (shape?.[key]) {
-        const innerZui = shape[key].ui as ZuiExtension<ToZodType<ZuiTypeAny>>['ui']
+        const innerZui = shape[key].ui as ZuiExtension<ToZodType<ZuiTypeAny>, any>['ui']
 
         assignZuiProps(value, innerZui)
         mergeZuiIntoJsonSchema(value, shape[key], opts)

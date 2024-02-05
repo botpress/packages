@@ -1,17 +1,16 @@
-export {
-  type UIExtension,
-  type BaseType,
-  type GlobalExtensionDefinition,
-  type UIExtensionDefinition,
-  defaultExtensions,
+export type {
+  UIExtension,
+  BaseType,
+  GlobalExtensionDefinition,
+  UIExtensionDefinition,
 } from './uiextensions'
 export {
-  type ZUIReactComponent,
-  type ZUIReactComponentLibrary,
   type ZuiFormProps,
   defaultComponentLibrary,
+  defaultExtensions,
   ZuiForm,
 } from './react'
+export type { ZUIFieldComponent, ZUIContainerComponent, ZUIComponent, ZUIComponentLibrary } from './react/types'
 export type { Zui, ZuiType, Infer, ZuiExtension, ZuiRawShape, ZuiTypeAny } from './zui'
 export type {
   JsonSchema7Type as JsonSchema7,

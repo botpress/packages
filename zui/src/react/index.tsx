@@ -1,27 +1,9 @@
-import React, { type FC } from 'react'
-import { z } from 'zod'
-import { BaseType, GlobalExtensionDefinition, UIExtension } from '../uiextensions'
+import React from 'react'
+import type { ZUIComponent, ZUIComponentLibrary, ZUIFieldComponent } from './types'
+import { BaseType, ContainerType, GlobalExtensionDefinition, UIExtension, containerTypes } from '../uiextensions'
 import { zuiKey } from '../zui'
 
-export type ZUIReactComponent<
-  Type extends BaseType,
-  ID extends keyof UI[Type],
-  UI extends UIExtension = GlobalExtensionDefinition,
-> = FC<{
-  type: Type
-  id: ID
-  params: z.infer<UI[Type][ID]['schema']>
-}>
-
-type AsBaseType<T> = T extends BaseType ? T : never
-
-export type ZUIReactComponentLibrary<UI extends UIExtension = GlobalExtensionDefinition> = {
-  [Type in keyof UI]: {
-    [ID in keyof UI[Type]]: ZUIReactComponent<AsBaseType<Type>, ID, UI>
-  }
-}
-
-export const NotImplementedComponent: ZUIReactComponent<any, any> = ({ type, id }) => {
+export const NotImplementedComponent: ZUIFieldComponent<any, any> = ({ type, id }) => {
   return (
     <div>
       <p>
@@ -31,7 +13,7 @@ export const NotImplementedComponent: ZUIReactComponent<any, any> = ({ type, id 
   )
 }
 
-export const NotFoundComponent: ZUIReactComponent<any, any> = ({ type, id }) => {
+export const NotFoundComponent: ZUIFieldComponent<any, any> = ({ type, id }) => {
   return (
     <div>
       <p>
@@ -41,31 +23,89 @@ export const NotFoundComponent: ZUIReactComponent<any, any> = ({ type, id }) => 
   )
 }
 
-export { defaultComponentLibrary } from './defaults'
-
 export interface ZuiFormProps<UI extends UIExtension = GlobalExtensionDefinition> {
-  components: ZUIReactComponentLibrary<UI>
+  components: ZUIComponentLibrary<UI>
   schema: any
 }
 
-const getComponent = (components: ZUIReactComponentLibrary<any>, type: BaseType, id: string) => {
-  const component = components[type][id]
-  if (!component) {
-    console.warn(`Component ${type}.${id} not found`)
-    return NotImplementedComponent
+const resolveComponent = (components: ZUIComponentLibrary<any>, fieldSchema: any, path: string[]) => {
+  const type = fieldSchema.type as BaseType
+  const uiDefinition = fieldSchema[zuiKey]?.displayAs || null
+
+  if (!uiDefinition || !Array.isArray(uiDefinition) || uiDefinition.length < 2) {
+    const defaultComponent = components[type]?.default
+    if (defaultComponent) {
+      return { Component: defaultComponent, type, id: 'default', params: {}, path, isContainer: containerTypes.includes(type as ContainerType)}
+    }
+    return null
   }
-  return component
+
+  const componentID: string = uiDefinition[0] || 'default'
+  
+  const Component = components[type]?.[componentID] || null
+
+  if (!Component) {
+    console.warn(`Component ${type}.${componentID} not found`)
+    return null
+  }
+  
+  const params = uiDefinition[1] || {}
+
+  return { Component: Component as ZUIComponent<any, any>, type, id: componentID, params, path, isContainer: containerTypes.includes(type as ContainerType)}
 }
 
-export const ZuiForm = <T extends UIExtension = GlobalExtensionDefinition>({ schema, components }: ZuiFormProps<T>) => {
+
+export const ZuiForm = <T extends UIExtension = GlobalExtensionDefinition>({ schema, components }: ZuiFormProps<T>): JSX.Element | null => {
+  const renderField = (fieldSchema: any, path: string[]) => {
+    const componentConfig = resolveComponent(components, fieldSchema, path);
+
+    if (!componentConfig) {
+      return null;
+    }
+
+    const { Component, id, isContainer, path: currentPath, params, type } = componentConfig;
+    
+    if (!Component) {
+      console.error(`Component not found for type: ${type} at path: ${path.join('.')}`);
+      return null;
+    }
+
+    return (
+      <Component
+        key={path.length > 0 ? path.join('.') : 'root'}
+        id={id}
+        type={type}
+        params={params}
+        children={isContainer ? renderObjectFields(fieldSchema, currentPath) : undefined}
+      />
+    );
+  };
+
+  const renderObjectFields = (objectSchema: any, path: string[]): (JSX.Element | null)[] => {
+    const { properties } = objectSchema;
+    const fields: (JSX.Element | null)[] = [];
+    
+    for (const [fieldName, fieldSchema] of Object.entries(properties) as [string, any]) {
+      const fieldPath = [...path, fieldName];
+
+      if (!fieldSchema) {
+        console.error(`Field schema not found for field: ${fieldPath.join('.')}`);
+        continue;
+      }
+
+      const renderedField = renderField(fieldSchema, fieldPath);
+
+      fields.push(renderedField);
+    }
+    
+    return fields;
+  };
+
   return (
-    <>
-      {Object.entries(schema.properties).map(([_, propertyObject]: any[]) => {
-        const dataType = propertyObject.type
-        const [componentID, params] = propertyObject[zuiKey]['displayAs']
-        const Component = getComponent(components, dataType, componentID) as ZUIReactComponent<any, any>
-        return <Component key={`${dataType}:${componentID}`} type={dataType} id={componentID} params={params} />
-      })}
-    </>
-  )
-}
+    <form>
+      {renderField(schema, [])}
+    </form>
+  );
+};
+
+export { defaultComponentLibrary, defaultExtensions } from './defaults'

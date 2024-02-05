@@ -27,10 +27,7 @@ const exampleExtensions = {
     SuperCheckbox: { id: 'SuperCheckbox', schema: z.object({ label: z.string().optional() }) },
   },
   array: {
-    SuperArray: {
-      id: 'SuperArray',
-      schema: z.object({ minItems: z.number().optional(), maxItems: z.number().optional() }),
-    },
+    // not implemented yet
   },
   object: {
     SuperObject: { id: 'SuperObject', schema: z.object({ label: z.string().optional() }) },
@@ -52,9 +49,9 @@ Then, implement your custom components:
 
 ```typescript
 import React from 'react'
-import type { ZUIReactComponentLibrary, ZUIReactComponent } from 'zui'
+import type { ZUIReactComponentLibrary, ZUIComponent } from 'zui'
 
-const SuperInput: ZUIReactComponent<'string', 'SuperInput'> = ({ params }) => {
+const SuperInput: ZUIComponent<'string', 'SuperInput'> = ({ params }) => {
   return <input {...params} />
 }
 // ... other components

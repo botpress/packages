@@ -1,7 +1,8 @@
 import { z } from 'zod'
 import { describe, test } from 'vitest'
 import { type Zui, zui as basezui } from './zui'
-import { type UIExtension, defaultExtensions } from './uiextensions'
+import { type UIExtension } from './uiextensions'
+import { defaultExtensions } from './react'
 
 const testExtensions = {
   string: {

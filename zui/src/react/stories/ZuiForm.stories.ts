@@ -54,16 +54,19 @@ const exampleSchema = zui.object({
     required: true,
     placeholder: 'Confirm Password',
   }),
-  planType: zui.string().displayAs('select', {
-    name: 'planType',
-    required: true,
-    default: 'premium',
-    options: [
-      { value: 'free', label: 'Free' },
-      { value: 'premium', label: 'Premium' },
-      { value: 'enterprise', label: 'Enterprise' }
-    ],
-  }).nonempty(),
+  planType: zui
+    .string()
+    .displayAs('select', {
+      name: 'planType',
+      required: true,
+      default: 'premium',
+      options: [
+        { value: 'free', label: 'Free' },
+        { value: 'premium', label: 'Premium' },
+        { value: 'enterprise', label: 'Enterprise' },
+      ],
+    })
+    .nonempty(),
   location: zui.object({
     street: zui.string().displayAs('textbox', {
       name: 'street',
@@ -106,8 +109,8 @@ const exampleSchema = zui.object({
         default: 0,
         min: -180,
       }),
-    })
-  })
+    }),
+  }),
 })
 
 export const ExampleSchema: Story = {

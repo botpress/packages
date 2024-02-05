@@ -3,7 +3,7 @@ import { ZodSchema, ZodType, z } from 'zod'
 export type BaseType = 'number' | 'string' | 'boolean' | 'object' | 'array'
 
 export const containerTypes = ['object', 'array'] as const
-export type ContainerType = typeof containerTypes[number]
+export type ContainerType = (typeof containerTypes)[number]
 
 export type UIExtension = {
   [type in BaseType]: {
@@ -33,4 +33,3 @@ export type ZodToBaseType<T extends ZodType> = T extends z.ZodString
   : T extends z.ZodObject<any, any>
   ? 'object'
   : any
-

@@ -30,10 +30,14 @@ export const defaultExtensions = {
       id: 'select',
       schema: commonHTMLInputSchema.extend({
         default: z.string().optional(),
-        options: z.array(z.object({
-          value: z.string(),
-          label: z.string(),
-        })).optional(),
+        options: z
+          .array(
+            z.object({
+              value: z.string(),
+              label: z.string(),
+            }),
+          )
+          .optional(),
       }),
     },
     datetimeinput: {
@@ -76,10 +80,8 @@ export const defaultExtensions = {
       }),
     },
   },
-  array: {
-  },
-  object: {
-  },
+  array: {},
+  object: {},
 } as const satisfies UIExtension
 
 const TextBox: ZUIComponent<'string', 'textbox', typeof defaultExtensions> = ({ params }) => {
@@ -127,15 +129,21 @@ export const defaultComponentLibrary: ZUIComponentLibrary<typeof defaultExtensio
   },
   array: {},
   object: {
-    default: ({ children }) => <div style={{
-      display: 'flex',
-      alignItems: 'stretch',
-      justifyContent: 'stretch',
-      flexDirection: 'column',
-      padding: '0.4rem',
-      margin: '0.2rem',
-      gap: '0.5rem',
-      boxSizing: 'border-box'
-    }}>{children}</div>,
+    default: ({ children }) => (
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'stretch',
+          justifyContent: 'stretch',
+          flexDirection: 'column',
+          padding: '0.4rem',
+          margin: '0.2rem',
+          gap: '0.5rem',
+          boxSizing: 'border-box',
+        }}
+      >
+        {children}
+      </div>
+    ),
   },
 }

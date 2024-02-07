@@ -10,6 +10,7 @@ on:
         options:
           - const
           - entities
+          - es-node
           - expresso
           - log4bot
           - opapi

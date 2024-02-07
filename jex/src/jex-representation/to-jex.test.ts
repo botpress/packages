@@ -10,57 +10,59 @@ import { jexEquals as jexEquals } from './jex-equals'
 
 const z2j = (s: z.ZodType): JSONSchema7 => zodToJsonSchema(s, { $refStrategy: 'none' }) as JSONSchema7 // TODO: support reference
 
-const compareZodAndJex = (zodSchema: z.ZodType, expectedJexSchema: JexType) => {
-  const jsonSchema = z2j(zodSchema)
-  const actualJexSchema = j2x(jsonSchema)
-  expect(jexEquals(actualJexSchema, expectedJexSchema)).toBe(true)
-}
+const expectZod = (zodSchema: z.ZodType) => ({
+  toEqualJex: (expectedJexSchema: JexType) => {
+    const jsonSchema = z2j(zodSchema)
+    const actualJexSchema = j2x(jsonSchema)
+    expect(jexEquals(actualJexSchema, expectedJexSchema)).toBe(true)
+  }
+})
 
 test('jex-rep should model primitive types', () => {
-  compareZodAndJex(z.string(), { type: 'string' })
-  compareZodAndJex(z.number(), { type: 'number' })
-  compareZodAndJex(z.boolean(), { type: 'boolean' })
-  compareZodAndJex(z.null(), { type: 'null' })
-  compareZodAndJex(z.undefined(), { type: 'undefined' })
+  expectZod(z.string()).toEqualJex({ type: 'string' })
+  expectZod(z.number()).toEqualJex({ type: 'number' })
+  expectZod(z.boolean()).toEqualJex({ type: 'boolean' })
+  expectZod(z.null()).toEqualJex({ type: 'null' })
+  expectZod(z.undefined()).toEqualJex({ type: 'undefined' })
 })
 
 test('jex-rep should model literal types', () => {
-  compareZodAndJex(z.literal('a'), { type: 'string', value: 'a' })
-  compareZodAndJex(z.literal(1), { type: 'number', value: 1 })
-  compareZodAndJex(z.literal(true), { type: 'boolean', value: true })
+  expectZod(z.literal('a')).toEqualJex({ type: 'string', value: 'a' })
+  expectZod(z.literal(1)).toEqualJex({ type: 'number', value: 1 })
+  expectZod(z.literal(true)).toEqualJex({ type: 'boolean', value: true })
 })
 
 test('jex-rep should model union of primitives', () => {
-  compareZodAndJex(z.union([z.string(), z.number()]), {
+  expectZod(z.union([z.string(), z.number()])).toEqualJex({
     type: 'union',
     anyOf: [{ type: 'string' }, { type: 'number' }]
   })
-  compareZodAndJex(z.union([z.boolean(), z.null()]), {
+  expectZod(z.union([z.boolean(), z.null()])).toEqualJex({
     type: 'union',
     anyOf: [{ type: 'boolean' }, { type: 'null' }]
   })
-  compareZodAndJex(z.union([z.string(), z.null(), z.undefined()]), {
+  expectZod(z.union([z.string(), z.null(), z.undefined()])).toEqualJex({
     type: 'union',
     anyOf: [{ type: 'string' }, { type: 'null' }, { type: 'undefined' }]
   })
 })
 
 test('jex-rep should model union of literals of a single primitive', () => {
-  compareZodAndJex(z.union([z.literal('a'), z.literal('b')]), {
+  expectZod(z.union([z.literal('a'), z.literal('b')])).toEqualJex({
     type: 'union',
     anyOf: [
       { type: 'string', value: 'a' },
       { type: 'string', value: 'b' }
     ]
   })
-  compareZodAndJex(z.union([z.literal(1), z.literal(2)]), {
+  expectZod(z.union([z.literal(1), z.literal(2)])).toEqualJex({
     type: 'union',
     anyOf: [
       { type: 'number', value: 1 },
       { type: 'number', value: 2 }
     ]
   })
-  compareZodAndJex(z.union([z.literal(true), z.literal(false)]), {
+  expectZod(z.union([z.literal(true), z.literal(false)])).toEqualJex({
     type: 'union',
     anyOf: [
       { type: 'boolean', value: true },
@@ -70,30 +72,23 @@ test('jex-rep should model union of literals of a single primitive', () => {
 })
 
 test('jex-rep should model optional and nullable fields', () => {
-  compareZodAndJex(z.string().optional(), {
-    type: 'union',
-    anyOf: [{ type: 'undefined' }, { type: 'string' }]
-  })
-  compareZodAndJex(z.string().nullable(), {
-    type: 'union',
-    anyOf: [{ type: 'string' }, { type: 'null' }]
-  })
-  compareZodAndJex(z.string().optional().nullable(), {
+  expectZod(z.string().optional()).toEqualJex({ type: 'union', anyOf: [{ type: 'undefined' }, { type: 'string' }] })
+  expectZod(z.string().nullable()).toEqualJex({ type: 'union', anyOf: [{ type: 'string' }, { type: 'null' }] })
+  expectZod(z.string().optional().nullable()).toEqualJex({
     type: 'union',
     anyOf: [{ type: 'undefined' }, { type: 'string' }, { type: 'null' }]
   })
 })
 
 test('jex-rep should model union of literals of multiple primitives', () => {
-  compareZodAndJex(z.union([z.literal('a'), z.literal(1)]), {
+  expectZod(z.union([z.literal('a'), z.literal(1)])).toEqualJex({
     type: 'union',
     anyOf: [
       { type: 'string', value: 'a' },
       { type: 'number', value: 1 }
     ]
   })
-
-  compareZodAndJex(z.union([z.literal('yes'), z.literal('no'), z.literal(1), z.literal(0), z.boolean()]), {
+  expectZod(z.union([z.literal('yes'), z.literal('no'), z.literal(1), z.literal(0), z.boolean()])).toEqualJex({
     type: 'union',
     anyOf: [
       { type: 'string', value: 'yes' },
@@ -106,41 +101,40 @@ test('jex-rep should model union of literals of multiple primitives', () => {
 })
 
 test('jex-rep should model object types', () => {
-  compareZodAndJex(
+  expectZod(
     z.object({
       name: z.string(),
       age: z.number()
-    }),
-    {
-      type: 'object',
-      properties: {
-        name: { type: 'string' },
-        age: { type: 'number' }
-      }
+    })
+  ).toEqualJex({
+    type: 'object',
+    properties: {
+      name: { type: 'string' },
+      age: { type: 'number' }
     }
-  )
+  })
 })
 
 test('jex-rep should model array types', () => {
-  compareZodAndJex(z.array(z.string()), {
+  expectZod(z.array(z.string())).toEqualJex({
     type: 'array',
     items: { type: 'string' }
   })
 })
 
 test('jex-rep should model map types', () => {
-  compareZodAndJex(z.record(z.string()), {
+  expectZod(z.record(z.string())).toEqualJex({
     type: 'map',
     items: { type: 'string' }
   })
 })
 
 test('jex-rep should model any type', () => {
-  compareZodAndJex(z.any(), { type: 'any' })
+  expectZod(z.any()).toEqualJex({ type: 'any' })
 })
 
 test('jex-rep should model bot create schema', () => {
-  compareZodAndJex(zodBotCreateSchema, jexBotCreateSchema)
+  expectZod(zodBotCreateSchema).toEqualJex(jexBotCreateSchema)
 
   // TODO: add update schema with optional fields and nullable fields
   // undefined means that the field should not be updated

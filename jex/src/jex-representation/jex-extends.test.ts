@@ -85,6 +85,24 @@ test('jex-extends should be false if child is an object with less properties tha
   expectJex(child).not.toExtend(parent)
 })
 
+test('jex-extends should be false if an optional property of child is required in parent', () => {
+  const child: types.JexType = {
+    type: 'object',
+    properties: {
+      a: { type: 'union', anyOf: [{ type: 'string' }, { type: 'undefined' }] }
+    }
+  }
+
+  const parent: types.JexType = {
+    type: 'object',
+    properties: {
+      a: { type: 'string' }
+    }
+  }
+
+  expectJex(child).not.toExtend(parent)
+})
+
 test('jex-extends should be true child is a union with more types than parent', () => {
   const child: types.JexType = {
     type: 'union',

@@ -3,9 +3,9 @@
 To define your own custom components for zui, first start with defining the different way each datatype can be displayed:
 
 ```typescript
-import { type UIExtension } from 'zui'
+import { type UIComponentDefinitions } from 'zui'
 
-const exampleExtensions = {
+const exampleComponentDefinitions = {
   string: {
     SuperInput: { id: 'SuperInput', schema: z.object({ allowVariables: z.boolean().optional() }) },
     SuperPasswordInput: {
@@ -35,47 +35,62 @@ const exampleExtensions = {
   object: {
     SuperObject: { id: 'SuperObject', schema: z.object({ label: z.string().optional() }) },
   },
-} satisfies UIExtension
+} satisfies UIComponentDefinitions
 ```
 
-Override the `UIExtensionDefinition` interface definition to have zui typecheck your extensions:
+Override the `ComponentDefinitions` interface definition to have zui typecheck your extensions:
 
 ```typescript
 declare module '@bpinternal/zui' {
-  interface UIExtensionDefinition {
-    extensions: typeof exampleExtensions
+  interface ComponentDefinitions {
+    components: typeof exampleComponentDefinitions
   }
 }
 ```
 
-Then, implement your custom components:
+Then, implement the translation functions for each component's JSON Forms UI Schema:
 
 ```typescript
-import React from 'react'
-import type { ZUIReactComponentLibrary, ZUIReactComponent } from 'zui'
+import type { ComponentImplementationMap } from 'zui'
 
-const SuperInput: ZUIReactComponent<'string', 'SuperInput'> = ({ params }) => {
-  return <input {...params} />
-}
-// ... other components
-
-const myComponentLibrary: ZUIReactComponentLibrary = {
+const myComponentLibrary: ComponentImplementationMap = {
   string: {
-    SuperInput: SuperInput,
-    SuperPasswordInput: SuperPasswordInput,
+    SuperInput: (type, id, params, { scope, schema }) => {
+      type: 'Control',
+      scope,
+      options: {
+        showVariables: params.allowVariables,
+      }
+    },
+    SuperPasswordInput: (type, id, params, { scope, schema }) => {
+      type: 'Control',
+      scope,
+      options: {
+        showSpecialCharacters: params.requireSpecialCharacters,
+        showNumbers: params.requireNumbers,
+        // ... and so on
+      }
+    },
+    default: (type, id, params // will always be {}, { scope, schema }) => {
+      type: 'Control',
+      scope,
+    },
   },
   number: {
-    SuperNumber: SuperNumber,
+    SuperNumber: (type, id, params, { scope, schema }) => {
+      type: 'Control',
+      scope,
+      options: {
+        min: params.min,
+        max: params.max,
+      }
+    },
+    default: (type, id, params // will always be {}, { scope, schema }) => {
+      type: 'Control',
+      scope,
+    },
   },
-  boolean: {
-    SuperCheckbox: SuperCheckbox,
-  },
-  array: {
-    SuperArray: SuperArray,
-  },
-  object: {
-    SuperObject: SuperObject,
-  },
+  // ... and so on
 }
 ```
 
@@ -84,6 +99,7 @@ You can now display a form using your custom components:
 ```typescript
 import { zui } from 'zui'
 import { ZuiForm } from 'zui/react'
+import { myJSONFormRenderers, myJSONFormCells } from './myJSONForms'
 
 const mySchema = zui.object({
   myString: zui.string().displayAs('SuperInput', {
@@ -97,7 +113,15 @@ const mySchema = zui.object({
   }),
 })
 
+// ZuiForm is an extension of the JSONForms Component
 const MyForm = () => {
-  return <ZuiForm schema={mySchema} componentLibrary={myComponentLibrary} />
+  return (
+    <ZuiForm
+      schema={mySchema}
+      components={myComponentLibrary}
+      renderers={myJSONFormRenderers}
+      cells={myJSONFormCells} /> // this is an extension of the JSONForms Component
+      onChange={onChange={({ errors, data }) => console.log({ errors, data })} />
+  )
 }
 ```

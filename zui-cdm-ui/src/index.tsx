@@ -1,8 +1,7 @@
-import React from 'react'
-import { zui, ZuiForm, type UIExtension, type ZUIReactComponent, type ZUIReactComponentLibrary } from '@bpinternal/zui'
+import { zui, type ComponentMap, UIComponentDefinitions } from '@bpinternal/zui'
 import { z } from 'zod'
 
-const myExtensions = {
+const myComponents = {
   string: {
     myStringInput: {
       id: 'myStringInput',
@@ -44,41 +43,22 @@ const myExtensions = {
       schema: z.object({ label: z.string().optional() })
     }
   }
-} as const satisfies UIExtension
+} as const satisfies UIComponentDefinitions
 
 declare module '@bpinternal/zui' {
-  interface UIExtensionDefinition {
-    extensions: typeof myExtensions
+  interface ComponentsDefinitions {
+    components: typeof myComponents
   }
 }
 
-zui.string().displayAs('myStringInput', {
+zui.string().displayAs('', {
   allowVariables: true
 })
 
-const MyPasswordInput: ZUIReactComponent<'string', 'myPasswordInput'> = ({ params }) => null
-
-const components: ZUIReactComponentLibrary = {
-  string: {
-    myStringInput: ({ params }) => null,
-    myPasswordInput: MyPasswordInput
-  },
-  number: {
-    myNumber: ({ params }) => null
-  },
-  boolean: {
-    myCheckbox: ({ params }) => null
-  },
-  array: {
-    myArray: ({ params }) => null
-  },
-  object: {
-    myObject: ({ params }) => null
-  }
-}
+const implementation: ComponentMap = {}
 
 const exampleSchema = zui.object({
-  name: zui.string().displayAs('myStringInput', { allowVariables: true }),
+  name: zui.string().displayAs('', { allowVariables: true }),
   password: zui.string().displayAs('myPasswordInput', { requireSpecialCharacters: true }),
   age: zui.number().displayAs('myNumber', { min: 0, max: 100 }),
   isHuman: zui.boolean().displayAs('myCheckbox', { label: 'Are you human?' }),
@@ -89,7 +69,7 @@ const Usage = () => {
   return (
     <>
       <h1>Look maa, a form!</h1>
-      <ZuiForm components={components} schema={exampleSchema.toJsonSchema()} />
+      {/* <ZuiForm components={components} schema={exampleSchema.toJsonSchema()} /> */}
     </>
   )
 }

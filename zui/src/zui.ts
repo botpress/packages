@@ -26,7 +26,7 @@ import { z } from 'zod'
 import { ZuiSchemaOptions, getZuiSchemas } from './zui-schemas'
 import { JsonSchema7, jsonSchemaToZui } from '.'
 import { ObjectToZuiOptions, objectToZui } from './object-to-zui'
-import type { GlobalExtensionDefinition, UIExtension, ZodToBaseType } from './uiextensions'
+import type { GlobalComponentDefinitions, UIComponentDefinitions, ZodToBaseType } from './ui/types'
 
 export type Infer<
   T extends ZodType | ZuiType<any> | ZuiTypeAny,
@@ -40,7 +40,7 @@ export type ZuiTypeAny = ZuiType<any>
 
 export type ZuiType<
   O extends ZodType,
-  UI extends UIExtension = any,
+  UI extends UIComponentDefinitions = any,
   N extends ZuiExtension<O, any> = ZuiExtension<O, UI>,
 > = N & {
   [P in keyof O]: O[P] extends (...args: any) => O
@@ -57,7 +57,7 @@ export type ZuiType<
     : O[P]
 }
 
-export type ZuiExtension<Z extends ZodType, UI extends UIExtension, Out = z.infer<Z>> = {
+export type ZuiExtension<Z extends ZodType, UI extends UIComponentDefinitions, Out = z.infer<Z>> = {
   id: (id: string) => ZuiType<Z, UI>
   // Sets the index of the field in a list
   index: (index: number) => ZuiType<Z, UI>
@@ -262,7 +262,7 @@ type ZuiRecord = {
   <Value extends ZodTypeAny>(valueSchema: ZodTypeAny, params?: RecordArgs[2]): ZuiType<ZodRecord<ZodString, Value>>
 }
 
-export type Zui<UI extends UIExtension = GlobalExtensionDefinition> = {
+export type Zui<UI extends UIComponentDefinitions = GlobalComponentDefinitions> = {
   string: (params?: StringArgs[0]) => ZuiType<ZodString, UI>
   number: (params?: NumberArgs[0]) => ZuiType<ZodNumber, UI>
   boolean: (params?: BooleanArgs[0]) => ZuiType<ZodBoolean, UI>
@@ -297,7 +297,7 @@ export type Zui<UI extends UIExtension = GlobalExtensionDefinition> = {
   fromObject(object: any, options?: ObjectToZuiOptions): ZuiType<ZodAny>
 }
 
-const zui: Zui<GlobalExtensionDefinition> = {
+const zui: Zui<GlobalComponentDefinitions> = {
   string: (params) => z.string(params) as unknown as ZuiType<ZodString>,
   number: (params) => z.number(params) as unknown as ZuiType<ZodNumber>,
   boolean: (params) => z.boolean(params) as unknown as ZuiType<ZodBoolean>,

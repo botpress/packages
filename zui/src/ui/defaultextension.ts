@@ -75,7 +75,7 @@ export const defaultExtensions = {
 
 export const defaultExtensionComponents: ComponentImplementationMap<typeof defaultExtensions> = {
   string: {
-    textbox: (_, __, { multiline, label, fitContentWidth, readonly }, { scope, schema }) => {
+    textbox: (_, __, { multiline, label, fitContentWidth, readonly }, { scope }) => {
       return {
         type: 'Control',
         scope,

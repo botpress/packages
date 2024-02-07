@@ -6,7 +6,7 @@ import { flattenUnions } from './flatten-unions'
 
 const _toInternalPrimitive = <T extends 'string' | 'number' | 'boolean'>(
   type: T,
-  schema: JSONSchema7,
+  schema: JSONSchema7
 ): types.JexType => {
   if (schema.enum === undefined && schema.const === undefined) {
     return { type } as types.JexPrimitives[T]
@@ -25,12 +25,12 @@ const _toInternalPrimitive = <T extends 'string' | 'number' | 'boolean'>(
   if (values.length === 1) {
     return {
       type,
-      value: values[0] as types.JexPrimitiveContents[T],
+      value: values[0] as types.JexPrimitiveContents[T]
     }
   }
   return {
     type: 'union',
-    anyOf: values.map((value) => ({ type, value })),
+    anyOf: values.map((value) => ({ type, value }))
   } as types.JexUnion
 }
 
@@ -38,20 +38,20 @@ const _toInternalRep = (schema: JSONSchema7): types.JexType => {
   if (schema.not !== undefined) {
     if (schema.not === true) {
       return {
-        type: 'any',
+        type: 'any'
       }
     }
 
     if (schema.not === false) {
       return {
-        type: 'undefined',
+        type: 'undefined'
       }
     }
 
     const not = _toInternalRep(schema.not)
     if (not.type === 'any') {
       return {
-        type: 'undefined',
+        type: 'undefined'
       }
     }
 
@@ -62,7 +62,7 @@ const _toInternalRep = (schema: JSONSchema7): types.JexType => {
     const { type: _, ...tmp } = schema
     return {
       type: 'union',
-      anyOf: schema.type.map((type) => _toInternalRep({ type, ...tmp })),
+      anyOf: schema.type.map((type) => _toInternalRep({ type, ...tmp }))
     }
   }
 
@@ -94,7 +94,7 @@ const _toInternalRep = (schema: JSONSchema7): types.JexType => {
     }
     return {
       type: 'array',
-      items: _toInternalRep(schema.items),
+      items: _toInternalRep(schema.items)
     }
   }
 
@@ -103,13 +103,13 @@ const _toInternalRep = (schema: JSONSchema7): types.JexType => {
       if (schema.additionalProperties === true) {
         return {
           type: 'map',
-          items: { type: 'any' },
+          items: { type: 'any' }
         }
       }
       if (schema.additionalProperties === false) {
         return {
           type: 'object',
-          properties: {},
+          properties: {}
         }
       }
       if (typeof schema.additionalProperties !== 'object') {
@@ -117,14 +117,14 @@ const _toInternalRep = (schema: JSONSchema7): types.JexType => {
       }
       return {
         type: 'map',
-        items: _toInternalRep(schema.additionalProperties),
+        items: _toInternalRep(schema.additionalProperties)
       }
     }
 
     if (schema.properties === undefined) {
       return {
         type: 'object',
-        properties: {},
+        properties: {}
       }
     }
 
@@ -137,13 +137,13 @@ const _toInternalRep = (schema: JSONSchema7): types.JexType => {
       } else {
         properties[key] = {
           type: 'union',
-          anyOf: [mapped, { type: 'undefined' }],
+          anyOf: [mapped, { type: 'undefined' }]
         }
       }
     }
     return {
       type: 'object',
-      properties,
+      properties
     }
   }
 
@@ -158,7 +158,7 @@ const _toInternalRep = (schema: JSONSchema7): types.JexType => {
 
     return {
       type: 'union',
-      anyOf: enums.map(_toInternalRep),
+      anyOf: enums.map(_toInternalRep)
     }
   }
 

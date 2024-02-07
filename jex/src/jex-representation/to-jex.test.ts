@@ -33,15 +33,15 @@ test('jex-rep should model literal types', () => {
 test('jex-rep should model union of primitives', () => {
   compareZodAndJex(z.union([z.string(), z.number()]), {
     type: 'union',
-    anyOf: [{ type: 'string' }, { type: 'number' }],
+    anyOf: [{ type: 'string' }, { type: 'number' }]
   })
   compareZodAndJex(z.union([z.boolean(), z.null()]), {
     type: 'union',
-    anyOf: [{ type: 'boolean' }, { type: 'null' }],
+    anyOf: [{ type: 'boolean' }, { type: 'null' }]
   })
   compareZodAndJex(z.union([z.string(), z.null(), z.undefined()]), {
     type: 'union',
-    anyOf: [{ type: 'string' }, { type: 'null' }, { type: 'undefined' }],
+    anyOf: [{ type: 'string' }, { type: 'null' }, { type: 'undefined' }]
   })
 })
 
@@ -50,37 +50,37 @@ test('jex-rep should model union of literals of a single primitive', () => {
     type: 'union',
     anyOf: [
       { type: 'string', value: 'a' },
-      { type: 'string', value: 'b' },
-    ],
+      { type: 'string', value: 'b' }
+    ]
   })
   compareZodAndJex(z.union([z.literal(1), z.literal(2)]), {
     type: 'union',
     anyOf: [
       { type: 'number', value: 1 },
-      { type: 'number', value: 2 },
-    ],
+      { type: 'number', value: 2 }
+    ]
   })
   compareZodAndJex(z.union([z.literal(true), z.literal(false)]), {
     type: 'union',
     anyOf: [
       { type: 'boolean', value: true },
-      { type: 'boolean', value: false },
-    ],
+      { type: 'boolean', value: false }
+    ]
   })
 })
 
 test('jex-rep should model optional and nullable fields', () => {
   compareZodAndJex(z.string().optional(), {
     type: 'union',
-    anyOf: [{ type: 'undefined' }, { type: 'string' }],
+    anyOf: [{ type: 'undefined' }, { type: 'string' }]
   })
   compareZodAndJex(z.string().nullable(), {
     type: 'union',
-    anyOf: [{ type: 'string' }, { type: 'null' }],
+    anyOf: [{ type: 'string' }, { type: 'null' }]
   })
   compareZodAndJex(z.string().optional().nullable(), {
     type: 'union',
-    anyOf: [{ type: 'undefined' }, { type: 'string' }, { type: 'null' }],
+    anyOf: [{ type: 'undefined' }, { type: 'string' }, { type: 'null' }]
   })
 })
 
@@ -89,8 +89,8 @@ test('jex-rep should model union of literals of multiple primitives', () => {
     type: 'union',
     anyOf: [
       { type: 'string', value: 'a' },
-      { type: 'number', value: 1 },
-    ],
+      { type: 'number', value: 1 }
+    ]
   })
 
   compareZodAndJex(z.union([z.literal('yes'), z.literal('no'), z.literal(1), z.literal(0), z.boolean()]), {
@@ -100,8 +100,8 @@ test('jex-rep should model union of literals of multiple primitives', () => {
       { type: 'string', value: 'no' },
       { type: 'number', value: 1 },
       { type: 'number', value: 0 },
-      { type: 'boolean' },
-    ],
+      { type: 'boolean' }
+    ]
   })
 })
 
@@ -109,29 +109,29 @@ test('jex-rep should model object types', () => {
   compareZodAndJex(
     z.object({
       name: z.string(),
-      age: z.number(),
+      age: z.number()
     }),
     {
       type: 'object',
       properties: {
         name: { type: 'string' },
-        age: { type: 'number' },
-      },
-    },
+        age: { type: 'number' }
+      }
+    }
   )
 })
 
 test('jex-rep should model array types', () => {
   compareZodAndJex(z.array(z.string()), {
     type: 'array',
-    items: { type: 'string' },
+    items: { type: 'string' }
   })
 })
 
 test('jex-rep should model map types', () => {
   compareZodAndJex(z.record(z.string()), {
     type: 'map',
-    items: { type: 'string' },
+    items: { type: 'string' }
   })
 })
 

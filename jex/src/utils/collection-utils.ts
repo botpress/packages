@@ -5,7 +5,7 @@ export type CustomSetOptions<T> = {
 }
 
 const DEFAULT_OPTIONS: CustomSetOptions<any> = {
-  compare: _.isEqual,
+  compare: _.isEqual
 }
 
 export class CustomSet<T> {
@@ -13,7 +13,7 @@ export class CustomSet<T> {
 
   public constructor(
     private readonly items: T[] = [],
-    opt: Partial<CustomSetOptions<T>> = {},
+    opt: Partial<CustomSetOptions<T>> = {}
   ) {
     this._options = { ...DEFAULT_OPTIONS, ...opt }
   }

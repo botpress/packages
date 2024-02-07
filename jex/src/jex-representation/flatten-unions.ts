@@ -4,7 +4,7 @@ export const flattenUnions = (schema: types.JexType): types.JexType => {
   if (schema.type === 'array') {
     return {
       type: 'array',
-      items: flattenUnions(schema.items),
+      items: flattenUnions(schema.items)
     }
   }
 
@@ -15,7 +15,7 @@ export const flattenUnions = (schema: types.JexType): types.JexType => {
     }
     return {
       type: 'object',
-      properties,
+      properties
     }
   }
 
@@ -31,7 +31,7 @@ export const flattenUnions = (schema: types.JexType): types.JexType => {
     }
     return {
       type: 'union',
-      anyOf,
+      anyOf
     }
   }
 

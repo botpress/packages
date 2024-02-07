@@ -133,10 +133,13 @@ test('jex-rep should model any type', () => {
   expectZod(z.any()).toEqualJex({ type: 'any' })
 })
 
+test('jex-rep should model tuple types', () => {
+  expectZod(z.tuple([z.string(), z.number()])).toEqualJex({
+    type: 'tuple',
+    items: [{ type: 'string' }, { type: 'number' }]
+  })
+})
+
 test('jex-rep should model bot create schema', () => {
   expectZod(zodBotCreateSchema).toEqualJex(jexBotCreateSchema)
-
-  // TODO: add update schema with optional fields and nullable fields
-  // undefined means that the field should not be updated
-  // null means that the field should be deleted
 })

@@ -1,4 +1,4 @@
-import { JSONSchema7, JSONSchema7Type } from 'json-schema'
+import { JSONSchema7, JSONSchema7Definition, JSONSchema7Type } from 'json-schema'
 import * as types from './typings'
 import { JexError } from '../errors'
 import _ from 'lodash'
@@ -85,6 +85,13 @@ const _toInternalRep = (schema: JSONSchema7): types.JexType => {
   if (schema.type === 'array') {
     if (schema.items === undefined) {
       throw new JexError('Array schema must have items')
+    }
+    if (Array.isArray(schema.items) && schema.minItems !== undefined && schema.maxItems !== undefined) {
+      const items = schema.items.filter(<T>(i: T | boolean): i is T => typeof i !== 'boolean')
+      return {
+        type: 'tuple',
+        items: items.map(_toInternalRep)
+      }
     }
     if (Array.isArray(schema.items)) {
       throw new JexError('Array schema items must be a single schema')

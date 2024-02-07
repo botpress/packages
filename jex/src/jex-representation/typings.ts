@@ -69,10 +69,11 @@ export type JexAny = {
   type: 'any'
 }
 
-/**
- * TODO:
- * - support for tuples
- */
+export type JexTuple = {
+  type: 'tuple'
+  items: JexType[]
+}
+
 export type JexType =
   | JexPrimitive
   | JexNull
@@ -83,3 +84,4 @@ export type JexType =
   | JexArray
   | JexMap
   | JexAny
+  | JexTuple

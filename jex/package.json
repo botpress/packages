@@ -1,0 +1,39 @@
+{
+  "name": "@bpinternal/jex",
+  "version": "0.0.1",
+  "description": "JSON-Extends; JSON Schema type checking library",
+  "main": "dist/index.cjs",
+  "module": "dist/index.mjs",
+  "types": "dist/src/index.d.ts",
+  "scripts": {
+    "build:node": "esbuild src/index.ts --bundle --platform=node --format=cjs --outfile=dist/index.cjs",
+    "build:browser": "esbuild src/index.ts --bundle --platform=browser --format=esm --outfile=dist/index.mjs",
+    "build:types": "tsc --emitDeclarationOnly",
+    "build": "pnpm build:node && pnpm build:browser && pnpm build:types",
+    "test": "vitest --run",
+    "type:check": "tsc --noEmit",
+    "format:check": "prettier --check .",
+    "format:fix": "prettier --write .",
+    "check": "pnpm format:check && pnpm type:check",
+    "fix": "pnpm format:fix"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/json-schema": "^7.0.15",
+    "@types/lodash": "^4.14.202",
+    "@types/node": "^20.11.16",
+    "ajv": "^8.12.0",
+    "esbuild": "^0.20.0",
+    "prettier": "^3.2.4",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.3.3",
+    "vitest": "^1.2.2",
+    "zod": "^3.22.4",
+    "zod-to-json-schema": "^3.22.4"
+  },
+  "dependencies": {
+    "lodash": "^4.17.21"
+  }
+}

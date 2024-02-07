@@ -1,6 +1,7 @@
 import { ZodSchema, ZodType, z } from 'zod'
 
 export type BaseType = 'number' | 'string' | 'boolean' | 'object' | 'array'
+export type ContainerType = 'object' | 'array'
 
 export type UIExtension = {
   [type in BaseType]: {
@@ -31,82 +32,74 @@ export type ZodToBaseType<T extends ZodType> = T extends z.ZodString
   ? 'object'
   : any
 
-export const commonHTMLInputSchema = z.object({
-  name: z.string(),
-  id: z.string().optional(),
-  disabled: z.boolean().default(false).optional(),
-  readonly: z.boolean().default(false).optional(),
-  hidden: z.boolean().default(false).optional(),
-  autofocus: z.boolean().default(false).optional(),
-  required: z.boolean().default(false).optional(),
+export const commonInputSchema = z.object({
+  scope: z.string().includes('#/properties/'),
+  label: z.string().optional(),
+  readonly: z.boolean().optional(),
 })
 
 export const defaultExtensions = {
   string: {
     textbox: {
       id: 'textbox',
-      schema: commonHTMLInputSchema.extend({
-        type: z.enum(['text', 'password', 'email', 'tel', 'url']).default('text'),
-        default: z.string().optional(),
-        maxLength: z.number().optional(),
-        minLength: z.number().optional(),
-        pattern: z.string().optional(),
-        placeholder: z.string().optional(),
+      schema: commonInputSchema.extend({
+        multiline: z.boolean().default(false).optional(),
+        fitContentWidth: z.boolean().default(false).optional(),
       }),
     },
     datetimeinput: {
       id: 'datetimeinput',
-      schema: commonHTMLInputSchema.extend({
-        type: z.enum(['datetime-local', 'date', 'week']).default('datetime-local'),
-        default: z.string().optional(),
-        min: z.string().optional(),
-        max: z.string().optional(),
+      schema: commonInputSchema.extend({
+        type: z.enum(['time', 'date', 'date-time']).default('date-time'),
       }),
     },
   },
   number: {
     numberinput: {
       id: 'numberinput',
-      schema: commonHTMLInputSchema.extend({
-        type: z.literal('number'),
-        default: z.number().optional().default(0),
-        min: z.number().optional().default(0),
-        max: z.number().optional(),
-        step: z.number().default(0).optional(),
-      }),
+      schema: commonInputSchema,
     },
     slider: {
       id: 'slider',
-      schema: commonHTMLInputSchema.extend({
-        type: z.literal('range'),
-        default: z.number().optional().default(0),
-        min: z.number().optional().default(0),
-        max: z.number().optional(),
-        step: z.number().default(0).optional(),
-      }),
+      schema: commonInputSchema,
     },
   },
   boolean: {
     checkbox: {
       id: 'checkbox',
-      schema: commonHTMLInputSchema.extend({
-        default: z.boolean().default(false).optional(),
-      }),
+      schema: commonInputSchema,
     },
   },
   array: {
     select: {
       id: 'select',
-      schema: commonHTMLInputSchema.extend({
-        default: z.string().optional(),
-        options: z.array(
-          z.object({
-            label: z.string(),
-            value: z.string(),
-          }),
-        ),
+      schema: z.undefined(),
+    },
+  },
+  object: {
+    verticalLayout: {
+      id: 'verticalLayout',
+      schema: z.undefined(),
+    },
+    horizontalLayout: {
+      id: 'horizontalLayout',
+      schema: z.undefined(),
+    },
+    group: {
+      id: 'group',
+      schema: z.object({
+        label: z.string(),
+      }),
+    },
+    categorization: {
+      id: 'categorization',
+      schema: z.undefined(),
+    },
+    category: {
+      id: 'category',
+      schema: z.object({
+        label: z.string(),
       }),
     },
   },
-  object: {},
 } as const satisfies UIExtension

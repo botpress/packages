@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react'
-import { ZuiForm, defaultComponentLibrary } from '..'
+import { ZuiForm, defaultZuiExtension } from '..'
 import { defaultExtensions } from '../../uiextensions'
 import { Zui, zui as zuiImport } from '../../zui'
 
@@ -18,48 +18,35 @@ type Story = StoryObj<typeof meta>
 
 const zui = zuiImport as Zui<typeof defaultExtensions>
 
-const exampleSchema = zui.object({
-  firstName: zui.string().displayAs('textbox', {
-    name: 'firstName',
-    type: 'text',
-    required: true,
-    placeholder: 'First Name',
-  }),
-  lastName: zui.string().displayAs('textbox', {
-    name: 'lastName',
-    type: 'text',
-    required: true,
-    placeholder: 'Last Name',
-  }),
-  birthday: zui.string().displayAs('datetimeinput', {
-    name: 'birthday',
-    type: 'date',
-    required: true,
-  }),
-  email: zui.string().displayAs('textbox', {
-    name: 'email',
-    type: 'email',
-    required: true,
-    placeholder: 'Email',
-  }),
-  password: zui.string().displayAs('textbox', {
-    name: 'password',
-    type: 'password',
-    required: true,
-    placeholder: 'Password',
-  }),
-  passwordConfirm: zui.string().displayAs('textbox', {
-    name: 'passwordConfirm',
-    type: 'password',
-    required: true,
-    placeholder: 'Confirm Password',
-  }),
-})
+const exampleSchema = zui
+  .object({
+    firstName: zui.string().displayAs('textbox', {
+      label: 'First Name',
+      scope: '#/properties/firstName',
+    }),
+    lastName: zui.string().displayAs('textbox', {
+      scope: '#/properties/lastName',
+    }),
+    birthday: zui.string().displayAs('datetimeinput', {
+      type: 'date',
+      scope: '#/properties/birthday',
+    }),
+    email: zui.string().displayAs('textbox', {
+      scope: '#/properties/email',
+    }),
+    password: zui.string().displayAs('textbox', {
+      scope: '#/properties/password',
+    }),
+    passwordConfirm: zui.string().displayAs('textbox', {
+      scope: '#/properties/passwordConfirm',
+    }),
+  })
+  .displayAs('horizontalLayout', undefined)
 
 export const ExampleSchema: Story = {
   args: {
-    components: defaultComponentLibrary,
     schema: exampleSchema.toJsonSchema(),
+    components: defaultZuiExtension,
   },
 }
 

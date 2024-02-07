@@ -1,0 +1,20 @@
+{
+  "name": "@bpinternal/zui-cdm-ui",
+  "version": "0.0.1",
+  "private": true,
+  "description": "bruh",
+  "scripts": {
+    "type:check": "tsc --noEmit",
+    "build": "pnpm run build:node && pnpm run build:web && pnpm run build:type",
+    "build:type": "tsc -p tsconfig.build.json"
+  },
+  "author": "",
+  "dependencies": {
+    "react": "^18.2.0",
+    "zod": "^3.22.4"
+  },
+  "devDependencies": {
+    "@types/react": "^18.2.51",
+    "typescript": "^5.3.3"
+  }
+}

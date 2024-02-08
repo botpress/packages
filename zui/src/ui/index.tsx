@@ -50,30 +50,39 @@ export const schemaToUISchema = <UI extends UIComponentDefinitions = GlobalCompo
 
     if (!schema[zuiKey]?.displayAs || schema[zuiKey].displayAs.length !== 2) {
       return (
-        components.object.default?.('object', 'default', {}, properties, {
-          schema,
-          scope,
-        }) || null
+        components.object.default?.(
+          {},
+          {
+            type: 'object',
+            id: 'default',
+            schema,
+            scope,
+          },
+          properties,
+        ) || null
       )
     }
 
     const [id, params] = schema[zuiKey].displayAs
     const translationFunc = resolveComponentFunction(components, schema.type, id)
 
-    return translationFunc(schema.type, id, params, properties, { schema, scope })
+    return translationFunc(params, { type: schema.type, id, schema, scope }, properties)
   }
 
   if (schema.type === 'array') {
     const items = schemaToUISchema(schema.items, components, currentKey)
     if (!schema[zuiKey]?.displayAs || schema[zuiKey].displayAs.length !== 2) {
       return (
-        components.array.default?.('array', 'default', {}, [items].filter(Boolean) as UISchema[], { schema, scope }) ||
-        null
+        components.array.default?.(
+          {},
+          { type: 'array', id: 'default', schema, scope },
+          [items].filter(Boolean) as UISchema[],
+        ) || null
       )
     }
     const [id, params] = schema[zuiKey].displayAs
     const translationFunc = resolveComponentFunction(components, schema.type, id)
-    return translationFunc(schema.type, id, params, [items].filter(Boolean) as UISchema[], { schema, scope })
+    return translationFunc(params, { type: schema.type, id, schema, scope }, [items].filter(Boolean) as UISchema[])
   }
 
   if (schema.type === 'string' || schema.type === 'boolean' || schema.type === 'number') {

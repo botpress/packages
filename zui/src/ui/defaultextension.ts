@@ -75,7 +75,7 @@ export const defaultExtensions = {
 
 export const defaultExtensionComponents: ComponentImplementationMap<typeof defaultExtensions> = {
   string: {
-    textbox: (_, __, { multiline, label, fitContentWidth, readonly }, { scope }) => {
+    textbox: ({ multiline, label, fitContentWidth, readonly }, { scope }) => {
       return {
         type: 'Control',
         scope,
@@ -87,7 +87,7 @@ export const defaultExtensionComponents: ComponentImplementationMap<typeof defau
         },
       }
     },
-    datetimeinput: (_, __, { type, label, readonly }, { scope }) => {
+    datetimeinput: ({ type, label, readonly }, { scope }) => {
       return {
         type: 'Control',
         scope,
@@ -100,7 +100,7 @@ export const defaultExtensionComponents: ComponentImplementationMap<typeof defau
     },
   },
   number: {
-    numberinput: (_, __, { readonly }, { scope }) => {
+    numberinput: ({ readonly }, { scope }) => {
       return {
         type: 'Control',
         scope,
@@ -109,7 +109,7 @@ export const defaultExtensionComponents: ComponentImplementationMap<typeof defau
         },
       }
     },
-    slider: (_, __, { label, readonly }, { scope }) => {
+    slider: ({ label, readonly }, { scope }) => {
       return {
         type: 'Control',
         scope,
@@ -122,7 +122,7 @@ export const defaultExtensionComponents: ComponentImplementationMap<typeof defau
     },
   },
   array: {
-    select: (_, __, ___, children) => {
+    select: (_, __, children) => {
       return {
         type: 'VerticalLayout',
         elements: children,
@@ -130,7 +130,7 @@ export const defaultExtensionComponents: ComponentImplementationMap<typeof defau
     },
   },
   boolean: {
-    checkbox: (_, __, { label, readonly }, { scope }) => {
+    checkbox: ({ label, readonly }, { scope }) => {
       return {
         type: 'Control',
         scope,
@@ -142,39 +142,39 @@ export const defaultExtensionComponents: ComponentImplementationMap<typeof defau
     },
   },
   object: {
-    verticalLayout: (_, __, ___, children) => {
+    verticalLayout: (_, __, children) => {
       return {
         type: 'VerticalLayout',
         elements: children,
       }
     },
-    horizontalLayout: (_, __, ___, children) => {
+    horizontalLayout: (_, __, children) => {
       return {
         type: 'HorizontalLayout',
         elements: children,
       }
     },
-    category: (_, __, { label }, children) => {
+    category: ({ label }, __, children) => {
       return {
         type: 'Category',
         label,
         elements: children,
       }
     },
-    categorization: (_, __, ___, children) => {
+    categorization: (_, __, children) => {
       return {
         type: 'Categorization',
         elements: children as UICategorySchema[],
       }
     },
-    group: (_, __, { label }, children) => {
+    group: ({ label }, _, children) => {
       return {
         type: 'Group',
         label,
         elements: children,
       }
     },
-    default: (_, __, ___, children) => {
+    default: (_, __, children) => {
       return {
         type: 'HorizontalLayout',
         elements: children,

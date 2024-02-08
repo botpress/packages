@@ -166,9 +166,15 @@ export type ComponentImplementationMap<UI extends UIComponentDefinitions = Globa
   }
 }
 
-type SchemaContext<T extends BaseType> = {
+type SchemaContext<
+  Type extends BaseType,
+  ID extends keyof UI[Type],
+  UI extends UIComponentDefinitions = GlobalComponentDefinitions,
+> = {
+  type: Type
+  id: ID
   scope: string
-  schema: JSONSchemaOfType<T>
+  schema: JSONSchemaOfType<Type>
 }
 
 type UIComponent<
@@ -176,11 +182,5 @@ type UIComponent<
   ID extends keyof UI[Type],
   UI extends UIComponentDefinitions = GlobalComponentDefinitions,
 > = Type extends ContainerType
-  ? (
-      type: Type,
-      id: ID,
-      params: z.infer<UI[Type][ID]['schema']>,
-      children: UISchema[],
-      context: SchemaContext<Type>,
-    ) => UISchema
-  : (type: Type, id: ID, params: z.infer<UI[Type][ID]['schema']>, context: SchemaContext<Type>) => UISchema
+  ? (params: z.infer<UI[Type][ID]['schema']>, context: SchemaContext<Type, ID, UI>, children: UISchema[]) => UISchema
+  : (params: z.infer<UI[Type][ID]['schema']>, context: SchemaContext<Type, ID, UI>) => UISchema

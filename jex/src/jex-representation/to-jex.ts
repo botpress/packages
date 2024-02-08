@@ -1,8 +1,22 @@
-import { JSONSchema7, JSONSchema7Definition, JSONSchema7Type } from 'json-schema'
+import { JSONSchema7, JSONSchema7Type } from 'json-schema'
 import * as types from './typings'
 import { JexError } from '../errors'
 import _ from 'lodash'
 import { flattenUnions } from './flatten-unions'
+import { $RefParser as RefParser } from '@apidevtools/json-schema-ref-parser'
+
+const _dereference = (schema: JSONSchema7) =>
+  new Promise<JSONSchema7>((resolve, reject) => {
+    RefParser.dereference(schema, (err, schema) => {
+      if (err) {
+        return reject(err)
+      }
+      if (!schema) {
+        reject(new Error('Something went wrong dereferencing the schema'))
+      }
+      return resolve(schema as JSONSchema7)
+    })
+  })
 
 const _toInternalPrimitive = <T extends 'string' | 'number' | 'boolean'>(
   type: T,
@@ -172,7 +186,8 @@ const _toInternalRep = (schema: JSONSchema7): types.JexType => {
   return { type: 'any' }
 }
 
-export const toJex = (schema: JSONSchema7): types.JexType => {
-  const jex = _toInternalRep(schema)
+export const toJex = async (schema: JSONSchema7): Promise<types.JexType> => {
+  const unref = await _dereference(schema)
+  const jex = _toInternalRep(unref)
   return flattenUnions(jex)
 }

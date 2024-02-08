@@ -12,14 +12,18 @@ export class CustomSet<T> {
   private _options: CustomSetOptions<T>
 
   public constructor(
-    private readonly items: T[] = [],
+    private readonly _items: T[] = [],
     opt: Partial<CustomSetOptions<T>> = {}
   ) {
     this._options = { ...DEFAULT_OPTIONS, ...opt }
   }
 
+  public get items(): T[] {
+    return [...this._items]
+  }
+
   public has(item: T): boolean {
-    return this.items.some((i) => this._options.compare(i, item))
+    return this._items.some((i) => this._options.compare(i, item))
   }
 
   public isEqual(other: CustomSet<T>): boolean {
@@ -27,6 +31,6 @@ export class CustomSet<T> {
   }
 
   public isSubsetOf(other: CustomSet<T>): boolean {
-    return this.items.every((i) => other.has(i))
+    return this._items.every((i) => other.has(i))
   }
 }

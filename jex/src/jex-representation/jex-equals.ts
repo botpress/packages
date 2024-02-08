@@ -14,21 +14,14 @@ export const jexEquals = (a: types.JexType, b: types.JexType): boolean => {
   }
 
   if (a.type === 'object' && b.type === 'object') {
-    const aKeys = Object.keys(a.properties)
-    const bKeys = Object.keys(b.properties)
-    if (aKeys.length !== bKeys.length) {
+    const aKeys = new utils.collection.CustomSet<string>(Object.keys(a.properties))
+    const bKeys = new utils.collection.CustomSet<string>(Object.keys(b.properties))
+
+    if (!aKeys.isEqual(bKeys)) {
       return false
     }
 
-    if (aKeys.some((key) => !bKeys.includes(key))) {
-      return false
-    }
-
-    if (bKeys.some((key) => !aKeys.includes(key))) {
-      return false
-    }
-
-    for (const aKey of aKeys) {
+    for (const aKey of aKeys.items) {
       const aValue = a.properties[aKey]!
       const bValue = b.properties[aKey]!
       if (!jexEquals(aValue, bValue)) {

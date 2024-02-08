@@ -20,9 +20,17 @@ export const jexEquals = (a: types.JexType, b: types.JexType): boolean => {
       return false
     }
 
-    for (const key of aKeys) {
-      const aValue = a.properties[key]!
-      const bValue = b.properties[key]!
+    if (aKeys.some((key) => !bKeys.includes(key))) {
+      return false
+    }
+
+    if (bKeys.some((key) => !aKeys.includes(key))) {
+      return false
+    }
+
+    for (const aKey of aKeys) {
+      const aValue = a.properties[aKey]!
+      const bValue = b.properties[aKey]!
       if (!jexEquals(aValue, bValue)) {
         return false
       }

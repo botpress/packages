@@ -3,20 +3,7 @@ import * as types from './typings'
 import { JexError } from '../errors'
 import _ from 'lodash'
 import { flattenUnions } from './flatten-unions'
-import { $RefParser as RefParser } from '@apidevtools/json-schema-ref-parser'
-
-const _dereference = (schema: JSONSchema7) =>
-  new Promise<JSONSchema7>((resolve, reject) => {
-    RefParser.dereference(schema, (err, schema) => {
-      if (err) {
-        return reject(err)
-      }
-      if (!schema) {
-        reject(new Error('Something went wrong dereferencing the schema'))
-      }
-      return resolve(schema as JSONSchema7)
-    })
-  })
+import { dereference } from '@apidevtools/json-schema-ref-parser'
 
 const _toInternalPrimitive = <T extends 'string' | 'number' | 'boolean'>(
   type: T,
@@ -98,18 +85,22 @@ const _toInternalRep = (schema: JSONSchema7): types.JexType => {
 
   if (schema.type === 'array') {
     if (schema.items === undefined) {
-      throw new JexError('Array schema must have items')
+      return {
+        type: 'array',
+        items: { type: 'any' }
+      }
     }
-    if (Array.isArray(schema.items) && schema.minItems !== undefined && schema.maxItems !== undefined) {
+
+    if (Array.isArray(schema.items)) {
       const items = schema.items.filter(<T>(i: T | boolean): i is T => typeof i !== 'boolean')
       return {
         type: 'tuple',
         items: items.map(_toInternalRep)
       }
     }
-    if (Array.isArray(schema.items)) {
-      throw new JexError('Array schema items must be a single schema')
-    }
+
+    // TODO: check for prefixItems and additionalItems
+
     if (typeof schema.items !== 'object') {
       throw new JexError('Array schema items must be an object')
     }
@@ -134,7 +125,7 @@ const _toInternalRep = (schema: JSONSchema7): types.JexType => {
         }
       }
       if (typeof schema.additionalProperties !== 'object') {
-        throw new JexError('Object schema additionalProperties must be a boolean or an object')
+        throw new JexError('Object schema additionalProperties must be an object')
       }
       return {
         type: 'map',
@@ -187,7 +178,11 @@ const _toInternalRep = (schema: JSONSchema7): types.JexType => {
 }
 
 export const toJex = async (schema: JSONSchema7): Promise<types.JexType> => {
-  const unref = await _dereference(schema)
+  const unref = (await dereference(schema, {
+    dereference: {
+      circular: false
+    }
+  })) as JSONSchema7
   const jex = _toInternalRep(unref)
   return flattenUnions(jex)
 }

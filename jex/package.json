@@ -3,13 +3,11 @@
   "version": "0.0.1",
   "description": "JSON-Extends; JSON Schema type checking library",
   "main": "dist/index.cjs",
-  "module": "dist/index.mjs",
   "types": "dist/src/index.d.ts",
   "scripts": {
     "build:node": "esbuild src/index.ts --bundle --platform=node --format=cjs --outfile=dist/index.cjs",
-    "build:browser": "esbuild src/index.ts --bundle --platform=browser --format=esm --outfile=dist/index.mjs",
     "build:types": "tsc --emitDeclarationOnly",
-    "build": "pnpm build:node && pnpm build:browser && pnpm build:types",
+    "build": "pnpm build:node && pnpm build:types",
     "test": "vitest --run",
     "type:check": "tsc --noEmit",
     "format:check": "prettier --check .",
@@ -34,6 +32,7 @@
   },
   "dependencies": {
     "@apidevtools/json-schema-ref-parser": "^11.1.0",
-    "lodash": "^4.17.21"
+    "lodash": "^4.17.21",
+    "node-fetch": "^3.3.2"
   }
 }

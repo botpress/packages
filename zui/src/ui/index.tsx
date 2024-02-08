@@ -88,11 +88,11 @@ export const schemaToUISchema = <UI extends UIComponentDefinitions = GlobalCompo
   if (schema.type === 'string' || schema.type === 'boolean' || schema.type === 'number') {
     if (!schema[zuiKey]?.displayAs || schema[zuiKey].displayAs.length !== 2) {
       const defaultComponent = components[schema.type].default as any
-      return defaultComponent?.(schema.type, 'default', {}, scope) || null
+      return defaultComponent?.({}, { type: schema.type, id: 'default', scope }) || null
     }
     const [id, params] = schema[zuiKey].displayAs
     const translationFunc = resolveComponentFunction(components, schema.type, id) as any
-    return translationFunc(schema.type, id, params, { schema, scope })
+    return translationFunc(params, { type: schema.type, id, schema, scope })
   }
 
   console.error('No component function found for', schema.type, schema)

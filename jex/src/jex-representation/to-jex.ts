@@ -1,9 +1,32 @@
 import { JSONSchema7, JSONSchema7Type } from 'json-schema'
 import * as types from './typings'
-import { JexError } from '../errors'
+import * as err from '../errors'
 import _ from 'lodash'
 import { flattenUnions } from './flatten-unions'
-import { dereference } from '@apidevtools/json-schema-ref-parser'
+import { dereference, JSONParserError } from '@apidevtools/json-schema-ref-parser'
+
+const _dereference = async (schema: JSONSchema7): Promise<JSONSchema7> => {
+  try {
+    const unref = await dereference(schema, {
+      dereference: {
+        circular: false // TODO: add support for circular references
+      }
+    })
+    return unref as JSONSchema7
+  } catch (thrown) {
+    if (thrown instanceof ReferenceError) {
+      const mapped = new err.JexReferenceError(thrown)
+      mapped.stack = thrown.stack
+      throw mapped
+    }
+    if (thrown instanceof JSONParserError) {
+      const mapped = new err.JexParserError(thrown)
+      mapped.stack = thrown.stack
+      throw mapped
+    }
+    throw thrown
+  }
+}
 
 const _toInternalPrimitive = <T extends 'string' | 'number' | 'boolean'>(
   type: T,
@@ -56,7 +79,7 @@ const _toInternalRep = (schema: JSONSchema7): types.JexType => {
       }
     }
 
-    throw new JexError('Not schema is only partially supported')
+    throw new err.JexError('Not schema is only partially supported')
   }
 
   if (Array.isArray(schema.type)) {
@@ -102,7 +125,7 @@ const _toInternalRep = (schema: JSONSchema7): types.JexType => {
     // TODO: check for prefixItems and additionalItems
 
     if (typeof schema.items !== 'object') {
-      throw new JexError('Array schema items must be an object')
+      throw new err.JexError('Array schema items must be an object')
     }
     return {
       type: 'array',
@@ -125,7 +148,7 @@ const _toInternalRep = (schema: JSONSchema7): types.JexType => {
         }
       }
       if (typeof schema.additionalProperties !== 'object') {
-        throw new JexError('Object schema additionalProperties must be an object')
+        throw new err.JexError('Object schema additionalProperties must be an object')
       }
       return {
         type: 'map',
@@ -163,7 +186,7 @@ const _toInternalRep = (schema: JSONSchema7): types.JexType => {
     const enums: JSONSchema7[] = []
     for (const item of schema.anyOf) {
       if (item === true || item === false) {
-        throw new JexError('Boolean schema is not supported')
+        throw new err.JexError('Boolean schema is not supported')
       }
       enums.push(item)
     }
@@ -178,11 +201,7 @@ const _toInternalRep = (schema: JSONSchema7): types.JexType => {
 }
 
 export const toJex = async (schema: JSONSchema7): Promise<types.JexType> => {
-  const unref = (await dereference(schema, {
-    dereference: {
-      circular: false // TODO: add support for circular references
-    }
-  })) as JSONSchema7
+  const unref = await _dereference(schema)
   const jex = _toInternalRep(unref)
   return flattenUnions(jex)
 }

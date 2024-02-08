@@ -180,7 +180,7 @@ const _toInternalRep = (schema: JSONSchema7): types.JexType => {
 export const toJex = async (schema: JSONSchema7): Promise<types.JexType> => {
   const unref = (await dereference(schema, {
     dereference: {
-      circular: false
+      circular: false // TODO: add support for circular references
     }
   })) as JSONSchema7
   const jex = _toInternalRep(unref)

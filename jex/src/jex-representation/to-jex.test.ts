@@ -8,7 +8,7 @@ import { toJex as j2x } from './to-jex'
 import { jexBotCreateSchema, zodBotCreateSchema } from './create-bot.utils.test'
 import { jexEquals as jexEquals } from './jex-equals'
 
-const z2j = (s: z.ZodType): JSONSchema7 => zodToJsonSchema(s) as JSONSchema7 // TODO: support reference
+const z2j = (s: z.ZodType): JSONSchema7 => zodToJsonSchema(s) as JSONSchema7
 
 const expectZod = (zodSchema: z.ZodType) => ({
   toEqualJex: async (expectedJexSchema: JexType): Promise<void> => {

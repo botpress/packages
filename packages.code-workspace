@@ -1,0 +1,19 @@
+{
+  "folders": [
+    { "path": "const" },
+    { "path": "entities" },
+    { "path": "es-node" },
+    { "path": "expresso" },
+    { "path": "jex" },
+    { "path": "log4bot" },
+    { "path": "opapi" },
+    { "path": "promex" },
+    { "path": "ptb-schema" },
+    { "path": "readiness" },
+    { "path": "trail" },
+    { "path": "tunnel" },
+    { "path": "verel" },
+    { "path": "yargs-extra" },
+    { "path": "zui" }
+  ]
+}

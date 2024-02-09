@@ -1,2 +1,2 @@
 export * as collection from './collection-utils'
-export * as typings from './type-utils'
+export * as types from './type-utils'

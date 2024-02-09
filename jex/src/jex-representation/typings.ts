@@ -1,7 +1,4 @@
-/**
- * Internal representation of Jex Schema
- * Simpler than JSON Schema and capable of representing all TypeScript types
- */
+import * as utils from '../utils'
 
 export type JexStringContent = string
 export type JexString = {
@@ -71,7 +68,7 @@ export type JexAny = {
 
 export type JexTuple = {
   type: 'tuple'
-  items: JexType[]
+  items: utils.types.Tuple<JexType, number>
 }
 
 export type JexType =

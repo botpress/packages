@@ -24,7 +24,7 @@ export const $ = {
   null: () => ({ type: 'null' }),
   undefined: () => ({ type: 'undefined' }),
   literal: _literal,
-  object: <const Args extends Record<string, types.JexType>>(properties: Args) => ({ type: 'object', properties }),
+  object: <Args extends Record<string, types.JexType>>(properties: Args) => ({ type: 'object', properties }),
   array: <const Args extends types.JexType>(items: Args) => ({ type: 'array', items: items as Args }),
   map: <const Args extends types.JexType>(items: Args) => ({ type: 'map', items: items as Args }),
   tuple: <const Args extends types.JexType[]>(items: Args) => ({ type: 'tuple', items }),

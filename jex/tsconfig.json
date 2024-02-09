@@ -22,6 +22,7 @@
     "noUnusedLocals": false,
     "noImplicitOverride": false,
     "checkJs": false,
+    "noErrorTruncation": true,
 
     "outDir": "dist"
   },

@@ -3,10 +3,19 @@
  */
 export type Resolve<T> = T extends (...args: infer A) => infer R
   ? (...args: Resolve<A>) => Resolve<R>
-  : T extends Promise<infer R>
-    ? Promise<Resolve<R>>
-    : T extends object
-      ? T extends infer O
-        ? { [K in keyof O]: Resolve<O[K]> }
-        : never
-      : T
+  : T extends [infer A]
+    ? [Resolve<A>]
+    : T extends [infer A, ...infer B]
+      ? [Resolve<A>, ...Resolve<B>]
+      : T extends Promise<infer R>
+        ? Promise<Resolve<R>>
+        : T extends object
+          ? T extends infer O
+            ? { [K in keyof O]: Resolve<O[K]> }
+            : never
+          : T
+
+export type Cast<T, U> = T extends U ? T : U
+
+type _Tuple<T, N extends number, R extends any[]> = R['length'] extends N ? R : _Tuple<T, N, [T, ...R]>
+export type Tuple<T, N extends number> = number extends N ? N[] : _Tuple<T, N, []>

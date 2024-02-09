@@ -1,15 +1,14 @@
 import * as types from './typings'
-import { JexSet, jexEquals } from './jex-equals'
+import { jexEquals } from './jex-equals'
 
-const _primitiveExtends = <T extends types.JexPrimitive>(
-  child: T | types.JexLiteral<T>,
-  parent: types.JexType
-): boolean => {
-  const isT = (x: types.JexType): x is T | types.JexLiteral<T> => x.type === child.type
+type LiteralOf<T extends types.JexPrimitive> = Extract<types.JexLiteral, { type: T['type'] }>
+
+const _primitiveExtends = <T extends types.JexPrimitive>(child: T | LiteralOf<T>, parent: types.JexType): boolean => {
+  const isT = (x: types.JexType): x is T | LiteralOf<T> => x.type === child.type
   if (!isT(parent)) return false
 
-  type Primitive = types.JexLiteral<T> | (T & { value: undefined })
-  const asPrimitive = (value: T | types.JexLiteral<T>): Primitive =>
+  type Primitive = LiteralOf<T> | (T & { value: undefined })
+  const asPrimitive = (value: T | LiteralOf<T>): Primitive =>
     'value' in value ? value : { ...value, value: undefined }
 
   const _child = asPrimitive(child)

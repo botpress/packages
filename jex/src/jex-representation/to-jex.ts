@@ -5,6 +5,18 @@ import _ from 'lodash'
 import { flattenUnions } from './flatten-unions'
 import { dereference, JSONParserError } from '@apidevtools/json-schema-ref-parser'
 
+type _Primitives = {
+  string: types.JexString
+  number: types.JexNumber
+  boolean: types.JexBoolean
+}
+
+type _Literals = {
+  string: types.JexStringLiteral
+  number: types.JexNumberLiteral
+  boolean: types.JexBooleanLiteral
+}
+
 const _dereference = async (schema: JSONSchema7): Promise<JSONSchema7> => {
   try {
     const unref = await dereference(schema, {
@@ -33,7 +45,7 @@ const _toInternalPrimitive = <T extends 'string' | 'number' | 'boolean'>(
   schema: JSONSchema7
 ): types.JexType => {
   if (schema.enum === undefined && schema.const === undefined) {
-    return { type } as types.JexPrimitives[T]
+    return { type } as _Primitives[T]
   }
   let values: JSONSchema7Type[] = []
   if (schema.enum !== undefined) {
@@ -44,13 +56,13 @@ const _toInternalPrimitive = <T extends 'string' | 'number' | 'boolean'>(
   }
   values = values.filter((value) => typeof value === type)
   if (values.length === 0) {
-    return { type } as types.JexPrimitives[T]
+    return { type } as _Primitives[T]
   }
   if (values.length === 1) {
     return {
       type,
-      value: values[0] as types.JexPrimitiveContents[T]
-    }
+      value: values[0]
+    } as _Literals[T]
   }
   return {
     type: 'union',

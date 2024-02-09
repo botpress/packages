@@ -20,22 +20,22 @@ export type JexBoolean = {
 
 export type JexPrimitive = JexString | JexNumber | JexBoolean
 
-export type JexPrimitives = {
-  string: JexString
-  number: JexNumber
-  boolean: JexBoolean
+export type JexStringLiteral<V extends string = string> = {
+  type: 'string'
+  value: V
 }
 
-export type JexPrimitiveContents = {
-  string: JexStringContent
-  number: JexNumberContent
-  boolean: JexBooleanContent
+export type JexNumberLiteral<V extends number = number> = {
+  type: 'number'
+  value: V
 }
 
-export type JexLiteral<T extends JexPrimitive = JexPrimitive> = {
-  type: T['type']
-  value: JexPrimitiveContents[T['type']] // instead of enum
+export type JexBooleanLiteral<V extends boolean = boolean> = {
+  type: 'boolean'
+  value: V
 }
+
+export type JexLiteral = JexStringLiteral | JexNumberLiteral | JexBooleanLiteral
 
 export type JexNull = {
   type: 'null'
@@ -78,7 +78,9 @@ export type JexType =
   | JexPrimitive
   | JexNull
   | JexUndefined
-  | JexLiteral
+  | JexStringLiteral
+  | JexNumberLiteral
+  | JexBooleanLiteral
   | JexUnion
   | JexObject
   | JexArray

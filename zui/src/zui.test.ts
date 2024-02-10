@@ -171,3 +171,20 @@ test('null', () => {
   const schema = zui.null()
   schema.parse(null)
 })
+
+test('lazy', () => {
+  const schema = zui.lazy(() => zui.string().hidden(true).examples(['hello']))
+  schema.parse('hello')
+  expect(schema.toJsonSchema()).toMatchInlineSnapshot(`
+    {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "type": "string",
+      "x-zui": {
+        "hidden": true,
+        "examples": [
+          "hello"
+        ]
+      },
+    }
+  `)
+})

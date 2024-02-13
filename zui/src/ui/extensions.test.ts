@@ -58,17 +58,10 @@ describe('ZUI UI Extensions', () => {
   test('should be able to use zui with default extensions', () => {
     const zui = basezui as Zui<typeof defaultExtensions>
 
-    zui.string().displayAs('textbox', {
-      label: 'First Name',
-    })
+    zui.string().displayAs('textbox', {})
 
-    zui.number().displayAs('numberinput', {
-      label: 'Age',
-    })
+    zui.number().displayAs('numberinput', {})
 
-    zui.boolean().displayAs('checkbox', {
-      label: 'Is this a checkbox?',
-      readonly: true,
-    })
+    zui.boolean().displayAs('checkbox', {}).disabled()
   })
 })

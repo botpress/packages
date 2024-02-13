@@ -22,13 +22,14 @@ const zui = zuiImport as Zui<typeof defaultExtensions>
 
 const exampleSchema = zui
   .object({
-    firstName: zui.string().displayAs('textbox', {
-      label: 'First Name',
-    }),
+    firstName: zui.string().displayAs('textbox', {}),
     lastName: zui.string().displayAs('textbox', {}),
-    birthday: zui.string().displayAs('datetimeinput', {
-      type: 'date',
-    }),
+    birthday: zui
+      .string()
+      .displayAs('datetimeinput', {
+        type: 'date',
+      })
+      .title('Date of Birth'),
     email: zui
       .string()
       .displayAs('textbox', {})
@@ -40,9 +41,8 @@ const exampleSchema = zui
     password: zui.string().displayAs('textbox', {}),
     passwordConfirm: zui.string().displayAs('textbox', {}),
   })
-  .displayAs('group', {
-    label: 'User Information',
-  })
+  .displayAs('group', {})
+  .title('User Information')
 
 export const ExampleSchema: Story = {
   args: {

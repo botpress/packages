@@ -55,9 +55,7 @@ export const defaultExtensions = {
     },
     group: {
       id: 'group',
-      schema: z.object({
-        label: z.string(),
-      }),
+      schema: z.object({}),
     },
     categorization: {
       id: 'categorization',
@@ -65,9 +63,7 @@ export const defaultExtensions = {
     },
     category: {
       id: 'category',
-      schema: z.object({
-        label: z.string(),
-      }),
+      schema: z.object({}),
     },
   },
 } as const satisfies UIComponentDefinitions
@@ -154,10 +150,10 @@ export const defaultExtensionComponents: ComponentImplementationMap<typeof defau
         elements: children,
       }
     },
-    category: ({ label }, __, children) => {
+    category: (_, { zuiProps }, children) => {
       return {
         type: 'Category',
-        label,
+        label: zuiProps.title,
         elements: children,
       }
     },
@@ -167,10 +163,10 @@ export const defaultExtensionComponents: ComponentImplementationMap<typeof defau
         elements: children as UICategorySchema[],
       }
     },
-    group: ({ label }, _, children) => {
+    group: (_, { zuiProps }, children) => {
       return {
         type: 'Group',
-        label,
+        label: zuiProps.title,
         elements: children,
       }
     },

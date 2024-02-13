@@ -89,7 +89,7 @@ export type UILayoutSchema =
     }
   | {
       type: 'Group'
-      label: string
+      label?: string
       elements: UISchema[]
       rule?: UIRuleSchema
     }
@@ -101,7 +101,7 @@ export type UILayoutSchema =
 
 export type UICategorySchema = {
   type: 'Category'
-  label: string
+  label?: string
   elements: UISchema[]
   rule?: UIRuleSchema
 }

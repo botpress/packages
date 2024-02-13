@@ -36,17 +36,14 @@ const exampleSchema = zui
         type: 'date',
       })
       .title('Date of Birth'),
-    plan: zui.enum(['basic', 'premium']).displayAs('textbox', {
-      multiline: true,
-    }),
+    plan: zui.enum(['basic', 'premium']).displayAs('textbox', {}).hidden(),
     age: zui.number().displayAs('numberinput', {}),
     email: zui.string().displayAs('textbox', {}).title('Email Address'),
     password: zui.string().displayAs('textbox', {}),
     passwordConfirm: zui.string().displayAs('textbox', {}),
   })
-  .displayAs('group', {
-    label: 'User Information',
-  })
+  .displayAs('group', {})
+  .title('User Information')
 
 export const ExampleSchema: Story = {
   args: {

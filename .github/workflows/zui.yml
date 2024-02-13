@@ -18,6 +18,8 @@ jobs:
       - uses: pnpm/action-setup@v2.2.4
         with:
           version: 8
+      - name: Type Check
+        run: pnpm type:check
       - name: Install And Build
         run: pnpm install && pnpm build
       - name: Format Check

@@ -58,9 +58,6 @@ export type ZuiType<
 }
 
 export type ZuiExtension<Z extends ZodType, UI extends UIComponentDefinitions, Out = z.infer<Z>> = {
-  id: (id: string) => ZuiType<Z, UI>
-  // Sets the index of the field in a list
-  index: (index: number) => ZuiType<Z, UI>
   /**
    * The type of component to use to display the field and its options
    */
@@ -69,21 +66,6 @@ export type ZuiExtension<Z extends ZodType, UI extends UIComponentDefinitions, O
     options: z.infer<UI[ZodToBaseType<Z>][K]['schema']>,
   ) => ZuiType<Z, UI>
   /**
-   * Examples of valid values for the field
-   * @default []
-   */
-  examples: (examples: Out[]) => ZuiType<Z, UI>
-  /**
-   * Whether the field should fill the available space
-   * @default false
-   */
-  fill: (fill: boolean) => ZuiType<Z, UI>
-  /**
-   * Whether the field can be set dynamically using super inputs
-   * @default false
-   */
-  dynamic: (dynamic: boolean) => ZuiType<Z, UI>
-  /**
    * The title of the field. Defaults to the field name.
    */
   title: (title: string) => ZuiType<Z, UI>
@@ -91,40 +73,21 @@ export type ZuiExtension<Z extends ZodType, UI extends UIComponentDefinitions, O
    * Whether the field is hidden in the UI. Useful for internal fields.
    * @default false
    */
-  hidden: (hidden: boolean) => ZuiType<Z, UI>
-  /**
-   * Whether the field can be overriden by a more specific configuration
-   * @default false
-   */
-  overridable: (overridable: boolean) => ZuiType<Z, UI>
-  /**
-   * Mark the field as searchable, when applicable
-   * @default true
-   */
-  searchable: (searchable: boolean) => ZuiType<Z, UI>
+  hidden: (hidden?: boolean) => ZuiType<Z, UI>
   /**
    * Whether the field is disabled
    * @default false
    */
-  disabled: (disabled: boolean) => ZuiType<Z, UI>
+  disabled: (disabled?: boolean) => ZuiType<Z, UI>
   /**
    * Whether the field should show the description as a tooltip
    * @default true
    */
-  tooltip: (tooltip: boolean) => ZuiType<Z, UI>
-  /**
-   * Whether the field is readonly
-   * @default false
-   */
-  readonly: (readonly: boolean) => ZuiType<Z, UI>
+  tooltip: (tooltip?: boolean) => ZuiType<Z, UI>
   /**
    * Placeholder text for the field
    */
   placeholder: (placeholder: string) => ZuiType<Z, UI>
-  /**
-   * Choose how the field & its childs are displayed
-   */
-  layout: (layout: 'HorizontalLayout' | 'VerticalLayout' | 'CollapsiblePanel') => ZuiType<Z, UI>
   /**
    * Returns the ZUI schema for the field
    */
@@ -139,21 +102,12 @@ export type ZuiExtension<Z extends ZodType, UI extends UIComponentDefinitions, O
 export const zuiKey = 'x-zui' as const
 
 const Extensions: ReadonlyArray<keyof ZuiExtension<any, any>> = [
-  'id',
-  'index',
   'tooltip',
   'disabled',
   'displayAs',
-  'dynamic',
-  'examples',
-  'fill',
   'hidden',
-  'readonly',
   'title',
   'placeholder',
-  'overridable',
-  'searchable',
-  'layout',
 ] as const
 
 type ZCreate = { create: (...args: any) => ZodType } & (

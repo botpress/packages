@@ -21,9 +21,16 @@ const zui = zuiImport as Zui<typeof defaultExtensions>
 
 const exampleSchema = zui
   .object({
-    firstName: zui.string().displayAs('textbox', {
-      label: 'First Name',
-    }),
+    firstName: zui
+      .string()
+      .displayAs('textbox', {
+        label: 'First Name',
+      })
+      .title('User')
+      .disabled()
+      .hidden()
+      .placeholder('Enter your name')
+      .tooltip(),
     lastName: zui.string().displayAs('textbox', {}),
     birthday: zui.string().displayAs('datetimeinput', {
       type: 'date',

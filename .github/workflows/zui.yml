@@ -14,14 +14,21 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - uses: pnpm/action-setup@v2.2.4
         with:
           version: 8
+      - uses: actions/setup-node@v3
+        with:
+          node-version: '18.x'
+          check-latest: true
+          cache: 'pnpm'
+      - name: Install And Build
+        run: pnpm install
       - name: Type Check
         run: pnpm type:check
-      - name: Install And Build
-        run: pnpm install && pnpm build
+      - name: Build
+        run: pnpm build
       - name: Format Check
         run: pnpm format:check
       - name: Test

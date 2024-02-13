@@ -353,8 +353,8 @@ describe('zuiToJsonSchema', () => {
   test('lazy schemas', () => {
     const schema = zui.lazy(() =>
       zui.object({
-        type: zui.string().examples(['hello']),
-        value: zui.number().hidden(true),
+        type: zui.string().title('Type'),
+        value: zui.number().hidden(),
       }),
     )
 
@@ -364,14 +364,9 @@ describe('zuiToJsonSchema', () => {
       "additionalProperties": false,
       "properties": {
         "type": {
-          "examples": [
-            "hello",
-          ],
           "type": "string",
           "x-zui": {
-            "examples": [
-              "hello",
-            ],
+            "title": "Type",
           },
         },
         "value": {

@@ -172,7 +172,7 @@ test('null', () => {
 test('Lazy', () => {
   const schema = zui.lazy(() =>
     zui.object({
-      type: zui.string().examples(['hello']),
+      type: zui.string(),
       value: zui.number().hidden(true),
     }),
   )

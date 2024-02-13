@@ -2,8 +2,8 @@ import type { Meta, StoryObj } from '@storybook/react'
 import { ZuiForm } from '..'
 import { defaultExtensionComponents } from '../defaultextension'
 import { defaultExtensions } from '../defaultextension'
-import { Zui, zui as zuiImport } from '../../zui'
 import { vanillaCells, vanillaRenderers } from '@jsonforms/vanilla-renderers'
+import { exampleSchema } from './exampleschema'
 
 const meta = {
   title: 'Form/Example',
@@ -16,34 +16,6 @@ const meta = {
 } satisfies Meta<typeof ZuiForm<typeof defaultExtensions>>
 
 type Story = StoryObj<typeof meta>
-
-const zui = zuiImport as Zui<typeof defaultExtensions>
-
-const exampleSchema = zui
-  .object({
-    firstName: zui
-      .string()
-      .displayAs('textbox', {})
-      .title('User')
-      .disabled()
-      .hidden()
-      .placeholder('Enter your name')
-      .tooltip(),
-    lastName: zui.string().displayAs('textbox', {}),
-    birthday: zui
-      .string()
-      .displayAs('datetimeinput', {
-        type: 'date',
-      })
-      .title('Date of Birth'),
-    plan: zui.enum(['basic', 'premium']).displayAs('textbox', {}).hidden(),
-    age: zui.number().displayAs('numberinput', {}),
-    email: zui.string().displayAs('textbox', {}).title('Email Address'),
-    password: zui.string().displayAs('textbox', {}),
-    passwordConfirm: zui.string().displayAs('textbox', {}),
-  })
-  .displayAs('group', {})
-  .title('User Information')
 
 export const ExampleSchema: Story = {
   args: {

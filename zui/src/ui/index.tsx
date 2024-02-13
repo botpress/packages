@@ -42,6 +42,11 @@ export const schemaToUISchema = <UI extends UIComponentDefinitions = GlobalCompo
   const scope = keyToScope(currentKey)
 
   const zuiProps = schema[zuiKey]
+
+  if (zuiProps?.hidden) {
+    return null
+  }
+
   if (schema.type === 'object') {
     const properties = Object.entries(schema.properties)
       .map(([key, value]) => {
@@ -96,6 +101,7 @@ export const schemaToUISchema = <UI extends UIComponentDefinitions = GlobalCompo
   if (schema.type === 'string' || schema.type === 'boolean' || schema.type === 'number') {
     if (!schema[zuiKey]?.displayAs || schema[zuiKey].displayAs.length !== 2) {
       const defaultComponent = components[schema.type].default as any
+
       return defaultComponent?.({}, { type: schema.type, id: 'default', scope, zuiProps }) || null
     }
     const [id, params] = schema[zuiKey].displayAs

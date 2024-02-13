@@ -93,6 +93,16 @@ export const defaultExtensionComponents: ComponentImplementationMap<typeof defau
         },
       }
     },
+    default: (_, { scope, zuiProps }) => {
+      return {
+        type: 'Control',
+        scope,
+        label: zuiProps.title ?? true,
+        options: {
+          readOnly: zuiProps.disabled ?? false,
+        },
+      }
+    },
   },
   number: {
     numberinput: (_, { scope, zuiProps }) => {

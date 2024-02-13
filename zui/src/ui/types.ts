@@ -173,7 +173,7 @@ export type ComponentImplementationMap<UI extends UIComponentDefinitions = Globa
   }
 }
 
-type SchemaContext<
+export type SchemaContext<
   Type extends BaseType,
   ID extends keyof UI[Type],
   UI extends UIComponentDefinitions = GlobalComponentDefinitions,
@@ -185,10 +185,14 @@ type SchemaContext<
   zuiProps: ZuiSchemaExtension[typeof zuiKey]
 }
 
-type UIComponent<
+export type UIComponent<
   Type extends BaseType,
   ID extends keyof UI[Type],
   UI extends UIComponentDefinitions = GlobalComponentDefinitions,
 > = Type extends ContainerType
-  ? (params: z.infer<UI[Type][ID]['schema']>, context: SchemaContext<Type, ID, UI>, children: UISchema[]) => UISchema
-  : (params: z.infer<UI[Type][ID]['schema']>, context: SchemaContext<Type, ID, UI>) => UISchema
+  ? (
+      params: z.infer<UI[Type][ID]['schema']>,
+      context: SchemaContext<Type, ID, UI>,
+      children: UISchema[],
+    ) => UISchema | null
+  : (params: z.infer<UI[Type][ID]['schema']>, context: SchemaContext<Type, ID, UI>) => UISchema | null

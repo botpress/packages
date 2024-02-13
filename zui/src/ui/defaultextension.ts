@@ -2,10 +2,7 @@ import { z } from 'zod'
 import { UICategorySchema, UIComponentDefinitions } from './types'
 import { ComponentImplementationMap } from './types'
 
-const commonInputSchema = z.object({
-  label: z.string().optional(),
-  readonly: z.boolean().optional(),
-})
+const commonInputSchema = z.object({})
 
 export const defaultExtensions = {
   string: {
@@ -36,7 +33,9 @@ export const defaultExtensions = {
   boolean: {
     checkbox: {
       id: 'checkbox',
-      schema: commonInputSchema,
+      schema: commonInputSchema.extend({
+        toggle: z.boolean().default(false).optional(),
+      }),
     },
   },
   array: {
@@ -75,48 +74,49 @@ export const defaultExtensions = {
 
 export const defaultExtensionComponents: ComponentImplementationMap<typeof defaultExtensions> = {
   string: {
-    textbox: ({ multiline, label, fitContentWidth, readonly }, { scope }) => {
+    textbox: ({ multiline, fitContentWidth }, { scope, zuiProps }) => {
       return {
         type: 'Control',
         scope,
-        label: label,
+        label: zuiProps.title ?? true,
         options: {
           multi: multiline,
-          readOnly: readonly,
+          readOnly: zuiProps.disabled ?? false,
           trim: fitContentWidth,
         },
       }
     },
-    datetimeinput: ({ type, label, readonly }, { scope }) => {
+    datetimeinput: ({ type }, { scope, zuiProps }) => {
       return {
         type: 'Control',
         scope,
-        label,
+        label: zuiProps.title ?? true,
         options: {
           format: type,
-          readOnly: readonly,
+          readOnly: zuiProps.disabled ?? false,
         },
       }
     },
   },
   number: {
-    numberinput: ({ readonly }, { scope }) => {
+    numberinput: (_, { scope, zuiProps }) => {
       return {
         type: 'Control',
         scope,
+        label: zuiProps.title ?? true,
         options: {
-          readOnly: readonly,
+          readOnly: zuiProps.disabled ?? false,
         },
       }
     },
-    slider: ({ label, readonly }, { scope }) => {
+    slider: (_, { scope, zuiProps }) => {
       return {
         type: 'Control',
         scope,
-        label,
+        label: zuiProps.title ?? false,
         options: {
           slider: true,
-          readOnly: readonly,
+          readOnly: zuiProps.disabled ?? false,
         },
       }
     },
@@ -130,13 +130,13 @@ export const defaultExtensionComponents: ComponentImplementationMap<typeof defau
     },
   },
   boolean: {
-    checkbox: ({ label, readonly }, { scope }) => {
+    checkbox: (_, { scope, zuiProps }) => {
       return {
         type: 'Control',
         scope,
-        label,
+        label: zuiProps.title ?? true,
         options: {
-          readOnly: readonly,
+          readOnly: zuiProps.disabled ?? false,
         },
       }
     },

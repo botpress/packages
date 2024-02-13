@@ -7,12 +7,6 @@ import { z } from 'zod'
 type JsonSchemaWithZui = JsonSchema7 & {
   [zuiKey]?: ZuiExtension<ToZodType<ZuiTypeAny>, any>
   properties?: {
-    tooltip?: boolean
-    disabled?: boolean
-    displayAs?: [string, any]
-    title?: string
-    hidden?: boolean
-    placeholder?: string
     [key: string]: any
   }
 }

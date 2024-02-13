@@ -4,7 +4,12 @@ import { zuiKey } from '../zui'
 
 export type ZuiSchemaExtension = {
   [zuiKey]: {
+    tooltip?: boolean
+    disabled?: boolean
     displayAs?: [string, any]
+    title?: string
+    hidden?: boolean
+    placeholder?: string
   }
 }
 
@@ -154,6 +159,8 @@ export type ZodToBaseType<T extends ZodType> = T extends z.ZodString
   ? 'array'
   : T extends z.ZodObject<any, any>
   ? 'object'
+  : T extends z.ZodEnum<[string, ...string[]]>
+  ? 'string'
   : any
 
 export type AsBaseType<T> = T extends BaseType ? T : never
@@ -175,6 +182,7 @@ type SchemaContext<
   id: ID
   scope: string
   schema: JSONSchemaOfType<Type>
+  zuiProps: ZuiSchemaExtension[typeof zuiKey]
 }
 
 type UIComponent<

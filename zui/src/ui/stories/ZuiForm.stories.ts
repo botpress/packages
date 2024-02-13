@@ -23,18 +23,23 @@ const exampleSchema = zui
   .object({
     firstName: zui
       .string()
-      .displayAs('textbox', {
-        label: 'First Name',
-      })
+      .displayAs('textbox', {})
       .title('User')
       .disabled()
       .hidden()
       .placeholder('Enter your name')
       .tooltip(),
     lastName: zui.string().displayAs('textbox', {}),
-    birthday: zui.string().displayAs('datetimeinput', {
-      type: 'date',
+    birthday: zui
+      .string()
+      .displayAs('datetimeinput', {
+        type: 'date',
+      })
+      .title('Date of Birth'),
+    plan: zui.enum(['basic', 'premium']).displayAs('textbox', {
+      multiline: true,
     }),
+    age: zui.number().displayAs('numberinput', {}),
     email: zui.string().displayAs('textbox', {}).title('Email Address'),
     password: zui.string().displayAs('textbox', {}),
     passwordConfirm: zui.string().displayAs('textbox', {}),

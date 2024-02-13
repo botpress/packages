@@ -9,12 +9,15 @@ const expectJex = (jexType: types.JexType) => ({
   not: {
     toExtend: (parent: types.JexType) => {
       const actual = jexExtends(jexType, parent)
-      expect(actual).toBe(false)
+      expect(actual.result).toBe(false)
     }
   },
   toExtend: (parent: types.JexType) => {
     const actual = jexExtends(jexType, parent)
-    expect(actual).toBe(true)
+    if (!actual.result) {
+      console.log(actual.reason)
+    }
+    expect(actual.result).toBe(true)
   }
 })
 

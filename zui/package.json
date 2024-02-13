@@ -47,6 +47,7 @@
     "@jsonforms/core": "^3.2.1",
     "@jsonforms/react": "^3.2.1",
     "@jsonforms/vanilla-renderers": "^3.2.1",
+    "lodash": "^4.17.21",
     "react": "^18.2.0"
   },
   "bundledDependencies": [

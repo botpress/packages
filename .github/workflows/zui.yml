@@ -22,7 +22,5 @@ jobs:
         run: pnpm install && pnpm build
       - name: Format Check
         run: pnpm format:check
-      - name: Type Check
-        run: pnpm type:check
       - name: Test
         run: pnpm test

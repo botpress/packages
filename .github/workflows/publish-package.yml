@@ -12,6 +12,7 @@ on:
           - entities
           - es-node
           - expresso
+          - jex
           - log4bot
           - opapi
           - promex

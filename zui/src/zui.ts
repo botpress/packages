@@ -160,6 +160,11 @@ function extend<T extends ZCreate | ZodLazy<any>>(zType: T) {
   if (!instance.ui) {
     Object.defineProperty(instance, 'ui', {
       get() {
+        // TODO: find out why this happens
+        if (!this._def) {
+          console.warn('Could not read _def from object')
+          return {}
+        }
         this._def[zuiKey] ??= {}
         return this._def[zuiKey]
       },

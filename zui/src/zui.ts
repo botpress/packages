@@ -137,8 +137,10 @@ function extend<T extends ZCreate>(zType: T) {
 
       if (Array.isArray(props) && props.length > 1) {
         this._def[zuiKey][extension] = props
-      } else {
+      } else if (props.length === 1) {
         this._def[zuiKey][extension] = props[0]
+      } else {
+        this._def[zuiKey][extension] = true
       }
       return this
     }

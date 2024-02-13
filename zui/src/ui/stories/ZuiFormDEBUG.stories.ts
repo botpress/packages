@@ -29,7 +29,14 @@ const exampleSchema = zui
     birthday: zui.string().displayAs('datetimeinput', {
       type: 'date',
     }),
-    email: zui.string().displayAs('textbox', {}).title('Email Address'),
+    email: zui
+      .string()
+      .displayAs('textbox', {})
+      .title('Email Address')
+      .tooltip()
+      .hidden()
+      .placeholder('Enter an email address')
+      .disabled(),
     password: zui.string().displayAs('textbox', {}),
     passwordConfirm: zui.string().displayAs('textbox', {}),
   })

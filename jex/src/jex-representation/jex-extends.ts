@@ -11,7 +11,7 @@ type _JexExtensionSuccess = { result: true }
 type _JexExtensionFailure = { result: false; reasons: _JexFailureReason[] }
 type _JexExtensionResult = _JexExtensionSuccess | _JexExtensionFailure
 
-const splitSuccessFailure = (results: _JexExtensionResult[]): [_JexExtensionSuccess[], _JexExtensionFailure[]] => {
+const _splitSuccessFailure = (results: _JexExtensionResult[]): [_JexExtensionSuccess[], _JexExtensionFailure[]] => {
   const success: _JexExtensionSuccess[] = []
   const failure: _JexExtensionFailure[] = []
   results.forEach((r) => {
@@ -21,13 +21,13 @@ const splitSuccessFailure = (results: _JexExtensionResult[]): [_JexExtensionSucc
   return [success, failure]
 }
 
-type LiteralOf<T extends types.JexPrimitive> = Extract<types.JexLiteral, { type: T['type'] }>
+type _LiteralOf<T extends types.JexPrimitive> = Extract<types.JexLiteral, { type: T['type'] }>
 const _primitiveExtends = <T extends types.JexPrimitive>(
   path: PropertyPath,
-  typeA: T | LiteralOf<T>,
+  typeA: T | _LiteralOf<T>,
   typeB: types.JexType
 ): _JexExtensionResult => {
-  const isT = (x: types.JexType): x is T | LiteralOf<T> => x.type === typeA.type
+  const isT = (x: types.JexType): x is T | _LiteralOf<T> => x.type === typeA.type
   if (!isT(typeB)) {
     return {
       result: false,
@@ -35,8 +35,8 @@ const _primitiveExtends = <T extends types.JexPrimitive>(
     }
   }
 
-  type Primitive = LiteralOf<T> | (T & { value: undefined })
-  const asPrimitive = (value: T | LiteralOf<T>): Primitive =>
+  type Primitive = _LiteralOf<T> | (T & { value: undefined })
+  const asPrimitive = (value: T | _LiteralOf<T>): Primitive =>
     'value' in value ? value : { ...value, value: undefined }
 
   const _typeA = asPrimitive(typeA)
@@ -64,14 +64,14 @@ const _jexExtends = (path: PropertyPath, typeA: types.JexType, typeB: types.JexT
 
   if (typeA.type === 'union') {
     const extensions = typeA.anyOf.map((c) => _jexExtends(path, c, typeB))
-    const [_, failures] = splitSuccessFailure(extensions)
+    const [_, failures] = _splitSuccessFailure(extensions)
     if (failures.length === 0) return { result: true } // A union all extends B
     return { result: false, reasons: failures.flatMap((f) => f.reasons) }
   }
 
   if (typeB.type === 'union') {
     const extensions = typeB.anyOf.map((c) => _jexExtends(path, typeA, c))
-    const [success, failures] = splitSuccessFailure(extensions)
+    const [success, failures] = _splitSuccessFailure(extensions)
     if (success.length > 0) return { result: true } // A extends at least one of the B union
     return { result: false, reasons: failures.flatMap((f) => f.reasons) }
   }
@@ -82,7 +82,7 @@ const _jexExtends = (path: PropertyPath, typeA: types.JexType, typeB: types.JexT
         const newPath: PropertyPath = [...path, { type: 'key', value: key }]
         return _jexExtends(newPath, valueA, typeB.items)
       })
-      const [_, failures] = splitSuccessFailure(extensions)
+      const [_, failures] = _splitSuccessFailure(extensions)
       if (failures.length === 0) return { result: true } // All properties of A extend B
       return { result: false, reasons: failures.flatMap((f) => f.reasons) }
     }
@@ -96,7 +96,7 @@ const _jexExtends = (path: PropertyPath, typeA: types.JexType, typeB: types.JexT
         return _jexExtends(newPath, valueA, valueB)
       })
 
-      const [_, failures] = splitSuccessFailure(extensions)
+      const [_, failures] = _splitSuccessFailure(extensions)
       if (failures.length === 0) return { result: true } // All properties of A extend B
       return { result: false, reasons: failures.flatMap((f) => f.reasons) }
     }
@@ -117,7 +117,7 @@ const _jexExtends = (path: PropertyPath, typeA: types.JexType, typeB: types.JexT
         const newPath: PropertyPath = [...path, { type: 'number-index', value: i }]
         return _jexExtends(newPath, c, typeB.items)
       })
-      const [_, failures] = splitSuccessFailure(extensions)
+      const [_, failures] = _splitSuccessFailure(extensions)
       if (failures.length === 0) return { result: true } // All items of A extend B
       return { result: false, reasons: failures.flatMap((f) => f.reasons) }
     }
@@ -130,7 +130,7 @@ const _jexExtends = (path: PropertyPath, typeA: types.JexType, typeB: types.JexT
         const newPath: PropertyPath = [...path, { type: 'number-index', value: i }]
         return _jexExtends(newPath, c, p)
       })
-      const [_, failures] = splitSuccessFailure(extensions)
+      const [_, failures] = _splitSuccessFailure(extensions)
       if (failures.length === 0) return { result: true } // All items of A extend B
       return { result: false, reasons: failures.flatMap((f) => f.reasons) }
     }
@@ -157,12 +157,12 @@ const _jexExtends = (path: PropertyPath, typeA: types.JexType, typeB: types.JexT
   return { result: true }
 }
 
-const reasonToString = (reason: _JexFailureReason): string =>
-  `${pathToString(reason.path)}: ${toString(reason.typeA)} ⊈ ${toString(reason.typeB)}\n`
+const _reasonToString = (reason: _JexFailureReason): string =>
+  `${pathToString(reason.path)}: ${toString(reason.typeA)} ⊈ ${toString(reason.typeB)}`
 
 export type JexExtensionResult = { extends: true } | { extends: false; reasons: string[] }
 export const jexExtends = (typeA: types.JexType, typeB: types.JexType): JexExtensionResult => {
   const extension = _jexExtends([], typeA, typeB)
   if (extension.result) return { extends: true }
-  return { extends: false, reasons: extension.reasons.map(reasonToString) }
+  return { extends: false, reasons: extension.reasons.map(_reasonToString) }
 }

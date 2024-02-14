@@ -21,6 +21,7 @@ type _Tuple<T, N extends number, R extends any[]> = R['length'] extends N ? R : 
 export type Tuple<T, N extends number> = number extends N ? T[] : _Tuple<T, N, []>
 
 export type Expect<T extends true> = T extends true ? true : 'Expectation failed'
+export type ExpectNot<T extends false> = T extends false ? true : 'Expectation failed'
 
 export type Extends<T, U> = T extends U ? true : false
 

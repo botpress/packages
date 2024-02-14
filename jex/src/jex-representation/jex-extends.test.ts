@@ -1,20 +1,32 @@
 import * as utils from '../utils'
 import { JexInfer } from './jex-infer'
 import * as types from './typings'
-import { jexExtends } from './jex-extends'
+import { JexExtensionResult, jexExtends } from './jex-extends'
 import { expect, test } from 'vitest'
 import { $ } from './jex-builder'
+import { toString } from './to-string'
 
-const expectJex = (jexType: types.JexType) => ({
+const SUBSET = `\u2286`
+
+const failureMessage = (res: JexExtensionResult): string => {
+  if (res.extends) return ''
+  return '\n' + res.reasons.map((r) => ` - ${r}\n`).join('')
+}
+
+const successMessage = (typeA: types.JexType, typeB: types.JexType): string => {
+  return `${toString(typeA)} ${SUBSET} ${toString(typeB)}`
+}
+
+const expectJex = (typeA: types.JexType) => ({
   not: {
-    toExtend: (parent: types.JexType) => {
-      const actual = jexExtends(jexType, parent)
-      expect(actual).to.eq(false, `${JSON.stringify(jexType)} ⊆ ${JSON.stringify(parent)}`)
+    toExtend: (typeB: types.JexType) => {
+      const actual = jexExtends(typeA, typeB)
+      expect(actual.extends).to.eq(false, successMessage(typeA, typeB))
     }
   },
-  toExtend: (parent: types.JexType) => {
-    const actual = jexExtends(jexType, parent)
-    expect(actual).to.eq(true, `${JSON.stringify(jexType)} ⊈ ${JSON.stringify(parent)}`)
+  toExtend: (typeB: types.JexType) => {
+    const actual = jexExtends(typeA, typeB)
+    expect(actual.extends).to.eq(true, failureMessage(actual))
   }
 })
 

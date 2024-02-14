@@ -14,16 +14,13 @@ const _primitiveExtends = <T extends types.JexPrimitive>(child: T | LiteralOf<T>
   const _child = asPrimitive(child)
   const _parent = asPrimitive(parent)
 
-  if (_parent.value === undefined && _child.value === undefined) {
-    return true
+  if (_parent.value !== undefined && _child.value === undefined) {
+    return false
   }
-  if (_parent.value === undefined) {
-    return true
+  if (_parent.value !== undefined && _child.value !== _parent.value) {
+    return false
   }
-  if (_parent.value === _child.value) {
-    return true
-  }
-  return false
+  return true
 }
 
 export const jexExtends = (child: types.JexType, parent: types.JexType): boolean => {

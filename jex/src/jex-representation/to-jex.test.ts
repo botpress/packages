@@ -7,6 +7,7 @@ import zodToJsonSchema from 'zod-to-json-schema'
 import { toJex as j2x } from './to-jex'
 import { jexBotCreateSchema, zodBotCreateSchema } from './create-bot.utils.test'
 import { jexEquals as jexEquals } from './jex-equals'
+import { toString } from './to-string'
 
 const z2j = (s: z.ZodType): JSONSchema7 => zodToJsonSchema(s) as JSONSchema7
 
@@ -14,7 +15,9 @@ const expectZod = (zodSchema: z.ZodType) => ({
   toEqualJex: async (expectedJexSchema: JexType): Promise<void> => {
     const jsonSchema = z2j(zodSchema)
     const actualJexSchema = await j2x(jsonSchema)
-    expect(jexEquals(actualJexSchema, expectedJexSchema)).toBe(true)
+
+    const failureMessage = `${toString(actualJexSchema)} ≠ ${toString(expectedJexSchema)}`
+    expect(jexEquals(actualJexSchema, expectedJexSchema)).to.eq(true, failureMessage)
   }
 })
 
@@ -145,4 +148,11 @@ test('jex-rep should model tuple types', async () => {
 
 test('jex-rep should model bot create schema', async () => {
   await expectZod(zodBotCreateSchema).toEqualJex(jexBotCreateSchema)
+})
+
+test('jex-rep should model record of any type', async () => {
+  await expectZod(z.record(z.any())).toEqualJex({
+    type: 'map',
+    items: { type: 'any' }
+  })
 })

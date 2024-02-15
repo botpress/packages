@@ -89,9 +89,7 @@ const _jexExtends = (path: PropertyPath, typeA: types.JexType, typeB: types.JexT
 
     if (typeB.type === 'object') {
       const extensions = Object.entries(typeB.properties).map(([key, valueB]): _JexExtensionResult => {
-        const valueA = typeA.properties[key]
-        if (valueA === undefined)
-          return { result: false, reasons: [{ path, typeA: { type: 'undefined' }, typeB: valueB }] } // undefined does not extend valueB
+        const valueA = typeA.properties[key] ?? { type: 'undefined' }
         const newPath: PropertyPath = [...path, { type: 'key', value: key }]
         return _jexExtends(newPath, valueA, valueB)
       })

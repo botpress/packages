@@ -6,15 +6,13 @@ import { expect, test } from 'vitest'
 import { $ } from './jex-builder'
 import { toString } from './to-string'
 
-const SUBSET = `\u2286`
-
 const failureMessage = (res: JexExtensionResult): string => {
   if (res.extends) return ''
   return '\n' + res.reasons.map((r) => ` - ${r}\n`).join('')
 }
 
 const successMessage = (typeA: types.JexType, typeB: types.JexType): string => {
-  return `${toString(typeA)} ${SUBSET} ${toString(typeB)}`
+  return `${toString(typeA)} ⊆ ${toString(typeB)}`
 }
 
 const expectJex = (typeA: types.JexType) => ({
@@ -76,6 +74,13 @@ test('jex-extends should be false if an optional property of child is required i
   type _parent = JexInfer<typeof parent>
   type _childNotExtendsParent = utils.types.ExpectNot<utils.types.Extends<_child, _parent>>
   expectJex(child).not.toExtend(parent)
+})
+
+// { a: string } extends { a: string; b: string | undefined }
+test('jex-extends should be true if child is an object made of only required properties of parent', () => {
+  const child = $.object({ a: $.string() })
+  const parent = $.object({ a: $.string(), b: $.union([$.string(), $.undefined()]) })
+  expectJex(child).toExtend(parent)
 })
 
 // string does not extend string | number

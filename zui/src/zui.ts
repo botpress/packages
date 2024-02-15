@@ -58,7 +58,7 @@ export type ZuiType<
     : O[P]
 }
 
-export type ZuiExtension<Z extends ZodType, UI extends UIComponentDefinitions, Out = z.infer<Z>> = {
+export type ZuiExtension<Z extends ZodType, UI extends UIComponentDefinitions> = {
   /**
    * The type of component to use to display the field and its options
    */
@@ -180,7 +180,7 @@ function extend<T extends ZCreate | ZodLazy<any>>(zType: T) {
   const stubWrapper = (name: string) => {
     const original = instance[name]
     if (original) {
-      instance[name] = function (...args) {
+      instance[name] = function (...args: any[]) {
         const ret = original.apply(this, args)
         extend(ret)
         ret._def[zuiKey] = this?._def?.[zuiKey]

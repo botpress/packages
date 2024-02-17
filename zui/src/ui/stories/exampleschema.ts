@@ -12,8 +12,21 @@ export const exampleSchema = zui
       .hidden()
       .placeholder('Enter your name')
       .tooltip(),
-    lastName: zui.string().displayAs('textbox', {}),
 
+    lastName: zui.string().displayAs('textbox', {
+      yes: 'it works!',
+    } as any),
+    dates: zui
+      .array(
+        zui
+          .string()
+          .displayAs('datetimeinput', {
+            type: 'date',
+          })
+          .title('Date'),
+      )
+      .displayAs('select', undefined)
+      .nonempty(),
     // tests the hidden function
     arandomfield: zui.string().hidden(),
     arandomnumber: zui.number().hidden(),
@@ -23,7 +36,9 @@ export const exampleSchema = zui
       .string()
       .displayAs('datetimeinput', {
         type: 'date',
-      })
+        yo: 'bero',
+        yes: 'it works!',
+      } as any)
       .title('Date of Birth'),
     plan: zui.enum(['basic', 'premium']).displayAs('textbox', {}).hidden(),
     age: zui.number().displayAs('numberinput', {}),

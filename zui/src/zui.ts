@@ -28,6 +28,7 @@ import { ZuiSchemaOptions, getZuiSchemas } from './zui-schemas'
 import { JsonSchema7, jsonSchemaToZui } from '.'
 import { ObjectToZuiOptions, objectToZui } from './object-to-zui'
 import type { GlobalComponentDefinitions, UIComponentDefinitions, ZodToBaseType } from './ui/types'
+import { isNodeEnvironment } from './utils'
 
 export type Infer<
   T extends ZodType | ZuiType<any> | ZuiTypeAny,
@@ -197,7 +198,7 @@ function extend<T extends ZCreate | ZodLazy<any>>(zType: T) {
 
   if (!instance.toTypeScript) {
     instance.toTypeScript = async function (options) {
-      if (typeof process === 'undefined') {
+      if (!isNodeEnvironment()) {
         return 'Not supported in browser'
       }
 

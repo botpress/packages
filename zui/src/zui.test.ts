@@ -8,11 +8,11 @@ describe('zui', () => {
   })
 
   test('string', () => {
-    const schema = zui.string().regex(/hello/i).title('Title').disabled().length(20)
+    const schema = zui.string().length(20).regex(/hello/i).title('Title').examples(['Example 1'])
 
     expect(schema.ui).toEqual({
       title: 'Title',
-      disabled: true,
+      examples: ['Example 1'],
     })
   })
 

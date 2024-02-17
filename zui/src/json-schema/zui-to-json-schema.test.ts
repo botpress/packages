@@ -1,7 +1,7 @@
 import { describe, test, expect } from 'vitest'
-import { zui } from '.'
-import { getZuiSchemas } from '.'
-import { zuiKey } from './zui'
+import { zui } from '..'
+import { getZuiSchemas } from '..'
+import { zuiKey } from '../zui'
 import { z } from 'zod'
 
 describe('zuiToJsonSchema', () => {
@@ -123,11 +123,14 @@ describe('zuiToJsonSchema', () => {
   })
 
   test('examples are available on json schema', () => {
-    const schema = zui.string()
+    const schema = zui.string().examples(['Example 1'])
+    const jsonSchema = schema.toJsonSchema({ stripZuiProps: true, $schemaUrl: false })
 
-    const jsonSchema = getZuiSchemas(schema, { stripZuiProps: true, $schemaUrl: false })
-    expect(jsonSchema.schema).toMatchInlineSnapshot(`
+    expect(jsonSchema).toMatchInlineSnapshot(`
       {
+        "examples": [
+          "Example 1",
+        ],
         "type": "string",
       }
     `)

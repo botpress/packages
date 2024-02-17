@@ -59,6 +59,9 @@ export type ZuiType<
 }
 
 export type ZuiExtension<Z extends ZodType, UI extends UIComponentDefinitions, Out = z.infer<Z>> = {
+  id: (id: string) => ZuiType<Z, UI>
+  // Sets the index of the field in a list
+  index: (index: number) => ZuiType<Z, UI>
   /**
    * The type of component to use to display the field and its options
    */
@@ -67,9 +70,19 @@ export type ZuiExtension<Z extends ZodType, UI extends UIComponentDefinitions, O
     options: z.infer<UI[ZodToBaseType<Z>][K]['schema']>,
   ) => ZuiType<Z, UI>
   /**
+   * Examples of valid values for the field
+   * @default []
+   */
+  examples: (examples: Out[]) => ZuiType<Z, UI>
+  /**
    * The title of the field. Defaults to the field name.
    */
   title: (title: string) => ZuiType<Z, UI>
+  /**
+   * Mark the field as searchable, when applicable
+   * @default true
+   */
+  searchable: (searchable: boolean) => ZuiType<Z, UI>
   /**
    * Whether the field is hidden in the UI. Useful for internal fields.
    * @default false
@@ -98,17 +111,22 @@ export type ZuiExtension<Z extends ZodType, UI extends UIComponentDefinitions, O
       : never
   }
   toJsonSchema(options?: ZuiSchemaOptions): any //TODO: fix typings, JsonSchema7 doesn't work well when consuming it
+  toTypeScript(options?: { schemaName?: string } & ZuiSchemaOptions): string
 }
 
 export const zuiKey = 'x-zui' as const
 
 const Extensions: ReadonlyArray<keyof ZuiExtension<any, any>> = [
+  'id',
+  'index',
   'tooltip',
   'disabled',
+  'examples',
   'displayAs',
   'hidden',
   'title',
   'placeholder',
+  'searchable',
 ] as const
 
 type ZCreate = { create: (...args: any) => ZodType } & (
@@ -174,6 +192,17 @@ function extend<T extends ZCreate | ZodLazy<any>>(zType: T) {
   if (!instance.toJsonSchema) {
     instance.toJsonSchema = function (options?: ZuiSchemaOptions) {
       return getZuiSchemas(this, options).schema
+    }
+  }
+
+  if (!instance.toTypeScript) {
+    instance.toTypeScript = async function (options) {
+      if (typeof process === 'undefined') {
+        return 'Not supported in browser'
+      }
+
+      const module = await import('./zui-to-ts')
+      return module.toTypescriptTypes(this.toJsonSchema(options), options)
     }
   }
 

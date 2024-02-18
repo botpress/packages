@@ -131,6 +131,7 @@ export type UsageId = Ids['UsageId']
 export type UserId = Ids['UserId']
 export type WebhookId = Ids['WebhookId']
 export type WorkspaceId = Ids['WorkspaceId']
+export type TaskId = Ids['TaskId']
 
 type Reverser<T extends Record<PropertyKey, PropertyKey>> = {
   [P in keyof T as T[P]]: P

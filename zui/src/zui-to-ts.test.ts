@@ -24,4 +24,18 @@ describe('zui-to-ts', () => {
       "
     `)
   })
+
+  test('without schema, no export statement', async () => {
+    const schema = zui.object({
+      name: zui.string().title('Name'),
+    })
+
+    const def = await schema.toTypeScript()
+    expect(def).toMatchInlineSnapshot(`
+      "{
+        name: string;
+      }
+      "
+    `)
+  })
 })

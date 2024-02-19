@@ -5,5 +5,11 @@ import type { Options } from 'json-schema-to-typescript'
  */
 export const toTypescriptTypes = async (jsonSchema: any, options?: { schemaName: string } & Options) => {
   const module = await import('json-schema-to-typescript')
-  return module.compile(jsonSchema, options?.schemaName || 'Schema', { bannerComment: '', ...options })
+
+  const generatedType = await module.compile(jsonSchema, options?.schemaName ?? 'Schema', {
+    bannerComment: '',
+    ...options,
+  })
+
+  return !options?.schemaName ? generatedType.replace(/export interface Schema /g, '') : generatedType
 }

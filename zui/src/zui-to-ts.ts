@@ -11,5 +11,5 @@ export const toTypescriptTypes = async (jsonSchema: any, options?: { schemaName:
     ...options,
   })
 
-  return !options?.schemaName ? generatedType.replace(/export interface Schema /g, '') : generatedType
+  return !options?.schemaName ? generatedType.replace(/export (type|interface) Schema /g, '') : generatedType
 }

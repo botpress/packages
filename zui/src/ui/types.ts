@@ -14,6 +14,8 @@ export type ZuiSchemaExtension = {
   }
 }
 
+export type JSONSchemaPrimitiveType = 'string' | 'number' | 'integer' | 'boolean' | 'null'
+
 export type ArraySchema = {
   type: 'array'
   items: JSONSchema
@@ -83,25 +85,25 @@ export type JSONSchemaOfType<T extends BaseType> = T extends 'string'
   : never
 
 export type UILayoutSchema =
-  | {
+  | ({
       type: 'VerticalLayout' | 'HorizontalLayout'
       _componentID: string
       elements: UISchema[]
       rule?: UIRuleSchema
-    }
-  | {
+    } & OptionsSchemaFragment)
+  | ({
       type: 'Group'
       _componentID: string
       label?: string
       elements: UISchema[]
       rule?: UIRuleSchema
-    }
-  | {
+    } & OptionsSchemaFragment)
+  | ({
       type: 'Categorization'
       _componentID: string
       elements: UICategorySchema[]
       rule?: UIRuleSchema
-    }
+    } & OptionsSchemaFragment)
 
 export type UICategorySchema = {
   type: 'Category'
@@ -109,22 +111,28 @@ export type UICategorySchema = {
   label?: string
   elements: UISchema[]
   rule?: UIRuleSchema
-}
+} & OptionsSchemaFragment
 
 export type UIControlSchema = {
   type: 'Control'
   scope: string
   label?: string | boolean
   _componentID: string
+  rule?: UIRuleSchema
+} & OptionsSchemaFragment
+
+type OptionsSchemaFragment = {
   options?: {
     [key: string]: any
   }
-  rule?: UIRuleSchema
+  [key: string]: any
 }
 
 export type UIRuleSchema = Rule
 
 export type UISchema = UIControlSchema | UILayoutSchema | UICategorySchema
+
+export type UISchemaType = UISchema['type']
 
 export type BaseType = 'number' | 'string' | 'boolean' | 'object' | 'array'
 
@@ -181,7 +189,7 @@ export type SchemaContext<
   id: ID
   scope: string
   schema: JSONSchemaOfType<Type>
-  zuiProps?: ZuiSchemaExtension[typeof zuiKey]
+  zuiProps: ZuiSchemaExtension[typeof zuiKey]
 }
 
 export type SchemaResolver<
@@ -204,32 +212,49 @@ export type ZuiReactComponentBaseProps<
   type: Type
   id: ID
   params: z.infer<UI[Type][ID]['schema']>
+  data: any
+  enabled: boolean
   scope: string
   onChange: (data: any) => void
   context: {
     path: string
     renderID: string
-    enabled: boolean
     uiSchema: UISchema
     fullSchema: JSONSchema
     renderers: any[]
     cells: any[]
   }
+  i18nKeyPrefix?: string
+  zuiProps: ZuiSchemaExtension[typeof zuiKey]
 }
 
-export type ZuiReactComponentBasePropsWithChildren<
+export type ZuiReactLayoutComponentProps<
   Type extends ContainerType,
   ID extends keyof UI[Type],
   UI extends UIComponentDefinitions = GlobalComponentDefinitions,
-> = ZuiReactComponentBaseProps<Type, ID, UI> & { children: any[] }
+> = ZuiReactComponentBaseProps<Type, ID, UI> & {
+  children: any[]
+}
+
+export type ZuiReactControlComponentProps<
+  Type extends BaseType,
+  ID extends keyof UI[Type],
+  UI extends UIComponentDefinitions = GlobalComponentDefinitions,
+> = ZuiReactComponentBaseProps<Type, ID, UI> & {
+  label: string | boolean
+  errors: string
+  description?: string
+  required: boolean
+  config: any
+}
 
 export type ZuiReactComponentProps<
   Type extends BaseType,
   ID extends keyof UI[Type],
   UI extends UIComponentDefinitions = GlobalComponentDefinitions,
 > = Type extends ContainerType
-  ? ZuiReactComponentBasePropsWithChildren<Type, ID, UI>
-  : ZuiReactComponentBaseProps<Type, ID, UI>
+  ? ZuiReactLayoutComponentProps<Type, ID, UI>
+  : ZuiReactControlComponentProps<Type, ID, UI>
 
 export type ZuiReactComponent<
   Type extends BaseType,

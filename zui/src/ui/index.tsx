@@ -4,9 +4,11 @@ import {
   GlobalComponentDefinitions,
   SchemaContext,
   UIComponentDefinitions,
+  UIControlSchema,
   UILayoutSchema,
   ZuiComponentMap,
-  ZuiReactComponentBaseProps,
+  ZuiReactControlComponentProps,
+  ZuiReactLayoutComponentProps,
   containerTypes,
 } from './types'
 import { zuiKey } from '../zui'
@@ -32,29 +34,31 @@ export type ZuiFormProps<UI extends UIComponentDefinitions = GlobalComponentDefi
 export const defaultControlResolver = (
   params: any,
   ctx: SchemaContext<'string' | 'number' | 'boolean', string>,
-): UISchema => {
+): UIControlSchema => {
   return {
     type: 'Control',
     scope: ctx.scope,
     _componentID: ctx.id,
     label: ctx.zuiProps?.title ?? true,
-    options: {
-      ...params,
-    },
+    options: params,
+    [zuiKey]: ctx.zuiProps,
   }
 }
 
 export const defaultContainerResolver = (
-  _: any,
+  params: any,
   ctx: SchemaContext<ContainerType, string>,
   children: UISchema[],
-): UISchema => {
+): UILayoutSchema => {
   return {
     type: 'HorizontalLayout',
     _componentID: ctx.id,
     elements: children,
-    label: ctx.zuiProps.title ?? true,
-  } as UILayoutSchema
+    options: {
+      params,
+    },
+    [zuiKey]: ctx.zuiProps,
+  }
 }
 
 export const defaultUISchemaResolvers: SchemaResolversMap<typeof defaultExtensions> = {
@@ -99,29 +103,29 @@ export const schemaToUISchema = <UI extends UIComponentDefinitions = GlobalCompo
 ): UISchema | null => {
   const scope = keyToScope(currentKey)
 
-  const zuiProps = schema[zuiKey]
+  const zuiProps = schema[zuiKey] ?? {}
 
-  if (zuiProps?.hidden) {
+  if (zuiProps.hidden === true) {
     return null
   }
+  if (zuiProps)
+    if (schema.type === 'object') {
+      const properties = Object.entries(schema.properties)
+        .map(([key, value]) => {
+          return schemaToUISchema(value, overrides, key)
+        })
+        .filter(Boolean) as UISchema[]
 
-  if (schema.type === 'object') {
-    const properties = Object.entries(schema.properties)
-      .map(([key, value]) => {
-        return schemaToUISchema(value, overrides, key)
-      })
-      .filter(Boolean) as UISchema[]
+      if (!schema[zuiKey]?.displayAs || schema[zuiKey].displayAs.length !== 2) {
+        const resolver = getSchemaResolver(schema.type, 'default', overrides)
+        return resolver?.({}, { type: 'object', id: 'default', schema, scope, zuiProps }, properties) || null
+      }
 
-    if (!schema[zuiKey]?.displayAs || schema[zuiKey].displayAs.length !== 2) {
-      const resolver = getSchemaResolver(schema.type, 'default', overrides)
-      return resolver?.({}, { type: 'object', id: 'default', schema, scope, zuiProps }, properties) || null
+      const [id, params] = schema[zuiKey].displayAs
+      const resolver = getSchemaResolver(schema.type, id, overrides)
+
+      return resolver?.(params, { type: schema.type, id: id as any, schema, scope, zuiProps }, properties) || null
     }
-
-    const [id, params] = schema[zuiKey].displayAs
-    const resolver = getSchemaResolver(schema.type, id, overrides)
-
-    return resolver?.(params, { type: schema.type, id: id as any, schema, scope, zuiProps }, properties) || null
-  }
 
   if (schema.type === 'array') {
     const items = schemaToUISchema(schema.items, overrides, currentKey)
@@ -182,19 +186,43 @@ const transformControlProps = <Type extends BaseType>(
   type: Type,
   id: string,
   props: ControlProps,
-): ZuiReactComponentBaseProps<Type, string> => {
-  const { uischema, id: renderID, schema, renderers, path, cells, enabled, handleChange } = props
-  const transformedProps: ZuiReactComponentBaseProps<Type, string> = {
+): ZuiReactControlComponentProps<Type, string> => {
+  const {
+    uischema,
+    id: renderID,
+    schema,
+    renderers,
+    path,
+    cells,
+    enabled,
+    handleChange,
+    required,
+    data,
+    errors,
+    label,
+    description,
+    config,
+    i18nKeyPrefix,
+  } = props
+  const transformedProps: ZuiReactControlComponentProps<Type, string> = {
     type,
     id,
     params: uischema?.options,
     scope: path!,
+    enabled: enabled,
+    required: required ?? false,
+    data,
+    errors,
+    label,
+    description,
+    config,
+    i18nKeyPrefix,
+    zuiProps: (uischema as any)[zuiKey] ?? {},
     onChange: (data) => handleChange(path, data),
     context: {
       path: path!,
       renderID: renderID!,
-      enabled: enabled!,
-      uiSchema: uischema! as any,
+      uiSchema: uischema as UIControlSchema,
       fullSchema: schema! as any,
       renderers: renderers!,
       cells: cells!,
@@ -216,24 +244,26 @@ const transformLayoutProps = <Type extends ContainerType>(
   type: Type,
   id: string,
   props: any,
-): ZuiReactComponentBaseProps<ContainerType, string> & { children: any[] } => {
-  const { uischema, id: renderID, schema, renderers, path, cells, enabled, handleChange } = props
+): ZuiReactLayoutComponentProps<ContainerType, string> => {
+  const { uischema: uischema, id: renderID, schema, renderers, path, cells, enabled, handleChange, data } = props
 
   return {
     type,
     id,
-    params: uischema.options!,
+    enabled,
+    params: uischema.options,
     scope: path!,
     onChange: (data) => handleChange(path, data),
     context: {
       path: path!,
       renderID: renderID!,
-      enabled: enabled!,
       uiSchema: uischema! as any,
       fullSchema: schema! as any,
       renderers: renderers!,
       cells: cells!,
     },
+    data,
+    zuiProps: (uischema as any)[zuiKey] ?? {},
     children: uischema.elements.map((child: any, index: number) => {
       return (
         <div key={`${path}-${index}`}>

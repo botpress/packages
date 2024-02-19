@@ -84,7 +84,7 @@ export type ZuiExtension<Z extends ZodType, UI extends UIComponentDefinitions> =
    * Whether the field should show the description as a tooltip
    * @default true
    */
-  tooltip: (tooltip?: boolean) => ZuiType<Z, UI>
+  tooltip: (text: string) => ZuiType<Z, UI>
   /**
    * Placeholder text for the field
    */

@@ -11,11 +11,18 @@ export const exampleSchema = zui
       .disabled()
       .hidden()
       .placeholder('Enter your name')
-      .tooltip(),
+      .tooltip('yo')
+      .nullable(),
 
-    lastName: zui.string().displayAs('textbox', {
-      yes: 'it works!',
-    } as any),
+    lastName: zui
+      .string()
+      .min(3)
+      .displayAs('textbox', {
+        fitContentWidth: true,
+        multiline: true,
+      })
+      .title('Last Name')
+      .nullable(),
     dates: zui
       .array(
         zui

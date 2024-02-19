@@ -22,12 +22,17 @@ type Story = StoryObj<typeof meta>
 const componentMap: ZuiComponentMap<typeof defaultExtensions> = {
   string: {
     datetimeinput: () => null,
-    textbox: ({ params, onChange, context }) => (
-      <input
-        placeholder={context.path}
-        onChange={(e) => onChange(e.target.value)}
-        type={params.multiline ? 'textarea' : 'text'}
-      />
+    textbox: ({ params, onChange, errors, required, label, data }) => (
+      <div style={{ padding: '1rem' }}>
+        <span>{label}</span>
+        <input
+          placeholder={params.fitContentWidth ? 'fitContentWidth' : 'default'}
+          onChange={(e) => onChange(e.target.value)}
+          type={params.multiline ? 'textarea' : 'text'}
+        />
+        {required && <span>*</span>}
+        {errors && typeof data !== 'undefined' && <span style={{ color: 'red' }}>{errors}</span>}
+      </div>
     ),
     default: () => null,
   },
@@ -58,7 +63,9 @@ const expandedRenderers = transformZuiComponentsToRenderers(componentMap)
 
 export const ExampleSchema: Story = {
   args: {
-    schema: exampleSchema.toJsonSchema(),
+    schema: exampleSchema.toJsonSchema({
+      target: 'openApi3',
+    }),
     overrides: resolverOverrides,
     renderers: [...expandedRenderers],
     cells: vanillaCells,

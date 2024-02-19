@@ -29,6 +29,7 @@ import { JsonSchema7, jsonSchemaToZui } from '.'
 import { ObjectToZuiOptions, objectToZui } from './object-to-zui'
 import type { GlobalComponentDefinitions, UIComponentDefinitions, ZodToBaseType } from './ui/types'
 import { isNodeEnvironment } from './utils'
+import type { ToTsOptions } from './zui-to-ts'
 
 export type Infer<
   T extends ZodType | ZuiType<any> | ZuiTypeAny,
@@ -98,7 +99,7 @@ export type ZuiExtension<Z extends ZodType, UI extends UIComponentDefinitions, O
    * Whether the field should show the description as a tooltip
    * @default true
    */
-  tooltip: (tooltip?: boolean) => ZuiType<Z, UI>
+  tooltip: (text: string) => ZuiType<Z, UI>
   /**
    * Placeholder text for the field
    */
@@ -112,7 +113,7 @@ export type ZuiExtension<Z extends ZodType, UI extends UIComponentDefinitions, O
       : never
   }
   toJsonSchema(options?: ZuiSchemaOptions): any //TODO: fix typings, JsonSchema7 doesn't work well when consuming it
-  toTypeScript(options?: { schemaName?: string } & ZuiSchemaOptions): string
+  toTypeScript(options?: { schemaName?: string } & ZuiSchemaOptions & ToTsOptions): string
 }
 
 export const zuiKey = 'x-zui' as const
@@ -197,7 +198,7 @@ function extend<T extends ZCreate | ZodLazy<any>>(zType: T) {
   }
 
   if (!instance.toTypeScript) {
-    instance.toTypeScript = async function (options) {
+    instance.toTypeScript = async function (options?: any) {
       if (!isNodeEnvironment()) {
         return 'Not supported in browser'
       }
@@ -210,7 +211,7 @@ function extend<T extends ZCreate | ZodLazy<any>>(zType: T) {
   const stubWrapper = (name: string) => {
     const original = instance[name]
     if (original) {
-      instance[name] = function (...args) {
+      instance[name] = function (...args: any[]) {
         const ret = original.apply(this, args)
         extend(ret)
         ret._def[zuiKey] = this?._def?.[zuiKey]

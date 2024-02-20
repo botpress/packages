@@ -1,8 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react'
 import { defaultExtensions, resolverOverrides } from '../defaultextension'
 import { ZuiFormDEBUG } from '../debugger'
-import { exampleSchema } from './exampleschema'
-import { componentMap } from './ZuiForm.stories'
+import { componentMap, exampleSchema } from './example'
 
 const meta = {
   title: 'Form/DEBUG',

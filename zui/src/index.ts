@@ -1,4 +1,5 @@
 import { UIComponentDefinitions } from './ui/types'
+import { zui } from './zui'
 export type { BaseType, UIComponentDefinitions, SchemaResolversMap, ZuiComponentMap, AsBaseType } from './ui/types'
 export {
   type ZuiFormProps,
@@ -7,13 +8,13 @@ export {
   transformZuiComponentsToRenderers,
   defaultUISchemaResolvers,
 } from './ui'
+export { ZuiFormDEBUG } from './ui/debugger'
 export type { Zui, ZuiType, Infer, ZuiExtension, ZuiRawShape, ZuiTypeAny } from './zui'
 export type {
   JsonSchema7Type as JsonSchema7,
   JsonSchema7ObjectType as JsonSchema7Object,
 } from '@bpinternal/zod-to-json-schema'
 
-export { zui } from './zui'
 export { getZuiSchemas } from './zui-schemas'
 export { jsonSchemaToZui } from './json-schema-to-zui'
 export { ZodError as ZuiError } from 'zod'
@@ -25,3 +26,8 @@ export type GlobalComponentDefinitions = ComponentDefinitions extends {
 }
   ? TComponentMap
   : any
+
+export { zui } from './zui'
+export { zui as z }
+
+export default zui

@@ -2,6 +2,7 @@ import type { ZodSchema, ZodType, z } from 'zod'
 import type { Rule } from '@jsonforms/core'
 import { zuiKey } from '../zui'
 import { FC } from 'react'
+import { GlobalComponentDefinitions } from '..'
 
 export type ZuiSchemaExtension = {
   [zuiKey]: {
@@ -148,14 +149,6 @@ export type UIComponentDefinitions = {
   }
 }
 
-export interface ComponentDefinitions {}
-
-export type GlobalComponentDefinitions = ComponentDefinitions extends {
-  components: infer TComponentMap extends UIComponentDefinitions
-}
-  ? TComponentMap
-  : any
-
 export type ZodToBaseType<T extends ZodType> = T extends z.ZodString
   ? 'string'
   : T extends z.ZodBoolean
@@ -216,11 +209,11 @@ export type ZuiReactComponentBaseProps<
   enabled: boolean
   scope: string
   onChange: (data: any) => void
+  schema: JSONSchemaOfType<Type>
   context: {
     path: string
     renderID: string
-    uiSchema: UISchema
-    fullSchema: JSONSchema
+    uiSchema: Type extends ContainerType ? UILayoutSchema : UIControlSchema
     renderers: any[]
     cells: any[]
   }

@@ -1,8 +1,9 @@
 import React from 'react'
 import { useState, useMemo, CSSProperties, FC, HTMLAttributes } from 'react'
 import { ZuiFormProps, schemaToUISchema } from '.'
-import { GlobalComponentDefinitions, UIComponentDefinitions } from './types'
+import { UIComponentDefinitions } from './types'
 import { JsonForms } from '@jsonforms/react'
+import { GlobalComponentDefinitions } from '..'
 
 const codeDivStyle: CSSProperties = {
   background: '#222',

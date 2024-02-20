@@ -1,7 +1,6 @@
 import {
   BaseType,
   ContainerType,
-  GlobalComponentDefinitions,
   SchemaContext,
   UIComponentDefinitions,
   UIControlSchema,
@@ -20,14 +19,16 @@ import { SchemaResolversMap } from './types'
 import { defaultExtensions } from './defaultextension'
 import { ControlProps, JsonFormsProps } from '@jsonforms/core'
 import { JsonFormsDispatch, useJsonForms, withJsonFormsControlProps, withJsonFormsLayoutProps } from '@jsonforms/react'
-import { FC } from 'react'
+import React, { FC } from 'react'
+import { GlobalComponentDefinitions } from '..'
 
 export type ZuiFormProps<UI extends UIComponentDefinitions = GlobalComponentDefinitions> = Omit<
   JsonFormsInitStateProps,
-  'uischema' | 'schema'
+  'uischema' | 'schema' | 'renderers' | 'cells'
 > &
   JsonFormsReactProps & {
-    overrides: SchemaResolversMap<UI>
+    overrides?: SchemaResolversMap<UI>
+    components: ZuiComponentMap<UI>
     schema: JSONSchema
   }
 
@@ -165,23 +166,6 @@ export const schemaToUISchema = <UI extends UIComponentDefinitions = GlobalCompo
   return null
 }
 
-export function ZuiForm<UI extends UIComponentDefinitions = GlobalComponentDefinitions>({
-  schema,
-  overrides = {},
-  ...jsonformprops
-}: ZuiFormProps<UI>): React.JSX.Element | null {
-  const uiSchema = useMemo(() => {
-    return schemaToUISchema<UI>(schema, overrides)
-  }, [schema, overrides])
-
-  if (!uiSchema) {
-    console.warn('UI Schema returned null, skipping form rendering')
-    return null
-  }
-
-  return <JsonForms schema={schema} uischema={uiSchema} {...jsonformprops} />
-}
-
 const transformControlProps = <Type extends BaseType>(
   type: Type,
   id: string,
@@ -219,11 +203,11 @@ const transformControlProps = <Type extends BaseType>(
     i18nKeyPrefix,
     zuiProps: (uischema as any)[zuiKey] ?? {},
     onChange: (data) => handleChange(path, data),
+    schema: schema as any,
     context: {
       path: path!,
       renderID: renderID!,
-      uiSchema: uischema as UIControlSchema,
-      fullSchema: schema! as any,
+      uiSchema: uischema as any,
       renderers: renderers!,
       cells: cells!,
     },
@@ -254,11 +238,11 @@ const transformLayoutProps = <Type extends ContainerType>(
     params: uischema.options,
     scope: path!,
     onChange: (data) => handleChange(path, data),
+    schema: schema as any,
     context: {
       path: path!,
       renderID: renderID!,
       uiSchema: uischema! as any,
-      fullSchema: schema! as any,
       renderers: renderers!,
       cells: cells!,
     },
@@ -311,4 +295,26 @@ export const transformZuiComponentsToRenderers = (
       })
     })
     .reduce((acc, val) => acc.concat(val), [])
+}
+
+export function ZuiForm<UI extends UIComponentDefinitions = GlobalComponentDefinitions>({
+  schema,
+  overrides = {},
+  components,
+  ...jsonformprops
+}: ZuiFormProps<UI>): React.ReactNode | null {
+  const renderers = useMemo(() => {
+    return transformZuiComponentsToRenderers(components)
+  }, [components])
+
+  const uiSchema = useMemo(() => {
+    return schemaToUISchema<UI>(schema, overrides)
+  }, [schema, overrides])
+
+  if (!uiSchema) {
+    console.warn('UI Schema returned null, skipping form rendering')
+    return null
+  }
+
+  return <JsonForms {...jsonformprops} schema={schema} uischema={uiSchema} renderers={renderers} />
 }

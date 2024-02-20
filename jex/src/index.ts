@@ -1,3 +1,4 @@
+import { JexError } from './errors'
 import * as jex from './jex-representation'
 import { JSONSchema7 } from 'json-schema'
 
@@ -13,4 +14,16 @@ export const jsonSchemaExtends = async (a: JSONSchema7, b: JSONSchema7): Promise
   const jexA = await jex.toJex(a)
   const jexB = await jex.toJex(b)
   return jex.jexExtends(jexA, jexB)
+}
+
+export const jsonSchemaMerge = async (a: JSONSchema7, b: JSONSchema7): Promise<JSONSchema7> => {
+  const jexA = await jex.toJex(a)
+  const jexB = await jex.toJex(b)
+
+  if (jexA.type !== 'object' || jexB.type !== 'object') {
+    throw new JexError('Both schemas must be objects to be merged')
+  }
+
+  const mergedJex = jex.jexMerge(jexA, jexB)
+  return jex.fromJex(mergedJex)
 }

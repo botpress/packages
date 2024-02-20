@@ -1,6 +1,6 @@
 import React from 'react'
 import { useState, useMemo, CSSProperties, FC, HTMLAttributes } from 'react'
-import { ZuiFormProps, schemaToUISchema } from '.'
+import { ZuiFormProps, schemaToUISchema, transformZuiComponentsToRenderers } from '.'
 import { UIComponentDefinitions } from './types'
 import { JsonForms } from '@jsonforms/react'
 import { GlobalComponentDefinitions } from '..'
@@ -80,6 +80,7 @@ export const ZuiFormDEBUG = <UI extends UIComponentDefinitions = GlobalComponent
   schema,
   overrides,
   fullscreen,
+  components,
   ...jsonformprops
 }: ZuiFormProps<UI> & { fullscreen: boolean }) => {
   const [data, setData] = useState({})
@@ -88,6 +89,9 @@ export const ZuiFormDEBUG = <UI extends UIComponentDefinitions = GlobalComponent
     return schemaToUISchema<UI>(schema, overrides)
   }, [schema, overrides])
 
+  const renderers = useMemo(() => {
+    return transformZuiComponentsToRenderers(components)
+  }, [components])
   if (!uiSchema) {
     return null
   }
@@ -99,6 +103,7 @@ export const ZuiFormDEBUG = <UI extends UIComponentDefinitions = GlobalComponent
         <JsonForms
           {...jsonformprops}
           data={data}
+          renderers={renderers}
           onChange={({ errors, data }) => {
             setData(data)
             setErrors(errors || null)

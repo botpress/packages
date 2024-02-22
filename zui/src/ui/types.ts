@@ -88,12 +88,14 @@ export type JSONSchemaOfType<T extends BaseType> = T extends 'string'
 export type UILayoutSchema =
   | ({
       type: 'VerticalLayout' | 'HorizontalLayout'
+      _componentType: BaseType
       _componentID: string
       elements: UISchema[]
       rule?: UIRuleSchema
     } & OptionsSchemaFragment)
   | ({
       type: 'Group'
+      _componentType: BaseType
       _componentID: string
       label?: string
       elements: UISchema[]
@@ -101,6 +103,7 @@ export type UILayoutSchema =
     } & OptionsSchemaFragment)
   | ({
       type: 'Categorization'
+      _componentType: BaseType
       _componentID: string
       elements: UICategorySchema[]
       rule?: UIRuleSchema
@@ -108,6 +111,7 @@ export type UILayoutSchema =
 
 export type UICategorySchema = {
   type: 'Category'
+  _componentType: BaseType
   _componentID: string
   label?: string
   elements: UISchema[]
@@ -118,6 +122,7 @@ export type UIControlSchema = {
   type: 'Control'
   scope: string
   label?: string | boolean
+  _componentType: BaseType
   _componentID: string
   rule?: UIRuleSchema
 } & OptionsSchemaFragment
@@ -251,7 +256,7 @@ export type ZuiReactComponentProps<
 
 export type ZuiReactComponent<
   Type extends BaseType,
-  ID extends keyof UI[Type],
+  ID extends keyof UI[Type] = 'default',
   UI extends UIComponentDefinitions = GlobalComponentDefinitions,
 > = FC<ZuiReactComponentProps<Type, ID, UI>>
 

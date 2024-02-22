@@ -9,16 +9,23 @@ import {
   ZuiReactControlComponentProps,
   ZuiReactLayoutComponentProps,
   containerTypes,
+  SchemaResolversMap,
+  JSONSchema,
+  UISchema,
 } from './types'
 import { zuiKey } from '../zui'
-import { JsonForms, type JsonFormsInitStateProps, type JsonFormsReactProps } from '@jsonforms/react'
+import {
+  JsonForms,
+  type JsonFormsInitStateProps,
+  type JsonFormsReactProps,
+  JsonFormsDispatch,
+  useJsonForms,
+  withJsonFormsControlProps,
+  withJsonFormsLayoutProps,
+} from '@jsonforms/react'
 import { useMemo } from 'react'
-import { UISchema } from './types'
-import { JSONSchema } from './types'
-import { SchemaResolversMap } from './types'
 import { defaultExtensions } from './defaultextension'
-import { ControlProps, JsonFormsProps } from '@jsonforms/core'
-import { JsonFormsDispatch, useJsonForms, withJsonFormsControlProps, withJsonFormsLayoutProps } from '@jsonforms/react'
+import { ControlProps, JsonFormsProps, JsonFormsRendererRegistryEntry } from '@jsonforms/core'
 import React, { FC } from 'react'
 import { GlobalComponentDefinitions } from '..'
 
@@ -39,6 +46,7 @@ export const defaultControlResolver = (
   return {
     type: 'Control',
     scope: ctx.scope,
+    _componentType: ctx.type,
     _componentID: ctx.id,
     label: ctx.zuiProps?.title ?? true,
     options: params,
@@ -53,6 +61,7 @@ export const defaultContainerResolver = (
 ): UILayoutSchema => {
   return {
     type: 'HorizontalLayout',
+    _componentType: ctx.type,
     _componentID: ctx.id,
     elements: children,
     options: {
@@ -229,7 +238,7 @@ const transformLayoutProps = <Type extends ContainerType>(
   id: string,
   props: any,
 ): ZuiReactLayoutComponentProps<ContainerType, string> => {
-  const { uischema: uischema, id: renderID, schema, renderers, path, cells, enabled, handleChange, data } = props
+  const { uischema, id: renderID, schema, renderers, path, cells, enabled, handleChange, data } = props
 
   return {
     type,
@@ -248,18 +257,17 @@ const transformLayoutProps = <Type extends ContainerType>(
     },
     data,
     zuiProps: (uischema as any)[zuiKey] ?? {},
-    children: uischema.elements.map((child: any, index: number) => {
+    children: uischema.elements?.map((child: any, index: number) => {
       return (
-        <div key={`${path}-${index}`}>
-          <JsonFormsDispatch
-            renderers={renderers}
-            cells={cells}
-            uischema={child}
-            schema={schema}
-            path={path}
-            enabled={enabled}
-          />
-        </div>
+        <JsonFormsDispatch
+          key={`${path}-${index}`}
+          renderers={renderers}
+          cells={cells}
+          uischema={child}
+          schema={schema}
+          path={path}
+          enabled={enabled}
+        />
       )
     }),
   }
@@ -272,23 +280,27 @@ const withTransformLayoutProps = (type: ContainerType, id: string, Component: FC
   })
 }
 
+type JSONFormsRenderer = JsonFormsRendererRegistryEntry
+
 export const transformZuiComponentsToRenderers = (
   components: ZuiComponentMap,
 ): NonNullable<JsonFormsProps['renderers']> => {
   return Object.entries(components)
     .map(([type, ids]) => {
-      return Object.entries(ids).map(([id, component]) => {
+      return Object.entries(ids).map<JSONFormsRenderer>(([id, component]) => {
         if (containerTypes.includes(type as ContainerType)) {
           return {
-            tester: (uischema: any, _: any, __: any) => {
-              return uischema?._componentID === id ? 100 : 0
+            tester: (uischema: any, _, __) => {
+              return uischema?._componentType === type && uischema?._componentID === id ? 100 : 0
             },
             renderer: withTransformLayoutProps(type as ContainerType, id, component),
           }
         }
         return {
-          tester: (uischema: any, _: any, __: any) => {
-            return uischema?.type === 'Control' && uischema?._componentID === id ? 100 : 0
+          tester: (uischema: any, _, __) => {
+            return uischema?.type === 'Control' && uischema._componentType === type && uischema?._componentID === id
+              ? 100
+              : 0
           },
           renderer: withTransformControlProps(type as BaseType, id, component),
         }

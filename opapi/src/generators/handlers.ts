@@ -40,6 +40,7 @@ export type GenerateHandlerProps = {
   status: number
   body: boolean
   isEmptyBody: boolean
+  contentType: string
 }
 
 const generateRequestResponseTypes = (useExpressTypes: boolean) => {
@@ -63,8 +64,8 @@ ${generateParameterFields(props)}
 }
 `
 
-const generateBodyField = (operationName: string) =>
-  `\t\t...req.body as NonNullable<components['requestBodies']['${operationName}Body']>['content']['application/json'],`
+const generateBodyField = (operationName: string, contentType: string) =>
+  `\t\t...req.body as NonNullable<components['requestBodies']['${operationName}Body']>['content']['${contentType}'],`
 
 const generateParameterFields = ({
   cookies,
@@ -73,9 +74,10 @@ const generateParameterFields = ({
   queries,
   body,
   operationName,
+  contentType,
 }: GenerateHandlerProps): string =>
   [
-    body ? generateBodyField(operationName) : undefined,
+    body ? generateBodyField(operationName, contentType) : undefined,
     ...cookies.map((cookie) =>
       generateField(cookie.name, 'cookies', cookie.parameter, cookie.parameter.required !== false),
     ),

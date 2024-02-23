@@ -125,6 +125,8 @@ export type OperationWithBodyProps<
     description: string
     schema: SchemaOfType<S>
   }
+
+  contentType?: 'application/json' | 'multipart/form-data'
 } & BaseOperationProps<DefaultParameterName, SectionName, Path, S>
 
 export const operationsWithoutBodyMethod = ['get', 'delete', 'options', 'head', 'trace'] as const

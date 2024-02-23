@@ -1,6 +1,9 @@
 const typesCode = `
 
-type RequestBody = { requestBody?: { content: { 'application/json': {} } } }
+type JsonRequestBody = { requestBody?: { content: { 'application/json': {} } } }
+type MultipartFormRequestBody = { requestBody?: { content: { 'multipart/form-data': {} } } }
+
+type RequestBody = JsonRequestBody | MultipartFormRequestBody
 type Responses = { responses: { default: { content: { 'application/json': {} } } } }
 type Parameters = { parameters?: {} }
 
@@ -9,7 +12,7 @@ type GetHeaderParameters<T> = T extends { header?: any } ? NonNullable<T['header
 type GetCookieParameters<T> = T extends { cookie?: any } ? NonNullable<T['cookie']> : {}
 type GetQueryParameters<T> = T extends { query?: any } ? NonNullable<T['query']> : {}
 
-type GetRequestBody<T> = T extends RequestBody ? NonNullable<T['requestBody']>['content']['application/json'] : {}
+type GetRequestBody<T> = T extends JsonRequestBody ? NonNullable<T['requestBody']>['content']['application/json'] : T extends MultipartFormRequestBody ? NonNullable<T['requestBody']>['content']['multipart/form-data'] : {}
 type GetParameters<T> = T extends Parameters
   ? GetPathParameters<NonNullable<T['parameters']>> &
       GetHeaderParameters<NonNullable<T['parameters']>> &

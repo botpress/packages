@@ -17,6 +17,7 @@ export const runOpenApiCodeGenerator = async (
     supportsES6: true,
     useSingleRequestParameter: true,
     withNodeImports: false,
+    multipartFormData: true, // is this necessary?
   })
 
   const buffer = await client.downloadClient(id)

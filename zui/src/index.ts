@@ -8,7 +8,6 @@ export {
   transformZuiComponentsToRenderers,
   defaultUISchemaResolvers,
 } from './ui'
-export { ZuiFormDEBUG } from './ui/debugger'
 export type { Zui, ZuiType, Infer, ZuiExtension, ZuiRawShape, ZuiTypeAny } from './zui'
 export type {
   JsonSchema7Type as JsonSchema7,

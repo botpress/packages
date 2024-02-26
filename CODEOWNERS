@@ -1,0 +1,17 @@
+* @botpress/cloud-services
+
+const @botpress/cloud-services
+entities @franklevasseur
+es-node @franklevasseur
+expresso @franklevasseur
+jex @franklevasseur
+log4bot @franklevasseur
+opapi @michaelmass @franklevasseur
+promex @michaelmass
+ptb-schema @franklevasseur
+readiness @franklevasseur
+trail @michaelmass
+tunnel @franklevasseur
+verel @franklevasseur
+yargs-extra @franklevasseur
+zui @charlescatta

@@ -1,3 +1,4 @@
+import { JexError } from './errors'
 import * as jex from './jex-representation'
 import { JSONSchema7 } from 'json-schema'
 
@@ -9,8 +10,20 @@ export const jsonSchemaEquals = async (a: JSONSchema7, b: JSONSchema7): Promise<
   return jex.jexEquals(jexA, jexB)
 }
 
-export const jsonSchemaExtends = async (child: JSONSchema7, parent: JSONSchema7): Promise<jex.JexExtensionResult> => {
-  const jexChild = await jex.toJex(child)
-  const jexParent = await jex.toJex(parent)
-  return jex.jexExtends(jexChild, jexParent)
+export const jsonSchemaExtends = async (a: JSONSchema7, b: JSONSchema7): Promise<jex.JexExtensionResult> => {
+  const jexA = await jex.toJex(a)
+  const jexB = await jex.toJex(b)
+  return jex.jexExtends(jexA, jexB)
+}
+
+export const jsonSchemaMerge = async (a: JSONSchema7, b: JSONSchema7): Promise<JSONSchema7> => {
+  const jexA = await jex.toJex(a)
+  const jexB = await jex.toJex(b)
+
+  if (jexA.type !== 'object' || jexB.type !== 'object') {
+    throw new JexError('Both schemas must be objects to be merged')
+  }
+
+  const mergedJex = jex.jexMerge(jexA, jexB)
+  return jex.fromJex(mergedJex)
 }

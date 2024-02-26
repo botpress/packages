@@ -1,8 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react'
+import { UIComponentDefinitions, ZuiComponentMap } from '../types'
+import { Zui, zui as zuiImport } from '../../index'
 import { ZuiForm } from '..'
-import { resolverOverrides } from '../defaultextension'
-import { SchemaResolversMap, UIComponentDefinitions, ZuiComponentMap } from '../types'
-import { Zui, zui as zuiImport } from '~/zui'
 import { z } from 'zod'
 
 const zui = zuiImport as Zui<typeof exampleExtensions>
@@ -43,12 +42,7 @@ const exampleExtensions = {
       }),
     },
   },
-  array: {
-    select: {
-      id: 'select',
-      schema: z.undefined(),
-    },
-  },
+  array: {},
   object: {
     verticalLayout: {
       id: 'verticalLayout',
@@ -58,32 +52,12 @@ const exampleExtensions = {
       id: 'horizontalLayout',
       schema: z.object({}),
     },
-    group: {
-      id: 'group',
-      schema: z.object({}),
-    },
-    categorization: {
-      id: 'categorization',
-      schema: z.object({}),
-    },
-    category: {
-      id: 'category',
-      schema: z.object({}),
-    },
   },
-} as const satisfies UIComponentDefinitions
+} satisfies UIComponentDefinitions
 
 const exampleSchema = zui
   .object({
-    firstName: zui
-      .string()
-      .displayAs('textbox', {})
-      .title('User')
-      .disabled()
-      .hidden()
-      .placeholder('Enter your name')
-      .tooltip('yo')
-      .nullable(),
+    firstName: zui.string().title('User').disabled().hidden().placeholder('Enter your name').tooltip('yo').nullable(),
 
     lastName: zui
       .string()
@@ -103,7 +77,6 @@ const exampleSchema = zui
           })
           .title('Date'),
       )
-      .displayAs('select', undefined)
       .nonempty(),
     // tests the hidden function
     arandomfield: zui.string().hidden(),
@@ -124,22 +97,16 @@ const exampleSchema = zui
     password: zui.string().displayAs('textbox', {}),
     passwordConfirm: zui.string().displayAs('textbox', {}),
   })
-  .displayAs('group', {})
+  .displayAs('horizontalLayout', {})
   .title('User Information')
-
-const resolverOverrides: SchemaResolversMap<typeof exampleExtensions> = {}
 
 const componentMap: ZuiComponentMap<typeof exampleExtensions> = {
   string: {
     datetimeinput: () => null,
-    textbox: ({ params, onChange, errors, required, label, data }) => (
+    textbox: ({ params, onChange, errors, required, label, data, zuiProps }) => (
       <div style={{ padding: '1rem' }}>
         <span>{label}</span>
-        <input
-          placeholder={params.fitContentWidth ? 'fitContentWidth' : 'default'}
-          onChange={(e) => onChange(e.target.value)}
-          type={params.multiline ? 'textarea' : 'text'}
-        />
+        <input placeholder={zuiProps?.placeholder} onChange={(e) => onChange(e.target.value)} />
         {required && <span>*</span>}
         {errors && typeof data !== 'undefined' && <span style={{ color: 'red' }}>{errors}</span>}
       </div>
@@ -148,7 +115,6 @@ const componentMap: ZuiComponentMap<typeof exampleExtensions> = {
   },
   array: {
     default: () => null,
-    select: ({ children }) => <div>array: {children}</div>,
   },
   boolean: {
     checkbox: () => null,
@@ -160,12 +126,14 @@ const componentMap: ZuiComponentMap<typeof exampleExtensions> = {
     slider: () => null,
   },
   object: {
-    category: () => null,
-    default: () => null,
+    default: ({ children }) => <div>{children}</div>,
     verticalLayout: () => null,
-    horizontalLayout: () => null,
-    group: ({ children }) => <div>{children}</div>,
-    categorization: () => null,
+    horizontalLayout: ({ zuiProps, children }) => (
+      <div>
+        <h1>{zuiProps.title}</h1>
+        <div>{children}</div>
+      </div>
+    ),
   },
 }
 
@@ -186,7 +154,6 @@ export const ExampleSchema: Story = {
     schema: exampleSchema.toJsonSchema({
       target: 'openApi3',
     }),
-    overrides: resolverOverrides,
     components: componentMap,
   },
 }

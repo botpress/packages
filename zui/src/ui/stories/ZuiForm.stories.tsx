@@ -103,7 +103,7 @@ const exampleSchema = zui
 const componentMap: ZuiComponentMap<typeof exampleExtensions> = {
   string: {
     datetimeinput: () => null,
-    textbox: ({ params, onChange, errors, required, label, data, zuiProps }) => (
+    textbox: ({ onChange, errors, required, label, data, zuiProps }) => (
       <div style={{ padding: '1rem' }}>
         <span>{label}</span>
         <input placeholder={zuiProps?.placeholder} onChange={(e) => onChange(e.target.value)} />

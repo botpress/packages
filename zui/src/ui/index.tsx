@@ -19,12 +19,10 @@ import {
   type JsonFormsInitStateProps,
   type JsonFormsReactProps,
   JsonFormsDispatch,
-  useJsonForms,
   withJsonFormsControlProps,
   withJsonFormsLayoutProps,
 } from '@jsonforms/react'
 import { useMemo } from 'react'
-import { defaultExtensions } from './defaultextension'
 import { ControlProps, JsonFormsProps, JsonFormsRendererRegistryEntry } from '@jsonforms/core'
 import React, { FC } from 'react'
 import { GlobalComponentDefinitions } from '..'
@@ -36,7 +34,7 @@ export type ZuiFormProps<UI extends UIComponentDefinitions = GlobalComponentDefi
   JsonFormsReactProps & {
     overrides?: SchemaResolversMap<UI>
     components: ZuiComponentMap<UI>
-    schema: JSONSchema
+    schema: JSONSchema | any
   }
 
 export const defaultControlResolver = (
@@ -71,7 +69,7 @@ export const defaultContainerResolver = (
   }
 }
 
-export const defaultUISchemaResolvers: SchemaResolversMap<typeof defaultExtensions> = {
+export const defaultUISchemaResolvers: SchemaResolversMap<UIComponentDefinitions> = {
   string: {
     default: defaultControlResolver,
   },
@@ -199,7 +197,8 @@ const transformControlProps = <Type extends BaseType>(
   } = props
   const transformedProps: ZuiReactControlComponentProps<Type, string> = {
     type,
-    id,
+    id: renderID,
+    componentID: id,
     params: uischema?.options,
     scope: path!,
     enabled: enabled,
@@ -215,7 +214,6 @@ const transformControlProps = <Type extends BaseType>(
     schema: schema as any,
     context: {
       path: path!,
-      renderID: renderID!,
       uiSchema: uischema as any,
       renderers: renderers!,
       cells: cells!,
@@ -227,9 +225,8 @@ const transformControlProps = <Type extends BaseType>(
 
 const withTransformControlProps = (type: BaseType, id: string, Component: FC<any>) => {
   return withJsonFormsControlProps((props) => {
-    const form = useJsonForms()
     const transformedProps = transformControlProps(type, id, props)
-    return <Component {...transformedProps} form={form} />
+    return <Component {...transformedProps} />
   })
 }
 
@@ -242,7 +239,8 @@ const transformLayoutProps = <Type extends ContainerType>(
 
   return {
     type,
-    id,
+    id: renderID,
+    componentID: id,
     enabled,
     params: uischema.options,
     scope: path!,
@@ -250,7 +248,6 @@ const transformLayoutProps = <Type extends ContainerType>(
     schema: schema as any,
     context: {
       path: path!,
-      renderID: renderID!,
       uiSchema: uischema! as any,
       renderers: renderers!,
       cells: cells!,

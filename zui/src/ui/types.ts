@@ -208,7 +208,8 @@ export type ZuiReactComponentBaseProps<
   UI extends UIComponentDefinitions = GlobalComponentDefinitions,
 > = {
   type: Type
-  id: ID
+  componentID: ID
+  id: string
   params: z.infer<UI[Type][ID]['schema']>
   data: any
   enabled: boolean
@@ -217,7 +218,6 @@ export type ZuiReactComponentBaseProps<
   schema: JSONSchemaOfType<Type>
   context: {
     path: string
-    renderID: string
     uiSchema: Type extends ContainerType ? UILayoutSchema : UIControlSchema
     renderers: any[]
     cells: any[]
@@ -239,7 +239,7 @@ export type ZuiReactControlComponentProps<
   ID extends keyof UI[Type],
   UI extends UIComponentDefinitions = GlobalComponentDefinitions,
 > = ZuiReactComponentBaseProps<Type, ID, UI> & {
-  label: string | boolean
+  label: string
   errors: string
   description?: string
   required: boolean

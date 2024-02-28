@@ -27,7 +27,7 @@ dependencies:
     specifier: 15.0.0
     version: 15.0.0
   vite:
-    specifier: ^5.1.4
+    specifier: 5.1.4
     version: 5.1.4(@types/node@18.0.0)
   vitest:
     specifier: 1.3.1

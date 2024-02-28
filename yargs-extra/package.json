@@ -26,7 +26,7 @@
     "@types/jest": "^28.1.1",
     "cross-env": "^5.2.0",
     "jest": "^28.1.1",
-    "typescript": "^5.0.4"
+    "typescript": "5.3.3"
   },
   "scripts": {
     "build": "tsc --build",

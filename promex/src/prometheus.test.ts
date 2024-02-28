@@ -15,8 +15,11 @@ const listen = (app: Express, port: number) => {
 }
 
 describe('init function', () => {
-  beforeEach(() => prom.register.clear())
-  afterEach(() => promex.reset())
+  afterEach(async () => {
+    await promex.reset()
+    prom.register.clear()
+    await new Promise(resolve => setTimeout(resolve, 1000))
+  })
 
   test('initialize a middleware on an express app', async () => {
     const app = express()

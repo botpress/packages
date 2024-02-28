@@ -9,7 +9,7 @@ import {
   SchemaObject,
   RequestBodyObject,
   ResponseObject
-} from 'openapi3-ts'
+} from 'openapi3-ts/oas31'
 import { getPathVariables, mapPathFromExpressToOpenAPI } from './parse-path'
 import { CustomInfo } from './router'
 import { AnyEndpoint, ZodTypeWithMeta } from './typings'
@@ -93,7 +93,7 @@ const pathItemObject = (endpoint: AnyEndpoint, schemas: Record<string, SchemaObj
   }
 }
 
-export const generateOpenAPI = (endpoints: AnyEndpoint[], info: CustomInfo): PathObject => {
+export const generateOpenAPI = (endpoints: AnyEndpoint[], info: CustomInfo) => {
   const paths: Record<string, PathItemObject> = {}
   const schemas: Record<string, SchemaObject> = {}
 

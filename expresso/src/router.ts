@@ -2,7 +2,7 @@ import bodyparser from 'body-parser'
 import express from 'express'
 import httpErrors from 'http-errors'
 import _ from 'lodash'
-import { InfoObject, OpenAPIObject } from 'openapi3-ts'
+import { InfoObject, OpenAPIObject } from 'openapi3-ts/oas31'
 import swaggerExpress, { SwaggerUiOptions } from 'swagger-ui-express'
 import { z } from 'zod'
 import { generateCliDocumentation } from './cli-doc'
@@ -10,6 +10,8 @@ import * as errors from './errors'
 import { generateOpenAPI } from './openapi'
 import { redocHtml } from './redoc'
 import { EndpointProps, EndpointHandler, AnyEndpoint, Endpoint, HTTPMethod } from './typings'
+
+
 
 const OPENAPI_DEFAULT_URL = '/openapi.json'
 const REDOC_DEFAULT_URL = '/redoc'

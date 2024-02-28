@@ -1,4 +1,4 @@
-name: Const
+name: Expresso
 
 on:
   push:
@@ -7,16 +7,16 @@ on:
 
   pull_request:
     paths:
-      - 'const/**'
+      - 'expresso/**'
 
   workflow_dispatch: {}
 
 defaults:
   run:
-    working-directory: ./const
+    working-directory: ./expresso
 
 jobs:
-  const:
+  expresso:
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
@@ -32,5 +32,5 @@ jobs:
         if: github.ref == 'refs/heads/master'
         uses: botpress/gh-actions/publish-if-not-exists@master
         with:
-          path: './const'
+          path: './expresso'
           token: '${{ secrets.NPM_ACCESS_TOKEN }}'

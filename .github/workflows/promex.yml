@@ -1,4 +1,4 @@
-name: Const
+name: Promex
 
 on:
   push:
@@ -7,16 +7,16 @@ on:
 
   pull_request:
     paths:
-      - 'const/**'
+      - 'promex/**'
 
   workflow_dispatch: {}
 
 defaults:
   run:
-    working-directory: ./const
+    working-directory: ./promex
 
 jobs:
-  const:
+  promex:
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
@@ -32,5 +32,5 @@ jobs:
         if: github.ref == 'refs/heads/master'
         uses: botpress/gh-actions/publish-if-not-exists@master
         with:
-          path: './const'
+          path: './promex'
           token: '${{ secrets.NPM_ACCESS_TOKEN }}'

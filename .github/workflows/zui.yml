@@ -1,9 +1,15 @@
 name: Zui
 
 on:
+  push:
+    branches:
+      - master
+
   pull_request:
     paths:
       - 'zui/**'
+
+  workflow_dispatch: {}
 
 defaults:
   run:
@@ -18,13 +24,14 @@ jobs:
       - uses: pnpm/action-setup@v3.0.0
         with:
           version: 8
-      - name: Install And Build
-        run: pnpm install
-      - name: Type Check
-        run: pnpm type:check
-      - name: Build
-        run: pnpm build
-      - name: Format Check
-        run: pnpm format:check
-      - name: Test
-        run: pnpm test
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm build
+      - run: pnpm type:check
+      - run: pnpm format:check
+      - run: pnpm test
+      - name: Publish
+        if: github.ref == 'refs/heads/master'
+        uses: botpress/gh-actions/publish-if-not-exists@master
+        with:
+          path: './zui'
+          token: '${{ secrets.NPM_ACCESS_TOKEN }}'

@@ -2,6 +2,7 @@ import { defineConfig } from 'vite'
 
 export default defineConfig({
   test: {
+    pool: 'forks',
     include: ['**/*.test.ts'],
     exclude: [
       '**/node_modules/**',

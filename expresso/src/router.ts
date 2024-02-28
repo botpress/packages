@@ -11,8 +11,6 @@ import { generateOpenAPI } from './openapi'
 import { redocHtml } from './redoc'
 import { EndpointProps, EndpointHandler, AnyEndpoint, Endpoint, HTTPMethod } from './typings'
 
-
-
 const OPENAPI_DEFAULT_URL = '/openapi.json'
 const REDOC_DEFAULT_URL = '/redoc'
 

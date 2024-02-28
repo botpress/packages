@@ -30,7 +30,7 @@ export class Logger implements types.Logger {
   public configure(config: Partial<types.LoggerConfig>) {
     this._config = { ...this._config, ...config }
     if (config.filters) {
-      this._filters = _.mapValues(config.filters, regexParser)
+      this._filters = _.mapValues(config.filters, regexParser) as any as { [level: string]: RegExp }
     }
 
     // logger configures all childs

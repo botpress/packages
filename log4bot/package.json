@@ -1,6 +1,6 @@
 {
   "name": "@bpinternal/log4bot",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "description": "Just a Logger",
   "main": "./dist/index.js",
   "author": "Botpress, Inc.",
@@ -20,7 +20,7 @@
   },
   "devDependencies": {
     "@types/lodash": "4.14.202",
-    "@types/node": "18.0.0",
+    "@types/node": "18.19.20",
     "typescript": "5.3.3"
   },
   "scripts": {

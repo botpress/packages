@@ -6,93 +6,90 @@ settings:
 
 dependencies:
   '@anatine/zod-openapi':
-    specifier: ^2.0.0
+    specifier: 2.2.3
     version: 2.2.3(openapi3-ts@4.2.2)(zod@3.22.4)
   '@readme/openapi-parser':
-    specifier: ^2.5.0
+    specifier: 2.5.0
     version: 2.5.0(openapi-types@12.1.3)
   axios:
-    specifier: ^1.2.3
+    specifier: 1.6.7
     version: 1.6.7
   chalk:
-    specifier: ^5.0.0
+    specifier: 5.3.0
     version: 5.3.0
   decompress:
-    specifier: ^4.2.1
+    specifier: 4.2.1
     version: 4.2.1
   execa:
-    specifier: ^8.0.0
+    specifier: 8.0.1
     version: 8.0.1
   json-schema-to-typescript:
-    specifier: ^13.0.2
+    specifier: 13.1.2
     version: 13.1.2
   nodemon:
-    specifier: ^3.0.0
+    specifier: 3.1.0
     version: 3.1.0
   openapi-typescript:
     specifier: 6.7.4
     version: 6.7.4
   openapi3-ts:
-    specifier: ^4.0.0
+    specifier: 4.2.2
     version: 4.2.2
   radash:
-    specifier: ^12.0.0
+    specifier: 12.0.0
     version: 12.0.0
   tsconfig-paths:
-    specifier: ^4.1.1
+    specifier: 4.2.0
     version: 4.2.0
   verror:
-    specifier: ^1.10.1
+    specifier: 1.10.1
     version: 1.10.1
   winston:
-    specifier: ^3.8.2
+    specifier: 3.11.0
     version: 3.11.0
   zod:
-    specifier: ^3.20.6
+    specifier: 3.22.4
     version: 3.22.4
 
 devDependencies:
   '@swc/core':
-    specifier: ^1.3.23
+    specifier: 1.4.2
     version: 1.4.2(@swc/helpers@0.5.6)
   '@swc/helpers':
-    specifier: ^0.5.0
+    specifier: 0.5.6
     version: 0.5.6
   '@types/decompress':
-    specifier: ^4.2.4
+    specifier: 4.2.7
     version: 4.2.7
   '@types/express':
-    specifier: ^4.17.15
+    specifier: 4.17.21
     version: 4.17.21
   '@types/node':
-    specifier: ^18.11.17
+    specifier: 18.19.20
     version: 18.19.20
-  '@types/prettier':
-    specifier: ^2.7.3
-    version: 2.7.3
   '@types/verror':
-    specifier: ^1.10.6
+    specifier: 1.10.9
     version: 1.10.9
   prettier:
-    specifier: ^3.0.0
+    specifier: 3.2.5
     version: 3.2.5
   ts-node:
-    specifier: ^10.9.1
+    specifier: 10.9.2
     version: 10.9.2(@swc/core@1.4.2)(@types/node@18.19.20)(typescript@5.3.3)
   tsup:
-    specifier: ^8.0.0
+    specifier: 8.0.2
     version: 8.0.2(@swc/core@1.4.2)(ts-node@10.9.2)(typescript@5.3.3)
   typescript:
     specifier: 5.3.3
     version: 5.3.3
   vite:
-    specifier: ^5.0.0
+    specifier: 5.1.4
     version: 5.1.4(@types/node@18.19.20)
   vite-node:
-    specifier: ^1.0.0
+    specifier: 1.3.1
     version: 1.3.1(@types/node@18.19.20)
   vitest:
-    specifier: ^1.0.0
+    specifier: 1.3.1
     version: 1.3.1(@types/node@18.19.20)
 
 packages:
@@ -457,7 +454,7 @@ packages:
     resolution: {integrity: sha512-Bt3QVovFSua4QmHa65EHUmh2xS0XJ3rgTEUPH998f4OW4VVJke3BuS16f+kM0ZLOGdvIrzrPRqwihuv5BAjtrA==}
     dependencies:
       '@jsdevtools/ono': 7.1.3
-      '@types/json-schema': 7.0.12
+      '@types/json-schema': 7.0.15
       call-me-maybe: 1.0.2
       js-yaml: 4.1.0
     dev: false
@@ -785,10 +782,6 @@ packages:
     resolution: {integrity: sha512-D0CFMMtydbJAegzOyHjtiKPLlvnm3iTZyZRSZoLq2mRhDdmLfIWOCYPfQJ4cu2erKghU++QvjcUjp/5h7hESpA==}
     dev: true
 
-  /@types/json-schema@7.0.12:
-    resolution: {integrity: sha512-Hr5Jfhc9eYOQNPYO5WLDq/n4jqijdHNlDXjuAQkkt+mWdQR+XJToOHrsD4cPaMXpn6KO7y2+wM8AZEs8VpBLVA==}
-    dev: false
-
   /@types/json-schema@7.0.15:
     resolution: {integrity: sha512-5+fP8P8MFNC+AyZCDxrB2pkZFPGzqQWUzpSeuuVLvm8VMcorNYavBqoFcxK8bQz4Qsbn4oUEEem4wDLfcysGHA==}
     dev: false
@@ -816,6 +809,7 @@ packages:
 
   /@types/prettier@2.7.3:
     resolution: {integrity: sha512-+68kP9yzs4LMp7VNh8gdzMSPZFL44MLGqiHWvttYJe+6qnuVr4Ek9wSBQoveqY/r+LwjCcU29kNVkidwim+kYA==}
+    dev: false
 
   /@types/qs@6.9.12:
     resolution: {integrity: sha512-bZcOkJ6uWrL0Qb2NAWKa7TBU+mJHPzhx9jjLL1KHF+XpzEcR7EXHvjbHlGtR/IsP1vyPrehuS6XqkmaePy//mg==}
@@ -1079,7 +1073,7 @@ packages:
       check-error: 1.0.3
       deep-eql: 4.1.3
       get-func-name: 2.0.2
-      loupe: 2.3.6
+      loupe: 2.3.7
       pathval: 1.1.1
       type-detect: 4.0.8
     dev: true
@@ -1849,13 +1843,6 @@ packages:
       safe-stable-stringify: 2.4.3
       triple-beam: 1.4.1
     dev: false
-
-  /loupe@2.3.6:
-    resolution: {integrity: sha512-RaPMZKiMy8/JruncMU5Bt6na1eftNoo++R4Y+N2FrxkDVTrGvcyzFTsaGif4QTeKESheMGegbhw6iUAq+5A8zA==}
-    deprecated: Please upgrade to 2.3.7 which fixes GHSA-4q6p-r6v2-jvc5
-    dependencies:
-      get-func-name: 2.0.2
-    dev: true
 
   /loupe@2.3.7:
     resolution: {integrity: sha512-zSMINGVYkdpYSOBmLi0D1Uo7JU9nVdQKrHxC8eYlV+9YKK9WePqAlL7lSlorG/U2Fw1w0hTBmaa/jrQ3UbPHtA==}

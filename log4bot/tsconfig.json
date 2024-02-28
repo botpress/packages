@@ -1,6 +1,5 @@
 {
   "compilerOptions": {
-    "incremental": true,
     "target": "es2019",
     "module": "commonjs",
     "declaration": true,
@@ -10,7 +9,6 @@
     "strictNullChecks": true,
     "outDir": "./dist",
     "rootDir": "./src",
-    "composite": true,
     "moduleResolution": "node",
     "esModuleInterop": true,
     "experimentalDecorators": true,

@@ -23,11 +23,11 @@ dependencies:
 
 devDependencies:
   '@bpinternal/log4bot':
+    specifier: 0.0.6
+    version: 0.0.6
+  '@bpinternal/yargs-extra':
     specifier: 0.0.4
     version: 0.0.4
-  '@bpinternal/yargs-extra':
-    specifier: 0.0.3
-    version: 0.0.3
   '@tsconfig/node18-strictest':
     specifier: ^1.0.0
     version: 1.0.0
@@ -76,23 +76,24 @@ packages:
       js-tokens: 4.0.0
     dev: true
 
-  /@bpinternal/log4bot@0.0.4:
-    resolution: {integrity: sha512-psjT4wxlMcKMnWu+acnxoMeVQaAjD5eRfTdpk1L2uymhy2hnukzxg53Z2cThbFDJsdEufFOneEGwSi2kfWXRwA==}
+  /@bpinternal/log4bot@0.0.6:
+    resolution: {integrity: sha512-2i1QhFedn5NS1u5IytXV6Q6tCJxkigIZ3jMGYJHszzAvlmgiWnYRuJ7RbqPaothxVDuC8gf3OiZtvO04fcPVoA==}
     dependencies:
+      chalk: 5.3.0
       lodash: 4.17.21
-      moment: 2.29.4
-      regex-parser: 2.2.11
+      moment: 2.30.1
+      regex-parser: 2.3.0
     dev: true
 
-  /@bpinternal/yargs-extra@0.0.3:
-    resolution: {integrity: sha512-e/unlq0LX4CJUv1jGOv1UgwB/h2M0NCXnwD4lEw496GpkQikO668RS+BBlRhkqdGfZmvKDkXZZ96xJCn+i6Ymg==}
+  /@bpinternal/yargs-extra@0.0.4:
+    resolution: {integrity: sha512-xcICSqjFiquC0y4bIxV5UiEKhgXzjupCFLaiFjdbvK3cKY//RV3ERq3gVQVYBTOnLG1clVu7y62eun06rXAL5A==}
     dependencies:
       '@types/yargs': 17.0.24
-      decamelize: 5.0.1
+      decamelize: 6.0.0
       json-schema: 0.4.0
       lodash: 4.17.21
       yargs: 17.7.2
-      yn: 4.0.0
+      yn: 5.0.0
     dev: true
 
   /@cspotcode/source-map-support@0.8.1:
@@ -531,6 +532,11 @@ packages:
       supports-color: 5.5.0
     dev: true
 
+  /chalk@5.3.0:
+    resolution: {integrity: sha512-dLitG79d+GV1Nb/VYcCDFivJeK1hiukt9QjRNVOsUtTy1rR1YJsmpGGTZ3qJos+uw7WmWF4wUwBd9jxjocFC2w==}
+    engines: {node: ^12.17.0 || ^14.13 || >=16.0.0}
+    dev: true
+
   /chromium-bidi@0.5.10(devtools-protocol@0.0.1249869):
     resolution: {integrity: sha512-4hsPE1VaLLM/sgNK/SlLbI24Ra7ZOuWAjA3rhw1lVCZ8ZiUgccS6cL5L/iqo4hjRcl5vwgYJ8xTtbXdulA9b6Q==}
     peerDependencies:
@@ -616,9 +622,9 @@ packages:
       ms: 2.1.2
     dev: true
 
-  /decamelize@5.0.1:
-    resolution: {integrity: sha512-VfxadyCECXgQlkoEAjeghAr5gY3Hf+IKjKb+X8tGVDtveCjN+USwprd2q3QXBR9T1+x2DG0XZF5/w+7HAtSaXA==}
-    engines: {node: '>=10'}
+  /decamelize@6.0.0:
+    resolution: {integrity: sha512-Fv96DCsdOgB6mdGl67MT5JaTNKRzrzill5OH5s8bjYJXVlcXyPYGyPsUkWyGV5p1TXI5esYIYMMeDJL0hEIwaA==}
+    engines: {node: ^12.20.0 || ^14.13.1 || >=16.0.0}
     dev: true
 
   /degenerator@5.0.1:
@@ -901,8 +907,8 @@ packages:
     resolution: {integrity: sha512-vKivATfr97l2/QBCYAkXYDbrIWPM2IIKEl7YPhjCvKlG3kE2gm+uBo6nEXK3M5/Ffh/FLpKExzOQ3JJoJGFKBw==}
     dev: true
 
-  /moment@2.29.4:
-    resolution: {integrity: sha512-5LC9SOxjSc2HF6vO2CyuTDNivEdoz2IvyJJGj6X8DJ0eFyfszE0QiEd+iXmBvUP3WHxSjFH/vIsA0EN00cgr8w==}
+  /moment@2.30.1:
+    resolution: {integrity: sha512-uEmtNhbDOrWPFS+hdjFCBfy9f2YoyzRpwcl+DqpC6taX21FzsTLQVbMV/W7PzNSX6x/bhC1zA3c2UQ5NzH6how==}
     dev: true
 
   /ms@2.1.2:
@@ -1048,8 +1054,8 @@ packages:
     requiresBuild: true
     dev: true
 
-  /regex-parser@2.2.11:
-    resolution: {integrity: sha512-jbD/FT0+9MBU2XAZluI7w2OBs1RBi6p9M83nkoZayQXXU9e8Robt69FcZc7wU4eJD/YFTjn1JdCk3rbMJajz8Q==}
+  /regex-parser@2.3.0:
+    resolution: {integrity: sha512-TVILVSz2jY5D47F4mA4MppkBrafEaiUWJO/TcZHEIuI13AqoZMkK1WMA4Om1YkYbTx+9Ki1/tSUXbceyr9saRg==}
     dev: true
 
   /require-directory@2.1.1:
@@ -1298,9 +1304,9 @@ packages:
     engines: {node: '>=6'}
     dev: true
 
-  /yn@4.0.0:
-    resolution: {integrity: sha512-huWiiCS4TxKc4SfgmTwW1K7JmXPPAmuXWYy4j9qjQo4+27Kni8mGhAAi1cloRWmBe2EqcLgt3IGqQoRL/MtPgg==}
-    engines: {node: '>=10'}
+  /yn@5.0.0:
+    resolution: {integrity: sha512-+l37+9TyGEsyxGLaTg6QgYy5KnOp74ZZl4dPFLQpBWSkO99uBC5jnS0pOGwXFViPbiaEtWbParH2KrgWWF2duQ==}
+    engines: {node: ^12.20.0 || ^14.13.1 || >=16.0.0}
     dev: true
 
   /zod@3.22.4:

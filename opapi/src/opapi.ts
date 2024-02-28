@@ -11,7 +11,12 @@ import { ApiError, ComponentType, createState, getRef, Metadata, Operation, Opti
 import { exportStateAsTypescript, ExportStateAsTypescriptOptions } from './generators/ts-state'
 export { Operation, Parameter } from './state'
 
-export const schema = extendApi
+type ExtendApi = typeof extendApi
+type AnatineSchemaObject = NonNullable<Parameters<ExtendApi>[1]>
+
+export const schema: <T extends OpenApiZodAny>(schema: T, schemaObject?: AnatineSchemaObject & { $ref: string }) => T =
+  extendApi
+
 export type OpenApi<
   SchemaName extends string = string,
   DefaultParameterName extends string = string,

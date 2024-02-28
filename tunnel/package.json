@@ -11,7 +11,7 @@
     "build:nodejs": "esbuild src/index.ts --bundle --platform=node --target=node16 --outfile=dist/index.cjs",
     "build:browser": "esbuild src/index.ts --bundle --platform=browser --target=es2017 --format=esm --outfile=dist/index.mjs",
     "build": "npm run build:nodejs && npm run build:browser",
-    "test:e2e": "ts-node -T ./e2e",
+    "test:e2e": "esbuild --bundle --external:esbuild --platform=node --outfile=custom-e2e/index.js e2e/index.ts && node custom-e2e/index.js",
     "test": "npm run test:e2e"
   },
   "dependencies": {

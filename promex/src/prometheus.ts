@@ -22,7 +22,7 @@ let defaultNormalizedPathEnabled = true
  * @param options for the promster middleware
  * @returns the configured promster middleware
  */
-export const config = (options: TPromsterOptions = {}) => {
+export const config = (options: TPromsterOptions = {}): ReturnType<typeof createMiddleware> => {
   if (options.normalizePath) {
     defaultNormalizedPathEnabled = false
   }

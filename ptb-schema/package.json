@@ -10,10 +10,7 @@
     "clean": "rimraf ./dist && rimraf ./node_modules"
   },
   "types": "./dist/index.d.ts",
-  "devDependencies": {
-    "@types/protobufjs": "^6.0.0"
-  },
   "dependencies": {
-    "protobufjs": "^6.11.2"
+    "protobufjs": "7.2.6"
   }
 }

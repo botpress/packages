@@ -9,7 +9,106 @@
       "paths": ["const/**"],
       "additionalBranchPrefix": "{{baseDir}}-",
       "commitMessageSuffix": "({{baseDir}})",
-      "packagePatterns": ["*"]
+      "packagePatterns": ["*"],
+      "groupName": "{{baseDir}}"
+    },
+    {
+      "paths": ["entities/**"],
+      "additionalBranchPrefix": "{{baseDir}}-",
+      "commitMessageSuffix": "({{baseDir}})",
+      "packagePatterns": ["*"],
+      "groupName": "{{baseDir}}"
+    },
+    {
+      "paths": ["es-node/**"],
+      "additionalBranchPrefix": "{{baseDir}}-",
+      "commitMessageSuffix": "({{baseDir}})",
+      "packagePatterns": ["*"],
+      "groupName": "{{baseDir}}"
+    },
+    {
+      "paths": ["expresso/**"],
+      "additionalBranchPrefix": "{{baseDir}}-",
+      "commitMessageSuffix": "({{baseDir}})",
+      "packagePatterns": ["*"],
+      "groupName": "{{baseDir}}"
+    },
+    {
+      "paths": ["jex/**"],
+      "additionalBranchPrefix": "{{baseDir}}-",
+      "commitMessageSuffix": "({{baseDir}})",
+      "packagePatterns": ["*"],
+      "groupName": "{{baseDir}}"
+    },
+    {
+      "paths": ["log4bot/**"],
+      "additionalBranchPrefix": "{{baseDir}}-",
+      "commitMessageSuffix": "({{baseDir}})",
+      "packagePatterns": ["*"],
+      "groupName": "{{baseDir}}"
+    },
+    {
+      "paths": ["opapi/**"],
+      "additionalBranchPrefix": "{{baseDir}}-",
+      "commitMessageSuffix": "({{baseDir}})",
+      "packagePatterns": ["*"],
+      "groupName": "{{baseDir}}"
+    },
+    {
+      "paths": ["promex/**"],
+      "additionalBranchPrefix": "{{baseDir}}-",
+      "commitMessageSuffix": "({{baseDir}})",
+      "packagePatterns": ["*"],
+      "groupName": "{{baseDir}}"
+    },
+    {
+      "paths": ["ptb-schema/**"],
+      "additionalBranchPrefix": "{{baseDir}}-",
+      "commitMessageSuffix": "({{baseDir}})",
+      "packagePatterns": ["*"],
+      "groupName": "{{baseDir}}"
+    },
+    {
+      "paths": ["readiness/**"],
+      "additionalBranchPrefix": "{{baseDir}}-",
+      "commitMessageSuffix": "({{baseDir}})",
+      "packagePatterns": ["*"],
+      "groupName": "{{baseDir}}"
+    },
+    {
+      "paths": ["trail/**"],
+      "additionalBranchPrefix": "{{baseDir}}-",
+      "commitMessageSuffix": "({{baseDir}})",
+      "packagePatterns": ["*"],
+      "groupName": "{{baseDir}}"
+    },
+    {
+      "paths": ["tunnel/**"],
+      "additionalBranchPrefix": "{{baseDir}}-",
+      "commitMessageSuffix": "({{baseDir}})",
+      "packagePatterns": ["*"],
+      "groupName": "{{baseDir}}"
+    },
+    {
+      "paths": ["verel/**"],
+      "additionalBranchPrefix": "{{baseDir}}-",
+      "commitMessageSuffix": "({{baseDir}})",
+      "packagePatterns": ["*"],
+      "groupName": "{{baseDir}}"
+    },
+    {
+      "paths": ["yargs-extra/**"],
+      "additionalBranchPrefix": "{{baseDir}}-",
+      "commitMessageSuffix": "({{baseDir}})",
+      "packagePatterns": ["*"],
+      "groupName": "{{baseDir}}"
+    },
+    {
+      "paths": ["zui/**"],
+      "additionalBranchPrefix": "{{baseDir}}-",
+      "commitMessageSuffix": "({{baseDir}})",
+      "packagePatterns": ["*"],
+      "groupName": "{{baseDir}}"
     }
   ],
   "enabledManagers": ["dockerfile", "npm", "github-actions"],

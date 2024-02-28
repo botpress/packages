@@ -1,6 +1,6 @@
 {
   "name": "@bpinternal/ptb-schema",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "main": "./dist/index.js",
   "author": "Botpress, Inc.",
   "license": "MIT",
@@ -13,6 +13,6 @@
     "@types/protobufjs": "^6.0.0"
   },
   "dependencies": {
-    "protobufjs": "^6.11.2"
+    "protobufjs": "^7.0.0"
   }
 }

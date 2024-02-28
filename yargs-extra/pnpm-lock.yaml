@@ -44,7 +44,7 @@ devDependencies:
     specifier: ^28.1.1
     version: 28.1.3(@types/node@20.11.21)
   typescript:
-    specifier: ^5.0.4
+    specifier: 5.3.3
     version: 5.3.3
 
 packages:

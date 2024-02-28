@@ -12,6 +12,10 @@
   "bumpVersion": "patch",
   "packageRules": [
     {
+      "matchPackageNames": ["@types/node"],
+      "allowedVersions": "< 19.0.0"
+    },
+    {
       "paths": [".github/**"],
       "packagePatterns": ["*"],
       "groupName": "{{baseDir}}"

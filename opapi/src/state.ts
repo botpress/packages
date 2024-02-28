@@ -1,4 +1,4 @@
-import type { SchemaObject } from 'openapi3-ts'
+import type { SchemaObject } from 'openapi3-ts/oas31'
 import { VError } from 'verror'
 import { z } from 'zod'
 import { schema } from './opapi'
@@ -218,10 +218,10 @@ export function createState<SchemaName extends string, DefaultParameterName exte
 
   const schemaEntries = props.schemas
     ? Object.entries<(typeof props.schemas)[SchemaName]>(props.schemas).map(([name, data]) => ({
-        name,
-        schema: data.schema,
-        section: data.section,
-      }))
+      name,
+      schema: data.schema,
+      section: data.section,
+    }))
     : []
 
   const schemas: Record<string, { schema: SchemaObject; section: SectionName }> = {}
@@ -237,11 +237,11 @@ export function createState<SchemaName extends string, DefaultParameterName exte
 
   const sections = props.sections
     ? toPairs(props.sections).map(([name, section]) => ({
-        ...section,
-        name,
-        operations: [],
-        schema: schemaEntries.find((schemaEntry) => schemaEntry.section === name)?.name,
-      }))
+      ...section,
+      name,
+      operations: [],
+      schema: schemaEntries.find((schemaEntry) => schemaEntry.section === name)?.name,
+    }))
     : []
 
   schemaEntries.forEach((schemaEntry) => {
@@ -282,9 +282,9 @@ export function createState<SchemaName extends string, DefaultParameterName exte
 
   const defaultParameters = props.defaultParameters
     ? (objects.mapValues(props.defaultParameters, mapParameter) satisfies Record<
-        DefaultParameterName,
-        Parameter<'json-schema'>
-      >)
+      DefaultParameterName,
+      Parameter<'json-schema'>
+    >)
     : undefined
 
   return {

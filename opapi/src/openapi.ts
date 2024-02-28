@@ -1,4 +1,4 @@
-import { OpenApiBuilder, OperationObject, ReferenceObject } from 'openapi3-ts'
+import { OpenApiBuilder, OperationObject, ReferenceObject } from 'openapi3-ts/oas31'
 import VError from 'verror'
 import { defaultResponseStatus } from './const'
 import { generateSchemaFromZod } from './jsonschema'
@@ -54,7 +54,7 @@ export const createOpenapi = <
 
     const responseRefSchema = generateSchemaFromZod(
       getRef(state, ComponentType.RESPONSES, responseName),
-    ) as ReferenceObject
+    ) as unknown as ReferenceObject
 
     const operation: OperationObject = {
       operationId: operationName,
@@ -78,7 +78,7 @@ export const createOpenapi = <
         },
       })
 
-      const bodyRefSchema = generateSchemaFromZod(getRef(state, ComponentType.REQUESTS, bodyName)) as ReferenceObject
+      const bodyRefSchema = generateSchemaFromZod(getRef(state, ComponentType.REQUESTS, bodyName)) as unknown as ReferenceObject
 
       operation.requestBody = bodyRefSchema
     }
@@ -141,15 +141,19 @@ export const createOpenapi = <
       })
     }
 
+    if (!openapi.rootDoc.paths) {
+      openapi.rootDoc.paths = {}
+    }
+
     if (!openapi.rootDoc.paths[path]) {
       openapi.rootDoc.paths[path] = {}
     }
 
-    if (openapi.rootDoc.paths[path][method]) {
+    if (openapi.rootDoc.paths[path]?.[method]) {
       throw new VError(`Operation ${method} ${path} already exists`)
     }
 
-    openapi.rootDoc.paths[path][method] = operation
+    openapi.rootDoc.paths[path]![method] = operation
   })
 
   return openapi

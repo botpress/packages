@@ -10,9 +10,6 @@
   "timezone": "America/Toronto",
   "schedule": ["before 3am every monday"],
   "bumpVersion": "patch",
-  "lockFileMaintenance": {
-    "enabled": true
-  },
   "packageRules": [
     {
       "matchPackageNames": ["@types/react", "react-dom", "react"],

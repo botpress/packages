@@ -2,7 +2,6 @@ import pathlib from 'path'
 import fs from 'fs'
 import { State } from '../state'
 import { tsFileHeader } from '../const'
-import prettier from 'prettier'
 
 const DEFAULT_IMPORT_PATH = '@bpinternal/opapi'
 
@@ -36,9 +35,8 @@ export const exportStateAsTypescript = <
     `export type State = opapi.State<${typeSchema}, ${typeParam}, ${typeSection}>`,
     `export const state = ${json} satisfies State`,
   ].join('\n')
-  const formatted = prettier.format(content, { parser: 'typescript' })
 
-  const ts = header + formatted
+  const ts = header + content
   const path = pathlib.join(dir, 'state.ts')
   fs.writeFileSync(path, ts)
 }

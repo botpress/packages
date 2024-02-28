@@ -5,8 +5,8 @@ type Cast<A, B> = A extends B ? A : B
 type FilterPathVar<P extends string[]> = P extends [`${infer Head}`]
   ? KeepPathVar<Head>
   : P extends [infer Head, ...infer Tail]
-  ? [...KeepPathVar<Cast<Head, string>>, ...FilterPathVar<Cast<Tail, string[]>>]
-  : []
+    ? [...KeepPathVar<Cast<Head, string>>, ...FilterPathVar<Cast<Tail, string[]>>]
+    : []
 
 type ToUnion<P extends string[]> = P[number]
 

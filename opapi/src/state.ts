@@ -1,4 +1,4 @@
-import type { SchemaObject } from 'openapi3-ts'
+import type { SchemaObject } from 'openapi3-ts/oas31'
 import { VError } from 'verror'
 import { z } from 'zod'
 import { schema } from './opapi'

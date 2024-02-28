@@ -73,14 +73,11 @@ export namespace OpenApi {
   ) => createOpapiFromState(state as State<SchemaName, DefaultParameterName, SectionName>)
 }
 
-export type SchemaOf<O extends OpenApi<any, any, any>> = O extends OpenApi<infer Skema, infer _Param, infer _Sexion>
-  ? Skema
-  : never
+export type SchemaOf<O extends OpenApi<any, any, any>> =
+  O extends OpenApi<infer Skema, infer _Param, infer _Sexion> ? Skema : never
 
-export type ParameterOf<O extends OpenApi<any, any, any>> = O extends OpenApi<infer _Skema, infer Param, infer _Sexion>
-  ? Param
-  : never
+export type ParameterOf<O extends OpenApi<any, any, any>> =
+  O extends OpenApi<infer _Skema, infer Param, infer _Sexion> ? Param : never
 
-export type SectionOf<O extends OpenApi<any, any, any>> = O extends OpenApi<infer _Skema, infer _Param, infer Sexion>
-  ? Sexion
-  : never
+export type SectionOf<O extends OpenApi<any, any, any>> =
+  O extends OpenApi<infer _Skema, infer _Param, infer Sexion> ? Sexion : never

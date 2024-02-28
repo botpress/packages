@@ -6,109 +6,100 @@
   ],
   "packageRules": [
     {
-      "paths": ["const/**"],
-      "additionalBranchPrefix": "{{baseDir}}-",
-      "commitMessageSuffix": "({{baseDir}})",
+      "paths": [".github/**"],
       "packagePatterns": ["*"],
-      "groupName": "{{baseDir}}"
+      "groupName": "{{baseDir}}",
+      "matchUpdateTypes": ["digest", "patch", "minor", "major"]
+    },
+    {
+      "paths": ["const/**"],
+      "packagePatterns": ["*"],
+      "groupName": "{{baseDir}}",
+      "matchUpdateTypes": ["digest", "patch", "minor", "major"]
     },
     {
       "paths": ["entities/**"],
-      "additionalBranchPrefix": "{{baseDir}}-",
-      "commitMessageSuffix": "({{baseDir}})",
       "packagePatterns": ["*"],
-      "groupName": "{{baseDir}}"
+      "groupName": "{{baseDir}}",
+      "matchUpdateTypes": ["digest", "patch", "minor", "major"]
     },
     {
       "paths": ["es-node/**"],
-      "additionalBranchPrefix": "{{baseDir}}-",
-      "commitMessageSuffix": "({{baseDir}})",
       "packagePatterns": ["*"],
-      "groupName": "{{baseDir}}"
+      "groupName": "{{baseDir}}",
+      "matchUpdateTypes": ["digest", "patch", "minor", "major"]
     },
     {
       "paths": ["expresso/**"],
-      "additionalBranchPrefix": "{{baseDir}}-",
-      "commitMessageSuffix": "({{baseDir}})",
       "packagePatterns": ["*"],
-      "groupName": "{{baseDir}}"
+      "groupName": "{{baseDir}}",
+      "matchUpdateTypes": ["digest", "patch", "minor", "major"]
     },
     {
       "paths": ["jex/**"],
-      "additionalBranchPrefix": "{{baseDir}}-",
-      "commitMessageSuffix": "({{baseDir}})",
       "packagePatterns": ["*"],
-      "groupName": "{{baseDir}}"
+      "groupName": "{{baseDir}}",
+      "matchUpdateTypes": ["digest", "patch", "minor", "major"]
     },
     {
       "paths": ["log4bot/**"],
-      "additionalBranchPrefix": "{{baseDir}}-",
-      "commitMessageSuffix": "({{baseDir}})",
       "packagePatterns": ["*"],
-      "groupName": "{{baseDir}}"
+      "groupName": "{{baseDir}}",
+      "matchUpdateTypes": ["digest", "patch", "minor", "major"]
     },
     {
       "paths": ["opapi/**"],
-      "additionalBranchPrefix": "{{baseDir}}-",
-      "commitMessageSuffix": "({{baseDir}})",
       "packagePatterns": ["*"],
-      "groupName": "{{baseDir}}"
+      "groupName": "{{baseDir}}",
+      "matchUpdateTypes": ["digest", "patch", "minor", "major"]
     },
     {
       "paths": ["promex/**"],
-      "additionalBranchPrefix": "{{baseDir}}-",
-      "commitMessageSuffix": "({{baseDir}})",
       "packagePatterns": ["*"],
-      "groupName": "{{baseDir}}"
+      "groupName": "{{baseDir}}",
+      "matchUpdateTypes": ["digest", "patch", "minor", "major"]
     },
     {
       "paths": ["ptb-schema/**"],
-      "additionalBranchPrefix": "{{baseDir}}-",
-      "commitMessageSuffix": "({{baseDir}})",
       "packagePatterns": ["*"],
-      "groupName": "{{baseDir}}"
+      "groupName": "{{baseDir}}",
+      "matchUpdateTypes": ["digest", "patch", "minor", "major"]
     },
     {
       "paths": ["readiness/**"],
-      "additionalBranchPrefix": "{{baseDir}}-",
-      "commitMessageSuffix": "({{baseDir}})",
       "packagePatterns": ["*"],
-      "groupName": "{{baseDir}}"
+      "groupName": "{{baseDir}}",
+      "matchUpdateTypes": ["digest", "patch", "minor", "major"]
     },
     {
       "paths": ["trail/**"],
-      "additionalBranchPrefix": "{{baseDir}}-",
-      "commitMessageSuffix": "({{baseDir}})",
       "packagePatterns": ["*"],
-      "groupName": "{{baseDir}}"
+      "groupName": "{{baseDir}}",
+      "matchUpdateTypes": ["digest", "patch", "minor", "major"]
     },
     {
       "paths": ["tunnel/**"],
-      "additionalBranchPrefix": "{{baseDir}}-",
-      "commitMessageSuffix": "({{baseDir}})",
       "packagePatterns": ["*"],
-      "groupName": "{{baseDir}}"
+      "groupName": "{{baseDir}}",
+      "matchUpdateTypes": ["digest", "patch", "minor", "major"]
     },
     {
       "paths": ["verel/**"],
-      "additionalBranchPrefix": "{{baseDir}}-",
-      "commitMessageSuffix": "({{baseDir}})",
       "packagePatterns": ["*"],
-      "groupName": "{{baseDir}}"
+      "groupName": "{{baseDir}}",
+      "matchUpdateTypes": ["digest", "patch", "minor", "major"]
     },
     {
       "paths": ["yargs-extra/**"],
-      "additionalBranchPrefix": "{{baseDir}}-",
-      "commitMessageSuffix": "({{baseDir}})",
       "packagePatterns": ["*"],
-      "groupName": "{{baseDir}}"
+      "groupName": "{{baseDir}}",
+      "matchUpdateTypes": ["digest", "patch", "minor", "major"]
     },
     {
       "paths": ["zui/**"],
-      "additionalBranchPrefix": "{{baseDir}}-",
-      "commitMessageSuffix": "({{baseDir}})",
       "packagePatterns": ["*"],
-      "groupName": "{{baseDir}}"
+      "groupName": "{{baseDir}}",
+      "matchUpdateTypes": ["digest", "patch", "minor", "major"]
     }
   ],
   "enabledManagers": ["dockerfile", "npm", "github-actions"],

@@ -41,7 +41,7 @@ devDependencies:
     specifier: ^18.0.0
     version: 18.19.20
   typescript:
-    specifier: ^5.0.0
+    specifier: 5.3.3
     version: 5.3.3
 
 packages:

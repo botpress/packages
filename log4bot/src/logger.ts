@@ -17,7 +17,7 @@ export class Logger implements types.Logger {
   private _loggers = new Map<string, Logger>()
   private _config: types.LoggerConfig = defaultConfig
   private _currentError: Error | undefined
-  private _filters: { [level: number]: RegExp } = {}
+  private _filters: { [level: string]: RegExp } = {}
 
   public parent: Logger | null = null
   public namespace: string = ''
@@ -30,7 +30,7 @@ export class Logger implements types.Logger {
   public configure(config: Partial<types.LoggerConfig>) {
     this._config = { ...this._config, ...config }
     if (config.filters) {
-      this._filters = _.mapValues(config.filters, regexParser)
+      this._filters = _.mapValues(config.filters, regexParser) as any as { [level: string]: RegExp }
     }
 
     // logger configures all childs

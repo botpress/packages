@@ -18,7 +18,7 @@
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
     "typeRoots": ["./node_modules/@types"],
-    "types": ["jest", "node"]
+    "types": ["node"]
   },
   "exclude": ["**/dist/", "**/node_modules/**/*.(ts|js)"],
   "include": ["src/**/*.ts"],

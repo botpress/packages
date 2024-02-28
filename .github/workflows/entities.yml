@@ -1,9 +1,15 @@
 name: Entities
 
 on:
+  push:
+    branches:
+      - master
+
   pull_request:
     paths:
       - 'entities/**'
+
+  workflow_dispatch: {}
 
 defaults:
   run:

@@ -31,6 +31,7 @@
   "scripts": {
     "build": "tsc --build",
     "start": "cross-env node ./dist/index.js",
+    "type:check": "tsc --noEmit",
     "test": "jest --roots ./dist",
     "clean": "rimraf ./dist && rimraf ./node_modules"
   }

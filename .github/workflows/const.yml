@@ -25,8 +25,8 @@ jobs:
         with:
           version: 8
       - run: pnpm install --frozen-lockfile
-      - run: pnpm type:check
       - run: pnpm build
+      - run: pnpm type:check
       - run: pnpm test
       - name: Publish
         if: github.ref == 'refs/heads/master'

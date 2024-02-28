@@ -1,6 +1,17 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "extends": [
-    "config:recommended"
-  ]
+    "config:recommended",
+    ":rebaseStalePrs"
+  ],
+  "packageRules": [
+    {
+      "paths": ["const/**"],
+      "additionalBranchPrefix": "{{baseDir}}-",
+      "commitMessageSuffix": "({{baseDir}})",
+      "packagePatterns": ["*"]
+    }
+  ],
+  "enabledManagers": ["dockerfile", "npm", "github-actions"],
+  "prHourlyLimit": 3
 }

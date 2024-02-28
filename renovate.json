@@ -8,7 +8,8 @@
   "prHourlyLimit": 5,
   "separateMajorMinor": false,
   "timezone": "America/Toronto",
-  "schedule": ["before 3am every weekday"],
+  "schedule": ["before 3am every monday"],
+  "bumpVersion": "patch",
   "packageRules": [
     {
       "paths": [".github/**"],

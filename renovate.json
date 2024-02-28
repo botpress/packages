@@ -12,6 +12,10 @@
   "bumpVersion": "patch",
   "packageRules": [
     {
+      "matchPackageNames": ["@types/react", "react-dom", "react"],
+      "allowedVersions": "< 19.0.0"
+    },
+    {
       "matchPackageNames": ["@types/node"],
       "allowedVersions": "< 19.0.0"
     },

@@ -1,6 +1,6 @@
 import { Request as ExpressRequest, Response as ExpressResponse, NextFunction as ExpressNextFunction } from 'express'
 import { IncomingHttpHeaders } from 'http'
-import { SchemaObject } from 'openapi3-ts'
+import { SchemaObject } from 'openapi3-ts/oas31'
 import { z } from 'zod'
 import { PathVariables } from './parse-path'
 

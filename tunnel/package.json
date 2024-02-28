@@ -22,7 +22,7 @@
     "zod": "^3.20.6"
   },
   "devDependencies": {
-    "@bpinternal/log4bot": "0.0.5",
+    "@bpinternal/log4bot": "0.0.6",
     "@bpinternal/yargs-extra": "0.0.4",
     "@tsconfig/node18-strictest": "^1.0.0",
     "@types/lodash": "^4.14.195",

@@ -1,6 +1,6 @@
 {
   "name": "@bpinternal/es-node",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "",
   "main": "dist/index.js",
   "bin": {
@@ -14,7 +14,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "esbuild": "^0.17.19"
+    "esbuild": "^0.20.0"
   },
   "devDependencies": {
     "@types/node": "^20.2.5",

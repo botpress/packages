@@ -57,7 +57,7 @@ export function remove$RefPropertiesFromSchema(
       if (propertyValue && '$ref' in propertyValue && propertyValue?.$ref) {
         _processed.propertyNamesWith$Ref.push(dereferencedPropertyKey)
       } else {
-        _processed.schema.properties[dereferencedPropertyKey] = (dereferencedPropertyValue as SchemaObject)
+        _processed.schema.properties[dereferencedPropertyKey] = dereferencedPropertyValue as SchemaObject
       }
       return _processed
     },

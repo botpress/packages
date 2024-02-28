@@ -31,7 +31,9 @@ export const formatJsonSchema = (jsonSchema: SchemaObject, allowUnions: boolean)
       formatJsonSchema(jsonSchema.additionalProperties as SchemaObject, allowUnions)
     }
 
-    Object.entries(jsonSchema.properties ?? {}).forEach(([_, value]) => formatJsonSchema(value as SchemaObject, allowUnions))
+    Object.entries(jsonSchema.properties ?? {}).forEach(([_, value]) =>
+      formatJsonSchema(value as SchemaObject, allowUnions),
+    )
   }
 
   if (!allowUnions && (jsonSchema.allOf || jsonSchema.anyOf || jsonSchema.oneOf)) {

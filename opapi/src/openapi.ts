@@ -78,7 +78,9 @@ export const createOpenapi = <
         },
       })
 
-      const bodyRefSchema = generateSchemaFromZod(getRef(state, ComponentType.REQUESTS, bodyName)) as unknown as ReferenceObject
+      const bodyRefSchema = generateSchemaFromZod(
+        getRef(state, ComponentType.REQUESTS, bodyName),
+      ) as unknown as ReferenceObject
 
       operation.requestBody = bodyRefSchema
     }

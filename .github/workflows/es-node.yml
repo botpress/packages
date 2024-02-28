@@ -1,4 +1,4 @@
-name: es-node
+name: Es Node
 
 on:
   push:

@@ -34,7 +34,6 @@ const main = async (argv: string[]) => {
   }
 
   utils.require.requireJsCode(artifact.text);
-  process.exit(0);
 };
 
 main(process.argv.slice(2)).catch((err) => {

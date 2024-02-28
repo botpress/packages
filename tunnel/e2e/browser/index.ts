@@ -34,7 +34,7 @@ const toJs = async (tsScript: string): Promise<string> => {
 }
 
 const launchBrowser = async (jsScript: string, logger: Logger) => {
-  const browser = await puppeteer.launch({ headless: 'new' })
+  const browser = await puppeteer.launch({ headless: true })
   const page = await browser.newPage()
   await page.setRequestInterception(false)
   page.on('console', (msg) => logger.debug(`PAGE LOG: ${msg.text()}`))

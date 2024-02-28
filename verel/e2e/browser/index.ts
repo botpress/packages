@@ -27,7 +27,7 @@ const toJs = async (tsScript: string): Promise<string> => {
 }
 
 const launchBrowser = async (jsScript: string) => {
-  const browser = await puppeteer.launch({ headless: 'new' })
+  const browser = await puppeteer.launch({ headless: true })
   const page = await browser.newPage()
   await page.setRequestInterception(false)
 

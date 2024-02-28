@@ -1,0 +1,103 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": [
+    "config:recommended",
+    ":rebaseStalePrs"
+  ],
+  "enabledManagers": ["dockerfile", "npm", "github-actions"],
+  "prHourlyLimit": 5,
+  "separateMajorMinor": false,
+  "timezone": "America/Toronto",
+  "schedule": ["before 3am every monday"],
+  "bumpVersion": "patch",
+  "packageRules": [
+    {
+      "matchPackageNames": ["@types/react", "react-dom", "react"],
+      "allowedVersions": "< 19.0.0"
+    },
+    {
+      "matchPackageNames": ["@types/node"],
+      "allowedVersions": "< 19.0.0"
+    },
+    {
+      "paths": [".github/**"],
+      "packagePatterns": ["*"],
+      "groupName": "{{baseDir}}"
+    },
+    {
+      "paths": ["const/**"],
+      "packagePatterns": ["*"],
+      "groupName": "{{baseDir}}"
+    },
+    {
+      "paths": ["entities/**"],
+      "packagePatterns": ["*"],
+      "groupName": "{{baseDir}}"
+    },
+    {
+      "paths": ["es-node/**"],
+      "packagePatterns": ["*"],
+      "groupName": "{{baseDir}}"
+    },
+    {
+      "paths": ["expresso/**"],
+      "packagePatterns": ["*"],
+      "groupName": "{{baseDir}}"
+    },
+    {
+      "paths": ["jex/**"],
+      "packagePatterns": ["*"],
+      "groupName": "{{baseDir}}"
+    },
+    {
+      "paths": ["log4bot/**"],
+      "packagePatterns": ["*"],
+      "groupName": "{{baseDir}}"
+    },
+    {
+      "paths": ["opapi/**"],
+      "packagePatterns": ["*"],
+      "groupName": "{{baseDir}}"
+    },
+    {
+      "paths": ["promex/**"],
+      "packagePatterns": ["*"],
+      "groupName": "{{baseDir}}"
+    },
+    {
+      "paths": ["ptb-schema/**"],
+      "packagePatterns": ["*"],
+      "groupName": "{{baseDir}}"
+    },
+    {
+      "paths": ["readiness/**"],
+      "packagePatterns": ["*"],
+      "groupName": "{{baseDir}}"
+    },
+    {
+      "paths": ["trail/**"],
+      "packagePatterns": ["*"],
+      "groupName": "{{baseDir}}"
+    },
+    {
+      "paths": ["tunnel/**"],
+      "packagePatterns": ["*"],
+      "groupName": "{{baseDir}}"
+    },
+    {
+      "paths": ["verel/**"],
+      "packagePatterns": ["*"],
+      "groupName": "{{baseDir}}"
+    },
+    {
+      "paths": ["yargs-extra/**"],
+      "packagePatterns": ["*"],
+      "groupName": "{{baseDir}}"
+    },
+    {
+      "paths": ["zui/**"],
+      "packagePatterns": ["*"],
+      "groupName": "{{baseDir}}"
+    }
+  ]
+}

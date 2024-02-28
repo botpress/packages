@@ -39,6 +39,7 @@
   },
   "scripts": {
     "build": "tsc --build",
+    "type:check": "tsc --noEmit",
     "test": "jest",
     "clean": "rimraf ./dist && rimraf ./node_modules"
   },

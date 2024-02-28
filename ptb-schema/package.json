@@ -6,6 +6,7 @@
   "license": "MIT",
   "scripts": {
     "build": "tsc --build",
+    "type:check": "tsc --noEmit",
     "clean": "rimraf ./dist && rimraf ./node_modules"
   },
   "types": "./dist/index.d.ts",

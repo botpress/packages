@@ -18,7 +18,6 @@ describe('init function', () => {
   afterEach(async () => {
     await promex.reset()
     prom.register.clear()
-    await new Promise(resolve => setTimeout(resolve, 1000))
   })
 
   test('initialize a middleware on an express app', async () => {

@@ -2,11 +2,7 @@ import { defineConfig } from 'vite'
 
 export default defineConfig({
   test: {
-    poolOptions: {
-      threads: {
-        singleThread: true,
-      }
-    },
+    pool: 'forks',
     include: ['**/*.test.ts'],
     exclude: [
       '**/node_modules/**',

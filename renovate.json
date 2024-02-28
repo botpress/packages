@@ -4,104 +4,91 @@
     "config:recommended",
     ":rebaseStalePrs"
   ],
+  "enabledManagers": ["dockerfile", "npm", "github-actions"],
+  "prHourlyLimit": 5,
+  "separateMajorMinor": false,
+  "timezone": "America/Toronto",
+  "schedule": ["before 3am every weekday"],
   "packageRules": [
     {
       "paths": [".github/**"],
       "packagePatterns": ["*"],
-      "groupName": "{{baseDir}}",
-      "matchUpdateTypes": ["digest", "patch", "minor", "major"]
+      "groupName": "{{baseDir}}"
     },
     {
       "paths": ["const/**"],
       "packagePatterns": ["*"],
-      "groupName": "{{baseDir}}",
-      "matchUpdateTypes": ["digest", "patch", "minor", "major"]
+      "groupName": "{{baseDir}}"
     },
     {
       "paths": ["entities/**"],
       "packagePatterns": ["*"],
-      "groupName": "{{baseDir}}",
-      "matchUpdateTypes": ["digest", "patch", "minor", "major"]
+      "groupName": "{{baseDir}}"
     },
     {
       "paths": ["es-node/**"],
       "packagePatterns": ["*"],
-      "groupName": "{{baseDir}}",
-      "matchUpdateTypes": ["digest", "patch", "minor", "major"]
+      "groupName": "{{baseDir}}"
     },
     {
       "paths": ["expresso/**"],
       "packagePatterns": ["*"],
-      "groupName": "{{baseDir}}",
-      "matchUpdateTypes": ["digest", "patch", "minor", "major"]
+      "groupName": "{{baseDir}}"
     },
     {
       "paths": ["jex/**"],
       "packagePatterns": ["*"],
-      "groupName": "{{baseDir}}",
-      "matchUpdateTypes": ["digest", "patch", "minor", "major"]
+      "groupName": "{{baseDir}}"
     },
     {
       "paths": ["log4bot/**"],
       "packagePatterns": ["*"],
-      "groupName": "{{baseDir}}",
-      "matchUpdateTypes": ["digest", "patch", "minor", "major"]
+      "groupName": "{{baseDir}}"
     },
     {
       "paths": ["opapi/**"],
       "packagePatterns": ["*"],
-      "groupName": "{{baseDir}}",
-      "matchUpdateTypes": ["digest", "patch", "minor", "major"]
+      "groupName": "{{baseDir}}"
     },
     {
       "paths": ["promex/**"],
       "packagePatterns": ["*"],
-      "groupName": "{{baseDir}}",
-      "matchUpdateTypes": ["digest", "patch", "minor", "major"]
+      "groupName": "{{baseDir}}"
     },
     {
       "paths": ["ptb-schema/**"],
       "packagePatterns": ["*"],
-      "groupName": "{{baseDir}}",
-      "matchUpdateTypes": ["digest", "patch", "minor", "major"]
+      "groupName": "{{baseDir}}"
     },
     {
       "paths": ["readiness/**"],
       "packagePatterns": ["*"],
-      "groupName": "{{baseDir}}",
-      "matchUpdateTypes": ["digest", "patch", "minor", "major"]
+      "groupName": "{{baseDir}}"
     },
     {
       "paths": ["trail/**"],
       "packagePatterns": ["*"],
-      "groupName": "{{baseDir}}",
-      "matchUpdateTypes": ["digest", "patch", "minor", "major"]
+      "groupName": "{{baseDir}}"
     },
     {
       "paths": ["tunnel/**"],
       "packagePatterns": ["*"],
-      "groupName": "{{baseDir}}",
-      "matchUpdateTypes": ["digest", "patch", "minor", "major"]
+      "groupName": "{{baseDir}}"
     },
     {
       "paths": ["verel/**"],
       "packagePatterns": ["*"],
-      "groupName": "{{baseDir}}",
-      "matchUpdateTypes": ["digest", "patch", "minor", "major"]
+      "groupName": "{{baseDir}}"
     },
     {
       "paths": ["yargs-extra/**"],
       "packagePatterns": ["*"],
-      "groupName": "{{baseDir}}",
-      "matchUpdateTypes": ["digest", "patch", "minor", "major"]
+      "groupName": "{{baseDir}}"
     },
     {
       "paths": ["zui/**"],
       "packagePatterns": ["*"],
-      "groupName": "{{baseDir}}",
-      "matchUpdateTypes": ["digest", "patch", "minor", "major"]
+      "groupName": "{{baseDir}}"
     }
-  ],
-  "enabledManagers": ["dockerfile", "npm", "github-actions"],
-  "prHourlyLimit": 3
+  ]
 }

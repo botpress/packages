@@ -1,5 +1,5 @@
 import OpenAPIParser from '@readme/openapi-parser'
-import type { SchemaObject } from 'openapi3-ts/oas31'
+import type { SchemaObject } from 'openapi3-ts'
 import { pascal, title } from 'radash'
 import { createOpenapi } from 'src/openapi'
 import { Block, DefaultState } from './types'

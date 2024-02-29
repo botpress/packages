@@ -6,7 +6,7 @@
     ":disableDependencyDashboard"
   ],
   "enabledManagers": ["dockerfile", "npm", "github-actions"],
-  "prHourlyLimit": 5,
+  "prHourlyLimit": 16,
   "separateMajorMinor": false,
   "timezone": "America/Toronto",
   "schedule": ["before 3am every monday"],

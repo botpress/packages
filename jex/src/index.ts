@@ -27,27 +27,3 @@ export const jsonSchemaMerge = async (a: JSONSchema7, b: JSONSchema7): Promise<J
   const mergedJex = jex.jexMerge(jexA, jexB)
   return jex.fromJex(mergedJex)
 }
-
-export const jsonSchemaEqualsSync = (a: JSONSchema7, b: JSONSchema7): boolean => {
-  const jexA = jex.toJexSync(a)
-  const jexB = jex.toJexSync(b)
-  return jex.jexEquals(jexA, jexB)
-}
-
-export const jsonSchemaExtendsSync = (a: JSONSchema7, b: JSONSchema7): jex.JexExtensionResult => {
-  const jexA = jex.toJexSync(a)
-  const jexB = jex.toJexSync(b)
-  return jex.jexExtends(jexA, jexB)
-}
-
-export const jsonSchemaMergeSync = (a: JSONSchema7, b: JSONSchema7): JSONSchema7 => {
-  const jexA = jex.toJexSync(a)
-  const jexB = jex.toJexSync(b)
-
-  if (jexA.type !== 'object' || jexB.type !== 'object') {
-    throw new JexError('Both schemas must be objects to be merged')
-  }
-
-  const mergedJex = jex.jexMerge(jexA, jexB)
-  return jex.fromJex(mergedJex)
-}

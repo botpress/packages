@@ -1,4 +1,4 @@
-import { OpenApiBuilder, OperationObject, ReferenceObject } from 'openapi3-ts/oas31'
+import { OpenApiBuilder, OperationObject, ReferenceObject } from 'openapi3-ts'
 import VError from 'verror'
 import { defaultResponseStatus } from './const'
 import { generateSchemaFromZod } from './jsonschema'

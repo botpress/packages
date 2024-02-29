@@ -1,5 +1,5 @@
 import { JSONSchema, compile as compileSchemaToTypes } from 'json-schema-to-typescript'
-import type { SchemaObject } from 'openapi3-ts/oas31'
+import type { SchemaObject } from 'openapi3-ts'
 import { title } from 'radash'
 import { Operation, isOperationWithBodyProps } from 'src/state'
 import { addPropertyToBlock, getBlankBlock, pascalize, remove$RefPropertiesFromSchema } from './helpers'

@@ -6,8 +6,8 @@ settings:
 
 dependencies:
   '@anatine/zod-openapi':
-    specifier: 2.2.3
-    version: 2.2.3(openapi3-ts@4.2.2)(zod@3.22.4)
+    specifier: 1.14.2
+    version: 1.14.2(openapi3-ts@3.2.0)(zod@3.22.4)
   body-parser:
     specifier: 1.20.2
     version: 1.20.2
@@ -21,8 +21,8 @@ dependencies:
     specifier: 4.17.21
     version: 4.17.21
   openapi3-ts:
-    specifier: 4.2.2
-    version: 4.2.2
+    specifier: 3.2.0
+    version: 3.2.0
   swagger-ui-express:
     specifier: 5.0.0
     version: 5.0.0(express@4.18.2)
@@ -61,13 +61,13 @@ devDependencies:
 
 packages:
 
-  /@anatine/zod-openapi@2.2.3(openapi3-ts@4.2.2)(zod@3.22.4):
-    resolution: {integrity: sha512-6trBwIszayH9yYQcIFZnnD3kwlDrMkRw5yiOLL3c74Brxa1kC3rcMk1UPH9gxlDwau6mX1g7A24X3HqJG88MKA==}
+  /@anatine/zod-openapi@1.14.2(openapi3-ts@3.2.0)(zod@3.22.4):
+    resolution: {integrity: sha512-q0qHfnuNYVKu0Swrnnvfj9971AEyW7c8v9jCOZGCl5ZbyGMNG4RPyJkRcMi/JC8CRfdOe0IDfNm1nNsi2avprg==}
     peerDependencies:
-      openapi3-ts: ^4.1.2
+      openapi3-ts: ^2.0.0 || ^3.0.0
       zod: ^3.20.0
     dependencies:
-      openapi3-ts: 4.2.2
+      openapi3-ts: 3.2.0
       ts-deepmerge: 6.2.1
       zod: 3.22.4
     dev: false
@@ -1181,8 +1181,8 @@ packages:
       mimic-fn: 4.0.0
     dev: true
 
-  /openapi3-ts@4.2.2:
-    resolution: {integrity: sha512-+9g4actZKeb3czfi9gVQ4Br2Ju3KwhCAQJBNaKgye5KggqcBLIhFHH+nIkcm0BUX00TrAJl6dH4JWgM4G4JWrw==}
+  /openapi3-ts@3.2.0:
+    resolution: {integrity: sha512-/ykNWRV5Qs0Nwq7Pc0nJ78fgILvOT/60OxEmB3v7yQ8a8Bwcm43D4diaYazG/KBn6czA+52XYy931WFLMCUeSg==}
     dependencies:
       yaml: 2.4.0
     dev: false

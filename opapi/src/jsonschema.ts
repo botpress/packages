@@ -1,5 +1,5 @@
 import { OpenApiZodAny, generateSchema as generateJsonSchema } from '@anatine/zod-openapi'
-import type { SchemaObject } from 'openapi3-ts/oas31'
+import type { SchemaObject } from 'openapi3-ts'
 import { removeFromArray } from './util'
 
 export type GenerateSchemaFromZodOpts = {

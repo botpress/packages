@@ -29,6 +29,18 @@
       "allowedVersions": "< 4.0.0"
     },
     {
+      "matchPackageNames": ["chalk"],
+      "allowedVersions": "< 5.0.0"
+    },
+    {
+      "matchPackageNames": ["yn"],
+      "allowedVersions": "< 5.0.0"
+    },
+    {
+      "matchPackageNames": ["decamelize"],
+      "allowedVersions": "< 6.0.0"
+    },
+    {
       "matchPackageNames": ["zod"],
       "allowedVersions": "3.22.4"
     },

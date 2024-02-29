@@ -22,7 +22,7 @@
     },
     {
       "matchPackageNames": ["@anatine/zod-openapi"],
-      "allowedVersions": "< 2.0.0"
+      "allowedVersions": "< 1.13.0"
     },
     {
       "matchPackageNames": ["openapi3-ts"],

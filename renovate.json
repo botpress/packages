@@ -37,6 +37,10 @@
       "allowedVersions": "< 5.0.0"
     },
     {
+      "matchPackageNames": ["decamelize"],
+      "allowedVersions": "< 6.0.0"
+    },
+    {
       "matchPackageNames": ["zod"],
       "allowedVersions": "3.22.4"
     },

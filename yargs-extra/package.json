@@ -13,7 +13,7 @@
   "types": "./dist/index.d.ts",
   "dependencies": {
     "@types/yargs": "^17.0.24",
-    "decamelize": "6.0.0",
+    "decamelize": "5.0.1",
     "json-schema": "^0.4.0",
     "lodash": "^4.17.21",
     "yargs": "^17.7.2",

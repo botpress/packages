@@ -3,15 +3,17 @@ import { expect, test } from 'vitest'
 import { $ } from './jex-builder'
 import { JexType } from './typings'
 import { JSONSchema7 } from 'json-schema'
-import { flattenUnions } from './flatten-unions'
+import { toJexSync } from './to-jex'
 
-const expectJex = (jex: JexType) => ({
+const expectJex = (actualJex: JexType) => ({
   toEqualJsonSchema: (expectedJsonSchema: JSONSchema7) => {
-    expect(fromJex(jex)).toEqual(expectedJsonSchema)
+    const actualJsonSchema = fromJex(actualJex)
+    expect(actualJsonSchema).toEqual(expectedJsonSchema)
+
+    const expectedJex = toJexSync(expectedJsonSchema)
+    expect(actualJex).toEqual(expectedJex)
   }
 })
-
-// jex-rep of primitive types should map to json-schema
 
 test('jex-rep of primitive types should map to json-schema', () => {
   expectJex($.string()).toEqualJsonSchema({ type: 'string' })
@@ -21,15 +23,11 @@ test('jex-rep of primitive types should map to json-schema', () => {
   expectJex($.undefined()).toEqualJsonSchema({ not: {} })
 })
 
-// jex-rep of literal types should map to json-schema
-
 test('jex-rep of literal types should map to json-schema', () => {
   expectJex($.literal('a')).toEqualJsonSchema({ type: 'string', const: 'a' })
   expectJex($.literal(1)).toEqualJsonSchema({ type: 'number', const: 1 })
   expectJex($.literal(true)).toEqualJsonSchema({ type: 'boolean', const: true })
 })
-
-// jex-rep of union of primitives should map to json-schema
 
 test('jex-rep of union of primitives should map to json-schema', () => {
   expectJex($.union([$.string(), $.number()])).toEqualJsonSchema({
@@ -42,8 +40,6 @@ test('jex-rep of union of primitives should map to json-schema', () => {
     anyOf: [{ type: 'string' }, { type: 'null' }, { not: {} }]
   })
 })
-
-// jex-rep of union of literals of a single primitive should map to json-schema
 
 test('jex-rep of union of literals of a single primitive should map to json-schema', () => {
   expectJex($.union([$.literal('a'), $.literal('b')])).toEqualJsonSchema({
@@ -60,8 +56,6 @@ test('jex-rep of union of literals of a single primitive should map to json-sche
   })
 })
 
-// jex-rep of optional and nullable fields should map to json-schema
-
 test('jex-rep of optional and nullable fields should map to json-schema', () => {
   expectJex($.union([$.string(), $.undefined()])).toEqualJsonSchema({
     anyOf: [{ type: 'string' }, { not: {} }]
@@ -73,8 +67,6 @@ test('jex-rep of optional and nullable fields should map to json-schema', () => 
     anyOf: [{ type: 'string' }, { type: 'null' }, { not: {} }]
   })
 })
-
-// jex-rep of union of literals of multiple primitives should map to json-schema
 
 test('jex-rep of union of literals of multiple primitives should map to json-schema', () => {
   expectJex($.union([$.literal('a'), $.literal(1)])).toEqualJsonSchema({
@@ -92,8 +84,6 @@ test('jex-rep of union of literals of multiple primitives should map to json-sch
   })
 })
 
-// jex-rep of object types should map to json-schema
-
 test('jex-rep of object types should map to json-schema', () => {
   expectJex($.object({})).toEqualJsonSchema({ type: 'object', properties: {}, required: [] })
   expectJex($.object({ a: $.string() })).toEqualJsonSchema({
@@ -108,8 +98,6 @@ test('jex-rep of object types should map to json-schema', () => {
   })
 })
 
-// jex-rep of array types should map to json-schema
-
 test('jex-rep of array types should map to json-schema', () => {
   expectJex($.array($.string())).toEqualJsonSchema({ type: 'array', items: { type: 'string' } })
   expectJex($.array($.number())).toEqualJsonSchema({ type: 'array', items: { type: 'number' } })
@@ -118,8 +106,6 @@ test('jex-rep of array types should map to json-schema', () => {
   expectJex($.array($.undefined())).toEqualJsonSchema({ type: 'array', items: { not: {} } })
   expectJex($.array($.literal('a'))).toEqualJsonSchema({ type: 'array', items: { type: 'string', const: 'a' } })
 })
-
-// jex-rep of map types should map to json-schema
 
 test('jex-rep of map types should map to json-schema', () => {
   expectJex($.map($.string())).toEqualJsonSchema({ type: 'object', additionalProperties: { type: 'string' } })
@@ -133,13 +119,9 @@ test('jex-rep of map types should map to json-schema', () => {
   })
 })
 
-// jex-rep of any type should map to json-schema
-
 test('jex-rep of any type should map to json-schema', () => {
   expectJex($.any()).toEqualJsonSchema({})
 })
-
-// jex-rep of tuple types should map to json-schema
 
 test('jex-rep of tuple types should map to json-schema', () => {
   expectJex($.tuple([$.string(), $.number()])).toEqualJsonSchema({

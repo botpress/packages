@@ -71,6 +71,10 @@ const _toInternalPrimitive = <T extends 'string' | 'number' | 'boolean'>(
 }
 
 const _toInternalRep = (schema: JSONSchema7): types.JexType => {
+  if (schema.$ref !== undefined) {
+    throw new err.JexError('Ref schema is not supported')
+  }
+
   if (schema.not !== undefined) {
     if (schema.not === true) {
       return {
@@ -215,5 +219,10 @@ const _toInternalRep = (schema: JSONSchema7): types.JexType => {
 export const toJex = async (schema: JSONSchema7): Promise<types.JexType> => {
   const unref = await _dereference(schema)
   const jex = _toInternalRep(unref)
+  return flattenUnions(jex)
+}
+
+export const toJexSync = (schema: JSONSchema7): types.JexType => {
+  const jex = _toInternalRep(schema)
   return flattenUnions(jex)
 }

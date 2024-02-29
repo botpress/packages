@@ -7,23 +7,27 @@ import { defaultServiceName, Resource } from '@opentelemetry/resources'
 import { SemanticResourceAttributes } from '@opentelemetry/semantic-conventions'
 import { diag, DiagConsoleLogger, DiagLogLevel } from '@opentelemetry/api'
 import { JaegerExporter } from '@opentelemetry/exporter-jaeger'
-import yn from 'yn'
 
-export const isEnabled = () => yn(process.env.TRACING_ENABLED, { default: false })
+export const isEnabled = () => process.env.TRACING_ENABLED === 'true'
+
 const isDebugEnabled = (enabled?: boolean) =>
-  enabled !== undefined ? enabled : yn(process.env.TRACING_DEBUG, { default: false })
+  enabled !== undefined ? enabled : process.env.TRACING_DEBUG === 'true'
 
 const removeUndefinedValues = <T>(obj: Record<string, T | undefined>): Record<string, T> => {
   const result: Record<string, T> = {}
-  Object.entries(obj).forEach(([key, value]) => {
-    if (value !== undefined) {
+
+  for (const [key, value] of Object.entries(obj)) {
+    if (value !== undefined && value !== null) {
       result[key] = value
     }
-  })
+  }
+
   return result
 }
 
 let initialized = false
+
+export const isInitialized = () => initialized
 
 type InitProps = {
   debug?: boolean

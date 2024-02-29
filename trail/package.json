@@ -1,7 +1,7 @@
 {
   "name": "@bpinternal/trail",
   "description": "Opentelemetry initialization package for nodejs.",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "author": "Botpress, Inc.",
   "repository": {
     "type": "git",
@@ -31,16 +31,18 @@
     "@opentelemetry/resources": "1.21.0",
     "@opentelemetry/sdk-trace-base": "1.21.0",
     "@opentelemetry/sdk-trace-node": "1.21.0",
-    "@opentelemetry/semantic-conventions": "1.21.0",
-    "yn": "^5.0.0"
+    "@opentelemetry/semantic-conventions": "1.21.0"
   },
   "devDependencies": {
     "@types/node": "^18.0.0",
-    "typescript": "5.3.3"
+    "typescript": "5.3.3",
+    "vite": "5.1.4",
+    "vitest": "1.3.1"
   },
   "scripts": {
     "build": "tsc --build",
     "type:check": "tsc --noEmit",
+    "test": "vitest",
     "clean": "rimraf ./dist && rimraf ./node_modules"
   },
   "engines": {

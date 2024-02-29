@@ -17,7 +17,7 @@
     "json-schema": "^0.4.0",
     "lodash": "^4.17.21",
     "yargs": "^17.7.2",
-    "yn": "^5.0.0"
+    "yn": "4.0.0"
   },
   "devDependencies": {
     "@types/json-schema": "^7.0.9",

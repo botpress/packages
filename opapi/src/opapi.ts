@@ -14,7 +14,7 @@ export { Operation, Parameter } from './state'
 type ExtendApi = typeof extendApi
 type AnatineSchemaObject = NonNullable<Parameters<ExtendApi>[1]>
 
-export const schema: <T extends OpenApiZodAny>(schema: T, schemaObject?: AnatineSchemaObject & { $ref: string }) => T =
+export const schema: <T extends OpenApiZodAny>(schema: T, schemaObject?: AnatineSchemaObject & { $ref?: string }) => T =
   extendApi
 
 export type OpenApi<

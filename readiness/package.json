@@ -14,7 +14,7 @@
   },
   "dependencies": {
     "@bpinternal/log4bot": "0.0.6",
-    "chalk": "^5.0.0",
+    "chalk": "4.1.2",
     "express": "^4.18.2",
     "ioredis": "^5.2.4",
     "node-fetch": "^3.3.1",

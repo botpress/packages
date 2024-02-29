@@ -39,7 +39,7 @@
     "@anatine/zod-openapi": "1.14.2",
     "@readme/openapi-parser": "2.5.0",
     "axios": "1.6.7",
-    "chalk": "5.3.0",
+    "chalk": "4.1.2",
     "decompress": "4.2.1",
     "execa": "8.0.1",
     "json-schema-to-typescript": "13.1.2",

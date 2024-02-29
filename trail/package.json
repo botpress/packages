@@ -1,7 +1,7 @@
 {
   "name": "@bpinternal/trail",
   "description": "Opentelemetry initialization package for nodejs.",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "author": "Botpress, Inc.",
   "repository": {
     "type": "git",

@@ -6,8 +6,8 @@ settings:
 
 dependencies:
   '@anatine/zod-openapi':
-    specifier: 1.14.1
-    version: 1.14.1(openapi3-ts@3.2.0)(zod@3.22.4)
+    specifier: 1.14.2
+    version: 1.14.2(openapi3-ts@3.2.0)(zod@3.22.4)
   body-parser:
     specifier: 1.20.2
     version: 1.20.2
@@ -61,8 +61,8 @@ devDependencies:
 
 packages:
 
-  /@anatine/zod-openapi@1.14.1(openapi3-ts@3.2.0)(zod@3.22.4):
-    resolution: {integrity: sha512-E1HN/M3uE+y/1pi0iJNSaJ7X/lMG4qFfeUKgGPpE80mdJvT+8DSrbvWnYEDXxTrIbjPLLy/NSf0MDZjjEGbtww==}
+  /@anatine/zod-openapi@1.14.2(openapi3-ts@3.2.0)(zod@3.22.4):
+    resolution: {integrity: sha512-q0qHfnuNYVKu0Swrnnvfj9971AEyW7c8v9jCOZGCl5ZbyGMNG4RPyJkRcMi/JC8CRfdOe0IDfNm1nNsi2avprg==}
     peerDependencies:
       openapi3-ts: ^2.0.0 || ^3.0.0
       zod: ^3.20.0

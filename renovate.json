@@ -21,6 +21,10 @@
       "allowedVersions": "< 19.0.0"
     },
     {
+      "matchPackageNames": ["zod"],
+      "allowedVersions": "3.22.4"
+    },
+    {
       "paths": ["**"],
       "packagePatterns": ["*"],
       "groupName": "{{baseDir}}"

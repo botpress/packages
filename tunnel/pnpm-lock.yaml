@@ -23,11 +23,11 @@ dependencies:
 
 devDependencies:
   '@bpinternal/log4bot':
-    specifier: 0.0.6
-    version: 0.0.6
+    specifier: 0.0.8
+    version: 0.0.8
   '@bpinternal/yargs-extra':
-    specifier: 0.0.4
-    version: 0.0.4
+    specifier: 0.0.5
+    version: 0.0.5
   '@tsconfig/node18-strictest':
     specifier: ^1.0.0
     version: 1.0.0
@@ -36,7 +36,7 @@ devDependencies:
     version: 4.14.202
   '@types/node':
     specifier: ^18.11.17
-    version: 18.19.20
+    version: 18.19.21
   '@types/web':
     specifier: ^0.0.140
     version: 0.0.140
@@ -48,7 +48,7 @@ devDependencies:
     version: 22.3.0(typescript@5.3.3)
   ts-node:
     specifier: ^10.9.1
-    version: 10.9.2(@types/node@18.19.20)(typescript@5.3.3)
+    version: 10.9.2(@types/node@18.19.21)(typescript@5.3.3)
   typescript:
     specifier: 5.3.3
     version: 5.3.3
@@ -76,24 +76,24 @@ packages:
       js-tokens: 4.0.0
     dev: true
 
-  /@bpinternal/log4bot@0.0.6:
-    resolution: {integrity: sha512-2i1QhFedn5NS1u5IytXV6Q6tCJxkigIZ3jMGYJHszzAvlmgiWnYRuJ7RbqPaothxVDuC8gf3OiZtvO04fcPVoA==}
+  /@bpinternal/log4bot@0.0.8:
+    resolution: {integrity: sha512-sBtnojV2hzj+lllAkNkhBh0jVYPtlPecdgaRw//wA7TsencQ6Byk+yfdhKaSQtwrQNE3IEG5UGKj0lc50m7wYA==}
     dependencies:
-      chalk: 5.3.0
+      chalk: 4.1.2
       lodash: 4.17.21
       moment: 2.30.1
       regex-parser: 2.3.0
     dev: true
 
-  /@bpinternal/yargs-extra@0.0.4:
-    resolution: {integrity: sha512-xcICSqjFiquC0y4bIxV5UiEKhgXzjupCFLaiFjdbvK3cKY//RV3ERq3gVQVYBTOnLG1clVu7y62eun06rXAL5A==}
+  /@bpinternal/yargs-extra@0.0.5:
+    resolution: {integrity: sha512-1mMFhaIQLh7biz086Fcq3MvIGEgVj5Qq7Vd+dDEnip4aBdrXeMDtwFQIfvEx+uhp6lzXPf8ScpGBmaraQjgdGw==}
     dependencies:
       '@types/yargs': 17.0.24
-      decamelize: 6.0.0
+      decamelize: 5.0.1
       json-schema: 0.4.0
       lodash: 4.17.21
       yargs: 17.7.2
-      yn: 5.0.0
+      yn: 4.0.0
     dev: true
 
   /@cspotcode/source-map-support@0.8.1:
@@ -372,8 +372,8 @@ packages:
     resolution: {integrity: sha512-OvlIYQK9tNneDlS0VN54LLd5uiPCBOp7gS5Z0f1mjoJYBrtStzgmJBxONW3U6OZqdtNzZPmn9BS/7WI7BFFcFQ==}
     dev: true
 
-  /@types/node@18.19.20:
-    resolution: {integrity: sha512-SKXZvI375jkpvAj8o+5U2518XQv76mAsixqfXiVyWyXZbVWQK25RurFovYpVIxVzul0rZoH58V/3SkEnm7s3qA==}
+  /@types/node@18.19.21:
+    resolution: {integrity: sha512-2Q2NeB6BmiTFQi4DHBzncSoq/cJMLDdhPaAoJFnFCyD9a8VPZRf7a1GAwp1Edb7ROaZc5Jz/tnZyL6EsWMRaqw==}
     dependencies:
       undici-types: 5.26.5
 
@@ -384,7 +384,7 @@ packages:
   /@types/ws@8.5.10:
     resolution: {integrity: sha512-vmQSUcfalpIq0R9q7uTo2lXs6eGIpt9wtnLdMv9LVpIjCA/+ufZRozlVoVelIYixx1ugCBKDhn89vnsEGOCx9A==}
     dependencies:
-      '@types/node': 18.19.20
+      '@types/node': 18.19.21
     dev: false
 
   /@types/yargs-parser@21.0.0:
@@ -401,7 +401,7 @@ packages:
     resolution: {integrity: sha512-oJoftv0LSuaDZE3Le4DbKX+KS9G36NzOeSap90UIK0yMA/NhKJhqlSGtNDORNRaIbQfzjXDrQa0ytJ6mNRGz/Q==}
     requiresBuild: true
     dependencies:
-      '@types/node': 18.19.20
+      '@types/node': 18.19.21
     dev: true
     optional: true
 
@@ -469,8 +469,8 @@ packages:
     dev: true
     optional: true
 
-  /bare-fs@2.2.0:
-    resolution: {integrity: sha512-+VhW202E9eTVGkX7p+TNXtZC4RTzj9JfJW7PtfIbZ7mIQ/QT9uOafQTx7lx2n9ERmWsXvLHF4hStAFn4gl2mQw==}
+  /bare-fs@2.2.1:
+    resolution: {integrity: sha512-+CjmZANQDFZWy4PGbVdmALIwmt33aJg8qTkVjClU6X4WmZkTPBDxRHiBn7fpqEWEfF3AC2io++erpViAIQbSjg==}
     requiresBuild: true
     dependencies:
       bare-events: 2.2.0
@@ -532,9 +532,12 @@ packages:
       supports-color: 5.5.0
     dev: true
 
-  /chalk@5.3.0:
-    resolution: {integrity: sha512-dLitG79d+GV1Nb/VYcCDFivJeK1hiukt9QjRNVOsUtTy1rR1YJsmpGGTZ3qJos+uw7WmWF4wUwBd9jxjocFC2w==}
-    engines: {node: ^12.17.0 || ^14.13 || >=16.0.0}
+  /chalk@4.1.2:
+    resolution: {integrity: sha512-oKnbhFyRIXpUuez8iBMmyEa4nbj4IOQyuhc/wy9kY7/WVPcwIO9VA668Pu8RkO7+0G76SLROeyw9CpQ061i4mA==}
+    engines: {node: '>=10'}
+    dependencies:
+      ansi-styles: 4.3.0
+      supports-color: 7.2.0
     dev: true
 
   /chromium-bidi@0.5.10(devtools-protocol@0.0.1249869):
@@ -622,9 +625,9 @@ packages:
       ms: 2.1.2
     dev: true
 
-  /decamelize@6.0.0:
-    resolution: {integrity: sha512-Fv96DCsdOgB6mdGl67MT5JaTNKRzrzill5OH5s8bjYJXVlcXyPYGyPsUkWyGV5p1TXI5esYIYMMeDJL0hEIwaA==}
-    engines: {node: ^12.20.0 || ^14.13.1 || >=16.0.0}
+  /decamelize@5.0.1:
+    resolution: {integrity: sha512-VfxadyCECXgQlkoEAjeghAr5gY3Hf+IKjKb+X8tGVDtveCjN+USwprd2q3QXBR9T1+x2DG0XZF5/w+7HAtSaXA==}
+    engines: {node: '>=10'}
     dev: true
 
   /degenerator@5.0.1:
@@ -799,6 +802,11 @@ packages:
   /has-flag@3.0.0:
     resolution: {integrity: sha512-sKJf1+ceQBr4SMkvQnBDNDtf4TXpVhVGateu0t918bl30FnbE2m4vNLX+VWe/dpjlb+HugGYzW7uQXH98HPEYw==}
     engines: {node: '>=4'}
+    dev: true
+
+  /has-flag@4.0.0:
+    resolution: {integrity: sha512-EykJT/Q1KjTWctppgIAgfSO0tKVuZUjhgMr17kqTumMl6Afv3EISleU7qZUzoXDFTAHTDC4NOoG/ZxU3EvlMPQ==}
+    engines: {node: '>=8'}
     dev: true
 
   /http-proxy-agent@7.0.2:
@@ -1139,13 +1147,20 @@ packages:
       has-flag: 3.0.0
     dev: true
 
+  /supports-color@7.2.0:
+    resolution: {integrity: sha512-qpCAvRl9stuOHveKsn7HncJRvv501qIacKzQlO/+Lwxc9+0q2wLyv4Dfvt80/DPn2pqOBsJdDiogXGR9+OvwRw==}
+    engines: {node: '>=8'}
+    dependencies:
+      has-flag: 4.0.0
+    dev: true
+
   /tar-fs@3.0.5:
     resolution: {integrity: sha512-JOgGAmZyMgbqpLwct7ZV8VzkEB6pxXFBVErLtb+XCOqzc6w1xiWKI9GVd6bwk68EX7eJ4DWmfXVmq8K2ziZTGg==}
     dependencies:
       pump: 3.0.0
       tar-stream: 3.1.7
     optionalDependencies:
-      bare-fs: 2.2.0
+      bare-fs: 2.2.1
       bare-path: 2.1.0
     dev: true
 
@@ -1165,7 +1180,7 @@ packages:
     resolution: {integrity: sha512-N3WMsuqV66lT30CrXNbEjx4GEwlow3v6rr4mCcv6prnfwhS01rkgyFdjPNBYd9br7LpXV1+Emh01fHnq2Gdgrw==}
     dev: true
 
-  /ts-node@10.9.2(@types/node@18.19.20)(typescript@5.3.3):
+  /ts-node@10.9.2(@types/node@18.19.21)(typescript@5.3.3):
     resolution: {integrity: sha512-f0FFpIdcHgn8zcPSbf1dRevwt047YMnaiJM3u2w2RewrB+fob/zePZcrOyQoLMMO7aBIddLcQIEK5dYjkLnGrQ==}
     hasBin: true
     peerDependencies:
@@ -1184,7 +1199,7 @@ packages:
       '@tsconfig/node12': 1.0.11
       '@tsconfig/node14': 1.0.3
       '@tsconfig/node16': 1.0.4
-      '@types/node': 18.19.20
+      '@types/node': 18.19.21
       acorn: 8.11.3
       acorn-walk: 8.3.2
       arg: 4.1.3
@@ -1304,9 +1319,9 @@ packages:
     engines: {node: '>=6'}
     dev: true
 
-  /yn@5.0.0:
-    resolution: {integrity: sha512-+l37+9TyGEsyxGLaTg6QgYy5KnOp74ZZl4dPFLQpBWSkO99uBC5jnS0pOGwXFViPbiaEtWbParH2KrgWWF2duQ==}
-    engines: {node: ^12.20.0 || ^14.13.1 || >=16.0.0}
+  /yn@4.0.0:
+    resolution: {integrity: sha512-huWiiCS4TxKc4SfgmTwW1K7JmXPPAmuXWYy4j9qjQo4+27Kni8mGhAAi1cloRWmBe2EqcLgt3IGqQoRL/MtPgg==}
+    engines: {node: '>=10'}
     dev: true
 
   /zod@3.22.4:

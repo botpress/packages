@@ -6,8 +6,8 @@ settings:
 
 dependencies:
   '@anatine/zod-openapi':
-    specifier: 2.2.3
-    version: 2.2.3(openapi3-ts@4.2.2)(zod@3.22.4)
+    specifier: 1.14.1
+    version: 1.14.1(openapi3-ts@3.2.0)(zod@3.22.4)
   '@readme/openapi-parser':
     specifier: 2.5.0
     version: 2.5.0(openapi-types@12.1.3)
@@ -30,8 +30,8 @@ dependencies:
     specifier: 6.7.4
     version: 6.7.4
   openapi3-ts:
-    specifier: 4.2.2
-    version: 4.2.2
+    specifier: 3.2.0
+    version: 3.2.0
   radash:
     specifier: 12.0.0
     version: 12.0.0
@@ -91,13 +91,13 @@ devDependencies:
 
 packages:
 
-  /@anatine/zod-openapi@2.2.3(openapi3-ts@4.2.2)(zod@3.22.4):
-    resolution: {integrity: sha512-6trBwIszayH9yYQcIFZnnD3kwlDrMkRw5yiOLL3c74Brxa1kC3rcMk1UPH9gxlDwau6mX1g7A24X3HqJG88MKA==}
+  /@anatine/zod-openapi@1.14.1(openapi3-ts@3.2.0)(zod@3.22.4):
+    resolution: {integrity: sha512-E1HN/M3uE+y/1pi0iJNSaJ7X/lMG4qFfeUKgGPpE80mdJvT+8DSrbvWnYEDXxTrIbjPLLy/NSf0MDZjjEGbtww==}
     peerDependencies:
-      openapi3-ts: ^4.1.2
+      openapi3-ts: ^2.0.0 || ^3.0.0
       zod: ^3.20.0
     dependencies:
-      openapi3-ts: 4.2.2
+      openapi3-ts: 3.2.0
       ts-deepmerge: 6.2.1
       zod: 3.22.4
     dev: false
@@ -2010,8 +2010,8 @@ packages:
       yargs-parser: 21.1.1
     dev: false
 
-  /openapi3-ts@4.2.2:
-    resolution: {integrity: sha512-+9g4actZKeb3czfi9gVQ4Br2Ju3KwhCAQJBNaKgye5KggqcBLIhFHH+nIkcm0BUX00TrAJl6dH4JWgM4G4JWrw==}
+  /openapi3-ts@3.2.0:
+    resolution: {integrity: sha512-/ykNWRV5Qs0Nwq7Pc0nJ78fgILvOT/60OxEmB3v7yQ8a8Bwcm43D4diaYazG/KBn6czA+52XYy931WFLMCUeSg==}
     dependencies:
       yaml: 2.4.0
     dev: false

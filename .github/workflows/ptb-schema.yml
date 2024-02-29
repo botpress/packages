@@ -28,7 +28,7 @@ jobs:
       - run: pnpm build
       - run: pnpm type:check
       - name: Publish
-        if: github.ref == 'refs/heads/master'
+        if: github.ref == 'refs/heads/master' || github.event_name == 'workflow_dispatch'
         uses: botpress/gh-actions/publish-if-not-exists@master
         with:
           path: './ptb-schema'

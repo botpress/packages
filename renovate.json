@@ -21,6 +21,14 @@
       "allowedVersions": "< 19.0.0"
     },
     {
+      "matchPackageNames": ["@anatine/zod-openapi"],
+      "allowedVersions": "< 2.0.0"
+    },
+    {
+      "matchPackageNames": ["openapi3-ts"],
+      "allowedVersions": "< 4.0.0"
+    },
+    {
       "matchPackageNames": ["zod"],
       "allowedVersions": "3.22.4"
     },
@@ -28,6 +36,10 @@
       "paths": ["**"],
       "packagePatterns": ["*"],
       "groupName": "{{baseDir}}"
+    },
+    {
+      "matchUpdateTypes": ["major"],
+      "enabled": false
     }
   ]
 }

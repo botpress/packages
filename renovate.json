@@ -41,6 +41,10 @@
       "allowedVersions": "< 6.0.0"
     },
     {
+      "matchPackageNames": ["nanoid"],
+      "allowedVersions": "< 4.0.0"
+    },
+    {
       "matchPackageNames": ["zod"],
       "allowedVersions": "3.22.4"
     },

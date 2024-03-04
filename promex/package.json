@@ -20,7 +20,7 @@
     "./package.json": "./package.json"
   },
   "readmeFilename": "readme.md",
-  "dependencies": {
+  "peerDependencies": {
     "@promster/express": "13.0.0",
     "@promster/metrics": "13.0.0",
     "@promster/server": "13.0.0",

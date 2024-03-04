@@ -1,7 +1,7 @@
 {
   "name": "@bpinternal/trail",
   "description": "Opentelemetry initialization package for nodejs.",
-  "version": "0.2.3",
+  "version": "0.2.4",
   "author": "Botpress, Inc.",
   "repository": {
     "type": "git",
@@ -22,7 +22,7 @@
     "./package.json": "./package.json"
   },
   "readmeFilename": "readme.md",
-  "dependencies": {
+  "peerDependencies": {
     "@opentelemetry/api": "1.8.0",
     "@opentelemetry/auto-instrumentations-node": "0.41.1",
     "@opentelemetry/exporter-jaeger": "1.22.0",

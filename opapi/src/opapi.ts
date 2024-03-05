@@ -11,7 +11,12 @@ import { ApiError, ComponentType, createState, getRef, Metadata, Operation, Opti
 import { exportStateAsTypescript, ExportStateAsTypescriptOptions } from './generators/ts-state'
 export { Operation, Parameter } from './state'
 
-export const schema = extendApi
+type ExtendApi = typeof extendApi
+type AnatineSchemaObject = NonNullable<Parameters<ExtendApi>[1]>
+
+export const schema: <T extends OpenApiZodAny>(schema: T, schemaObject?: AnatineSchemaObject & { $ref?: string }) => T =
+  extendApi
+
 export type OpenApi<
   SchemaName extends string = string,
   DefaultParameterName extends string = string,
@@ -73,14 +78,11 @@ export namespace OpenApi {
   ) => createOpapiFromState(state as State<SchemaName, DefaultParameterName, SectionName>)
 }
 
-export type SchemaOf<O extends OpenApi<any, any, any>> = O extends OpenApi<infer Skema, infer _Param, infer _Sexion>
-  ? Skema
-  : never
+export type SchemaOf<O extends OpenApi<any, any, any>> =
+  O extends OpenApi<infer Skema, infer _Param, infer _Sexion> ? Skema : never
 
-export type ParameterOf<O extends OpenApi<any, any, any>> = O extends OpenApi<infer _Skema, infer Param, infer _Sexion>
-  ? Param
-  : never
+export type ParameterOf<O extends OpenApi<any, any, any>> =
+  O extends OpenApi<infer _Skema, infer Param, infer _Sexion> ? Param : never
 
-export type SectionOf<O extends OpenApi<any, any, any>> = O extends OpenApi<infer _Skema, infer _Param, infer Sexion>
-  ? Sexion
-  : never
+export type SectionOf<O extends OpenApi<any, any, any>> =
+  O extends OpenApi<infer _Skema, infer _Param, infer Sexion> ? Sexion : never

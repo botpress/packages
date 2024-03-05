@@ -1,5 +1,5 @@
 import OpenAPIParser from '@readme/openapi-parser'
-import { SchemaObject } from 'openapi3-ts'
+import type { SchemaObject } from 'openapi3-ts'
 import { pascal, title } from 'radash'
 import { createOpenapi } from 'src/openapi'
 import { Block, DefaultState } from './types'
@@ -54,10 +54,10 @@ export function remove$RefPropertiesFromSchema(
   ).reduce(
     (_processed, [dereferencedPropertyKey, dereferencedPropertyValue]) => {
       const propertyValue = schema.properties?.[dereferencedPropertyKey]
-      if (propertyValue?.$ref) {
+      if (propertyValue && '$ref' in propertyValue && propertyValue?.$ref) {
         _processed.propertyNamesWith$Ref.push(dereferencedPropertyKey)
       } else {
-        _processed.schema.properties[dereferencedPropertyKey] = dereferencedPropertyValue
+        _processed.schema.properties[dereferencedPropertyKey] = dereferencedPropertyValue as SchemaObject
       }
       return _processed
     },

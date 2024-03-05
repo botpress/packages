@@ -8,7 +8,7 @@ export type GenerateSchemaFromZodOpts = {
 }
 
 export const generateSchemaFromZod = (zodRef: OpenApiZodAny, opts?: GenerateSchemaFromZodOpts) => {
-  const jsonSchema = generateJsonSchema(zodRef, opts?.useOutput)
+  const jsonSchema = generateJsonSchema(zodRef, opts?.useOutput) as SchemaObject
   formatJsonSchema(jsonSchema, opts?.allowUnions ?? false)
   return jsonSchema
 }
@@ -28,10 +28,12 @@ export const formatJsonSchema = (jsonSchema: SchemaObject, allowUnions: boolean)
     }
 
     if (typeof jsonSchema.additionalProperties === 'object') {
-      formatJsonSchema(jsonSchema.additionalProperties, allowUnions)
+      formatJsonSchema(jsonSchema.additionalProperties as SchemaObject, allowUnions)
     }
 
-    Object.entries(jsonSchema.properties ?? {}).forEach(([_, value]) => formatJsonSchema(value, allowUnions))
+    Object.entries(jsonSchema.properties ?? {}).forEach(([_, value]) =>
+      formatJsonSchema(value as SchemaObject, allowUnions),
+    )
   }
 
   if (!allowUnions && (jsonSchema.allOf || jsonSchema.anyOf || jsonSchema.oneOf)) {

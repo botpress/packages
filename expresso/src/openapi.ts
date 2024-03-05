@@ -9,7 +9,7 @@ import {
   SchemaObject,
   RequestBodyObject,
   ResponseObject
-} from 'openapi3-ts/oas31'
+} from 'openapi3-ts'
 import { getPathVariables, mapPathFromExpressToOpenAPI } from './parse-path'
 import { CustomInfo } from './router'
 import { AnyEndpoint, ZodTypeWithMeta } from './typings'

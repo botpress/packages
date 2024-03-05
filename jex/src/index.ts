@@ -4,19 +4,21 @@ import { JSONSchema7 } from 'json-schema'
 
 export * as errors from './errors'
 
-export const jsonSchemaEquals = async (a: JSONSchema7, b: JSONSchema7): Promise<boolean> => {
+export type JSONSchema = JSONSchema7
+
+export const jsonSchemaEquals = async (a: JSONSchema, b: JSONSchema): Promise<boolean> => {
   const jexA = await jex.toJex(a)
   const jexB = await jex.toJex(b)
   return jex.jexEquals(jexA, jexB)
 }
 
-export const jsonSchemaExtends = async (a: JSONSchema7, b: JSONSchema7): Promise<jex.JexExtensionResult> => {
+export const jsonSchemaExtends = async (a: JSONSchema, b: JSONSchema): Promise<jex.JexExtensionResult> => {
   const jexA = await jex.toJex(a)
   const jexB = await jex.toJex(b)
   return jex.jexExtends(jexA, jexB)
 }
 
-export const jsonSchemaMerge = async (a: JSONSchema7, b: JSONSchema7): Promise<JSONSchema7> => {
+export const jsonSchemaMerge = async (a: JSONSchema, b: JSONSchema): Promise<JSONSchema> => {
   const jexA = await jex.toJex(a)
   const jexB = await jex.toJex(b)
 

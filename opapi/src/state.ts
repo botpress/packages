@@ -124,9 +124,9 @@ export type OperationWithBodyProps<
   requestBody: {
     description: string
     schema: SchemaOfType<S>
+    format?: 'binary'
   }
-
-  contentType?: 'application/json' | 'multipart/form-data'
+  contentType?: 'application/json' | '*/*'
 } & BaseOperationProps<DefaultParameterName, SectionName, Path, S>
 
 export const operationsWithoutBodyMethod = ['get', 'delete', 'options', 'head', 'trace'] as const

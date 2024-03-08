@@ -195,7 +195,8 @@ function extend<T extends ZCreate | ZodLazy<any>>(zType: T) {
   if (!instance.toTypescriptTypings) {
     instance.toTypescriptTypings = async function (options?: any) {
       if (!isNodeEnvironment()) {
-        return 'Not supported in browser'
+        console.warn('toTypescriptTypings is not supported in browser')
+        return ''
       }
 
       const module = await import('./typescript/zui-to-ts')

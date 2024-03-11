@@ -1,3 +1,4 @@
+import { test, expect } from 'vitest'
 import { Logger } from '.'
 import { FormattedLogEntry, LogEntry, LogEntryFormatter, LoggerConfig, LogTransporter } from './typings'
 

@@ -80,3 +80,4 @@ gen/
 *.config.json
 .ignore.me.*
 
+custom-e2e/

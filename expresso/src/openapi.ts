@@ -93,7 +93,7 @@ const pathItemObject = (endpoint: AnyEndpoint, schemas: Record<string, SchemaObj
   }
 }
 
-export const generateOpenAPI = (endpoints: AnyEndpoint[], info: CustomInfo): PathObject => {
+export const generateOpenAPI = (endpoints: AnyEndpoint[], info: CustomInfo) => {
   const paths: Record<string, PathItemObject> = {}
   const schemas: Record<string, SchemaObject> = {}
 

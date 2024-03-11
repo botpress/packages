@@ -1,4 +1,4 @@
-import { describe, expect, test, beforeEach, jest, afterEach } from '@jest/globals'
+import { describe, expect, test, beforeEach, afterEach, vi } from 'vitest'
 import express, { Express } from 'express'
 import * as promex from './prometheus'
 import prom from 'prom-client'
@@ -15,8 +15,10 @@ const listen = (app: Express, port: number) => {
 }
 
 describe('init function', () => {
-  beforeEach(() => prom.register.clear())
-  afterEach((done) => void promex.reset().then(() => done()))
+  afterEach(async () => {
+    await promex.reset()
+    prom.register.clear()
+  })
 
   test('initialize a middleware on an express app', async () => {
     const app = express()
@@ -47,8 +49,8 @@ describe('init function', () => {
   })
 
   test('initialize a callback for each metric request', async () => {
-    const callbackErr = jest.fn(async () => {})
-    const callbackReq = jest.fn(async () => {
+    const callbackErr = vi.fn(async () => { })
+    const callbackReq = vi.fn(async () => {
       throw new Error('test')
     })
 
@@ -56,7 +58,7 @@ describe('init function', () => {
     promex.init(app)
     await promex.start({ onRequest: callbackReq, onError: callbackErr })
 
-    await axios.get('http://127.0.0.1:9090/metrics').catch(() => {})
+    await axios.get('http://127.0.0.1:9090/metrics').catch(() => { })
 
     expect(callbackReq).toHaveBeenCalledTimes(1)
     expect(callbackErr).toHaveBeenCalledTimes(1)
@@ -99,7 +101,7 @@ describe('init function', () => {
 
     const appServer = await listen(app, 9091)
 
-    await axios.post('http://127.0.0.1:9091/randompath/that/doesnt/exist').catch(() => {})
+    await axios.post('http://127.0.0.1:9091/randompath/that/doesnt/exist').catch(() => { })
 
     const res = await axios.get('http://127.0.0.1:9090/metrics')
 

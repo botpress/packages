@@ -1,6 +1,5 @@
 import { createMiddleware, defaultNormalizers, signalIsUp } from '@promster/express'
 import { getContentType, getSummary } from '@promster/metrics'
-import { TPromsterOptions } from '@promster/types'
 import type { Express } from 'express'
 import { resetAppRoutes, initAppRoute, normalizePath } from './normalize-path'
 import http from 'http'
@@ -17,12 +16,14 @@ let server: http.Server | undefined
 let promsterMiddleware: ReturnType<typeof createMiddleware> | undefined
 let defaultNormalizedPathEnabled = true
 
+type TOptionalPromsterOptions = NonNullable<Parameters<typeof createMiddleware>[0]>['options']
+
 /**
  * config is used to setup the global promster middleware
  * @param options for the promster middleware
  * @returns the configured promster middleware
  */
-export const config = (options: TPromsterOptions = {}) => {
+export const config = (options: TOptionalPromsterOptions = {}): ReturnType<typeof createMiddleware> => {
   if (options.normalizePath) {
     defaultNormalizedPathEnabled = false
   }
@@ -32,8 +33,10 @@ export const config = (options: TPromsterOptions = {}) => {
       options: {
         ...defaultNormalizers,
         normalizePath: normalizePath() as any, // The type of normalizePath is wrong any is required
-        buckets: [0.05, 0.1, 0.5, 1, 3],
-        ...options
+        metricBuckets: {
+          httpRequestDurationInSeconds: [0.05, 0.1, 0.5, 1, 3],
+        },
+        ...options,
       }
     })
   }

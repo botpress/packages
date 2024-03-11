@@ -1,6 +1,6 @@
 {
   "name": "@bpinternal/es-node",
-  "version": "0.0.1",
+  "version": "0.0.3",
   "description": "",
   "main": "dist/index.js",
   "bin": {
@@ -8,16 +8,17 @@
   },
   "scripts": {
     "build": "tsc",
+    "type:check": "tsc --noEmit",
     "start": "node dist/index.js"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "esbuild": "^0.17.19"
+    "esbuild": "^0.20.0"
   },
   "devDependencies": {
     "@types/node": "^20.2.5",
-    "typescript": "^5.0.4"
+    "typescript": "5.3.3"
   }
 }

@@ -1,7 +1,7 @@
 import { title, sift, camel } from 'radash'
 import type { Parameter as OpenApiParameter } from '../state'
-
 import type { GenerateHandlersProps, GenerateHandlerProps } from './handlers'
+import { typeHelpers } from './helpers'
 
 type Parameters = {
   name: string
@@ -24,13 +24,14 @@ export function generateClientCode(props: GenerateClientsProps) {
 
   return `
 import axios, { AxiosInstance } from 'axios'
-import type { Merge, Except } from 'type-fest'
 import {
   DefaultApi,
   Configuration,
 ${sift(operations.map((operation) => generateImport(operation))).join(',\n')},
 } from '.'
 import { errorFrom } from './errors'
+
+${typeHelpers}
 
 export class ApiClient {
   private _innerClient: DefaultApi

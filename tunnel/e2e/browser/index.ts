@@ -2,14 +2,16 @@
 import { Logger } from '@bpinternal/log4bot'
 import esbuild from 'esbuild'
 import fs from 'fs'
-import pathlib from 'path'
+import pathlib, { join } from 'path'
 import puppeteer from 'puppeteer'
 import { TunnelResponse, TunnelServer } from '../../src'
 import { expect, sleep } from '../utils'
 import { TUNNEL_ID, REQUEST_ID, REQUEST_BODY, RESPONSE_BODY } from './constants'
 
+const dirname = join(process.cwd(), 'e2e/browser')
+
 const readTsScript = (port: number) => {
-  const filePath = pathlib.join(__dirname, 'ts-script.ts')
+  const filePath = pathlib.join(dirname, 'ts-script.ts')
   const fileContent = fs.readFileSync(filePath, 'utf8')
   const tsScript = fileContent.replace(/process\.env\.PORT!/g, port.toString())
 
@@ -20,7 +22,7 @@ const toJs = async (tsScript: string): Promise<string> => {
   const buildResult = await esbuild.build({
     stdin: {
       contents: tsScript,
-      resolveDir: __dirname,
+      resolveDir: dirname,
       loader: 'ts'
     },
     bundle: true,
@@ -34,7 +36,7 @@ const toJs = async (tsScript: string): Promise<string> => {
 }
 
 const launchBrowser = async (jsScript: string, logger: Logger) => {
-  const browser = await puppeteer.launch({ headless: 'new' })
+  const browser = await puppeteer.launch({ headless: true })
   const page = await browser.newPage()
   await page.setRequestInterception(false)
   page.on('console', (msg) => logger.debug(`PAGE LOG: ${msg.text()}`))

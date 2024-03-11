@@ -104,10 +104,13 @@ function createParameters<DefaultParameterNames extends string>(
 }
 
 function validateParametersInPath(path: string, parameters?: ParametersMap<string, 'json-schema'>) {
-  const parametersMapInPath = getParameterFromPath(path).reduce((value, current) => {
-    value[current] = false
-    return value
-  }, {} as { [name: string]: boolean })
+  const parametersMapInPath = getParameterFromPath(path).reduce(
+    (value, current) => {
+      value[current] = false
+      return value
+    },
+    {} as { [name: string]: boolean },
+  )
 
   if (parameters) {
     Object.entries(parameters).map(([parameterName, parameter]) => {

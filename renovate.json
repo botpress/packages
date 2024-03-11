@@ -1,0 +1,61 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": [
+    "config:recommended",
+    ":rebaseStalePrs",
+    ":disableDependencyDashboard"
+  ],
+  "enabledManagers": ["dockerfile", "npm", "github-actions"],
+  "prHourlyLimit": 16,
+  "separateMajorMinor": false,
+  "timezone": "America/Toronto",
+  "schedule": ["before 3am every monday"],
+  "bumpVersion": "patch",
+  "packageRules": [
+    {
+      "matchPackageNames": ["@types/react", "react-dom", "react"],
+      "allowedVersions": "< 19.0.0"
+    },
+    {
+      "matchPackageNames": ["@types/node"],
+      "allowedVersions": "< 19.0.0"
+    },
+    {
+      "matchPackageNames": ["@anatine/zod-openapi"],
+      "allowedVersions": "< 1.13.0"
+    },
+    {
+      "matchPackageNames": ["openapi3-ts"],
+      "allowedVersions": "< 3.0.0"
+    },
+    {
+      "matchPackageNames": ["chalk"],
+      "allowedVersions": "< 5.0.0"
+    },
+    {
+      "matchPackageNames": ["yn"],
+      "allowedVersions": "< 5.0.0"
+    },
+    {
+      "matchPackageNames": ["decamelize"],
+      "allowedVersions": "< 6.0.0"
+    },
+    {
+      "matchPackageNames": ["nanoid"],
+      "allowedVersions": "< 4.0.0"
+    },
+    {
+      "matchPackageNames": ["zod"],
+      "allowedVersions": "3.22.4"
+    },
+    {
+      "paths": ["**"],
+      "packagePatterns": ["*"],
+      "groupName": "{{baseDir}}"
+    },
+    {
+      "matchUpdateTypes": ["major"],
+      "enabled": false
+    }
+  ]
+}

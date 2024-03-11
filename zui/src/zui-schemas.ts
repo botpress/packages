@@ -1,6 +1,6 @@
 import type { ZuiTypeAny } from './zui'
 import type { Options } from '@bpinternal/zod-to-json-schema'
-import { zuiToJsonSchema } from './zui-to-json-schema'
+import { zuiToJsonSchema } from './json-schema/zui-to-json-schema'
 import { z } from 'zod'
 
 export type ZuiSchemaOptions = {
@@ -45,16 +45,11 @@ const processConfiguration = (config: Record<string, ZuiTypeAny>, currentRoot: s
     const scope = `${currentRoot}${key}`
     const nextScope = `${scope}/properties/`
     const zuiSchema = config[key]
-    const currentShape = zuiSchema._def?.shape?.()
+    const currentShape = zuiSchema?._def?.shape?.()
     const elements = currentSchema.elements ?? []
 
-    if (zuiSchema.ui) {
-      if (zuiSchema.ui.layout) {
-        elements.push({ type: zuiSchema.ui.layout, label: zuiSchema.ui.title, elements: [] })
-        return processConfiguration(currentShape, nextScope, elements[elements.length - 1])
-      }
-
-      elements.push({ scope, label: zuiSchema.ui.title, ...(zuiSchema.ui.displayAs as any) })
+    if (zuiSchema?.ui) {
+      elements.push({ scope, label: zuiSchema?.ui.title })
     } else if (!currentShape) {
       elements.push({ scope, label: key })
     }
@@ -71,13 +66,6 @@ export const getZuiSchemas = (input: ZuiTypeAny | z.ZodTypeAny, opts: ZuiSchemaO
   let uischema: UISchema = {}
 
   if (input?._def?.shape) {
-    const layout = input && 'ui' in input && input.ui.layout
-
-    uischema = {
-      type: layout || 'VerticalLayout',
-      elements: [],
-    }
-
     processConfiguration(input._def.shape(), opts.rootScope || BASE_SCOPE, uischema)
   }
 

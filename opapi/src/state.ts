@@ -201,6 +201,7 @@ type BaseOperationProps<
     status?: 200 | 201 | 418 | 302
     description: string
     schema: SchemaOfType<S>
+    format?: 'binary'
   }
 }
 

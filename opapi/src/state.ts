@@ -124,7 +124,9 @@ export type OperationWithBodyProps<
   requestBody: {
     description: string
     schema: SchemaOfType<S>
+    format?: 'binary'
   }
+  contentType?: 'application/json' | '*/*'
 } & BaseOperationProps<DefaultParameterName, SectionName, Path, S>
 
 export const operationsWithoutBodyMethod = ['get', 'delete', 'options', 'head', 'trace'] as const
@@ -196,9 +198,10 @@ type BaseOperationProps<
   response: {
     // Status code of the response
     // Default is 200
-    status?: 200 | 201 | 418
+    status?: 200 | 201 | 418 | 302
     description: string
     schema: SchemaOfType<S>
+    format?: 'binary'
   }
 }
 

@@ -68,11 +68,12 @@ export const createOpenapi = <
 
     if (isOperationWithBodyProps(operationObject)) {
       const requestBody = operationObject.requestBody
+      const contentType = operationObject.contentType ?? 'application/json'
 
       openapi.addRequestBody(bodyName, {
         description: requestBody.description,
         content: {
-          'application/json': {
+          [contentType]: {
             schema: requestBody.schema,
           },
         },

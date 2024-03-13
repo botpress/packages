@@ -1,6 +1,6 @@
 {
   "name": "@bpinternal/log4bot",
-  "version": "0.0.8",
+  "version": "0.0.9",
   "description": "Just a Logger",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
@@ -18,10 +18,10 @@
     "regex-parser": "2.3.0"
   },
   "devDependencies": {
-    "@types/lodash": "4.14.202",
-    "@types/node": "18.19.21",
+    "@types/lodash": "4.17.0",
+    "@types/node": "18.19.24",
     "tsup": "^8.0.1",
-    "typescript": "5.3.3",
+    "typescript": "5.4.2",
     "vitest": "1.3.1"
   },
   "scripts": {

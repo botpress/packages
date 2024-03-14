@@ -1,42 +1,61 @@
-import * as utils from "./utils";
-import * as esbuild from "esbuild";
+import * as utils from './utils'
+import * as esbuild from 'esbuild'
 
-const main = async (argv: string[]) => {
-  if (argv.length < 1) {
-    throw new Error("No entrypoint specified");
+const ARGV_OFFSET = 2
+
+const main = async () => {
+  if (process.argv.length < ARGV_OFFSET + 1) {
+    throw new Error('No entrypoint specified')
   }
-  if (argv.length > 1) {
-    throw new Error("Too many arguments");
+
+  const entrypointArgs = process.argv[ARGV_OFFSET + 0]
+
+  const splitIdx = process.argv.indexOf('--')
+
+  let esbuildArgs: string[] = []
+  let scriptArgs: string[] = []
+
+  if (splitIdx !== -1) {
+    esbuildArgs = process.argv.slice(ARGV_OFFSET + 1, splitIdx)
+    scriptArgs = process.argv.slice(splitIdx + 1)
+    process.argv.splice(0, splitIdx + 1)
+  } else {
+    esbuildArgs = process.argv.slice(ARGV_OFFSET + 1)
+    scriptArgs = []
+    process.argv.splice(0, process.argv.length)
   }
 
-  const cwd = utils.path.cwd();
+  if (esbuildArgs.length > 0) {
+    // TODO: pass esbuild args to esbuild
+    console.log('Ignoring esbuild args: ' + esbuildArgs.join(' '))
+  }
 
-  let entrypoint = argv[0];
-  entrypoint = utils.path.absoluteFrom(cwd, entrypoint);
-
+  const cwd = utils.path.cwd()
+  const entrypoint = utils.path.absoluteFrom(cwd, entrypointArgs)
   const { outputFiles } = await esbuild.build({
     entryPoints: [entrypoint],
-    logOverride: { "equals-negative-zero": "silent" },
-    platform: "node",
-    target: "es2020",
+    logOverride: { 'equals-negative-zero': 'silent' },
+    platform: 'node',
+    target: 'es2020',
     minify: true,
     bundle: true,
     sourcemap: false,
     absWorkingDir: cwd,
-    logLevel: "silent",
+    logLevel: 'silent',
     keepNames: true,
-    write: false,
-  });
+    write: false
+  })
 
-  const artifact = outputFiles[0];
+  const artifact = outputFiles[0]
   if (!artifact) {
-    throw new Error("No artifact produced");
+    throw new Error('No artifact produced')
   }
 
-  utils.require.requireJsCode(artifact.text);
-};
+  console.log(`Calling script with args: ${process.argv.join(' ')}`)
+  utils.require.requireJsCode(artifact.text)
+}
 
-main(process.argv.slice(2)).catch((err) => {
-  console.error(err);
-  process.exit(1);
-});
+main().catch((err) => {
+  console.error(err)
+  process.exit(1)
+})

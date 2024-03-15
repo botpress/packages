@@ -12,7 +12,7 @@ export const mapValues = <K extends string, V1, V2>(obj: Record<K, V1>, fn: (v: 
 
 export const mapKeys = <K1 extends string, K2 extends string, V>(
   obj: Record<K1, V>,
-  fn: (k: K1, v: V) => K2
+  fn: (k: K1, v: V) => K2,
 ): Record<K2, V> => {
   const result: Record<K2, V> = {} as Record<K2, V>
   for (const [k, v] of entries(obj)) {

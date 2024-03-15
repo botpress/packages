@@ -43,13 +43,15 @@
     "decompress": "4.2.1",
     "execa": "8.0.1",
     "json-schema-to-typescript": "13.1.2",
+    "json-schema-to-zod": "^2.0.14",
     "openapi-typescript": "6.7.4",
     "openapi3-ts": "2.0.2",
     "radash": "12.0.0",
     "tsconfig-paths": "4.2.0",
     "verror": "1.10.1",
     "winston": "3.12.0",
-    "zod": "3.22.4"
+    "zod": "3.22.4",
+    "zod-to-json-schema": "^3.22.4"
   },
   "keywords": [],
   "author": "Botpress, Inc.",

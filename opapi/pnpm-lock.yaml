@@ -26,6 +26,9 @@ dependencies:
   json-schema-to-typescript:
     specifier: 13.1.2
     version: 13.1.2
+  json-schema-to-zod:
+    specifier: ^2.0.14
+    version: 2.0.14
   openapi-typescript:
     specifier: 6.7.4
     version: 6.7.4
@@ -47,6 +50,9 @@ dependencies:
   zod:
     specifier: 3.22.4
     version: 3.22.4
+  zod-to-json-schema:
+    specifier: ^3.22.4
+    version: 3.22.4(zod@3.22.4)
 
 devDependencies:
   '@swc/core':
@@ -1732,6 +1738,11 @@ packages:
       prettier: 2.8.8
     dev: false
 
+  /json-schema-to-zod@2.0.14:
+    resolution: {integrity: sha512-Pp9wg1/AcMw5KA1RA7t6ybUTIes1yX0vp8PeE48cPnddHb+ZZWbAKPaFXVf4Pif4XSbo9u9i/hIzBcS1UHK/TA==}
+    hasBin: true
+    dev: false
+
   /json-schema-traverse@1.0.0:
     resolution: {integrity: sha512-NM8/P9n3XjXhIZn1lLhkFaACTOURQXjWhV4BA/RnOv8xvgqtqpAX9IO4mRQxSx1Rlo4tqzeqb0sOlruaOy3dug==}
     dev: false
@@ -2824,6 +2835,14 @@ packages:
     resolution: {integrity: sha512-9bnSc/HEW2uRy67wc+T8UwauLuPJVn28jb+GtJY16iiKWyvmYJRXVT4UamsAEGQfPohgr2q4Tq0sQbQlxTfi1g==}
     engines: {node: '>=12.20'}
     dev: true
+
+  /zod-to-json-schema@3.22.4(zod@3.22.4):
+    resolution: {integrity: sha512-2Ed5dJ+n/O3cU383xSY28cuVi0BCQhF8nYqWU5paEpl7fVdqdAmiLdqLyfblbNdfOFwFfi/mqU4O1pwc60iBhQ==}
+    peerDependencies:
+      zod: ^3.22.4
+    dependencies:
+      zod: 3.22.4
+    dev: false
 
   /zod@3.22.4:
     resolution: {integrity: sha512-iC+8Io04lddc+mVqQ9AZ7OQ2MrUKGN+oIQyq1vemgt46jwCwLfhq7/pwnBnNXXXZb8VTVLKwp9EDkx+ryxIWmg==}

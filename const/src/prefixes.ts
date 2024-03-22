@@ -30,6 +30,7 @@ export const prefixToObjectMap = {
   pat: 'personalAccessToken',
   quota: 'quota',
   recevt: 'recurringEvent',
+  report: 'report',
   sandbox: 'sandbox',
   schema: 'schema',
   script: 'script',
@@ -75,6 +76,7 @@ export const objectToPrefixMap: Reverser<typeof prefixToObjectMap> = {
   personalAccessToken: 'pat',
   quota: 'quota',
   recurringEvent: 'recevt',
+  report: 'report',
   sandbox: 'sandbox',
   schema: 'schema',
   script: 'script',
@@ -121,6 +123,7 @@ export type NodeId = Ids['NodeId']
 export type PersonalAccessTokenId = Ids['PersonalAccessTokenId']
 export type QuotaId = Ids['QuotaId']
 export type RecurringEventId = Ids['RecurringEventId']
+export type ReportId = Ids['ReportId']
 export type SandboxId = Ids['SandboxId']
 export type SchemaId = Ids['SchemaId']
 export type ScriptId = Ids['ScriptId']

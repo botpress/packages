@@ -180,3 +180,13 @@ test('Lazy', () => {
 
   schema.parse({ type: 'hello', value: 5 })
 })
+
+test('array', () => {
+  const schema = zui.array(
+    zui.object({
+      name: zui.string(),
+      age: zui.number(),
+      aliases: zui.record(zui.number(), zui.string(), {}),
+    }),
+  )
+})

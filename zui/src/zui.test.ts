@@ -186,7 +186,7 @@ test('array', () => {
     zui.object({
       name: zui.string(),
       age: zui.number(),
-      aliases: zui.record(zui.number(), zui.string(), {}),
+      aliases: zui.record(zui.string(), zui.object({ name: zui.string() }), {}),
     }),
   )
 
@@ -195,7 +195,7 @@ test('array', () => {
       age: 34,
       name: 'Hello',
       aliases: {
-        1: 'Yo',
+        yo: { name: 'jacques' },
       },
     },
   ] satisfies Infer<typeof schema>)

@@ -189,4 +189,14 @@ test('array', () => {
       aliases: zui.record(zui.number(), zui.string(), {}),
     }),
   )
+
+  schema.parse([
+    {
+      age: 34,
+      name: 'Hello',
+      aliases: {
+        1: 'Yo',
+      },
+    },
+  ] satisfies Infer<typeof schema>)
 })

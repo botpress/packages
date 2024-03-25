@@ -5,7 +5,8 @@ import { FC } from 'react'
 import { GlobalComponentDefinitions } from '..'
 import { JsonFormsStateContext } from '@jsonforms/react'
 
-export type ZuiSchemaExtension = {
+export type BaseSchema = {
+  description?: string
   [zuiKey]: {
     tooltip?: boolean
     disabled?: boolean
@@ -26,7 +27,7 @@ export type ArraySchema = {
   uniqueItems?: boolean
   minContains?: number
   maxContains?: number
-} & ZuiSchemaExtension
+} & BaseSchema
 
 export type ObjectSchema = {
   type: 'object'
@@ -41,7 +42,7 @@ export type ObjectSchema = {
   dependentRequired?: {
     [key: string]: string[]
   }
-} & ZuiSchemaExtension
+} & BaseSchema
 
 export type StringSchema = {
   type: 'string'
@@ -52,7 +53,7 @@ export type StringSchema = {
   pattern?: string
   format?: string
   default?: string
-} & ZuiSchemaExtension
+} & BaseSchema
 
 export type NumberSchema = {
   type: 'number' | 'integer'
@@ -62,13 +63,13 @@ export type NumberSchema = {
   exclusiveMinimum?: number
   exclusiveMaximum?: number
   enum?: number[]
-} & ZuiSchemaExtension
+} & BaseSchema
 
 export type BooleanSchema = {
   type: 'boolean'
   enum?: boolean[]
   const?: boolean
-} & ZuiSchemaExtension
+} & BaseSchema
 
 export type PrimitiveSchema = StringSchema | NumberSchema | BooleanSchema
 
@@ -188,7 +189,7 @@ export type SchemaContext<
   id: ID
   scope: string
   schema: JSONSchemaOfType<Type>
-  zuiProps: ZuiSchemaExtension[typeof zuiKey]
+  zuiProps: BaseSchema[typeof zuiKey]
 }
 
 export type SchemaResolver<
@@ -217,19 +218,19 @@ export type ZuiReactComponentBaseProps<
   scope: string
   onChange: (data: any) => void
   schema: JSONSchemaOfType<Type>
+  label: string
   context: {
     path: string
-    uiSchema: Type extends ContainerType ? UILayoutSchema : UIControlSchema
     formErrors: NonNullable<JsonFormsStateContext['core']>['errors']
     formData?: any
     readonly: boolean
-    dispatch?: JsonFormsStateContext['dispatch']
+    updateForm: (path: string, data: any) => void
   }
   i18nKeyPrefix?: string
-  zuiProps: ZuiSchemaExtension[typeof zuiKey]
+  zuiProps: BaseSchema[typeof zuiKey]
 }
 
-export type ZuiReactLayoutComponentProps<
+export type ZuiReactObjectComponentProps<
   Type extends ContainerType,
   ID extends keyof UI[Type],
   UI extends UIComponentDefinitions = GlobalComponentDefinitions,
@@ -237,12 +238,20 @@ export type ZuiReactLayoutComponentProps<
   children: JSX.Element | JSX.Element[]
 }
 
+export type ZuiReactArrayComponentProps<
+  Type extends ContainerType,
+  ID extends keyof UI[Type],
+  UI extends UIComponentDefinitions = GlobalComponentDefinitions,
+> = ZuiReactComponentBaseProps<Type, ID, UI> & {
+  children: JSX.Element | JSX.Element[]
+  addItem: (data: any) => void
+}
+
 export type ZuiReactControlComponentProps<
   Type extends BaseType,
   ID extends keyof UI[Type],
   UI extends UIComponentDefinitions = GlobalComponentDefinitions,
 > = ZuiReactComponentBaseProps<Type, ID, UI> & {
-  label: string
   errors: string
   description?: string
   required: boolean
@@ -253,9 +262,11 @@ export type ZuiReactComponentProps<
   Type extends BaseType,
   ID extends keyof UI[Type],
   UI extends UIComponentDefinitions = GlobalComponentDefinitions,
-> = Type extends ContainerType
-  ? ZuiReactLayoutComponentProps<Type, ID, UI>
-  : ZuiReactControlComponentProps<Type, ID, UI>
+> = Type extends 'object'
+  ? ZuiReactObjectComponentProps<Type, ID, UI>
+  : Type extends 'array'
+    ? ZuiReactArrayComponentProps<Type, ID, UI>
+    : ZuiReactControlComponentProps<Type, ID, UI>
 
 export type ZuiReactComponent<
   Type extends BaseType,

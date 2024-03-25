@@ -1,145 +1,134 @@
+import React from 'react'
 import type { Meta, StoryObj } from '@storybook/react'
 import { UIComponentDefinitions, ZuiComponentMap } from '../types'
 import { Zui, zui as zuiImport } from '../../index'
-import { ZuiForm } from '..'
+import { ZuiForm, ZuiForm2 } from '..'
 import { z } from 'zod'
 
 const zui = zuiImport as Zui<typeof exampleExtensions>
 
-const commonInputSchema = z.object({})
-
 const exampleExtensions = {
   string: {
-    textbox: {
-      id: 'textbox',
-      schema: commonInputSchema.extend({
-        multiline: z.boolean().default(false).optional(),
-        fitContentWidth: z.boolean().default(false).optional(),
-      }),
-    },
-    datetimeinput: {
-      id: 'datetimeinput',
-      schema: commonInputSchema.extend({
-        type: z.enum(['time', 'date', 'date-time']).default('date-time'),
-      }),
-    },
   },
   number: {
-    numberinput: {
-      id: 'numberinput',
-      schema: commonInputSchema,
-    },
-    slider: {
-      id: 'slider',
-      schema: commonInputSchema,
-    },
   },
   boolean: {
-    checkbox: {
-      id: 'checkbox',
-      schema: commonInputSchema.extend({
-        toggle: z.boolean().default(false).optional(),
-      }),
-    },
   },
   array: {},
   object: {
-    verticalLayout: {
-      id: 'verticalLayout',
-      schema: z.object({}),
-    },
-    horizontalLayout: {
-      id: 'horizontalLayout',
-      schema: z.object({}),
-    },
   },
 } satisfies UIComponentDefinitions
 
 const exampleSchema = zui
   .object({
-    firstName: zui.string().title('User').disabled().hidden().placeholder('Enter your name').tooltip('yo').nullable(),
-
+    firstName: zui.string().title('User').disabled().placeholder('Enter your name').nullable(),
     lastName: zui
       .string()
       .min(3)
-      .displayAs('textbox', {
-        fitContentWidth: true,
-        multiline: true,
-      })
       .title('Last Name')
       .nullable(),
     dates: zui
       .array(
         zui
           .string()
-          .displayAs('datetimeinput', {
-            type: 'date',
-          })
           .title('Date'),
       )
+      .min(1)
       .nonempty(),
     // tests the hidden function
     arandomfield: zui.string().hidden(),
-    arandomnumber: zui.number().hidden(),
-    arandomboolean: zui.boolean().hidden(),
 
-    birthday: zui
-      .string()
-      .displayAs('datetimeinput', {
-        type: 'date',
-        yo: 'bero',
-        yes: 'it works!',
-      } as any)
-      .title('Date of Birth'),
-    plan: zui.enum(['basic', 'premium']).displayAs('textbox', {}).hidden(),
-    age: zui.number().displayAs('numberinput', {}),
-    email: zui.string().displayAs('textbox', {}).title('Email Address'),
-    password: zui.string().displayAs('textbox', {}),
-    passwordConfirm: zui.string().displayAs('textbox', {}),
+    stuff: zui.object({
+      birthday: zui
+        .string(),
+      plan: zui.enum(['basic', 'premium']),
+      age: zui.number(),
+      email: zui.string().title('Email Address'),
+      password: zui.string(),
+      passwordConfirm: zui.string(),
+    })
   })
-  .displayAs('horizontalLayout', {})
   .title('User Information')
 
 const componentMap: ZuiComponentMap<typeof exampleExtensions> = {
   string: {
-    datetimeinput: () => null,
-    textbox: ({ onChange, errors, required, label, data, zuiProps }) => (
-      <div style={{ padding: '1rem' }}>
-        <span>{label}</span>
-        <input placeholder={zuiProps?.placeholder} onChange={(e) => onChange(e.target.value)} />
-        {required && <span>*</span>}
-        {errors && typeof data !== 'undefined' && <span style={{ color: 'red' }}>{errors}</span>}
-      </div>
-    ),
-    default: () => null,
+    default: ({ onChange, errors, required, label, data, zuiProps, schema }) => {
+      if (schema.enum?.length) {
+        return (
+          <div style={{ padding: '1rem' }}>
+            <span>{label}</span>
+            <select onChange={(e) => onChange(e.target.value)}>
+              {schema.enum.map((e) => (
+                <option key={e} value={e}>
+                  {e}
+                </option>
+              ))}
+            </select>
+            {required && <span>*</span>}
+            {errors && typeof data !== 'undefined' && <span style={{ color: 'red' }}>{errors}</span>}
+          </div>
+        )
+      }
+      return (
+        <div style={{ padding: '1rem' }}>
+          <span>{label}</span>
+          <input placeholder={zuiProps?.placeholder} onChange={(e) => onChange(e.target.value)} />
+          {required && <span>*</span>}
+          {errors && typeof data !== 'undefined' && <span style={{ color: 'red' }}>{errors}</span>}
+        </div>
+      )
+    },
   },
   array: {
-    default: () => null,
+    default: ({ children, id, context }) => <><button>Add item {context.path}</button><p>{id}</p>{children}</>,
   },
   boolean: {
-    checkbox: () => null,
-    default: () => null,
+    default: ({ data, enabled, label, errors, onChange }) => {
+      return (
+        <div style={{ padding: '1rem' }}>
+          <label>
+            <input type="checkbox" disabled={!enabled} checked={data} onChange={(e) => onChange(e.target.checked)} />
+            {label}
+          </label>
+          {errors && typeof data !== 'undefined' && <span style={{ color: 'red' }}>{errors}</span>}
+        </div>
+      )
+    },
   },
   number: {
-    default: () => null,
-    numberinput: () => null,
-    slider: () => null,
+    default: ({ data, zuiProps, onChange, label, required, errors, schema }) => {
+      if (schema.enum?.length) {
+        return (
+          <div style={{ padding: '1rem' }}>
+            <span>{label}</span>
+            <select onChange={(e) => onChange(e.target.value)}>
+              {schema.enum.map((e) => (
+                <option key={e} value={e}>
+                  {e}
+                </option>
+              ))}
+            </select>
+            {required && <span>*</span>}
+            {errors && typeof data !== 'undefined' && <span style={{ color: 'red' }}>{errors}</span>}
+          </div>
+        )
+      }
+      return (<div style={{ padding: '1rem' }}>
+        <span>{label}</span>
+        <input type="number" placeholder={zuiProps?.placeholder} onChange={(e) => onChange(e.target.value)} />
+        {required && <span>*</span>}
+        {errors && typeof data !== 'undefined' && <span style={{ color: 'red' }}>{errors}</span>}
+      </div>)
+    },
   },
   object: {
-    default: ({ children }) => <div>{children}</div>,
-    verticalLayout: () => null,
-    horizontalLayout: ({ zuiProps, children }) => (
-      <div>
-        <h1>{zuiProps.title}</h1>
-        <div>{children}</div>
-      </div>
-    ),
+    default: ({ children }) => <div style={{ border: '1px solid red' }}>{children}</div>,
   },
 }
 
 const meta = {
   title: 'Form/Example',
-  component: ZuiForm<typeof exampleExtensions>,
+  component: ZuiForm2<typeof exampleExtensions>,
   // This component will have an automatically generated Autodocs entry: https://storybook.js.org/docs/writing-docs/autodocs
   parameters: {
     // More on how to position stories at: https://storybook.js.org/docs/configure/story-layout

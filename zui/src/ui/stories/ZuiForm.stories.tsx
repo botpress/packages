@@ -1,14 +1,18 @@
-import React from 'react'
+import React, { useState } from 'react'
 import type { Meta, StoryObj } from '@storybook/react'
 import { UIComponentDefinitions, ZuiComponentMap } from '../types'
 import { Zui, zui as zuiImport } from '../../index'
-import { ZuiForm, ZuiForm2 } from '..'
+import { ZuiForm } from '..'
 import { z } from 'zod'
 
 const zui = zuiImport as Zui<typeof exampleExtensions>
 
 const exampleExtensions = {
   string: {
+    debug: {
+      id: 'debug',
+      schema: z.string(),
+    }
   },
   number: {
   },
@@ -46,7 +50,8 @@ const exampleSchema = zui
       email: zui.string().title('Email Address'),
       password: zui.string(),
       passwordConfirm: zui.string(),
-    })
+    }),
+    debug: zui.string().displayAs('debug', ''),
   })
   .title('User Information')
 
@@ -57,7 +62,7 @@ const componentMap: ZuiComponentMap<typeof exampleExtensions> = {
         return (
           <div style={{ padding: '1rem' }}>
             <span>{label}</span>
-            <select onChange={(e) => onChange(e.target.value)}>
+            <select onChange={(e) => onChange(e.target.value)} value={data || undefined}>
               {schema.enum.map((e) => (
                 <option key={e} value={e}>
                   {e}
@@ -78,16 +83,19 @@ const componentMap: ZuiComponentMap<typeof exampleExtensions> = {
         </div>
       )
     },
+    debug: ({ context }) => {
+      return <pre>{JSON.stringify(context.formData, null, 2)}</pre>
+    }
   },
   array: {
-    default: ({ children, id, context }) => <><button>Add item {context.path}</button><p>{id}</p>{children}</>,
+    default: ({ children, id, context, addItem }) => <><button onClick={() => addItem('yo')}>Add item {context.path}</button><p>{id}</p>{children}</>,
   },
   boolean: {
     default: ({ data, enabled, label, errors, onChange }) => {
       return (
         <div style={{ padding: '1rem' }}>
           <label>
-            <input type="checkbox" disabled={!enabled} checked={data} onChange={(e) => onChange(e.target.checked)} />
+            <input type="checkbox" disabled={!enabled} checked={data || undefined} onChange={(e) => onChange(e.target.checked)} />
             {label}
           </label>
           {errors && typeof data !== 'undefined' && <span style={{ color: 'red' }}>{errors}</span>}
@@ -101,7 +109,7 @@ const componentMap: ZuiComponentMap<typeof exampleExtensions> = {
         return (
           <div style={{ padding: '1rem' }}>
             <span>{label}</span>
-            <select onChange={(e) => onChange(e.target.value)}>
+            <select onChange={(e) => onChange(e.target.value)} value={data || undefined}>
               {schema.enum.map((e) => (
                 <option key={e} value={e}>
                   {e}
@@ -115,7 +123,7 @@ const componentMap: ZuiComponentMap<typeof exampleExtensions> = {
       }
       return (<div style={{ padding: '1rem' }}>
         <span>{label}</span>
-        <input type="number" placeholder={zuiProps?.placeholder} onChange={(e) => onChange(e.target.value)} />
+        <input type="number" placeholder={zuiProps?.placeholder} onChange={(e) => onChange(e.target.value)} value={data || undefined} />
         {required && <span>*</span>}
         {errors && typeof data !== 'undefined' && <span style={{ color: 'red' }}>{errors}</span>}
       </div>)
@@ -126,24 +134,35 @@ const componentMap: ZuiComponentMap<typeof exampleExtensions> = {
   },
 }
 
+
+const ZuiFormExample = () => {
+  const [formData, setFormData] = useState({})
+  return (
+    <ZuiForm<typeof exampleExtensions>
+      schema={exampleSchema.toJsonSchema({
+        target: 'openApi3',
+      })}
+      value={formData}
+      onChange={setFormData}
+      components={componentMap}
+    />
+  )
+}
 const meta = {
   title: 'Form/Example',
-  component: ZuiForm2<typeof exampleExtensions>,
+  component: ZuiFormExample,
   // This component will have an automatically generated Autodocs entry: https://storybook.js.org/docs/writing-docs/autodocs
   parameters: {
     // More on how to position stories at: https://storybook.js.org/docs/configure/story-layout
     layout: 'fullscreen',
   },
-} satisfies Meta<typeof ZuiForm<typeof exampleExtensions>>
+} satisfies Meta<typeof ZuiFormExample>
 
 type Story = StoryObj<typeof meta>
 
 export const ExampleSchema: Story = {
   args: {
-    schema: exampleSchema.toJsonSchema({
-      target: 'openApi3',
-    }),
-    components: componentMap,
+
   },
 }
 

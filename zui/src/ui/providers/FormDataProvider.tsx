@@ -24,10 +24,22 @@ export const useFormData = () => {
         context.setFormData(setObjectPath(context.formData, path, data))
     };
 
-    return { ...context, handlePropertyChange };
+    const addArrayItem = (path: string, data: any) => {
+        const currentData = getPathData(context.formData, path.split('.')) || []
+        console.log('currentData', currentData)
+        context.setFormData(setObjectPath(context.formData, path, [...currentData, data]))
+    }
+
+    const removeArrayItem = (path: string, index: number) => {
+        const currentData = getPathData(context.formData, path.split('.'))
+        currentData.splice(index, 1)
+        context.setFormData(setObjectPath(context.formData, path, currentData))
+    }
+
+    return { ...context, handlePropertyChange, addArrayItem, removeArrayItem };
 };
 
-function setObjectPath(obj: any, path: string, data: any): any {
+export function setObjectPath(obj: any, path: string, data: any): any {
     const pathArray = path.split('.');
     const pathArrayLength = pathArray.length;
     pathArray.reduce((current: any, key: string, index: number) => {
@@ -50,4 +62,10 @@ export const FormDataProvider: React.FC<PropsWithChildren<FormFieldContextProps>
         </FormDataContext.Provider>
     );
 };
+
+export function getPathData(object: any, path: string[]): any {
+    return path.reduce((prev, curr) => {
+        return prev ? prev[curr] : null
+    }, object)
+}
 

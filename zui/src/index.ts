@@ -8,13 +8,7 @@ export type {
   AsBaseType,
   ZuiReactComponent,
 } from './ui/types'
-export {
-  type ZuiFormProps,
-  ZuiForm,
-  schemaToUISchema,
-  transformZuiComponentsToRenderers,
-  defaultUISchemaResolvers,
-} from './ui'
+export { ZuiForm } from './ui'
 export type { Zui, ZuiType, Infer, ZuiExtension, ZuiRawShape, ZuiTypeAny } from './zui'
 export type {
   JsonSchema7Type as JsonSchema7,

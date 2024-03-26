@@ -7,16 +7,25 @@ import {
   ZuiReactComponentBaseProps,
   ObjectSchema,
   ArraySchema,
+  ZuiReactComponentProps,
+  ZuiReactControlComponentProps,
+  PrimitiveSchema,
 } from './types'
 import { zuiKey } from '../zui'
-import { PropsWithChildren, createContext, useContext, useMemo, useState } from 'react'
+import { useMemo } from 'react'
 import React, { FC } from 'react'
 import { GlobalComponentDefinitions } from '..'
 import { FormDataProvider, useFormData } from './providers/FormDataProvider'
-import { FormFieldProvider, useFormField } from './providers/FormFieldProvider'
+import { getPathData } from './providers/FormDataProvider'
 
+type ComponentMeta<Type extends BaseType = BaseType> = {
+  type: Type,
+  Component: ZuiReactComponent<Type, string>,
+  id: string,
+  params: any,
+}
 
-const resolveComponent = (components: ZuiComponentMap<any>, fieldSchema: JSONSchema) => {
+const resolveComponent = <Type extends BaseType>(components: ZuiComponentMap<any>, fieldSchema: JSONSchema): ComponentMeta<Type> | null => {
   const type = fieldSchema.type as BaseType
   const uiDefinition = fieldSchema[zuiKey]?.displayAs || null
 
@@ -24,8 +33,8 @@ const resolveComponent = (components: ZuiComponentMap<any>, fieldSchema: JSONSch
     const defaultComponent = components[type]?.default
     if (defaultComponent) {
       return {
-        Component: defaultComponent,
-        type,
+        Component: defaultComponent as ZuiReactComponent<Type, string>,
+        type: type as Type,
         id: 'default',
         params: {},
       }
@@ -45,17 +54,19 @@ const resolveComponent = (components: ZuiComponentMap<any>, fieldSchema: JSONSch
   const params = uiDefinition[1] || {}
 
   return {
-    Component: Component as ZuiReactComponent<any, any>,
-    type,
+    Component: Component as ZuiReactComponent<Type, string>,
+    type: type as Type,
     id: componentID,
     params,
   }
 }
 
 
-export const ZuiForm2 = <UI extends UIComponentDefinitions = GlobalComponentDefinitions>({
+export const ZuiForm = <UI extends UIComponentDefinitions = GlobalComponentDefinitions>({
   schema,
   components,
+  onChange,
+  value,
 }: {
   schema: JSONSchema,
   components: ZuiComponentMap<UI>,
@@ -64,38 +75,30 @@ export const ZuiForm2 = <UI extends UIComponentDefinitions = GlobalComponentDefi
 }): JSX.Element | null => {
 
   return (
-    <FormDataProvider = { initialValue }>
-    
-  </FormDataProvider >)
+    <FormDataProvider formData={value} setFormData={onChange}>
+      <FormElementRenderer components={components} fieldSchema={schema} path={[]} config={{ required: false, formData: value, onFormChange: onChange }} />
+    </FormDataProvider >)
 }
 
-const renderFormFields = (components: ZuiComponentMap<any>, schema: JSONSchema, formData: any) => {
-  if (schema.type === 'object') {
-    return renderObjectFields(components, schema, [], formData)
-  }
-  if (schema.type === 'array') {
-    return renderArrayFields(components, schema, [], formData)
-  }
-  return FieldRenderer(components, schema, [], formData)
-}
 
-const resolveProps = (fieldSchema: JSONSchema, componentConfig: NonNullable<ReturnType<typeof resolveComponent>>, config: { path: string[], required: boolean, formData: any }) => {
-  const { id, params, type } = componentConfig
+const resolveBaseProps = (meta: ComponentMeta, fieldSchema: JSONSchema, config: { path: string[], required: boolean, formData: any, onChange: (path: string, data: any) => void, onFormChange: (formData: any) => void }): Omit<ZuiReactComponentBaseProps<any, any>,
+  'data'> => {
+  const { type, params, id } = meta
 
-  const pathString = config.path.length > 0 ? config.path.join('.') : 'root'
+  const pathString = config.path.length > 0 ? config.path.join('.') : ''
   return {
     context: {
       path: pathString,
       readonly: false,
       formData: config.formData,
       formErrors: [],
-      dispatch: () => { },
+      updateForm: config.onChange,
     },
-    onChange: () => { },
-    id: pathString,
+    onChange: (data: any) => config.onChange(pathString, data),
+    id: config.path[config.path.length - 1]?.toString() || 'root',
     label: fieldSchema['x-zui']?.title || config.path[config.path.length - 1]?.toString() || '',
     componentID: id,
-    enabled: fieldSchema['x-zui'].disabled !== true,
+    enabled: fieldSchema['x-zui']?.disabled !== true,
     schema: fieldSchema,
     params,
     scope: pathString,
@@ -106,136 +109,78 @@ const resolveProps = (fieldSchema: JSONSchema, componentConfig: NonNullable<Retu
 
 }
 
-const FieldDispatch: FC<{ components: ZuiComponentMap<any>, fieldSchema: JSONSchema, path: string[], config: any }> = ({
-  components,
-  fieldSchema,
-  path,
-  config,
-}) => {
-  const { formData, handlePropertyChange } = useFormData()
+const FormElementRenderer: FC<{ components: ZuiComponentMap<any>, fieldSchema: JSONSchema, path: string[], config: any }> = ({ components, fieldSchema, path, config }) => {
+  const { formData, handlePropertyChange, addArrayItem } = useFormData()
+  const data = useMemo(() => getPathData(formData, path), [formData, path])
+  const componentMeta = useMemo(() => resolveComponent(components, fieldSchema), [fieldSchema, components])
 
-  const componentConfig = useMemo(() => resolveComponent(components, fieldSchema), [fieldSchema, components])
-  const pathString = useMemo(() => path.length > 0 ? path.join('.') : '', [path])
-
-  if (!componentConfig) {
+  if (!componentMeta) {
     return null
   }
 
-  return (
-    <FormFieldProvider path={pathString} key={pathString}>
-      <FormElementRenderer
-        componentConfig={componentConfig}
-        fieldSchema={fieldSchema}
-        path={path}
-        config={config} />
-    </FormFieldProvider>
-  )
-}
+  const { Component: _component, type } = componentMeta
 
-const FormElementRenderer = ({ componentConfig, fieldSchema, path, config }) => {
-  const { data, path, } = useFormField()
-  if (componentConfig.type === 'array') {
-    return <FormArrayRenderer Component={componentConfig.Component} fieldSchema={fieldSchema} path={path} config={config} />
+  const baseProps = resolveBaseProps(componentMeta, fieldSchema, { path, required: config.required, formData: config.formData, onChange: handlePropertyChange, onFormChange: config.onFormChange })
 
-  }
-}
+  if (fieldSchema.type === 'array' && type === 'array') {
+    const Component = _component as any as ZuiReactComponent<'array', any>
+    const props: Omit<ZuiReactComponentProps<'array', any>, 'children'> = {
+      ...baseProps,
+      context: {
+        ...baseProps.context,
+      },
+      schema: baseProps.schema as any as ArraySchema,
+      data: Array.isArray(data) ? data : [],
+      addItem: (data) => {
+        console.log(baseProps.context.path)
+        addArrayItem(baseProps.context.path, data)
+      },
+    }
 
-const FormArrayRenderer = ({ Component, fieldSchema, path, config }) => {
-  const { data, onChange, path } = useFormField()
-  return (
-    <Component
-      key={path}
-      data={{}}
-      children={renderArrayFields(components, fieldSchema, path, [1, 2, 3, 4, 5])}
-    />
-  )
-}
-
-const FieldRenderer = (components: ZuiComponentMap<any>, fieldSchema: JSONSchema, path: string[], config: { required: boolean, formData: any }): ZuiReactComponentBaseProps<any, any> | null => {
-  const componentConfig = useMemo(() => resolveComponent(components, fieldSchema), [fieldSchema, components])
-
-  if (!componentConfig) {
-    return null
-  }
-
-  const { Component: _component, type } = componentConfig
-  const Component = _component as any as ZuiReactComponent<any, any>
-
-  const pathString = path.length > 0 ? path.join('.') : ''
-  const props = resolveProps(fieldSchema, componentConfig, { path, required: config.required, formData: config.formData })
-
-  if (!Component) {
-    console.error(`Component not found for type: ${type} at path: ${path.join('.')}`)
-    return null
-  }
-  if (fieldSchema.type === 'array') {
     return <Component
-      key={pathString}
-      data={{}}
-      {...props}
-      children={renderArrayFields(components, fieldSchema, path, [1, 2, 3, 4, 5])}
-    />
+      key={baseProps.scope}
+      {...props}>
+      {props.data?.map((_, index) =>
+        <FormElementRenderer components={components} fieldSchema={fieldSchema.items} path={[...path, index.toString()]} config={config} />
+      ) || []}
+    </Component>
   }
 
   if (fieldSchema.type === 'object') {
+    const Component = _component as any as ZuiReactComponent<'object', any>
+    const props: Omit<ZuiReactComponentProps<'object', any>, 'children'> = {
+      ...baseProps,
+      context: {
+        ...baseProps.context,
+      },
+      schema: baseProps.schema as any as ObjectSchema,
+      data: data || {},
+    }
     return (
       <Component
-        key={pathString}
-        data={{}}
+        key={baseProps.scope}
         {...props}
-        children={renderObjectFields(components, fieldSchema)}
-      />
+      >
+        {Object.entries(fieldSchema.properties).map(([fieldName, fieldSchema]) => {
+          return <FormElementRenderer components={components} fieldSchema={fieldSchema} path={[...path, fieldName]} config={config} />
+        })}
+      </Component>
     )
   }
+  const Component = _component as any as ZuiReactComponent<any, any>
+
+  const props: ZuiReactControlComponentProps<'boolean' | 'number' | 'string', any> = {
+    ...baseProps,
+    schema: baseProps.schema as any as PrimitiveSchema,
+    required: config.required,
+    config: {},
+    errors: '',
+    data,
+  }
+
   return (
     <Component
-      key={pathString}
-      errors=""
-      data={{}}
-      description={fieldSchema.description}
-      required={required}
-      config={{}}
       {...props}
     />
   )
 }
-const renderArrayFields = (components: ZuiComponentMap<any>, arraySchema: ArraySchema, path: string[], data: any[]) => {
-
-  return (
-    <div>
-      {data.map((_, index) => {
-        const itemPath = [...path, index.toString()]
-        return (
-          <div key={index}>
-            {FieldRenderer(components, arraySchema.items, itemPath, formData, false)}
-          </div>
-        )
-      })}
-    </div>
-  )
-}
-
-
-const renderObjectFields = (components: ZuiComponentMap<any>, objectSchema: ObjectSchema, path: string[], data: any) => {
-  const { properties } = objectSchema
-  const fields: (JSX.Element | null)[] = []
-
-  for (const [fieldName, fieldSchema] of Object.entries(properties) as [string, any]) {
-    const fieldPath = [...path, fieldName]
-
-    if (!fieldSchema) {
-      console.error(`Field schema not found for field: ${fieldPath.join('.')}`)
-      continue
-    }
-
-    const renderedField = FieldRenderer(components, fieldSchema, fieldPath, {
-      required: objectSchema.required?.includes(fieldName) || false,
-      formData: data,
-    })
-
-    fields.push(renderedField)
-  }
-
-  return fields.filter<JSX.Element>((x): x is JSX.Element => x !== null)
-}
-

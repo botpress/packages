@@ -170,6 +170,18 @@ export type ZodToBaseType<T extends ZodType> = T extends z.ZodString
             ? 'string'
             : any
 
+export type BaseTypeToType<T extends BaseType> = T extends 'string'
+  ? string
+  : T extends 'number'
+    ? number
+    : T extends 'boolean'
+      ? boolean
+      : T extends 'object'
+        ? object
+        : T extends 'array'
+          ? any[]
+          : never
+
 export type AsBaseType<T> = T extends BaseType ? T : never
 
 export type SchemaResolversMap<UI extends UIComponentDefinitions = GlobalComponentDefinitions> = {
@@ -213,7 +225,7 @@ export type ZuiReactComponentBaseProps<
   componentID: ID
   id: string
   params: z.infer<UI[Type][ID]['schema']>
-  data: any
+  data: BaseTypeToType<Type> | null
   enabled: boolean
   scope: string
   onChange: (data: any) => void

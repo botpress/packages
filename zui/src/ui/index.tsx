@@ -76,7 +76,7 @@ export const ZuiForm = <UI extends UIComponentDefinitions = GlobalComponentDefin
 
   return (
     <FormDataProvider formData={value} setFormData={onChange} formSchema={schema}>
-      <FormElementRenderer components={components} fieldSchema={schema} path={[]} config={{ required: false, formData: value, onFormChange: onChange }} />
+      <FormElementRenderer components={components} fieldSchema={schema} path={[]} required={true} />
     </FormDataProvider >)
 }
 

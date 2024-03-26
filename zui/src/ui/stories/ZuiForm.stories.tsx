@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { FC, useState } from 'react'
 import type { Meta, StoryObj } from '@storybook/react'
 import { UIComponentDefinitions, ZuiComponentMap } from '../types'
 import { Zui, zui as zuiImport } from '../../index'
@@ -30,6 +30,7 @@ const exampleSchema = zui
       .string()
       .min(3)
       .title('Last Name')
+      .optional()
       .nullable(),
     dates: zui
       .array(
@@ -58,6 +59,8 @@ const exampleSchema = zui
   })
   .title('User Information')
 
+const ErrorBox: FC<{ errors: z.ZodIssue[], data: any | null }> = ({ errors, data }) => errors && data !== null && <span style={{ color: 'red' }}>{errors.map(e => <p key={e.code}>{e.message}</p>)}</span>
+
 const componentMap: ZuiComponentMap<typeof exampleExtensions> = {
   string: {
     default: ({ onChange, errors, required, label, data, zuiProps, schema }) => {
@@ -73,7 +76,7 @@ const componentMap: ZuiComponentMap<typeof exampleExtensions> = {
               ))}
             </select>
             {required && <span>*</span>}
-            {errors && data !== null && <span style={{ color: 'red' }}>{errors.map(e => <p>{e.message}</p>)}</span>}
+            <ErrorBox errors={errors} data={data} />
           </div>
         )
       }
@@ -82,7 +85,7 @@ const componentMap: ZuiComponentMap<typeof exampleExtensions> = {
           <span>{label}</span>
           <input placeholder={zuiProps?.placeholder} onChange={(e) => onChange(e.target.value)} value={data || ''} />
           {required && <span>*</span>}
-          {errors && data !== null && <span style={{ color: 'red' }}>{errors.map(e => <p>{e.message}</p>)}</span>}
+          <ErrorBox errors={errors} data={data} />
         </div>
       )
     },
@@ -101,7 +104,7 @@ const componentMap: ZuiComponentMap<typeof exampleExtensions> = {
             <input type="checkbox" disabled={!enabled} checked={data || false} onChange={(e) => onChange(e.target.checked)} />
             {label}
           </label>
-          {errors && data !== null && <span style={{ color: 'red' }}>{errors.map(e => <p>{e.message}</p>)}</span>}
+          <ErrorBox errors={errors} data={data} />
         </div>
       )
     },
@@ -120,7 +123,7 @@ const componentMap: ZuiComponentMap<typeof exampleExtensions> = {
               ))}
             </select>
             {required && <span>*</span>}
-            {errors && data !== null && <span style={{ color: 'red' }}>{errors.map(e => <p>{e.message}</p>)}</span>}
+            <ErrorBox errors={errors} data={data} />
           </div>
         )
       }
@@ -128,7 +131,7 @@ const componentMap: ZuiComponentMap<typeof exampleExtensions> = {
         <span>{label}</span>
         <input type="number" placeholder={zuiProps?.placeholder} onChange={(e) => onChange(parseFloat(e.target.value))} value={data || 0} />
         {required && <span>*</span>}
-        {errors && data !== null && <span style={{ color: 'red' }}>{errors.map(e => <p>{e.message}</p>)}</span>}
+        <ErrorBox errors={errors} data={data} />
       </div>)
     },
   },
@@ -164,9 +167,7 @@ const meta = {
 type Story = StoryObj<typeof meta>
 
 export const ExampleSchema: Story = {
-  args: {
-
-  },
+  args: {},
 }
 
 export default meta

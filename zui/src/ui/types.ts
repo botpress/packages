@@ -1,9 +1,7 @@
 import type { ZodSchema, ZodType, z } from 'zod'
-import type { Rule } from '@jsonforms/core'
 import { zuiKey } from '../zui'
 import { FC } from 'react'
 import { GlobalComponentDefinitions } from '..'
-import { JsonFormsStateContext } from '@jsonforms/react'
 
 export type BaseSchema = {
   description?: string
@@ -87,61 +85,6 @@ export type JSONSchemaOfType<T extends BaseType> = T extends 'string'
           ? ArraySchema
           : never
 
-export type UILayoutSchema =
-  | ({
-      type: 'VerticalLayout' | 'HorizontalLayout'
-      _componentType: BaseType
-      _componentID: string
-      elements: UISchema[]
-      rule?: UIRuleSchema
-    } & OptionsSchemaFragment)
-  | ({
-      type: 'Group'
-      _componentType: BaseType
-      _componentID: string
-      label?: string
-      elements: UISchema[]
-      rule?: UIRuleSchema
-    } & OptionsSchemaFragment)
-  | ({
-      type: 'Categorization'
-      _componentType: BaseType
-      _componentID: string
-      elements: UICategorySchema[]
-      rule?: UIRuleSchema
-    } & OptionsSchemaFragment)
-
-export type UICategorySchema = {
-  type: 'Category'
-  _componentType: BaseType
-  _componentID: string
-  label?: string
-  elements: UISchema[]
-  rule?: UIRuleSchema
-} & OptionsSchemaFragment
-
-export type UIControlSchema = {
-  type: 'Control'
-  scope: string
-  label?: string | boolean
-  _componentType: BaseType
-  _componentID: string
-  rule?: UIRuleSchema
-} & OptionsSchemaFragment
-
-type OptionsSchemaFragment = {
-  options?: {
-    [key: string]: any
-  }
-  [key: string]: any
-}
-
-export type UIRuleSchema = Rule
-
-export type UISchema = UIControlSchema | UILayoutSchema | UICategorySchema
-
-export type UISchemaType = UISchema['type']
-
 export type BaseType = 'number' | 'string' | 'boolean' | 'object' | 'array'
 
 export const containerTypes = ['object', 'array'] as const
@@ -184,14 +127,6 @@ export type BaseTypeToType<T extends BaseType> = T extends 'string'
 
 export type AsBaseType<T> = T extends BaseType ? T : never
 
-export type SchemaResolversMap<UI extends UIComponentDefinitions = GlobalComponentDefinitions> = {
-  [Type in keyof UI]?: {
-    [ID in keyof UI[Type]]?: SchemaResolver<AsBaseType<Type>, ID, UI>
-  } & {
-    default?: SchemaResolver<AsBaseType<Type>, 'default', UI>
-  }
-}
-
 export type SchemaContext<
   Type extends BaseType,
   ID extends keyof UI[Type],
@@ -203,18 +138,6 @@ export type SchemaContext<
   schema: JSONSchemaOfType<Type>
   zuiProps: BaseSchema[typeof zuiKey]
 }
-
-export type SchemaResolver<
-  Type extends BaseType,
-  ID extends keyof UI[Type],
-  UI extends UIComponentDefinitions = GlobalComponentDefinitions,
-> = Type extends ContainerType
-  ? (
-      params: z.infer<UI[Type][ID]['schema']>,
-      context: SchemaContext<Type, ID, UI>,
-      children: UISchema[],
-    ) => UISchema | null
-  : (params: z.infer<UI[Type][ID]['schema']>, context: SchemaContext<Type, ID, UI>) => UISchema | null
 
 export type ZuiReactComponentBaseProps<
   Type extends BaseType,

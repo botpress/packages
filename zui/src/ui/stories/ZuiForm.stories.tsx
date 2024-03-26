@@ -93,7 +93,7 @@ const componentMap: ZuiComponentMap<typeof exampleExtensions> = {
     }
   },
   array: {
-    default: ({ children, scope, context, addItem, schema }) => <><button onClick={() => addItem()}>Add item {context.path}</button><p>{scope}</p>{children}</>,
+    default: ({ children, scope, context, addItem }) => <><button onClick={() => addItem()}>Add item {context.path}</button><p>{scope}</p>{children}</>,
   },
   boolean: {
     default: ({ data, enabled, label, errors, onChange }) => {
@@ -135,7 +135,9 @@ const componentMap: ZuiComponentMap<typeof exampleExtensions> = {
     },
   },
   object: {
-    default: ({ children }) => <div style={{ border: '1px solid red' }}>{children}</div>,
+    default: ({ children, ...rest }) => {
+      return <section><div style={{ border: '1px solid red' }}>{children}</div>{rest.isArrayChild === true && (<button onClick={() => rest.removeSelf()}>delete</button>)}</section>
+    },
   },
 }
 

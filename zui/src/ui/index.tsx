@@ -10,6 +10,7 @@ import {
   ZuiReactComponentProps,
   ZuiReactControlComponentProps,
   PrimitiveSchema,
+  ZuiReactArrayChildProps,
 } from './types'
 import { zuiKey } from '../zui'
 import { useMemo } from 'react'
@@ -76,7 +77,7 @@ export const ZuiForm = <UI extends UIComponentDefinitions = GlobalComponentDefin
 
   return (
     <FormDataProvider formData={value} setFormData={onChange} formSchema={schema}>
-      <FormElementRenderer components={components} fieldSchema={schema} path={[]} required={true} />
+      <FormElementRenderer components={components} fieldSchema={schema} path={[]} required={true} isArrayChild={false} />
     </FormDataProvider >)
 }
 
@@ -85,9 +86,9 @@ type FormRendererProps = {
   fieldSchema: JSONSchema,
   path: string[],
   required: boolean,
-}
+} & ZuiReactArrayChildProps
 
-const FormElementRenderer: FC<FormRendererProps> = ({ components, fieldSchema, path, required }) => {
+const FormElementRenderer: FC<FormRendererProps> = ({ components, fieldSchema, path, required, ...childProps }) => {
   const { formData, handlePropertyChange, addArrayItem, removeArrayItem, formErrors, formValid } = useFormData()
   const data = useMemo(() => getPathData(formData, path), [formData, path])
   const componentMeta = useMemo(() => resolveComponent(components, fieldSchema), [fieldSchema, components])
@@ -100,7 +101,7 @@ const FormElementRenderer: FC<FormRendererProps> = ({ components, fieldSchema, p
 
   const pathString = path.length > 0 ? path.join('.') : 'root'
 
-  const baseProps: Omit<ZuiReactComponentBaseProps<BaseType, any>, 'data'> = {
+  const baseProps: Omit<ZuiReactComponentBaseProps<BaseType, any>, 'data' | 'isArrayChild'> = {
     type,
     componentID: componentMeta.id,
     scope: pathString,
@@ -118,7 +119,7 @@ const FormElementRenderer: FC<FormRendererProps> = ({ components, fieldSchema, p
     label: fieldSchema['x-zui']?.title || path[path.length - 1]?.toString() || '',
     params: componentMeta.params,
     schema: fieldSchema,
-    zuiProps: fieldSchema[zuiKey] || {},
+    zuiProps: fieldSchema[zuiKey],
   }
 
   if (fieldSchema.type === 'array' && type === 'array') {
@@ -132,14 +133,17 @@ const FormElementRenderer: FC<FormRendererProps> = ({ components, fieldSchema, p
       data: Array.isArray(data) ? data : [],
       addItem: (data = undefined) => addArrayItem(baseProps.context.path, typeof data === 'undefined' ? getDefaultItemData(schema.items) : data),
       removeItem: (index) => removeArrayItem(baseProps.context.path, index),
+      ...childProps
     }
 
     return <Component
       key={baseProps.scope}
-      {...props}>
+      {...props}
+      isArrayChild={props.isArrayChild as any}
+    >
       {props.data?.map((_, index) => {
         const childPath = [...path, index.toString()]
-        return <FormElementRenderer key={childPath.join('.')} components={components} fieldSchema={fieldSchema.items} path={childPath} required={required} />
+        return <FormElementRenderer key={childPath.join('.')} components={components} fieldSchema={fieldSchema.items} path={childPath} required={required} isArrayChild={true} index={index} removeSelf={() => removeArrayItem(baseProps.context.path, index)} />
       }
       ) || []}
     </Component>
@@ -152,15 +156,17 @@ const FormElementRenderer: FC<FormRendererProps> = ({ components, fieldSchema, p
       type,
       schema: baseProps.schema as any as ObjectSchema,
       data: data || {},
+      ...childProps
     }
     return (
       <Component
         key={baseProps.scope}
         {...props}
+        isArrayChild={props.isArrayChild as any}
       >
         {Object.entries(fieldSchema.properties).map(([fieldName, childSchema]) => {
           const childPath = [...path, fieldName]
-          return <FormElementRenderer key={childPath.join('.')} components={components} fieldSchema={childSchema} path={childPath} required={fieldSchema.required?.includes(fieldName) || false} />
+          return <FormElementRenderer key={childPath.join('.')} components={components} fieldSchema={childSchema} path={childPath} required={fieldSchema.required?.includes(fieldName) || false} isArrayChild={false} />
         })}
       </Component>
     )
@@ -174,6 +180,8 @@ const FormElementRenderer: FC<FormRendererProps> = ({ components, fieldSchema, p
     config: {},
     required,
     data,
+    description: fieldSchema.description,
+    ...childProps
   }
 
   return (

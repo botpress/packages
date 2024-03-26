@@ -163,7 +163,17 @@ export type ZuiReactComponentBaseProps<
     updateForm: (path: string, data: any) => void
   }
   zuiProps: BaseSchema[typeof zuiKey]
-}
+} & ZuiReactArrayChildProps
+
+export type ZuiReactArrayChildProps =
+  | {
+      isArrayChild: true
+      index: number
+      removeSelf: () => void
+    }
+  | {
+      isArrayChild: false
+    }
 
 export type ZuiReactObjectComponentProps<
   Type extends ContainerType,
@@ -179,7 +189,7 @@ export type ZuiReactArrayComponentProps<
   UI extends UIComponentDefinitions = GlobalComponentDefinitions,
 > = ZuiReactComponentBaseProps<Type, ID, UI> & {
   children: JSX.Element | JSX.Element[]
-  addItem: (initialData: any | undefined) => void
+  addItem: (initialData?: any) => void
   removeItem: (index: number) => void
 }
 

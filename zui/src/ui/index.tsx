@@ -75,42 +75,20 @@ export const ZuiForm = <UI extends UIComponentDefinitions = GlobalComponentDefin
 }): JSX.Element | null => {
 
   return (
-    <FormDataProvider formData={value} setFormData={onChange}>
+    <FormDataProvider formData={value} setFormData={onChange} formSchema={schema}>
       <FormElementRenderer components={components} fieldSchema={schema} path={[]} config={{ required: false, formData: value, onFormChange: onChange }} />
     </FormDataProvider >)
 }
 
-
-const resolveBaseProps = (meta: ComponentMeta, fieldSchema: JSONSchema, config: { path: string[], required: boolean, formData: any, onChange: (path: string, data: any) => void, onFormChange: (formData: any) => void }): Omit<ZuiReactComponentBaseProps<any, any>,
-  'data'> => {
-  const { type, params, id } = meta
-
-  const pathString = config.path.length > 0 ? config.path.join('.') : ''
-  return {
-    context: {
-      path: pathString,
-      readonly: false,
-      formData: config.formData,
-      formErrors: [],
-      updateForm: config.onChange,
-    },
-    onChange: (data: any) => config.onChange(pathString, data),
-    id: config.path[config.path.length - 1]?.toString() || 'root',
-    label: fieldSchema['x-zui']?.title || config.path[config.path.length - 1]?.toString() || '',
-    componentID: id,
-    enabled: fieldSchema['x-zui']?.disabled !== true,
-    schema: fieldSchema,
-    params,
-    scope: pathString,
-    type,
-    zuiProps: fieldSchema[zuiKey] || {},
-    i18nKeyPrefix: '',
-  }
-
+type FormRendererProps = {
+  components: ZuiComponentMap<any>,
+  fieldSchema: JSONSchema,
+  path: string[],
+  required: boolean,
 }
 
-const FormElementRenderer: FC<{ components: ZuiComponentMap<any>, fieldSchema: JSONSchema, path: string[], config: any }> = ({ components, fieldSchema, path, config }) => {
-  const { formData, handlePropertyChange, addArrayItem } = useFormData()
+const FormElementRenderer: FC<FormRendererProps> = ({ components, fieldSchema, path, required }) => {
+  const { formData, handlePropertyChange, addArrayItem, removeArrayItem, formErrors, formValid } = useFormData()
   const data = useMemo(() => getPathData(formData, path), [formData, path])
   const componentMeta = useMemo(() => resolveComponent(components, fieldSchema), [fieldSchema, components])
 
@@ -120,39 +98,56 @@ const FormElementRenderer: FC<{ components: ZuiComponentMap<any>, fieldSchema: J
 
   const { Component: _component, type } = componentMeta
 
-  const baseProps = resolveBaseProps(componentMeta, fieldSchema, { path, required: config.required, formData: config.formData, onChange: handlePropertyChange, onFormChange: config.onFormChange })
+  const pathString = path.length > 0 ? path.join('.') : 'root'
+
+  const baseProps: Omit<ZuiReactComponentBaseProps<BaseType, any>, 'data'> = {
+    type,
+    componentID: componentMeta.id,
+    scope: pathString,
+    context: {
+      path: pathString,
+      readonly: false,
+      formData,
+      formErrors: formErrors || null,
+      formValid: formValid || null,
+      updateForm: handlePropertyChange,
+    },
+    enabled: fieldSchema['x-zui']?.disabled !== true,
+    onChange: (data: any) => handlePropertyChange(pathString, data),
+    errors: formErrors?.filter(e => e.path.join('.') === pathString) || [],
+    label: fieldSchema['x-zui']?.title || path[path.length - 1]?.toString() || '',
+    params: componentMeta.params,
+    schema: fieldSchema,
+    zuiProps: fieldSchema[zuiKey] || {},
+  }
 
   if (fieldSchema.type === 'array' && type === 'array') {
     const Component = _component as any as ZuiReactComponent<'array', any>
     const props: Omit<ZuiReactComponentProps<'array', any>, 'children'> = {
       ...baseProps,
-      context: {
-        ...baseProps.context,
-      },
+      type,
       schema: baseProps.schema as any as ArraySchema,
       data: Array.isArray(data) ? data : [],
-      addItem: (data) => {
-        console.log(baseProps.context.path)
-        addArrayItem(baseProps.context.path, data)
-      },
+      addItem: (data) => addArrayItem(baseProps.context.path, data),
+      removeItem: (index) => removeArrayItem(baseProps.context.path, index),
     }
 
     return <Component
       key={baseProps.scope}
       {...props}>
-      {props.data?.map((_, index) =>
-        <FormElementRenderer components={components} fieldSchema={fieldSchema.items} path={[...path, index.toString()]} config={config} />
+      {props.data?.map((_, index) => {
+        const childPath = [...path, index.toString()]
+        return <FormElementRenderer key={childPath.join('.')} components={components} fieldSchema={fieldSchema.items} path={childPath} required={required} />
+      }
       ) || []}
     </Component>
   }
 
-  if (fieldSchema.type === 'object') {
+  if (fieldSchema.type === 'object' && type === 'object') {
     const Component = _component as any as ZuiReactComponent<'object', any>
     const props: Omit<ZuiReactComponentProps<'object', any>, 'children'> = {
       ...baseProps,
-      context: {
-        ...baseProps.context,
-      },
+      type,
       schema: baseProps.schema as any as ObjectSchema,
       data: data || {},
     }
@@ -161,8 +156,9 @@ const FormElementRenderer: FC<{ components: ZuiComponentMap<any>, fieldSchema: J
         key={baseProps.scope}
         {...props}
       >
-        {Object.entries(fieldSchema.properties).map(([fieldName, fieldSchema]) => {
-          return <FormElementRenderer components={components} fieldSchema={fieldSchema} path={[...path, fieldName]} config={config} />
+        {Object.entries(fieldSchema.properties).map(([fieldName, childSchema]) => {
+          const childPath = [...path, fieldName]
+          return <FormElementRenderer key={childPath.join('.')} components={components} fieldSchema={childSchema} path={childPath} required={fieldSchema.required?.includes(fieldName) || false} />
         })}
       </Component>
     )
@@ -171,10 +167,10 @@ const FormElementRenderer: FC<{ components: ZuiComponentMap<any>, fieldSchema: J
 
   const props: ZuiReactControlComponentProps<'boolean' | 'number' | 'string', any> = {
     ...baseProps,
+    type: type as any as 'boolean' | 'number' | 'string',
     schema: baseProps.schema as any as PrimitiveSchema,
-    required: config.required,
     config: {},
-    errors: '',
+    required,
     data,
   }
 

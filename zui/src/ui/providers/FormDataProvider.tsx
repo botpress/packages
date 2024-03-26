@@ -1,15 +1,20 @@
-import { PropsWithChildren, createContext, useContext } from 'react'
+import { PropsWithChildren, createContext, useContext, useEffect, useMemo } from 'react'
 import React from 'react'
+import { JSONSchema } from '../types'
+import { jsonSchemaToZui } from '../../json-schema/json-schema-to-zui'
+import { ZodAny } from 'zod'
 
 
 
 export type FormFieldContextProps = {
     formData: any
+    formSchema: JSONSchema | any
     setFormData: (data: any) => void
 }
 
 export const FormDataContext = createContext<FormFieldContextProps>({
     formData: undefined,
+    formSchema: undefined,
     setFormData: () => { throw new Error('Must be within a FormDataProvider') },
 })
 
@@ -19,6 +24,30 @@ export const useFormData = () => {
     if (context === undefined) {
         throw new Error('useFormData must be used within a FormDataProvider');
     }
+    const zodSchema = useMemo(() => {
+        try {
+            return jsonSchemaToZui(context.formSchema) as any as ZodAny
+        } catch (e) {
+            console.error(e)
+            return null
+        }
+    }, [context.formSchema])
+
+    const validation = useMemo(() => {
+        if (!zodSchema) return null
+        const validation = zodSchema.safeParse(context.formData)
+
+        if (!validation.success) {
+            return {
+                formValid: false,
+                formErrors: validation.error.issues
+            }
+        }
+        return {
+            formValid: true,
+            formErrors: []
+        }
+    }, [zodSchema, context.formData])
 
     const handlePropertyChange = (path: string, data: any) => {
         context.setFormData(setObjectPath(context.formData, path, data))
@@ -26,7 +55,6 @@ export const useFormData = () => {
 
     const addArrayItem = (path: string, data: any) => {
         const currentData = getPathData(context.formData, path.split('.')) || []
-        console.log('currentData', currentData)
         context.setFormData(setObjectPath(context.formData, path, [...currentData, data]))
     }
 
@@ -36,7 +64,7 @@ export const useFormData = () => {
         context.setFormData(setObjectPath(context.formData, path, currentData))
     }
 
-    return { ...context, handlePropertyChange, addArrayItem, removeArrayItem };
+    return { ...context, handlePropertyChange, addArrayItem, removeArrayItem, ...validation };
 };
 
 export function setObjectPath(obj: any, path: string, data: any): any {
@@ -55,9 +83,9 @@ export function setObjectPath(obj: any, path: string, data: any): any {
     return { ...obj };
 }
 
-export const FormDataProvider: React.FC<PropsWithChildren<FormFieldContextProps>> = ({ children, setFormData, formData }) => {
+export const FormDataProvider: React.FC<PropsWithChildren<FormFieldContextProps>> = ({ children, setFormData, formData, formSchema }) => {
     return (
-        <FormDataContext.Provider value={{ formData, setFormData }}>
+        <FormDataContext.Provider value={{ formData, setFormData, formSchema }}>
             {children}
         </FormDataContext.Provider>
     );

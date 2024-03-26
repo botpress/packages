@@ -34,8 +34,11 @@ const exampleSchema = zui
     dates: zui
       .array(
         zui
-          .string()
-          .title('Date'),
+          .object({
+            date: zui.string(),
+            time: zui.string(),
+            id: zui.number(),
+          })
       )
       .min(1)
       .nonempty(),
@@ -62,7 +65,7 @@ const componentMap: ZuiComponentMap<typeof exampleExtensions> = {
         return (
           <div style={{ padding: '1rem' }}>
             <span>{label}</span>
-            <select onChange={(e) => onChange(e.target.value)} value={data || undefined}>
+            <select onChange={(e) => onChange(e.target.value)} value={data || ''}>
               {schema.enum.map((e) => (
                 <option key={e} value={e}>
                   {e}
@@ -70,16 +73,16 @@ const componentMap: ZuiComponentMap<typeof exampleExtensions> = {
               ))}
             </select>
             {required && <span>*</span>}
-            {errors && typeof data !== 'undefined' && <span style={{ color: 'red' }}>{errors}</span>}
+            {errors && data !== null && <span style={{ color: 'red' }}>{errors.map(e => <p>{e.message}</p>)}</span>}
           </div>
         )
       }
       return (
         <div style={{ padding: '1rem' }}>
           <span>{label}</span>
-          <input placeholder={zuiProps?.placeholder} onChange={(e) => onChange(e.target.value)} />
+          <input placeholder={zuiProps?.placeholder} onChange={(e) => onChange(e.target.value)} value={data || ''} />
           {required && <span>*</span>}
-          {errors && typeof data !== 'undefined' && <span style={{ color: 'red' }}>{errors}</span>}
+          {errors && data !== null && <span style={{ color: 'red' }}>{errors.map(e => <p>{e.message}</p>)}</span>}
         </div>
       )
     },
@@ -88,17 +91,17 @@ const componentMap: ZuiComponentMap<typeof exampleExtensions> = {
     }
   },
   array: {
-    default: ({ children, id, context, addItem }) => <><button onClick={() => addItem('yo')}>Add item {context.path}</button><p>{id}</p>{children}</>,
+    default: ({ children, scope, context, addItem }) => <><button onClick={() => addItem({})}>Add item {context.path}</button><p>{scope}</p>{children}</>,
   },
   boolean: {
     default: ({ data, enabled, label, errors, onChange }) => {
       return (
         <div style={{ padding: '1rem' }}>
           <label>
-            <input type="checkbox" disabled={!enabled} checked={data || undefined} onChange={(e) => onChange(e.target.checked)} />
+            <input type="checkbox" disabled={!enabled} checked={data || false} onChange={(e) => onChange(e.target.checked)} />
             {label}
           </label>
-          {errors && typeof data !== 'undefined' && <span style={{ color: 'red' }}>{errors}</span>}
+          {errors && data !== null && <span style={{ color: 'red' }}>{errors.map(e => <p>{e.message}</p>)}</span>}
         </div>
       )
     },
@@ -109,7 +112,7 @@ const componentMap: ZuiComponentMap<typeof exampleExtensions> = {
         return (
           <div style={{ padding: '1rem' }}>
             <span>{label}</span>
-            <select onChange={(e) => onChange(e.target.value)} value={data || undefined}>
+            <select onChange={(e) => onChange(e.target.value)} value={data || 0}>
               {schema.enum.map((e) => (
                 <option key={e} value={e}>
                   {e}
@@ -117,15 +120,15 @@ const componentMap: ZuiComponentMap<typeof exampleExtensions> = {
               ))}
             </select>
             {required && <span>*</span>}
-            {errors && typeof data !== 'undefined' && <span style={{ color: 'red' }}>{errors}</span>}
+            {errors && data !== null && <span style={{ color: 'red' }}>{errors.map(e => <p>{e.message}</p>)}</span>}
           </div>
         )
       }
       return (<div style={{ padding: '1rem' }}>
         <span>{label}</span>
-        <input type="number" placeholder={zuiProps?.placeholder} onChange={(e) => onChange(e.target.value)} value={data || undefined} />
+        <input type="number" placeholder={zuiProps?.placeholder} onChange={(e) => onChange(parseFloat(e.target.value))} value={data || 0} />
         {required && <span>*</span>}
-        {errors && typeof data !== 'undefined' && <span style={{ color: 'red' }}>{errors}</span>}
+        {errors && data !== null && <span style={{ color: 'red' }}>{errors.map(e => <p>{e.message}</p>)}</span>}
       </div>)
     },
   },

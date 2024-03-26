@@ -7,7 +7,7 @@ import { JsonFormsStateContext } from '@jsonforms/react'
 
 export type BaseSchema = {
   description?: string
-  [zuiKey]: {
+  [zuiKey]?: {
     tooltip?: boolean
     disabled?: boolean
     displayAs?: [string, any]
@@ -223,7 +223,6 @@ export type ZuiReactComponentBaseProps<
 > = {
   type: Type
   componentID: ID
-  id: string
   params: z.infer<UI[Type][ID]['schema']>
   data: BaseTypeToType<Type> | null
   enabled: boolean
@@ -231,14 +230,15 @@ export type ZuiReactComponentBaseProps<
   onChange: (data: any) => void
   schema: JSONSchemaOfType<Type>
   label: string
+  errors: z.ZodIssue[]
   context: {
     path: string
-    formErrors: NonNullable<JsonFormsStateContext['core']>['errors']
+    formValid: boolean | null
+    formErrors: z.ZodIssue[] | null
     formData?: any
     readonly: boolean
     updateForm: (path: string, data: any) => void
   }
-  i18nKeyPrefix?: string
   zuiProps: BaseSchema[typeof zuiKey]
 }
 
@@ -256,7 +256,8 @@ export type ZuiReactArrayComponentProps<
   UI extends UIComponentDefinitions = GlobalComponentDefinitions,
 > = ZuiReactComponentBaseProps<Type, ID, UI> & {
   children: JSX.Element | JSX.Element[]
-  addItem: (data: any) => void
+  addItem: (initialData: any) => void
+  removeItem: (index: number) => void
 }
 
 export type ZuiReactControlComponentProps<
@@ -264,7 +265,6 @@ export type ZuiReactControlComponentProps<
   ID extends keyof UI[Type],
   UI extends UIComponentDefinitions = GlobalComponentDefinitions,
 > = ZuiReactComponentBaseProps<Type, ID, UI> & {
-  errors: string
   description?: string
   required: boolean
   config: any

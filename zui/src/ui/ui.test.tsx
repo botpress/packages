@@ -6,157 +6,6 @@ import { FC, PropsWithChildren, useState } from 'react'
 import { vi } from 'vitest'
 import { z } from 'zod'
 
-const testComponentDefinitions = {
-    string: {
-        customstringcomponent: {
-            id: 'customstringcomponent',
-            schema: z.object({ multiline: z.boolean() }),
-        }
-    },
-    number: {},
-    boolean: {},
-    array: {},
-    object: {},
-} satisfies ComponentDefinitions
-
-const ZuiFormWithState: FC<Omit<ZuiFormProps, 'onChange' | 'value'>> = (props) => {
-    const [state, setState] = useState({})
-    return <ZuiForm {...props} value={state} onChange={(data) => setState(data)} />
-}
-
-const TestWrapper: FC<PropsWithChildren<ZuiReactComponentBaseProps<BaseType, any>>> = ({
-    children,
-    type,
-    scope,
-    schema,
-    params,
-    ...props
-}) => {
-    return (
-        <div
-            data-testid={`${type}:${scope}`}
-            data-componentid={props.componentID}
-            data-elementdata={props.data}
-            data-label={props.label}
-            data-ischild={props.isArrayChild}
-            data-index={props.isArrayChild ? props.index : undefined}
-        >
-            <section data-testid={`${type}:${scope}:container`}>{children}</section>
-            <script type="application/json" data-testid={`${type}:${scope}:schema`}>
-                {JSON.stringify(schema, null, 2)}
-            </script>
-            <script type="application/json" data-testid={`${type}:${scope}:params`}>
-                {JSON.stringify(params, null, 2)}
-            </script>
-            <script type="application/json" data-testid={`${type}:${scope}:zuiprops`}>
-                {JSON.stringify(props.zuiProps || {}, null, 2)}
-            </script>
-            {props.isArrayChild ? (
-                <button data-testid={`${type}:${scope}:removeselfbtn`} onClick={() => props.removeSelf()}>
-                    Remove self
-                </button>
-            ) : null}
-        </div>
-    )
-}
-
-const testComponentImplementation: ZuiComponentMap<typeof testComponentDefinitions> = {
-    string: {
-        customstringcomponent: (props) => {
-            return (
-                <TestWrapper {...props}>
-                    <input
-                        data-testid={`${props.type}:${props.scope}:custominput`}
-                        value={props.data || ''}
-                        onChange={(e) => props.onChange(e.target.value)}
-                    />
-                </TestWrapper>
-            )
-        },
-        default: (props) => {
-            return (
-                <TestWrapper {...props}>
-                    <input
-                        data-testid={`${props.type}:${props.scope}:input`}
-                        value={props.data || ''}
-                        onChange={(e) => props.onChange(e.target.value)}
-                    />
-                </TestWrapper>
-            )
-        },
-    },
-    number: {
-        default: (props) => {
-            return (
-                <TestWrapper {...props}>
-                    <input
-                        type="number"
-                        data-testid={`${props.type}:${props.scope}:input`}
-                        value={props.data || ''}
-                        onChange={(e) => props.onChange(parseFloat(e.target.value))}
-                    />
-                </TestWrapper>
-            )
-        },
-    },
-    boolean: {
-        default: (props) => {
-            return (
-                <TestWrapper {...props}>
-                    <input
-                        type="checkbox"
-                        data-testid={`${props.type}:${props.scope}:input`}
-                        checked={props.data || false}
-                        onChange={(e) => props.onChange(Boolean(e.target.value))}
-                    />
-                </TestWrapper>
-            )
-        },
-    },
-    object: {
-        default: (props) => {
-            return (
-                <TestWrapper {...props}>
-                    {props.children}
-                </TestWrapper>
-            )
-        },
-    },
-    array: {
-        default: ({ type, scope, children, addItem, removeItem, schema }) => {
-            return (
-                <div data-testid={`${type}:${scope}`}>
-                    <section data-testid={`${type}:${scope}:container`}>{children}</section>
-                    <button data-testid={`${type}:${scope}:addbtn`} onClick={() => addItem()}>
-                        Add Item
-                    </button>
-                    <button data-testid={`${type}:${scope}:removebtn`} onClick={() => removeItem(0)}>
-                        Remove first
-                    </button>
-                    <script type="application/json" data-testid={`${type}:${scope}:schema`}>
-                        {JSON.stringify(schema, null, 2)}
-                    </script>
-                </div>
-            )
-        },
-    },
-}
-
-const traverseSchemaTest = (schema: JSONSchema, callback: (path: string[], child: JSONSchema) => void) => {
-    const traverse = (path: string[], child: JSONSchema) => {
-        if (child.type === 'object') {
-            for (const [key, value] of Object.entries(child.properties)) {
-                traverse([...path, key], value)
-            }
-        }
-        if (child.type === 'array') {
-            traverse([...path, '0'], child.items!)
-        }
-        callback(path, child)
-    }
-    return traverse([], schema)
-}
-
 const TestId = (type: JSONSchema['type'], path: string[], subpath?: string) =>
     `${type}:${path.length > 0 ? path.join('.') : 'root'}${subpath ? `:${subpath}` : ''}`
 
@@ -535,3 +384,155 @@ describe('UI', () => {
         })
     })
 })
+
+
+const testComponentDefinitions = {
+    string: {
+        customstringcomponent: {
+            id: 'customstringcomponent',
+            schema: z.object({ multiline: z.boolean() }),
+        }
+    },
+    number: {},
+    boolean: {},
+    array: {},
+    object: {},
+} satisfies ComponentDefinitions
+
+const ZuiFormWithState: FC<Omit<ZuiFormProps, 'onChange' | 'value'>> = (props) => {
+    const [state, setState] = useState({})
+    return <ZuiForm {...props} value={state} onChange={(data) => setState(data)} />
+}
+
+const TestWrapper: FC<PropsWithChildren<ZuiReactComponentBaseProps<BaseType, any>>> = ({
+    children,
+    type,
+    scope,
+    schema,
+    params,
+    ...props
+}) => {
+    return (
+        <div
+            data-testid={`${type}:${scope}`}
+            data-componentid={props.componentID}
+            data-elementdata={props.data}
+            data-label={props.label}
+            data-ischild={props.isArrayChild}
+            data-index={props.isArrayChild ? props.index : undefined}
+        >
+            <section data-testid={`${type}:${scope}:container`}>{children}</section>
+            <script type="application/json" data-testid={`${type}:${scope}:schema`}>
+                {JSON.stringify(schema, null, 2)}
+            </script>
+            <script type="application/json" data-testid={`${type}:${scope}:params`}>
+                {JSON.stringify(params, null, 2)}
+            </script>
+            <script type="application/json" data-testid={`${type}:${scope}:zuiprops`}>
+                {JSON.stringify(props.zuiProps || {}, null, 2)}
+            </script>
+            {props.isArrayChild ? (
+                <button data-testid={`${type}:${scope}:removeselfbtn`} onClick={() => props.removeSelf()}>
+                    Remove self
+                </button>
+            ) : null}
+        </div>
+    )
+}
+
+const testComponentImplementation: ZuiComponentMap<typeof testComponentDefinitions> = {
+    string: {
+        customstringcomponent: (props) => {
+            return (
+                <TestWrapper {...props}>
+                    <input
+                        data-testid={`${props.type}:${props.scope}:custominput`}
+                        value={props.data || ''}
+                        onChange={(e) => props.onChange(e.target.value)}
+                    />
+                </TestWrapper>
+            )
+        },
+        default: (props) => {
+            return (
+                <TestWrapper {...props}>
+                    <input
+                        data-testid={`${props.type}:${props.scope}:input`}
+                        value={props.data || ''}
+                        onChange={(e) => props.onChange(e.target.value)}
+                    />
+                </TestWrapper>
+            )
+        },
+    },
+    number: {
+        default: (props) => {
+            return (
+                <TestWrapper {...props}>
+                    <input
+                        type="number"
+                        data-testid={`${props.type}:${props.scope}:input`}
+                        value={props.data || ''}
+                        onChange={(e) => props.onChange(parseFloat(e.target.value))}
+                    />
+                </TestWrapper>
+            )
+        },
+    },
+    boolean: {
+        default: (props) => {
+            return (
+                <TestWrapper {...props}>
+                    <input
+                        type="checkbox"
+                        data-testid={`${props.type}:${props.scope}:input`}
+                        checked={props.data || false}
+                        onChange={(e) => props.onChange(Boolean(e.target.value))}
+                    />
+                </TestWrapper>
+            )
+        },
+    },
+    object: {
+        default: (props) => {
+            return (
+                <TestWrapper {...props}>
+                    {props.children}
+                </TestWrapper>
+            )
+        },
+    },
+    array: {
+        default: ({ type, scope, children, addItem, removeItem, schema }) => {
+            return (
+                <div data-testid={`${type}:${scope}`}>
+                    <section data-testid={`${type}:${scope}:container`}>{children}</section>
+                    <button data-testid={`${type}:${scope}:addbtn`} onClick={() => addItem()}>
+                        Add Item
+                    </button>
+                    <button data-testid={`${type}:${scope}:removebtn`} onClick={() => removeItem(0)}>
+                        Remove first
+                    </button>
+                    <script type="application/json" data-testid={`${type}:${scope}:schema`}>
+                        {JSON.stringify(schema, null, 2)}
+                    </script>
+                </div>
+            )
+        },
+    },
+}
+
+const traverseSchemaTest = (schema: JSONSchema, callback: (path: string[], child: JSONSchema) => void) => {
+    const traverse = (path: string[], child: JSONSchema) => {
+        if (child.type === 'object') {
+            for (const [key, value] of Object.entries(child.properties)) {
+                traverse([...path, key], value)
+            }
+        }
+        if (child.type === 'array') {
+            traverse([...path, '0'], child.items!)
+        }
+        callback(path, child)
+    }
+    return traverse([], schema)
+}

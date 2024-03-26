@@ -34,12 +34,11 @@ const exampleSchema = zui
       .nullable(),
     dates: zui
       .array(
-        zui
-          .object({
-            date: zui.string(),
-            time: zui.string(),
-            id: zui.number(),
-          })
+        zui.object({
+          date: zui.string(),
+          time: zui.string(),
+          ids: zui.array(zui.number()),
+        })
       )
       .min(1)
       .nonempty(),
@@ -94,7 +93,7 @@ const componentMap: ZuiComponentMap<typeof exampleExtensions> = {
     }
   },
   array: {
-    default: ({ children, scope, context, addItem }) => <><button onClick={() => addItem({})}>Add item {context.path}</button><p>{scope}</p>{children}</>,
+    default: ({ children, scope, context, addItem, schema }) => <><button onClick={() => addItem()}>Add item {context.path}</button><p>{scope}</p>{children}</>,
   },
   boolean: {
     default: ({ data, enabled, label, errors, onChange }) => {

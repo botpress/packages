@@ -83,6 +83,25 @@ export function setObjectPath(obj: any, path: string, data: any): any {
     return { ...obj };
 }
 
+export const getDefaultItemData = (schema: JSONSchema): any => {
+    if (schema.type === 'object') {
+        return {}
+    }
+    if (schema.type === 'array') {
+        return []
+    }
+    if (schema.type === 'string') {
+        return ''
+    }
+    if (schema.type === 'number') {
+        return 0
+    }
+    if (schema.type === 'boolean') {
+        return false
+    }
+    return null
+}
+
 export const FormDataProvider: React.FC<PropsWithChildren<FormFieldContextProps>> = ({ children, setFormData, formData, formSchema }) => {
     return (
         <FormDataContext.Provider value={{ formData, setFormData, formSchema }}>

@@ -15,7 +15,7 @@ import { zuiKey } from '../zui'
 import { useMemo } from 'react'
 import React, { FC } from 'react'
 import { GlobalComponentDefinitions } from '..'
-import { FormDataProvider, useFormData } from './providers/FormDataProvider'
+import { FormDataProvider, getDefaultItemData, useFormData } from './providers/FormDataProvider'
 import { getPathData } from './providers/FormDataProvider'
 
 type ComponentMeta<Type extends BaseType = BaseType> = {
@@ -123,12 +123,14 @@ const FormElementRenderer: FC<FormRendererProps> = ({ components, fieldSchema, p
 
   if (fieldSchema.type === 'array' && type === 'array') {
     const Component = _component as any as ZuiReactComponent<'array', any>
+    const schema = baseProps.schema as ArraySchema
+
     const props: Omit<ZuiReactComponentProps<'array', any>, 'children'> = {
       ...baseProps,
       type,
-      schema: baseProps.schema as any as ArraySchema,
+      schema,
       data: Array.isArray(data) ? data : [],
-      addItem: (data) => addArrayItem(baseProps.context.path, data),
+      addItem: (data = undefined) => addArrayItem(baseProps.context.path, typeof data === 'undefined' ? getDefaultItemData(schema.items) : data),
       removeItem: (index) => removeArrayItem(baseProps.context.path, index),
     }
 

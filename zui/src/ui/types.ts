@@ -179,7 +179,7 @@ export type ZuiReactArrayComponentProps<
   UI extends UIComponentDefinitions = GlobalComponentDefinitions,
 > = ZuiReactComponentBaseProps<Type, ID, UI> & {
   children: JSX.Element | JSX.Element[]
-  addItem: (initialData: any) => void
+  addItem: (initialData: any | undefined) => void
   removeItem: (index: number) => void
 }
 

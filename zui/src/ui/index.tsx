@@ -115,7 +115,7 @@ const FormElementRenderer: FC<FormRendererProps> = ({ components, fieldSchema, p
     return null
   }
 
-  if (fieldSchema['x-zui']?.hidden === true) {
+  if (fieldSchema[zuiKey]?.hidden === true) {
     return null
   }
 
@@ -135,10 +135,10 @@ const FormElementRenderer: FC<FormRendererProps> = ({ components, fieldSchema, p
       formValid,
       updateForm: handlePropertyChange,
     },
-    enabled: fieldSchema['x-zui']?.disabled !== true,
+    enabled: fieldSchema[zuiKey]?.disabled !== true,
     onChange: (data: any) => handlePropertyChange(pathString, data),
     errors: formErrors?.filter((e) => e.path.join('.') === pathString) || [],
-    label: fieldSchema['x-zui']?.title || formatTitle(path[path.length - 1]?.toString() || ''),
+    label: fieldSchema[zuiKey]?.title || formatTitle(path[path.length - 1]?.toString() || ''),
     params: componentMeta.params,
     schema: fieldSchema,
     zuiProps: fieldSchema[zuiKey],

@@ -18,6 +18,7 @@ import React, { FC } from 'react'
 import { GlobalComponentDefinitions } from '..'
 import { FormDataProvider, getDefaultItemData, useFormData } from './providers/FormDataProvider'
 import { getPathData } from './providers/FormDataProvider'
+import { formatTitle } from './titleutils'
 
 type ComponentMeta<Type extends BaseType = BaseType> = {
   type: Type,
@@ -97,6 +98,10 @@ const FormElementRenderer: FC<FormRendererProps> = ({ components, fieldSchema, p
     return null
   }
 
+  if (fieldSchema['x-zui']?.hidden === true) {
+    return null
+  }
+
   const { Component: _component, type } = componentMeta
 
   const pathString = path.length > 0 ? path.join('.') : 'root'
@@ -116,7 +121,7 @@ const FormElementRenderer: FC<FormRendererProps> = ({ components, fieldSchema, p
     enabled: fieldSchema['x-zui']?.disabled !== true,
     onChange: (data: any) => handlePropertyChange(pathString, data),
     errors: formErrors?.filter(e => e.path.join('.') === pathString) || [],
-    label: fieldSchema['x-zui']?.title || path[path.length - 1]?.toString() || '',
+    label: fieldSchema['x-zui']?.title || formatTitle(path[path.length - 1]?.toString() || ''),
     params: componentMeta.params,
     schema: fieldSchema,
     zuiProps: fieldSchema[zuiKey],
@@ -185,8 +190,6 @@ const FormElementRenderer: FC<FormRendererProps> = ({ components, fieldSchema, p
   }
 
   return (
-    <Component
-      {...props}
-    />
+    <Component {...props} />
   )
 }

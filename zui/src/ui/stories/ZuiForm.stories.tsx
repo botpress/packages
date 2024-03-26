@@ -29,7 +29,7 @@ const exampleSchema = zui
     lastName: zui
       .string()
       .min(3)
-      .title('Last Name')
+      .title('Last Name <3')
       .optional()
       .nullable(),
     dates: zui
@@ -43,7 +43,7 @@ const exampleSchema = zui
       .min(1)
       .nonempty(),
     // tests the hidden function
-    arandomfield: zui.string().hidden(),
+    aRandomField: zui.string().hidden(),
 
     stuff: zui.object({
       birthday: zui

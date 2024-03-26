@@ -28,7 +28,7 @@ export const useFormData = () => {
         try {
             return jsonSchemaToZui(context.formSchema) as any as ZodAny
         } catch (e) {
-            console.error(e)
+            console.error('Error transforming zod schema to zui schema', e)
             return null
         }
     }, [context.formSchema])

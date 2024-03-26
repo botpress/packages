@@ -66,19 +66,28 @@ const resolveComponent = <Type extends BaseType>(
   }
 }
 
+export type ZuiFormProps<UI extends UIComponentDefinitions = GlobalComponentDefinitions> = {
+  schema: JSONSchema
+  components: ZuiComponentMap<UI>
+  value: any
+  onChange: (value: any) => void
+  disableValidation?: boolean
+}
+
 export const ZuiForm = <UI extends UIComponentDefinitions = GlobalComponentDefinitions>({
   schema,
   components,
   onChange,
   value,
-}: {
-  schema: JSONSchema
-  components: ZuiComponentMap<UI>
-  value: any
-  onChange: (value: any) => void
-}): JSX.Element | null => {
+  disableValidation,
+}: ZuiFormProps<UI>): JSX.Element | null => {
   return (
-    <FormDataProvider formData={value} setFormData={onChange} formSchema={schema}>
+    <FormDataProvider
+      formData={value}
+      setFormData={onChange}
+      formSchema={schema}
+      disableValidation={disableValidation || false}
+    >
       <FormElementRenderer
         components={components}
         fieldSchema={schema}
@@ -122,8 +131,8 @@ const FormElementRenderer: FC<FormRendererProps> = ({ components, fieldSchema, p
       path: pathString,
       readonly: false,
       formData,
-      formErrors: formErrors || null,
-      formValid: formValid || null,
+      formErrors,
+      formValid,
       updateForm: handlePropertyChange,
     },
     enabled: fieldSchema['x-zui']?.disabled !== true,

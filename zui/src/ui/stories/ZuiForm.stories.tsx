@@ -11,7 +11,7 @@ const exampleExtensions = {
   string: {
     debug: {
       id: 'debug',
-      schema: z.string(),
+      schema: z.null(),
     },
   },
   number: {},
@@ -22,7 +22,7 @@ const exampleExtensions = {
 
 const exampleSchema = zui
   .object({
-    firstName: zui.string().title('User').disabled().placeholder('Enter your name').nullable(),
+    firstName: zui.string().title('first name').disabled().placeholder('Enter your name').nullable(),
     lastName: zui.string().min(3).title('Last Name <3').optional().nullable(),
     dates: zui
       .array(
@@ -35,7 +35,7 @@ const exampleSchema = zui
       .min(1)
       .nonempty(),
     // tests the hidden function
-    aRandomField: zui.string().hidden(),
+    aRandomField: zui.string().optional().hidden(),
 
     stuff: zui.object({
       birthday: zui.string(),
@@ -45,7 +45,7 @@ const exampleSchema = zui
       password: zui.string(),
       passwordConfirm: zui.string(),
     }),
-    debug: zui.string().displayAs('debug', ''),
+    debug: zui.string().optional().displayAs('debug', null),
   })
   .title('User Information')
 
@@ -88,7 +88,25 @@ const componentMap: ZuiComponentMap<typeof exampleExtensions> = {
       )
     },
     debug: ({ context }) => {
-      return <pre>{JSON.stringify(context.formData, null, 2)}</pre>
+      return (
+        <div>
+          <pre>{JSON.stringify(context.formData, null, 2)}</pre>
+          {context.formValid === null && <p>Form validation disabled</p>}
+          {context.formValid === true && <p>Form is valid</p>}
+          {context.formValid === false && (
+            <div>
+              <p>Form is invalid with {context.formErrors?.length} errors:</p>
+              <ul>
+                {context.formErrors?.map((e) => (
+                  <li>
+                    {e.path.join('.')} - {e.message}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+        </div>
+      )
     },
   },
   array: {
@@ -173,6 +191,7 @@ const ZuiFormExample = () => {
       value={formData}
       onChange={setFormData}
       components={componentMap}
+      disableValidation={false}
     />
   )
 }

@@ -8,6 +8,7 @@ export type FormFieldContextProps = {
   formData: any
   formSchema: JSONSchema | any
   setFormData: (data: any) => void
+  disableValidation: boolean
 }
 
 export const FormDataContext = createContext<FormFieldContextProps>({
@@ -16,6 +17,7 @@ export const FormDataContext = createContext<FormFieldContextProps>({
   setFormData: () => {
     throw new Error('Must be within a FormDataProvider')
   },
+  disableValidation: false,
 })
 
 export const useFormData = () => {
@@ -33,7 +35,14 @@ export const useFormData = () => {
   }, [context.formSchema])
 
   const validation = useMemo(() => {
-    if (!zodSchema) return null
+    if (context.disableValidation) {
+      return { formValid: null, formErrors: null }
+    }
+
+    if (!zodSchema) {
+      return { formValid: null, formErrors: null }
+    }
+
     const validation = zodSchema.safeParse(context.formData)
 
     if (!validation.success) {
@@ -106,8 +115,13 @@ export const FormDataProvider: React.FC<PropsWithChildren<FormFieldContextProps>
   setFormData,
   formData,
   formSchema,
+  disableValidation,
 }) => {
-  return <FormDataContext.Provider value={{ formData, setFormData, formSchema }}>{children}</FormDataContext.Provider>
+  return (
+    <FormDataContext.Provider value={{ formData, setFormData, formSchema, disableValidation }}>
+      {children}
+    </FormDataContext.Provider>
+  )
 }
 
 export function getPathData(object: any, path: string[]): any {

@@ -13,8 +13,7 @@ import {
   ZuiReactArrayChildProps,
 } from './types'
 import { zuiKey } from '../zui'
-import { useMemo } from 'react'
-import React, { FC } from 'react'
+import React, { type FC, useMemo } from 'react'
 import { GlobalComponentDefinitions } from '..'
 import { FormDataProvider, getDefaultItemData, useFormData } from './providers/FormDataProvider'
 import { getPathData } from './providers/FormDataProvider'

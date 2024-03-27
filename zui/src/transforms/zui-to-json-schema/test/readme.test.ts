@@ -1,5 +1,5 @@
 import { z } from 'zod'
-import zodToJsonSchema from '..'
+import { zodToJsonSchema } from '../zodToJsonSchema'
 
 describe('The readme example', () => {
   it('should be valid', () => {

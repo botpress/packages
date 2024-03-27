@@ -32,7 +32,7 @@ describe('promise', () => {
     expect(parsedSchema).toEqual(jsonSchema)
   })
 
-  it('default with transform', (assert) => {
+  it('default with transform', () => {
     const stringWithDefault = z
       .string()
       .transform((val) => val.toUpperCase())

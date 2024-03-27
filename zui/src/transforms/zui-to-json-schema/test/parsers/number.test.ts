@@ -123,7 +123,7 @@ describe('Number validations', () => {
       expect(jsonParsedSchema).not.toHaveProperty('errorMessage')
     }
   })
-  it("should not include error messages if error message isn't explicitly set to true in References constructor", (assert) => {
+  it("should not include error messages if error message isn't explicitly set to true in References constructor", () => {
     const zodNumberSchemas = [
       z.number().lt(5),
       z.number().gt(5),

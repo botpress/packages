@@ -1,6 +1,6 @@
 {
   "name": "@bpinternal/zui",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "description": "An extension of Zod for working nicely with UIs and JSON Schemas",
   "type": "module",
   "source": "./src/index.ts",
@@ -42,6 +42,7 @@
     "ajv": "^8.12.0",
     "ajv-formats": "^2.1.1",
     "jsdom": "^24.0.0",
+    "local-ref-resolver": "^0.2.0",
     "prettier": "^3.0.0",
     "react-dom": "^18.2.0",
     "storybook": "^8.0.4",
@@ -49,11 +50,10 @@
     "typescript": "5.4.2",
     "vite": "^5.2.6",
     "vitest": "1.4.0",
-    "zod": "3.20.6"
+    "zod": "3.22.4"
   },
   "dependencies": {
     "@bpinternal/json-schema-to-zod": "^2.0.15",
-    "@bpinternal/zod-to-json-schema": "^3.22.5",
     "json-schema-to-typescript": "^13.1.2",
     "lodash": "^4.17.21",
     "react": "^18.2.0"

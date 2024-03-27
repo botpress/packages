@@ -26,12 +26,13 @@ import type {
 
 // eslint-disable-next-line no-duplicate-imports
 import { z } from 'zod'
-import { ZuiSchemaOptions, getZuiSchemas } from './zui-schemas'
-import { GlobalComponentDefinitions, JsonSchema7, jsonSchemaToZui } from '.'
-import { ObjectToZuiOptions, objectToZui } from './object/object-to-zui'
+import { GlobalComponentDefinitions, jsonSchemaToZui } from '.'
+import { ObjectToZuiOptions, objectToZui } from './transforms/object-to-zui'
 import type { UIComponentDefinitions, ZodToBaseType } from './ui/types'
 import { isNodeEnvironment } from './utils'
-import { ToTsOptions } from './typescript/zui-to-ts'
+import { ToTsOptions } from './transforms/zui-to-typescript'
+import { ZuiSchemaOptions, zuiToJsonSchema } from './transforms/zui-to-json-schema/zui-extension'
+import { JsonSchema7Type } from './transforms/zui-to-json-schema/parseDef'
 
 export type Infer<
   T extends ZodType | ZuiType<any> | ZuiTypeAny,
@@ -178,7 +179,7 @@ function extend<T extends ZCreate | ZodLazy<any>>(zType: T) {
 
   if (!instance.toJsonSchema) {
     instance.toJsonSchema = function (options?: ZuiSchemaOptions) {
-      return getZuiSchemas(this, options).schema
+      return zuiToJsonSchema(this, options)
     }
   }
 
@@ -201,7 +202,7 @@ function extend<T extends ZCreate | ZodLazy<any>>(zType: T) {
         return ''
       }
 
-      const module = await import('./typescript/zui-to-ts')
+      const module = await import('./transforms/zui-to-typescript')
       return module.toTypescriptTypings(this.toJsonSchema(options), options)
     }
   }
@@ -258,6 +259,13 @@ type ZuiRecord = {
   ): ZuiType<ZodRecord<ZodString, ToZodType<Value>>>
 }
 
+export type JSONSchemaWithZui<Schema extends object> = Schema & {
+  [zuiKey]?: ZuiExtension<ToZodType<ZuiType>, any>
+  properties?: {
+    [key: string]: any
+  }
+}
+
 export type Zui<UI extends UIComponentDefinitions = GlobalComponentDefinitions> = {
   string: (params?: StringArgs[0]) => ZuiType<ZodString, UI>
   number: (params?: NumberArgs[0]) => ZuiType<ZodNumber, UI>
@@ -290,7 +298,7 @@ export type Zui<UI extends UIComponentDefinitions = GlobalComponentDefinitions> 
   unknown: (params?: UnknownArgs[0]) => ZuiType<ZodUnknown>
   null: (params?: NullArgs[0]) => ZuiType<ZodNull>
   lazy: <T extends ZodTypeAny>(schema: () => T) => ZuiType<ZodLazy<T>, UI>
-  fromJsonSchema(schema: JsonSchema7): ZuiType<ZodAny>
+  fromJsonSchema(schema: JsonSchema7Type): ZuiType<ZodAny>
   fromObject(object: any, options?: ObjectToZuiOptions): ZuiType<ZodAny>
 }
 

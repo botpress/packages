@@ -8,9 +8,6 @@ dependencies:
   '@bpinternal/json-schema-to-zod':
     specifier: ^2.0.15
     version: 2.0.15
-  '@bpinternal/zod-to-json-schema':
-    specifier: ^3.22.5
-    version: 3.22.5(zod@3.20.6)
   json-schema-to-typescript:
     specifier: ^13.1.2
     version: 13.1.2
@@ -76,6 +73,9 @@ devDependencies:
   jsdom:
     specifier: ^24.0.0
     version: 24.0.0
+  local-ref-resolver:
+    specifier: ^0.2.0
+    version: 0.2.0
   prettier:
     specifier: ^3.0.0
     version: 3.2.5
@@ -98,8 +98,8 @@ devDependencies:
     specifier: 1.4.0
     version: 1.4.0(jsdom@24.0.0)
   zod:
-    specifier: 3.20.6
-    version: 3.20.6
+    specifier: 3.22.4
+    version: 3.22.4
 
 packages:
 
@@ -1397,14 +1397,6 @@ packages:
 
   /@bpinternal/json-schema-to-zod@2.0.15:
     resolution: {integrity: sha512-CEi5XbffaDBAV+Ghqifx8XN+QZ/lzTGsWPn62uiTwD+arpqdlNZs7a0gtkNz1Fkr0KmkHWTZtzUdYNjIqIszTw==}
-    dev: false
-
-  /@bpinternal/zod-to-json-schema@3.22.5(zod@3.20.6):
-    resolution: {integrity: sha512-6cWhIJYtbOPz94La+uBGt6Vpdh8sNYG9JeKPSdjJdx9+M2ty83qcYzKM5zYnl4Ith+wWM9HD14n+ygM9Jln63w==}
-    peerDependencies:
-      zod: ^3.22.4
-    dependencies:
-      zod: 3.20.6
     dev: false
 
   /@colors/colors@1.5.0:
@@ -5823,6 +5815,10 @@ packages:
       pkg-types: 1.0.3
     dev: true
 
+  /local-ref-resolver@0.2.0:
+    resolution: {integrity: sha512-Qwrp+Ng1WgbvvS73+eco3MtQitSphQKCus4umweCoiWFFWQjQ1i0Aez+Mcg/EBTFMKG9rgxRV86M1pmQUzsaQg==}
+    dev: true
+
   /locate-path@3.0.0:
     resolution: {integrity: sha512-7AO748wWnIhNqAuaty2ZWHkQHRSNfPVIsPIfwEOWO22AmaoVrWavlOcMR5nzTLNYvp36X220/maaRsrec1G65A==}
     engines: {node: '>=6'}
@@ -8108,5 +8104,6 @@ packages:
     engines: {node: '>=12.20'}
     dev: true
 
-  /zod@3.20.6:
-    resolution: {integrity: sha512-oyu0m54SGCtzh6EClBVqDDlAYRz4jrVtKwQ7ZnsEmMI9HnzuZFj8QFwAY1M5uniIYACdGvv0PBWPF2kO0aNofA==}
+  /zod@3.22.4:
+    resolution: {integrity: sha512-iC+8Io04lddc+mVqQ9AZ7OQ2MrUKGN+oIQyq1vemgt46jwCwLfhq7/pwnBnNXXXZb8VTVLKwp9EDkx+ryxIWmg==}
+    dev: true

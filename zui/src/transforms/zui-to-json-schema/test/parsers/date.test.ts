@@ -29,10 +29,10 @@ describe('Number validations', () => {
       minimum: 86400000,
     }
 
-    assert(parsedSchema, jsonSchema)
+    expect(parsedSchema).toEqual(jsonSchema)
   })
 
-  it('should be possible to describe maximum date', (assert) => {
+  it('should be possible to describe maximum date', () => {
     const zodDateSchema = z.date().max(new Date('1970-01-02'))
     const parsedSchema = parseDateDef(zodDateSchema._def, getRefs({ dateStrategy: 'integer' }))
 

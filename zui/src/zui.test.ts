@@ -11,9 +11,11 @@ export const someSchema: ExampleSchema = {
   schema: zui.object({
     name: zui.string().title('Name'),
     age: zui.number().title('Age'),
-    employer: zui.object({
-      name: zui.string().title('Employer Name'),
-    }).disabled(),
+    employer: zui
+      .object({
+        name: zui.string().title('Employer Name'),
+      })
+      .disabled(),
   }),
 }
 

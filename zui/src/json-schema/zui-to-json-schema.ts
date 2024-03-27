@@ -1,8 +1,10 @@
-import { zodToJsonSchema, type JsonSchema7ArrayType, type JsonSchema7ObjectType } from '@bpinternal/zod-to-json-schema'
+import { zodToJsonSchema } from '@bpinternal/zod-to-json-schema'
 import type { JsonSchema7, ZuiExtension, ZuiTypeAny, ZuiType } from '../index'
 import { zuiKey, ToZodType } from '../zui'
 import type { ZuiSchemaOptions } from '../zui-schemas'
 import { z } from 'zod'
+import { ArraySchema, ObjectSchema } from '~/ui/types'
+import { JSONSchema } from 'json-schema-to-typescript'
 
 type JsonSchemaWithZui = JsonSchema7 & {
   [zuiKey]?: ZuiExtension<ToZodType<ZuiType>, any>
@@ -11,7 +13,10 @@ type JsonSchemaWithZui = JsonSchema7 & {
   }
 }
 
-export const zuiToJsonSchema = (zuiType: ZuiTypeAny | z.ZodTypeAny, opts: ZuiSchemaOptions = {}): JsonSchemaWithZui => {
+export const zuiToJsonSchema = (
+  zuiType: ZuiTypeAny | z.ZodTypeAny,
+  opts: ZuiSchemaOptions = { target: 'jsonSchema7' },
+): JsonSchemaWithZui => {
   const jsonSchema = zodToJsonSchema(zuiType as ToZodType<ZuiType>, opts)
 
   if (opts.$schemaUrl === false) {
@@ -20,14 +25,14 @@ export const zuiToJsonSchema = (zuiType: ZuiTypeAny | z.ZodTypeAny, opts: ZuiSch
     jsonSchema.$schema = opts.$schemaUrl
   }
 
-  return mergeZuiIntoJsonSchema(jsonSchema as JsonSchema7, zuiType, opts)
+  return mergeZuiIntoJsonSchema(jsonSchema as JSONSchema, zuiType, opts)
 }
 
-const isObject = (schema: JsonSchema7): schema is JsonSchema7ObjectType =>
+const isObject = (schema: JsonSchema7): schema is ObjectSchema =>
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   (schema as any).type === 'object' && (schema as any).properties
 
-const isArray = (schema: JsonSchema7): schema is JsonSchema7ArrayType =>
+const isArray = (schema: JsonSchema7): schema is ArraySchema =>
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   (schema as any).type === 'array'
 
@@ -45,11 +50,11 @@ const getShape = (zuiSchema?: ZuiType<any> | z.ZodTypeAny) => {
 }
 
 const mergeZuiIntoJsonSchema = (
-  jsonSchema: JsonSchemaWithZui,
+  jsonSchema: JSONSchema,
   zuiSchema: ZuiType<any> | z.ZodTypeAny,
   opts: ZuiSchemaOptions,
-): JsonSchema7 => {
-  const assignZuiProps = (value: JsonSchemaWithZui, ui: ZuiExtension<ToZodType<ZuiType>, any>['ui']) => {
+): JSONSchema => {
+  const assignZuiProps = (value: JSONSchema, ui: ZuiExtension<ToZodType<ZuiType>, any>['ui']) => {
     if (!opts.stripZuiProps) {
       Object.assign(value, { [zuiKey]: ui })
     }

@@ -21,41 +21,22 @@ export type ZuiSchemaOptions = {
   target?: 'jsonSchema7' | 'openApi3'
 } & Partial<Pick<Options, 'unionStrategy' | 'discriminator'>>
 
-/**
- * This is a recursive schema that describes the UI of a Zod schema.
- */
-export type UISchema = {
-  /** Type and options are available when using "displayAs" */
-  type?: string
-  options?: any
-  /**
-   * The scope is the full path to the property defined in the JSON schema, the root node being represented by #
-   * Objects doesn't have any scope, only  its child does
-   * */
-  scope?: string
-  /** Optional label for the element */
-  label?: string
-  elements?: UISchema[]
-}
-
 const BASE_SCOPE = '#/properties/'
 
-const processConfiguration = (config: Record<string, ZuiTypeAny>, currentRoot: string, currentSchema: UISchema) => {
+const processConfiguration = (config: Record<string, ZuiTypeAny>, currentRoot: string) => {
   Object.keys(config).forEach((key) => {
     const scope = `${currentRoot}${key}`
     const nextScope = `${scope}/properties/`
     const zuiSchema = config[key]
     const currentShape = zuiSchema?._def?.shape?.()
-    const elements = currentSchema.elements ?? []
+    const elements = []
 
-    if (zuiSchema?.ui) {
-      elements.push({ scope, label: zuiSchema?.ui.title })
-    } else if (!currentShape) {
+    if (!currentShape) {
       elements.push({ scope, label: key })
     }
 
     if (currentShape) {
-      processConfiguration(currentShape, nextScope, currentSchema)
+      processConfiguration(currentShape, nextScope)
     }
   })
 }
@@ -63,11 +44,9 @@ const processConfiguration = (config: Record<string, ZuiTypeAny>, currentRoot: s
 export const getZuiSchemas = (input: ZuiTypeAny | z.ZodTypeAny, opts: ZuiSchemaOptions = { rootScope: BASE_SCOPE }) => {
   const schema = zuiToJsonSchema(input, opts)
 
-  let uischema: UISchema = {}
-
   if (input?._def?.shape) {
-    processConfiguration(input._def.shape(), opts.rootScope || BASE_SCOPE, uischema)
+    processConfiguration(input._def.shape(), opts.rootScope || BASE_SCOPE)
   }
 
-  return { schema, uischema }
+  return { schema }
 }

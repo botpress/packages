@@ -422,7 +422,6 @@ describe('UI', () => {
     const element = rendered.queryByTestId('stringlistelement:0')
 
     expect(element).toBeTruthy()
-    
   })
 })
 
@@ -563,7 +562,9 @@ const testComponentImplementation: ZuiComponentMap<typeof testComponentDefinitio
       const childrens = Array.isArray(props.children) ? props.children : [props.children]
       return (
         <TestWrapper {...props}>
-          <button data-testid="stringlistelement:addbtn" onClick={() => props.addItem('')}>Add item</button>
+          <button data-testid="stringlistelement:addbtn" onClick={() => props.addItem('')}>
+            Add item
+          </button>
           {childrens.map((child, index) => (
             <div data-testid={`stringlistelement:${index}`}>
               <span key={index}>{child}</span>

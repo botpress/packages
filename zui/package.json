@@ -49,8 +49,7 @@
     "tsup": "^8.0.1",
     "typescript": "5.4.2",
     "vite": "^5.2.6",
-    "vitest": "1.4.0",
-    "zod": "3.22.4"
+    "vitest": "1.4.0"
   },
   "dependencies": {
     "@bpinternal/json-schema-to-zod": "^2.0.15",
@@ -61,6 +60,9 @@
   "bundledDependencies": [
     "zod"
   ],
+  "peerDependencies": {
+    "zod": "3.22.4"
+  },
   "repository": {
     "type": "git",
     "url": "https://github.com/botpress/packages"

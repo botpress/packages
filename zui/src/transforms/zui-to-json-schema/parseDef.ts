@@ -30,6 +30,7 @@ import { JsonSchema7UnionType, parseUnionDef } from './parsers/union'
 import { JsonSchema7UnknownType, parseUnknownDef } from './parsers/unknown'
 import { Refs, Seen } from './Refs'
 import { parseReadonlyDef } from './parsers/readonly'
+import { zuiKey } from '../../zui'
 
 type JsonSchema7RefType = { $ref: string }
 type JsonSchema7Meta = {
@@ -216,6 +217,9 @@ const addMeta = (def: ZodTypeDef, refs: Refs, jsonSchema: JsonSchema7Type): Json
     if (refs.markdownDescription) {
       jsonSchema.markdownDescription = def.description
     }
+  }
+  if ((def as any)[zuiKey]) {
+    (jsonSchema as any)[zuiKey] = (def as any)[zuiKey]
   }
   return jsonSchema
 }

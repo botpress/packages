@@ -1,4 +1,5 @@
 import { UIComponentDefinitions } from './ui/types'
+import { zui } from './zui'
 export type { BaseType, UIComponentDefinitions, ZuiComponentMap, AsBaseType, ZuiReactComponent } from './ui/types'
 export { ZuiForm, type ZuiFormProps } from './ui'
 export type { Zui, ZuiType, Infer, ZuiExtension, ZuiRawShape, ZuiTypeAny } from './zui'
@@ -15,6 +16,7 @@ export type GlobalComponentDefinitions = ComponentDefinitions extends {
   ? TComponentMap
   : any
 
-export { zui as z } from './zui'
 export { zui } from './zui'
-export { zui as zod } from './zui'
+export { zui as z }
+
+export default zui

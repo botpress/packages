@@ -1,7 +1,7 @@
 import { parseSchema } from '@bpinternal/json-schema-to-zod'
 import { ZodTypeAny } from 'zod'
-import { ZuiTypeAny, zui, zuiKey } from '../zui'
-import { JsonSchema7 } from '..'
+import { ZuiTypeAny, zui, zuiKey } from '../../zui'
+import { JsonSchema7Type } from '../zui-to-json-schema/parseDef'
 
 const jsonSchemaToZodStr = (schema: any): string => {
   return parseSchema(schema, {
@@ -50,7 +50,7 @@ const applyZuiPropsRecursively = (zodField: ZodTypeAny, jsonSchemaField: any) =>
   }
 }
 
-export const jsonSchemaToZui = (schema: JsonSchema7): ZuiTypeAny => {
+export const jsonSchemaToZui = (schema: JsonSchema7Type): ZuiTypeAny => {
   const zodSchema = jsonSchemaToZod(schema)
   applyZuiPropsRecursively(zodSchema, schema)
   return zodSchema as unknown as ZuiTypeAny

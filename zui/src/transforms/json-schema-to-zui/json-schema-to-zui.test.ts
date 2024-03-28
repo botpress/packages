@@ -1,11 +1,10 @@
 import { describe, expect, test } from 'vitest'
-import { ZuiTypeAny, zui, zuiKey } from '../zui'
-import { getZuiSchemas } from '../zui-schemas'
-import { jsonSchemaToZui } from './json-schema-to-zui'
-import { zuiToJsonSchema } from './zui-to-json-schema'
+import { ZuiTypeAny, zui, zuiKey } from '../../zui'
+import { jsonSchemaToZui } from '.'
+import { zuiToJsonSchema } from '../zui-to-json-schema/zui-extension'
 
 const testZuiConversion = (zuiObject: ZuiTypeAny) => {
-  const jsonSchema = getZuiSchemas(zuiObject).schema
+  const jsonSchema = zuiToJsonSchema(zuiObject)
   const asZui = jsonSchemaToZui(jsonSchema)
   const convertedJsonSchema = zuiToJsonSchema(asZui)
 
@@ -81,7 +80,7 @@ describe('jsonSchemaToZui', () => {
     ])
     const strategy = { discriminator: true, unionStrategy: 'oneOf' } as const
 
-    const jsonSchema = getZuiSchemas(zuiSchema, strategy).schema
+    const jsonSchema = zuiToJsonSchema(zuiSchema, strategy)
     const converted = zuiToJsonSchema(jsonSchemaToZui(jsonSchema), strategy)
 
     expect(jsonSchema).toEqual(converted)

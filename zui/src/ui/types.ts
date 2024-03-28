@@ -61,12 +61,14 @@ export type NumberSchema = {
   exclusiveMinimum?: number
   exclusiveMaximum?: number
   enum?: number[]
+  default?: number
 } & BaseSchema
 
 export type BooleanSchema = {
   type: 'boolean'
   enum?: boolean[]
   const?: boolean
+  default?: boolean
 } & BaseSchema
 
 export type PrimitiveSchema = StringSchema | NumberSchema | BooleanSchema

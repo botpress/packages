@@ -1,7 +1,7 @@
 import { PropsWithChildren, createContext, useContext, useMemo } from 'react'
 import React from 'react'
 import { JSONSchema } from '../types'
-import { jsonSchemaToZui } from '../../json-schema/json-schema-to-zui'
+import { jsonSchemaToZui } from '../../transforms/json-schema-to-zui'
 import { ZodAny } from 'zod'
 
 export type FormFieldContextProps = {

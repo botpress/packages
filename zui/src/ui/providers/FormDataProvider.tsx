@@ -49,7 +49,6 @@ export const useFormData = () => {
     const isValid = compiledSchema(context.formData)
 
     if (!isValid) {
-      console.log(compiledSchema.errors)
       return {
         formValid: false,
         formErrors: compiledSchema.errors?.map<FormError>(e => {
@@ -57,7 +56,7 @@ export const useFormData = () => {
             path: e.instancePath.split('/').slice(1),
             message: e.message || 'Unknown error',
           }
-        })
+        }) || [],
       }
     }
     return {

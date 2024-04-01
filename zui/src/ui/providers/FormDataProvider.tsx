@@ -1,8 +1,7 @@
 import { PropsWithChildren, createContext, useContext, useMemo } from 'react'
 import React from 'react'
-import { JSONSchema } from '../types'
-import { jsonSchemaToZui } from '../../transforms/json-schema-to-zui'
-import { ZodAny } from 'zod'
+import { FormError, JSONSchema } from '../types'
+import ajv from 'ajv'
 
 export type FormFieldContextProps = {
   formData: any
@@ -25,13 +24,17 @@ export const useFormData = () => {
   if (context === undefined) {
     throw new Error('useFormData must be used within a FormDataProvider')
   }
-  const zodSchema = useMemo(() => {
-    try {
-      return jsonSchemaToZui(context.formSchema) as any as ZodAny
-    } catch (e) {
-      console.error('Error transforming zod schema to zui schema', e)
+  const compiledSchema = useMemo(() => {
+    if (!context.formSchema) {
       return null
     }
+    
+    if (context.disableValidation) {
+      return null
+    }
+    
+    const ajvInstance = new ajv({ strictSchema: false })
+    return ajvInstance.compile(context.formSchema)
   }, [context.formSchema])
 
   const validation = useMemo(() => {
@@ -39,23 +42,29 @@ export const useFormData = () => {
       return { formValid: null, formErrors: null }
     }
 
-    if (!zodSchema) {
+    if (!compiledSchema) {
       return { formValid: null, formErrors: null }
     }
 
-    const validation = zodSchema.safeParse(context.formData)
+    const isValid = compiledSchema(context.formData)
 
-    if (!validation.success) {
+    if (!isValid) {
+      console.log(compiledSchema.errors)
       return {
         formValid: false,
-        formErrors: validation.error.issues,
+        formErrors: compiledSchema.errors?.map<FormError>(e => {
+          return {
+            path: e.instancePath.split('/').slice(1),
+            message: e.message || 'Unknown error',
+          }
+        })
       }
     }
     return {
       formValid: true,
       formErrors: [],
     }
-  }, [zodSchema, context.formData])
+  }, [compiledSchema, context.formData])
 
   const handlePropertyChange = (path: string, data: any) => {
     context.setFormData(setObjectPath(context.formData, path, data))

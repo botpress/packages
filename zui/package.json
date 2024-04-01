@@ -39,8 +39,7 @@
     "@types/json-schema": "^7.0.15",
     "@types/react": "^18.2.48",
     "@vitejs/plugin-react-swc": "^3.6.0",
-    "ajv": "^8.12.0",
-    "ajv-formats": "^2.1.1",
+    "ajv-formats": "^3.0.1",
     "jsdom": "^24.0.0",
     "local-ref-resolver": "^0.2.0",
     "prettier": "^3.0.0",
@@ -53,6 +52,7 @@
   },
   "dependencies": {
     "@bpinternal/json-schema-to-zod": "^2.0.15",
+    "ajv": "^8.12.0",
     "json-schema-to-typescript": "^13.1.2",
     "lodash": "^4.17.21",
     "react": "^18.2.0"

@@ -141,6 +141,11 @@ export type SchemaContext<
   zuiProps: BaseSchema[typeof zuiKey]
 }
 
+export type FormError = {
+  message: string,
+  path: (string | number)[]
+}
+
 export type ZuiReactComponentBaseProps<
   Type extends BaseType,
   ID extends keyof UI[Type],
@@ -155,11 +160,11 @@ export type ZuiReactComponentBaseProps<
   onChange: (data: any) => void
   schema: JSONSchemaOfType<Type>
   label: string
-  errors: z.ZodIssue[]
+  errors: FormError[]
   context: {
     path: string
     formValid: boolean | null
-    formErrors: z.ZodIssue[] | null
+    formErrors: FormError[] | null
     formData?: any
     readonly: boolean
     updateForm: (path: string, data: any) => void

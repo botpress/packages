@@ -28,11 +28,11 @@ export const useFormData = () => {
     if (!context.formSchema) {
       return null
     }
-    
+
     if (context.disableValidation) {
       return null
     }
-    
+
     const ajvInstance = new ajv({ strictSchema: false })
     return ajvInstance.compile(context.formSchema)
   }, [context.formSchema])
@@ -51,12 +51,13 @@ export const useFormData = () => {
     if (!isValid) {
       return {
         formValid: false,
-        formErrors: compiledSchema.errors?.map<FormError>(e => {
-          return {
-            path: e.instancePath.split('/').slice(1),
-            message: e.message || 'Unknown error',
-          }
-        }) || [],
+        formErrors:
+          compiledSchema.errors?.map<FormError>((e) => {
+            return {
+              path: e.instancePath.split('/').slice(1),
+              message: e.message || 'Unknown error',
+            }
+          }) || [],
       }
     }
     return {

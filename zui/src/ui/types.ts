@@ -142,7 +142,7 @@ export type SchemaContext<
 }
 
 export type FormError = {
-  message: string,
+  message: string
   path: (string | number)[]
 }
 

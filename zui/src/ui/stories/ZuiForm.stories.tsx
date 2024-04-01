@@ -176,7 +176,7 @@ const componentMap: ZuiComponentMap<typeof exampleExtensions> = {
         <section>
           <div style={{ border: '1px solid red' }}>{children}</div>
           {rest.isArrayChild === true && <button onClick={() => rest.removeSelf()}>delete</button>}
-          {!!errors?.length  && <ErrorBox errors={errors} data={data} /> }
+          {!!errors?.length && <ErrorBox errors={errors} data={data} />}
         </section>
       )
     },

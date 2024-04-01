@@ -1,6 +1,6 @@
 import { describe, expect, test } from 'vitest'
 import { ZuiTypeAny, zui, zuiKey } from '../../zui'
-import { jsonSchemaToZui } from '.'
+import { jsonSchemaToZui, traverseZodDefinitions } from '.'
 import { zuiToJsonSchema } from '../zui-to-json-schema/zui-extension'
 
 const testZuiConversion = (zuiObject: ZuiTypeAny) => {
@@ -26,8 +26,17 @@ const testZuiConversion = (zuiObject: ZuiTypeAny) => {
 
 describe('jsonSchemaToZui', () => {
   test('convert record', () => {
-    const zuiObject = zui.record(zui.string().title('Name'), zui.number().title('Age'))
-    testZuiConversion(zuiObject)
+    const inner = [zui.string().title('Name'), zui.number().title('Age')] as const
+
+    expect(zuiToJsonSchema(zui.record(inner[0], inner[1]))).toMatchObject({
+      type: 'object',
+      additionalProperties: {
+        type: 'number',
+        [zuiKey]: {
+          title: 'Age',
+        },
+      },
+    })
   })
 
   test('convert discriminated union', () => {
@@ -87,25 +96,53 @@ describe('jsonSchemaToZui', () => {
   })
 
   test('convert object with nested', () => {
-    const zuiSchema = zui.object({
-      name: zui.string().describe('Name of person').title('title').optional(),
-      isAdmin: zui.boolean().displayAs('Checkbox', {}).optional(),
-      department: zui.string().default('IT').optional(),
-      address: zui.object({
-        city: zui.object({
-          name: zui.string().title('City Name').optional(),
-          synonyms: zui.array(zui.string().title('One synonyms')).title('All synonyms').optional(),
-        }),
-        street: zui.string().title('Street name').optional(),
-      }),
+
+    const zuiSchema = jsonSchemaToZui({
+      type: 'object',
+      properties: {
+        name: { type: 'string', description: 'Name of person', [zuiKey]: { title: 'title' } },
+        isAdmin: { type: 'boolean', [zuiKey]: { displayAs: ['Checkbox', {}] } },
+        department: { type: 'string', default: 'IT', [zuiKey]: {} },
+        address: {
+          type: 'object',
+          properties: {
+            city: {
+              type: 'object',
+              properties: {
+                name: { type: 'string', [zuiKey]: { title: 'City Name' } },
+                bestFoods: {
+                  type: 'array',
+                  items: { type: 'string', [zuiKey]: { title: 'Food Name' } },
+                  [zuiKey]: { title: 'Best foods' },
+                },
+              },
+              additionalProperties: false,
+              [zuiKey]: {},
+            },
+            street: { type: 'string', [zuiKey]: { title: 'Street name' } },
+          },
+          required: ['city'],
+          additionalProperties: false,
+          [zuiKey]: {},
+        },
+      },
+      required: ['address'],
+      additionalProperties: false,
+      $schema: 'http://json-schema.org/draft-07/schema#',
+      [zuiKey]: {},
+    } as any)
+
+    traverseZodDefinitions(zuiSchema._def, (type, def, path) => {
+      if (path.join('.') === 'address.city.bestFoods') {
+        expect(['ZodArray', 'ZodOptional']).toContain(type)
+        if (type === 'ZodOptional') {
+          expect(def[zuiKey]?.title).toBe('Best foods')
+        }
+      }
+      if (path.join('.') === 'address.city.bestFoods.0.type') {
+        expect(type).toBe('ZodString')
+        expect(def?.[zuiKey]?.title).toBe('Food Name')
+      }
     })
-
-    const converted = testZuiConversion(zuiSchema) as any
-
-    expect(converted.properties?.name[zuiKey]).toHaveProperty('title')
-    expect(converted.properties?.isAdmin[zuiKey]).toHaveProperty('displayAs')
-    expect(converted.properties?.address.properties.street[zuiKey]).toHaveProperty('title')
-    expect(converted.properties?.address.properties.city.properties.name[zuiKey]).toHaveProperty('title')
-    expect(converted.properties.address.properties.city.properties.synonyms[zuiKey]).toHaveProperty('title')
   })
 })

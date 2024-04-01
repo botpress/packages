@@ -566,7 +566,7 @@ const testComponentImplementation: ZuiComponentMap<typeof testComponentDefinitio
             Add item
           </button>
           {childrens.map((child, index) => (
-            <div data-testid={`stringlistelement:${index}`}>
+            <div key={child.key} data-testid={`stringlistelement:${index}`}>
               <span key={index}>{child}</span>
               <button onClick={() => props.removeItem(index)}>-</button>
             </div>

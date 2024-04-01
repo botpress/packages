@@ -95,7 +95,7 @@ export type ZodAllDefs =
   | ZodStringDef
   | ZodDefaultDef
 
-  export type ZodTypeKind = `${ZodFirstPartyTypeKind}`
+export type ZodTypeKind = `${ZodFirstPartyTypeKind}`
 
 export type ZodDef<Type extends ZodTypeKind> = Type extends 'ZodObject'
   ? ZodObjectDef
@@ -131,11 +131,10 @@ export type ZodDef<Type extends ZodTypeKind> = Type extends 'ZodObject'
                                 ? ZodDefaultDef
                                 : never
 
-
 export const traverseZodDefinitions = (
   def: ZodDef<ZodFirstPartyTypeKind>,
-  cb: <T extends ZodTypeKind>(type: T, def: ZodDef<T> & { [zuiKey]?: any}, path: string[]) => void,
-  path: string[] = []
+  cb: <T extends ZodTypeKind>(type: T, def: ZodDef<T> & { [zuiKey]?: any }, path: string[]) => void,
+  path: string[] = [],
 ) => {
   switch (def.typeName) {
     case ZodFirstPartyTypeKind.ZodObject:
@@ -216,7 +215,7 @@ export const traverseZodDefinitions = (
     case ZodFirstPartyTypeKind.ZodEnum:
       cb(ZodFirstPartyTypeKind.ZodEnum, def, path)
       break
-    
+
     case ZodFirstPartyTypeKind.ZodDefault:
       cb(ZodFirstPartyTypeKind.ZodDefault, def, path)
       break

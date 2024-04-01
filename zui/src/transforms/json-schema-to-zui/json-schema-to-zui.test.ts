@@ -96,7 +96,6 @@ describe('jsonSchemaToZui', () => {
   })
 
   test('convert object with nested', () => {
-
     const zuiSchema = jsonSchemaToZui({
       type: 'object',
       properties: {

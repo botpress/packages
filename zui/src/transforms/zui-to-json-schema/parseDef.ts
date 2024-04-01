@@ -219,7 +219,7 @@ const addMeta = (def: ZodTypeDef, refs: Refs, jsonSchema: JsonSchema7Type): Json
     }
   }
   if ((def as any)[zuiKey]) {
-    (jsonSchema as any)[zuiKey] = (def as any)[zuiKey]
+    ;(jsonSchema as any)[zuiKey] = (def as any)[zuiKey]
   }
   return jsonSchema
 }

@@ -1,7 +1,7 @@
 import { PropsWithChildren, createContext, useContext, useMemo } from 'react'
 import React from 'react'
-import { FormError, JSONSchema } from '../types'
-import ajv from 'ajv'
+import { JSONSchema } from '../types'
+import { jsonSchemaToZui } from '../../transforms/json-schema-to-zui'
 
 export type FormFieldContextProps = {
   formData: any
@@ -24,47 +24,29 @@ export const useFormData = () => {
   if (context === undefined) {
     throw new Error('useFormData must be used within a FormDataProvider')
   }
-  const compiledSchema = useMemo(() => {
-    if (!context.formSchema) {
-      return null
-    }
-
-    if (context.disableValidation) {
-      return null
-    }
-
-    const ajvInstance = new ajv({ strictSchema: false, allErrors: true })
-    return ajvInstance.compile(context.formSchema)
-  }, [context.formSchema])
 
   const validation = useMemo(() => {
     if (context.disableValidation) {
       return { formValid: null, formErrors: null }
     }
 
-    if (!compiledSchema) {
+    if (!context.formSchema) {
       return { formValid: null, formErrors: null }
     }
 
-    const isValid = compiledSchema(context.formData)
+    const validation = jsonSchemaToZui(context.formSchema).safeParse(context.formData)
 
-    if (!isValid) {
+    if (!validation.success) {
       return {
         formValid: false,
-        formErrors:
-          compiledSchema.errors?.map<FormError>((e) => {
-            return {
-              path: e.instancePath.split('/').slice(1),
-              message: e.message || 'Unknown error',
-            }
-          }) || [],
+        formErrors: validation.error.issues
       }
     }
     return {
       formValid: true,
       formErrors: [],
     }
-  }, [compiledSchema, context.formData])
+  }, [context.formData])
 
   const handlePropertyChange = (path: string, data: any) => {
     context.setFormData(setObjectPath(context.formData, path, data))

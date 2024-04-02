@@ -19,7 +19,7 @@ import {
   ZodEnumDef,
   ZodDefaultDef,
 } from 'zod'
-import { JSONSchemaWithZui, ZuiTypeAny, zui, zuiKey } from '../../zui'
+import { JSONSchemaWithZui, ZuiType, zui, zuiKey } from '../../zui'
 import { JsonSchema7Type } from '../zui-to-json-schema/parseDef'
 
 const jsonSchemaToZodStr = (schema: any): string => {
@@ -224,8 +224,8 @@ export const traverseZodDefinitions = (
   }
 }
 
-export const jsonSchemaToZui = (schema: JSONSchemaWithZui<JsonSchema7Type>): ZuiTypeAny => {
+export const jsonSchemaToZui = (schema: JSONSchemaWithZui<JsonSchema7Type>): ZuiType<ZodTypeAny> => {
   const zodSchema = jsonSchemaToZod(schema)
   applyZuiPropsRecursively(zodSchema, schema)
-  return zodSchema as unknown as ZuiTypeAny
+  return zodSchema as unknown as ZuiType<ZodTypeAny>
 }

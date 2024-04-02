@@ -23,8 +23,6 @@ import type {
   Primitive,
   ZodSymbol,
 } from 'zod'
-
-// eslint-disable-next-line no-duplicate-imports
 import { z } from 'zod'
 import { GlobalComponentDefinitions, jsonSchemaToZui } from '.'
 import { ObjectToZuiOptions, objectToZui } from './transforms/object-to-zui'
@@ -337,7 +335,7 @@ const zui: Zui<GlobalComponentDefinitions> = {
     valueSchema: Value,
     params?: RecordArgs[2],
   ) =>
-    z.record(keySchema as ToZodType<Keys>, valueSchema as ToZodType<Value>, params) as unknown as ZuiType<
+    z.record(keySchema, valueSchema as ToZodType<Value>, params) as unknown as ZuiType<
       ZodRecord<ToZodType<Keys>, ToZodType<Value>>
     >,
 

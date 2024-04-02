@@ -41,7 +41,7 @@ const exampleSchema = zui
       birthday: zui.string(),
       plan: zui.enum(['basic', 'premium']),
       age: zui.number(),
-      email: zui.string().title('Email Address'),
+      email: zui.string().email().title('Email Address'),
       password: zui.string(),
       passwordConfirm: zui.string(),
     }),

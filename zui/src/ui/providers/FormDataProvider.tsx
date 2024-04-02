@@ -33,7 +33,7 @@ export const useFormData = () => {
       return null
     }
 
-    const ajvInstance = new ajv({ strictSchema: false })
+    const ajvInstance = new ajv({ strictSchema: false, allErrors: true })
     return ajvInstance.compile(context.formSchema)
   }, [context.formSchema])
 

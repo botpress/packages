@@ -39,7 +39,7 @@ export const useFormData = () => {
     if (!validation.success) {
       return {
         formValid: false,
-        formErrors: validation.error.issues
+        formErrors: validation.error.issues,
       }
     }
     return {

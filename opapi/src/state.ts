@@ -87,6 +87,18 @@ export type BooleanParameter = BaseParameter & {
   in: 'query' | 'header' | 'cookie'
 }
 
+export type IntegerParameter = BaseParameter & {
+  type: 'integer'
+  required?: boolean
+  in: 'query' | 'header' | 'cookie'
+}
+
+export type NumberParameter = BaseParameter & {
+  type: 'number'
+  required?: boolean
+  in: 'query' | 'header' | 'cookie'
+}
+
 export type QueryParameterStringArray = BaseParameter & {
   type: 'string[]'
   required?: boolean
@@ -104,6 +116,8 @@ export type QueryParameterObject<S extends SchemaType = 'zod-schema'> = BasePara
 export type Parameter<S extends SchemaType = 'zod-schema'> =
   | StandardParameter
   | BooleanParameter
+  | IntegerParameter
+  | NumberParameter
   | PathParameter
   | QueryParameterObject<S>
   | QueryParameterStringArray

@@ -1,6 +1,6 @@
 {
   "name": "@bpinternal/opapi",
-  "version": "0.8.1",
+  "version": "0.9.0",
   "description": "",
   "main": "./dist/index.js",
   "module": "./dist/index.mjs",
@@ -13,8 +13,7 @@
     }
   },
   "scripts": {
-    "test:e2e": "vitest",
-    "test": "pnpm run test:e2e",
+    "test": "vitest",
     "build": "tsup src/index.ts --dts --format cjs,esm --clean",
     "type:check": "tsc --noEmit",
     "format:check": "prettier --check .",

@@ -6,6 +6,8 @@ import {
   type PathParameter,
   type Operation,
   type BooleanParameter,
+  type IntegerParameter,
+  type NumberParameter,
 } from '../state'
 
 export type GenerateHandlersProps = {
@@ -31,11 +33,16 @@ type Parameter<P> = {
 export type GenerateHandlerProps = {
   operationName: string
   operation: Operation<string, string, string, 'json-schema'>
-  headers: Parameter<StandardParameter | BooleanParameter>[]
-  cookies: Parameter<StandardParameter | BooleanParameter>[]
+  headers: Parameter<StandardParameter | BooleanParameter | IntegerParameter | NumberParameter>[]
+  cookies: Parameter<StandardParameter | BooleanParameter | IntegerParameter | NumberParameter>[]
   params: Parameter<PathParameter>[]
   queries: Parameter<
-    StandardParameter | BooleanParameter | QueryParameterStringArray | QueryParameterObject<'json-schema'>
+    | StandardParameter
+    | BooleanParameter
+    | IntegerParameter
+    | NumberParameter
+    | QueryParameterStringArray
+    | QueryParameterObject<'json-schema'>
   >[]
   status: number
   body: boolean
@@ -96,7 +103,7 @@ const generateField = (name: string, type: FieldType, parameter: OpenApiParamete
   `\t\t'${name}': req.${type}['${name}'] ${generateTypeAnnotation(parameter, required)},`
 
 const generateTypeAnnotation = (parameter: OpenApiParameter<'json-schema'>, required: boolean) => {
-  let typeAnnotation = 'as'
+  let typeAnnotation = 'as unknown as'
 
   const parameterType = parameter.type
 
@@ -120,6 +127,12 @@ const generateTypeAnnotation = (parameter: OpenApiParameter<'json-schema'>, requ
       break
     case 'boolean':
       typeAnnotation += ' boolean'
+      break
+    case 'integer':
+      typeAnnotation += ' number'
+      break
+    case 'number':
+      typeAnnotation += ' number'
       break
     default:
       throw new Error(`Unsupported parameter type: ${parameterType}`)

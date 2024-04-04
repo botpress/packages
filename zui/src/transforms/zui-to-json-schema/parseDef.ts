@@ -201,6 +201,8 @@ const selectParser = (def: any, typeName: ZodFirstPartyTypeKind, refs: Refs): Js
       return parseCatchDef(def, refs)
     case ZodFirstPartyTypeKind.ZodPipeline:
       return parsePipelineDef(def, refs)
+    case ZodFirstPartyTypeKind.ZodTemplateLiteral:
+      throw new Error('Template literals are not supported yet')
     case ZodFirstPartyTypeKind.ZodFunction:
     case ZodFirstPartyTypeKind.ZodVoid:
     case ZodFirstPartyTypeKind.ZodSymbol:

@@ -10,7 +10,11 @@
     "noUnusedParameters": true,
     "noUncheckedIndexedAccess": true,
     "allowSyntheticDefaultImports": true,
-    "lib": ["dom", "dom.iterable", "esnext"],
+    "lib": [
+      "dom",
+      "dom.iterable",
+      "esnext"
+    ],
     "allowJs": false,
     "declaration": false,
     "skipLibCheck": true,
@@ -19,9 +23,20 @@
     "resolveJsonModule": true,
     "isolatedModules": true,
     "paths": {
-      "~/*": ["./src/*"]
+      "~/*": [
+        "./src/*"
+      ],
+      "zod": [
+        "./src/zod/index.ts"
+      ]
     }
   },
-  "exclude": ["node_modules", "dist", "*.test.ts"],
-  "include": ["src/**/*"]
+  "exclude": [
+    "node_modules",
+    "dist",
+    "*.test.ts"
+  ],
+  "include": [
+    "src/**/*"
+  ]
 }

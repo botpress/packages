@@ -1,80 +1,80 @@
-import Benchmark from "benchmark";
+import Benchmark from 'benchmark'
 
-import { z } from "../index";
+import { z } from '../index'
 
-const doubleSuite = new Benchmark.Suite("z.union: double");
-const manySuite = new Benchmark.Suite("z.union: many");
+const doubleSuite = new Benchmark.Suite('z.union: double')
+const manySuite = new Benchmark.Suite('z.union: many')
 
 const aSchema = z.object({
-  type: z.literal("a"),
-});
+  type: z.literal('a'),
+})
 const objA = {
-  type: "a",
-};
+  type: 'a',
+}
 
 const bSchema = z.object({
-  type: z.literal("b"),
-});
+  type: z.literal('b'),
+})
 const objB = {
-  type: "b",
-};
+  type: 'b',
+}
 
 const cSchema = z.object({
-  type: z.literal("c"),
-});
+  type: z.literal('c'),
+})
 const objC = {
-  type: "c",
-};
+  type: 'c',
+}
 
 const dSchema = z.object({
-  type: z.literal("d"),
-});
+  type: z.literal('d'),
+})
 
-const double = z.union([aSchema, bSchema]);
-const many = z.union([aSchema, bSchema, cSchema, dSchema]);
+const double = z.union([aSchema, bSchema])
+const many = z.union([aSchema, bSchema, cSchema, dSchema])
 
 doubleSuite
-  .add("valid: a", () => {
-    double.parse(objA);
+  .add('valid: a', () => {
+    double.parse(objA)
   })
-  .add("valid: b", () => {
-    double.parse(objB);
+  .add('valid: b', () => {
+    double.parse(objB)
   })
-  .add("invalid: null", () => {
+  .add('invalid: null', () => {
     try {
-      double.parse(null);
+      double.parse(null)
     } catch (err) {}
   })
-  .add("invalid: wrong shape", () => {
+  .add('invalid: wrong shape', () => {
     try {
-      double.parse(objC);
+      double.parse(objC)
     } catch (err) {}
   })
-  .on("cycle", (e: Benchmark.Event) => {
-    console.log(`${(doubleSuite as any).name}: ${e.target}`);
-  });
+  .on('cycle', (e: Benchmark.Event) => {
+    console.log(`${(doubleSuite as any).name}: ${e.target}`)
+  })
 
 manySuite
-  .add("valid: a", () => {
-    many.parse(objA);
+  .add('valid: a', () => {
+    many.parse(objA)
   })
-  .add("valid: c", () => {
-    many.parse(objC);
+  .add('valid: c', () => {
+    many.parse(objC)
   })
-  .add("invalid: null", () => {
+  .add('invalid: null', () => {
     try {
-      many.parse(null);
+      many.parse(null)
     } catch (err) {}
   })
-  .add("invalid: wrong shape", () => {
+  .add('invalid: wrong shape', () => {
     try {
-      many.parse({ type: "unknown" });
+      many.parse({ type: 'unknown' })
     } catch (err) {}
   })
-  .on("cycle", (e: Benchmark.Event) => {
-    console.log(`${(manySuite as any).name}: ${e.target}`);
-  });
+  .on('cycle', (e: Benchmark.Event) => {
+    console.log(`${(manySuite as any).name}: ${e.target}`)
+  })
 
 export default {
   suites: [doubleSuite, manySuite],
-};
+}

@@ -40,13 +40,13 @@ import {
   ZodUnion,
   ZodUnknown,
   ZodVoid,
-} from "./types";
+} from './types'
 
-export { ZodType as Schema, ZodType as ZodSchema };
+export { ZodType as Schema, ZodType as ZodSchema }
 
 export const late = {
   object: ZodObject.lazycreate,
-};
+}
 
 export type ZodFirstPartySchemaTypes =
   | ZodString
@@ -85,7 +85,7 @@ export type ZodFirstPartySchemaTypes =
   | ZodPipeline<any, any>
   | ZodReadonly<any>
   | ZodSymbol
-  | ZodTemplateLiteral<any>;
+  | ZodTemplateLiteral<any>
 
 // requires TS 4.4+
 abstract class Class {
@@ -96,68 +96,64 @@ const instanceOfType = <T extends typeof Class>(
   cls: T,
   params: CustomParams = {
     message: `Input not instance of ${cls.name}`,
-  }
-) => custom<InstanceType<T>>((data) => data instanceof cls, params);
+  },
+) => custom<InstanceType<T>>((data) => data instanceof cls, params)
 
-const stringType = ZodString.create;
-const numberType = ZodNumber.create;
-const nanType = ZodNaN.create;
-const bigIntType = ZodBigInt.create;
-const booleanType = ZodBoolean.create;
-const dateType = ZodDate.create;
-const symbolType = ZodSymbol.create;
-const undefinedType = ZodUndefined.create;
-const nullType = ZodNull.create;
-const anyType = ZodAny.create;
-const unknownType = ZodUnknown.create;
-const neverType = ZodNever.create;
-const voidType = ZodVoid.create;
-const arrayType = ZodArray.create;
-const objectType = ZodObject.create;
-const strictObjectType = ZodObject.strictCreate;
-const unionType = ZodUnion.create;
-const discriminatedUnionType = ZodDiscriminatedUnion.create;
-const intersectionType = ZodIntersection.create;
-const tupleType = ZodTuple.create;
-const recordType = ZodRecord.create;
-const mapType = ZodMap.create;
-const setType = ZodSet.create;
-const functionType = ZodFunction.create;
-const lazyType = ZodLazy.create;
-const literalType = ZodLiteral.create;
-const enumType = ZodEnum.create;
-const nativeEnumType = ZodNativeEnum.create;
-const promiseType = ZodPromise.create;
-const effectsType = ZodEffects.create;
-const optionalType = ZodOptional.create;
-const nullableType = ZodNullable.create;
-const preprocessType = ZodEffects.createWithPreprocess;
-const pipelineType = ZodPipeline.create;
-const templateLiteralType = ZodTemplateLiteral.create;
-const ostring = () => stringType().optional();
-const onumber = () => numberType().optional();
-const oboolean = () => booleanType().optional();
+const stringType = ZodString.create
+const numberType = ZodNumber.create
+const nanType = ZodNaN.create
+const bigIntType = ZodBigInt.create
+const booleanType = ZodBoolean.create
+const dateType = ZodDate.create
+const symbolType = ZodSymbol.create
+const undefinedType = ZodUndefined.create
+const nullType = ZodNull.create
+const anyType = ZodAny.create
+const unknownType = ZodUnknown.create
+const neverType = ZodNever.create
+const voidType = ZodVoid.create
+const arrayType = ZodArray.create
+const objectType = ZodObject.create
+const strictObjectType = ZodObject.strictCreate
+const unionType = ZodUnion.create
+const discriminatedUnionType = ZodDiscriminatedUnion.create
+const intersectionType = ZodIntersection.create
+const tupleType = ZodTuple.create
+const recordType = ZodRecord.create
+const mapType = ZodMap.create
+const setType = ZodSet.create
+const functionType = ZodFunction.create
+const lazyType = ZodLazy.create
+const literalType = ZodLiteral.create
+const enumType = ZodEnum.create
+const nativeEnumType = ZodNativeEnum.create
+const promiseType = ZodPromise.create
+const effectsType = ZodEffects.create
+const optionalType = ZodOptional.create
+const nullableType = ZodNullable.create
+const preprocessType = ZodEffects.createWithPreprocess
+const pipelineType = ZodPipeline.create
+const templateLiteralType = ZodTemplateLiteral.create
+const ostring = () => stringType().optional()
+const onumber = () => numberType().optional()
+const oboolean = () => booleanType().optional()
 
 export const coerce = {
-  string: ((arg) =>
-    ZodString.create({ ...arg, coerce: true })) as (typeof ZodString)["create"],
-  number: ((arg) =>
-    ZodNumber.create({ ...arg, coerce: true })) as (typeof ZodNumber)["create"],
+  string: ((arg) => ZodString.create({ ...arg, coerce: true })) as (typeof ZodString)['create'],
+  number: ((arg) => ZodNumber.create({ ...arg, coerce: true })) as (typeof ZodNumber)['create'],
   boolean: ((arg) =>
     ZodBoolean.create({
       ...arg,
       coerce: true,
-    })) as (typeof ZodBoolean)["create"],
-  bigint: ((arg) =>
-    ZodBigInt.create({ ...arg, coerce: true })) as (typeof ZodBigInt)["create"],
-  date: ((arg) =>
-    ZodDate.create({ ...arg, coerce: true })) as (typeof ZodDate)["create"],
+    })) as (typeof ZodBoolean)['create'],
+  bigint: ((arg) => ZodBigInt.create({ ...arg, coerce: true })) as (typeof ZodBigInt)['create'],
+  date: ((arg) => ZodDate.create({ ...arg, coerce: true })) as (typeof ZodDate)['create'],
   templateLiteral: ((arg) =>
     ZodTemplateLiteral.create({
       ...arg,
       coerce: true,
-    })) as (typeof ZodTemplateLiteral)["create"],
-};
+    })) as (typeof ZodTemplateLiteral)['create'],
+}
 
 export {
   anyType as any,
@@ -200,13 +196,13 @@ export {
   unionType as union,
   unknownType as unknown,
   voidType as void,
-};
+}
 
-export const NEVER = INVALID as never;
+export const NEVER = INVALID as never
 
-export * from "./types";
-export * from "./types/error";
-export * from "./types/utils";
-export * from "./types/utils/parseUtil";
-export * from "./types/utils/typeAliases";
-export * from "./z";
+export * from './types'
+export * from './types/error'
+export * from './types/utils'
+export * from './types/utils/parseUtil'
+export * from './types/utils/typeAliases'
+export * from './z'

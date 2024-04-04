@@ -1,12 +1,6 @@
-import { ZodError, ZodIssue, ZodIssueCode } from "../error";
-import {
-  RawCreateParams,
-  ZodFirstPartyTypeKind,
-  ZodType,
-  ZodTypeAny,
-  ZodTypeDef,
-} from "../index";
-import { processCreateParams } from "../utils";
+import { ZodError, ZodIssue, ZodIssueCode } from '../error'
+import { RawCreateParams, ZodFirstPartyTypeKind, ZodType, ZodTypeAny, ZodTypeDef } from '../index'
+import { processCreateParams } from '../utils'
 import {
   addIssueToContext,
   DIRTY,
@@ -15,55 +9,48 @@ import {
   ParseInput,
   ParseReturnType,
   SyncParseReturnType,
-} from "../utils/parseUtil";
+} from '../utils/parseUtil'
 
-export type ZodUnionOptions = Readonly<[ZodTypeAny, ...ZodTypeAny[]]>;
-export interface ZodUnionDef<
-  T extends ZodUnionOptions = Readonly<
-    [ZodTypeAny, ZodTypeAny, ...ZodTypeAny[]]
-  >
-> extends ZodTypeDef {
-  options: T;
-  typeName: ZodFirstPartyTypeKind.ZodUnion;
+export type ZodUnionOptions = Readonly<[ZodTypeAny, ...ZodTypeAny[]]>
+export interface ZodUnionDef<T extends ZodUnionOptions = Readonly<[ZodTypeAny, ZodTypeAny, ...ZodTypeAny[]]>>
+  extends ZodTypeDef {
+  options: T
+  typeName: ZodFirstPartyTypeKind.ZodUnion
 }
 
 export class ZodUnion<T extends ZodUnionOptions> extends ZodType<
-  T[number]["_output"],
+  T[number]['_output'],
   ZodUnionDef<T>,
-  T[number]["_input"]
+  T[number]['_input']
 > {
-  _parse(input: ParseInput): ParseReturnType<this["_output"]> {
-    const { ctx } = this._processInputParams(input);
-    const options = this._def.options;
+  _parse(input: ParseInput): ParseReturnType<this['_output']> {
+    const { ctx } = this._processInputParams(input)
+    const options = this._def.options
 
-    function handleResults(
-      results: { ctx: ParseContext; result: SyncParseReturnType<any> }[]
-    ) {
+    function handleResults(results: { ctx: ParseContext; result: SyncParseReturnType<any> }[]) {
       // return first issue-free validation if it exists
       for (const result of results) {
-        if (result.result.status === "valid") {
-          return result.result;
+        if (result.result.status === 'valid') {
+          return result.result
         }
       }
 
       for (const result of results) {
-        if (result.result.status === "dirty") {
+        if (result.result.status === 'dirty') {
           // add issues from dirty option
-          ctx.common.issues.push(...result.ctx.common.issues);
-          return result.result;
+          ctx.common.issues.push(...result.ctx.common.issues)
+          return result.result
         }
       }
 
       // return invalid
-      const unionErrors = results.map(
-        (result) => new ZodError(result.ctx.common.issues)
-      );
+      const unionErrors = results.map((result) => new ZodError(result.ctx.common.issues))
 
       addIssueToContext(ctx, {
         code: ZodIssueCode.invalid_union,
         unionErrors,
-      });
-      return INVALID;
+      })
+      return INVALID
     }
 
     if (ctx.common.async) {
@@ -76,7 +63,7 @@ export class ZodUnion<T extends ZodUnionOptions> extends ZodType<
               issues: [],
             },
             parent: null,
-          };
+          }
           return {
             result: await option._parseAsync({
               data: ctx.data,
@@ -84,13 +71,12 @@ export class ZodUnion<T extends ZodUnionOptions> extends ZodType<
               parent: childCtx,
             }),
             ctx: childCtx,
-          };
-        })
-      ).then(handleResults);
+          }
+        }),
+      ).then(handleResults)
     } else {
-      let dirty: undefined | { result: DIRTY<any>; ctx: ParseContext } =
-        undefined;
-      const issues: ZodIssue[][] = [];
+      let dirty: undefined | { result: DIRTY<any>; ctx: ParseContext } = undefined
+      const issues: ZodIssue[][] = []
       for (const option of options) {
         const childCtx: ParseContext = {
           ...ctx,
@@ -99,53 +85,51 @@ export class ZodUnion<T extends ZodUnionOptions> extends ZodType<
             issues: [],
           },
           parent: null,
-        };
+        }
         const result = option._parseSync({
           data: ctx.data,
           path: ctx.path,
           parent: childCtx,
-        });
+        })
 
-        if (result.status === "valid") {
-          return result;
-        } else if (result.status === "dirty" && !dirty) {
-          dirty = { result, ctx: childCtx };
+        if (result.status === 'valid') {
+          return result
+        } else if (result.status === 'dirty' && !dirty) {
+          dirty = { result, ctx: childCtx }
         }
 
         if (childCtx.common.issues.length) {
-          issues.push(childCtx.common.issues);
+          issues.push(childCtx.common.issues)
         }
       }
 
       if (dirty) {
-        ctx.common.issues.push(...dirty.ctx.common.issues);
-        return dirty.result;
+        ctx.common.issues.push(...dirty.ctx.common.issues)
+        return dirty.result
       }
 
-      const unionErrors = issues.map((issues) => new ZodError(issues));
+      const unionErrors = issues.map((issues) => new ZodError(issues))
       addIssueToContext(ctx, {
         code: ZodIssueCode.invalid_union,
         unionErrors,
-      });
+      })
 
-      return INVALID;
+      return INVALID
     }
   }
 
   get options() {
-    return this._def.options;
+    return this._def.options
   }
 
-  static create = <
-    T extends Readonly<[ZodTypeAny, ZodTypeAny, ...ZodTypeAny[]]>
-  >(
+  static create = <T extends Readonly<[ZodTypeAny, ZodTypeAny, ...ZodTypeAny[]]>>(
     types: T,
-    params?: RawCreateParams
+    params?: RawCreateParams,
   ): ZodUnion<T> => {
     return new ZodUnion({
       options: types,
       typeName: ZodFirstPartyTypeKind.ZodUnion,
       ...processCreateParams(params),
-    });
-  };
+    })
+  }
 }

@@ -1,13 +1,13 @@
-import Benchmark from "benchmark";
+import Benchmark from 'benchmark'
 
-import { z } from "../index";
+import { z } from '../index'
 
-const shortSuite = new Benchmark.Suite("realworld");
+const shortSuite = new Benchmark.Suite('realworld')
 
 const People = z.array(
   z.object({
-    type: z.literal("person"),
-    hair: z.enum(["blue", "brown"]),
+    type: z.literal('person'),
+    hair: z.enum(['blue', 'brown']),
     active: z.boolean(),
     name: z.string(),
     age: z.number().int(),
@@ -17,27 +17,27 @@ const People = z.array(
       zip: z.string(),
       country: z.string(),
     }),
-  })
-);
+  }),
+)
 
-let i = 0;
+let i = 0
 
 function num() {
-  return ++i;
+  return ++i
 }
 
 function str() {
-  return (++i % 100).toString(16);
+  return (++i % 100).toString(16)
 }
 
 function array<T>(fn: () => T): T[] {
-  return Array.from({ length: ++i % 10 }, () => fn());
+  return Array.from({ length: ++i % 10 }, () => fn())
 }
 
 const people = Array.from({ length: 100 }, () => {
   return {
-    type: "person",
-    hair: i % 2 ? "blue" : "brown",
+    type: 'person',
+    hair: i % 2 ? 'blue' : 'brown',
     active: !!(i % 2),
     name: str(),
     age: num(),
@@ -47,17 +47,17 @@ const people = Array.from({ length: 100 }, () => {
       zip: str(),
       country: str(),
     },
-  };
-});
+  }
+})
 
 shortSuite
-  .add("valid", () => {
-    People.parse(people);
+  .add('valid', () => {
+    People.parse(people)
   })
-  .on("cycle", (e: Benchmark.Event) => {
-    console.log(`${(shortSuite as any).name}: ${e.target}`);
-  });
+  .on('cycle', (e: Benchmark.Event) => {
+    console.log(`${(shortSuite as any).name}: ${e.target}`)
+  })
 
 export default {
   suites: [shortSuite],
-};
+}

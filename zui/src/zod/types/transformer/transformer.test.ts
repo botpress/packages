@@ -85,7 +85,7 @@ test('z.NEVER in transform', () => {
   util.assertEqual<foo, number>(true)
   const arg = foo.safeParse(undefined)
   if (!arg.success) {
-    expect(arg.error.issues[0].message).toEqual('bad')
+    expect(arg.error.issues[0]?.message).toEqual('bad')
   }
 })
 
@@ -201,13 +201,13 @@ test('short circuit on dirty', () => {
   const result = schema.safeParse('asdf')
   expect(result.success).toEqual(false)
   if (!result.success) {
-    expect(result.error.issues[0].code).toEqual(z.ZodIssueCode.custom)
+    expect(result.error.issues[0]?.code).toEqual(z.ZodIssueCode.custom)
   }
 
   const result2 = schema.safeParse(1234)
   expect(result2.success).toEqual(false)
   if (!result2.success) {
-    expect(result2.error.issues[0].code).toEqual(z.ZodIssueCode.invalid_type)
+    expect(result2.error.issues[0]?.code).toEqual(z.ZodIssueCode.invalid_type)
   }
 })
 
@@ -219,12 +219,12 @@ test('async short circuit on dirty', async () => {
   const result = await schema.spa('asdf')
   expect(result.success).toEqual(false)
   if (!result.success) {
-    expect(result.error.issues[0].code).toEqual(z.ZodIssueCode.custom)
+    expect(result.error.issues[0]?.code).toEqual(z.ZodIssueCode.custom)
   }
 
   const result2 = await schema.spa(1234)
   expect(result2.success).toEqual(false)
   if (!result2.success) {
-    expect(result2.error.issues[0].code).toEqual(z.ZodIssueCode.invalid_type)
+    expect(result2.error.issues[0]?.code).toEqual(z.ZodIssueCode.invalid_type)
   }
 })

@@ -77,7 +77,7 @@ test('failing when parsing empty set in nonempty ', () => {
 
   if (result.success === false) {
     expect(result.error.issues.length).toEqual(1)
-    expect(result.error.issues[0].code).toEqual(ZodIssueCode.too_small)
+    expect(result.error.issues[0]?.code).toEqual(ZodIssueCode.too_small)
   }
 })
 
@@ -87,7 +87,7 @@ test('failing when set is smaller than min() ', () => {
 
   if (result.success === false) {
     expect(result.error.issues.length).toEqual(1)
-    expect(result.error.issues[0].code).toEqual(ZodIssueCode.too_small)
+    expect(result.error.issues[0]?.code).toEqual(ZodIssueCode.too_small)
   }
 })
 
@@ -97,7 +97,7 @@ test('failing when set is bigger than max() ', () => {
 
   if (result.success === false) {
     expect(result.error.issues.length).toEqual(1)
-    expect(result.error.issues[0].code).toEqual(ZodIssueCode.too_big)
+    expect(result.error.issues[0]?.code).toEqual(ZodIssueCode.too_big)
   }
 })
 
@@ -111,7 +111,7 @@ test('throws when a Map is given', () => {
   expect(result.success).toEqual(false)
   if (result.success === false) {
     expect(result.error.issues.length).toEqual(1)
-    expect(result.error.issues[0].code).toEqual(ZodIssueCode.invalid_type)
+    expect(result.error.issues[0]?.code).toEqual(ZodIssueCode.invalid_type)
   }
 })
 
@@ -120,8 +120,8 @@ test('throws when the given set has invalid input', () => {
   expect(result.success).toEqual(false)
   if (result.success === false) {
     expect(result.error.issues.length).toEqual(1)
-    expect(result.error.issues[0].code).toEqual(ZodIssueCode.invalid_type)
-    expect(result.error.issues[0].path).toEqual([0])
+    expect(result.error.issues[0]?.code).toEqual(ZodIssueCode.invalid_type)
+    expect(result.error.issues[0]?.path).toEqual([0])
   }
 })
 
@@ -131,9 +131,9 @@ test('throws when the given set has multiple invalid entries', () => {
   expect(result.success).toEqual(false)
   if (result.success === false) {
     expect(result.error.issues.length).toEqual(2)
-    expect(result.error.issues[0].code).toEqual(ZodIssueCode.invalid_type)
-    expect(result.error.issues[0].path).toEqual([0])
-    expect(result.error.issues[1].code).toEqual(ZodIssueCode.invalid_type)
-    expect(result.error.issues[1].path).toEqual([1])
+    expect(result.error.issues[0]?.code).toEqual(ZodIssueCode.invalid_type)
+    expect(result.error.issues[0]?.path).toEqual([0])
+    expect(result.error.issues[1]?.code).toEqual(ZodIssueCode.invalid_type)
+    expect(result.error.issues[1]?.path).toEqual([1])
   }
 })

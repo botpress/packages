@@ -176,9 +176,9 @@ test('reported issues with nested usage', () => {
     const issues = (error as z.ZodError).issues
 
     expect(issues.length).toEqual(3)
-    expect(issues[0].message).toMatch('string')
-    expect(issues[1].message).toMatch('literal')
-    expect(issues[2].message).toMatch('boolean')
+    expect(issues[0]?.message).toMatch('string')
+    expect(issues[1]?.message).toMatch('literal')
+    expect(issues[2]?.message).toMatch('boolean')
   }
 })
 
@@ -201,11 +201,11 @@ test('catch error', () => {
 
   expect(result.success).toEqual(false)
   expect(!result.success && result.error.issues.length).toEqual(1)
-  expect(!result.success && result.error.issues[0].message).toMatch('number')
+  expect(!result.success && result.error.issues[0]?.message).toMatch('number')
 
   expect(catchError).toBeInstanceOf(z.ZodError)
   expect(catchError !== undefined && (catchError as z.ZodError).issues.length).toEqual(1)
-  expect(catchError !== undefined && (catchError as z.ZodError).issues[0].message).toMatch('string')
+  expect(catchError !== undefined && (catchError as z.ZodError).issues[0]?.message).toMatch('string')
 })
 
 test('ctx.input', () => {

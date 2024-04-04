@@ -26,8 +26,8 @@ test('invalid_literal should have `received` field with data', () => {
   const result = literalTuna.safeParse(data)
   if (!result.success) {
     const issue = result.error.issues[0]
-    if (issue.code === 'invalid_literal') {
-      expect(issue.received).toBe(data)
+    if (issue?.code === 'invalid_literal') {
+      expect(issue?.received).toBe(data)
     }
   }
 })

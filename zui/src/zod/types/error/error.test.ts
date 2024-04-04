@@ -41,8 +41,8 @@ test('type error with custom error map', () => {
   } catch (err) {
     const zerr: z.ZodError = err as any
 
-    expect(zerr.issues[0].code).toEqual(z.ZodIssueCode.invalid_type)
-    expect(zerr.issues[0].message).toEqual(`bad type!`)
+    expect(zerr.issues[0]?.code).toEqual(z.ZodIssueCode.invalid_type)
+    expect(zerr.issues[0]?.message).toEqual(`bad type!`)
   }
 })
 
@@ -55,8 +55,8 @@ test('refinement fail with params', () => {
       .parse(2, { errorMap })
   } catch (err) {
     const zerr: z.ZodError = err as any
-    expect(zerr.issues[0].code).toEqual(z.ZodIssueCode.custom)
-    expect(zerr.issues[0].message).toEqual(`less-than-3`)
+    expect(zerr.issues[0]?.code).toEqual(z.ZodIssueCode.custom)
+    expect(zerr.issues[0]?.message).toEqual(`less-than-3`)
   }
 })
 
@@ -70,7 +70,7 @@ test('custom error with custom errormap', () => {
       .parse('asdf', { errorMap })
   } catch (err) {
     const zerr: z.ZodError = err as any
-    expect(zerr.issues[0].message).toEqual('override')
+    expect(zerr.issues[0]?.message).toEqual('override')
   }
 })
 
@@ -82,7 +82,7 @@ test('default error message', () => {
   } catch (err) {
     const zerr: z.ZodError = err as any
     expect(zerr.issues.length).toEqual(1)
-    expect(zerr.issues[0].message).toEqual('Invalid input')
+    expect(zerr.issues[0]?.message).toEqual('Invalid input')
   }
 })
 
@@ -94,7 +94,7 @@ test('override error in refine', () => {
   } catch (err) {
     const zerr: z.ZodError = err as any
     expect(zerr.issues.length).toEqual(1)
-    expect(zerr.issues[0].message).toEqual('override')
+    expect(zerr.issues[0]?.message).toEqual('override')
   }
 })
 
@@ -108,7 +108,7 @@ test('override error in refinement', () => {
   } catch (err) {
     const zerr: z.ZodError = err as any
     expect(zerr.issues.length).toEqual(1)
-    expect(zerr.issues[0].message).toEqual('override')
+    expect(zerr.issues[0]?.message).toEqual('override')
   }
 })
 
@@ -117,15 +117,15 @@ test('array minimum', () => {
     z.array(z.string()).min(3, 'tooshort').parse(['asdf', 'qwer'])
   } catch (err) {
     const zerr: ZodError = err as any
-    expect(zerr.issues[0].code).toEqual(ZodIssueCode.too_small)
-    expect(zerr.issues[0].message).toEqual('tooshort')
+    expect(zerr.issues[0]?.code).toEqual(ZodIssueCode.too_small)
+    expect(zerr.issues[0]?.message).toEqual('tooshort')
   }
   try {
     z.array(z.string()).min(3).parse(['asdf', 'qwer'])
   } catch (err) {
     const zerr: ZodError = err as any
-    expect(zerr.issues[0].code).toEqual(ZodIssueCode.too_small)
-    expect(zerr.issues[0].message).toEqual(`Array must contain at least 3 element(s)`)
+    expect(zerr.issues[0]?.code).toEqual(ZodIssueCode.too_small)
+    expect(zerr.issues[0]?.message).toEqual(`Array must contain at least 3 element(s)`)
   }
 })
 
@@ -139,13 +139,13 @@ test('array minimum', () => {
 
 //   if (p1.success === true) throw new Error();
 //   expect(p1.success).toBe(false);
-//   expect(p1.error.issues[0].code).toEqual(ZodIssueCode.custom);
+//   expect(p1.error.issues[0]?.code).toEqual(ZodIssueCode.custom);
 
 //   const p2 = z.union([z.string(), z.number()]).safeParse(false);
 //   // .catch(err => expect(err.issues[0].code).toEqual(ZodIssueCode.invalid_union));
 //   if (p2.success === true) throw new Error();
 //   expect(p2.success).toBe(false);
-//   expect(p2.error.issues[0].code).toEqual(ZodIssueCode.invalid_union);
+//   expect(p2.error.issues[0]?.code).toEqual(ZodIssueCode.invalid_union);
 // });
 
 test('custom path in custom error map', () => {
@@ -162,7 +162,7 @@ test('custom path in custom error map', () => {
   const result = schema.safeParse({ items: ['first'] }, { errorMap })
   expect(result.success).toEqual(false)
   if (!result.success) {
-    expect(result.error.issues[0].path).toEqual(['items', 'items-too-few'])
+    expect(result.error.issues[0]?.path).toEqual(['items', 'items-too-few'])
   }
 })
 
@@ -176,9 +176,9 @@ test('error metadata from value', () => {
   expect(result.success).toEqual(false)
   if (!result.success) {
     const sub = result.error.issues[0]
-    expect(result.error.issues[0].code).toEqual('custom')
-    if (sub.code === 'custom') {
-      expect(sub.params!.val).toEqual('asdf')
+    expect(result.error.issues[0]?.code).toEqual('custom')
+    if (sub?.code === 'custom') {
+      expect(sub!.params!.val).toEqual('asdf')
     }
   }
 })
@@ -361,13 +361,13 @@ test('schema-bound error map', () => {
   const result = stringWithCustomError.safeParse(1234)
   expect(result.success).toEqual(false)
   if (!result.success) {
-    expect(result.error.issues[0].message).toEqual('Invalid name')
+    expect(result.error.issues[0]?.message).toEqual('Invalid name')
   }
 
   const result2 = stringWithCustomError.safeParse(undefined)
   expect(result2.success).toEqual(false)
   if (!result2.success) {
-    expect(result2.error.issues[0].message).toEqual('Name is required')
+    expect(result2.error.issues[0]?.message).toEqual('Name is required')
   }
 
   // support contextual override
@@ -376,7 +376,7 @@ test('schema-bound error map', () => {
   })
   expect(result3.success).toEqual(false)
   if (!result3.success) {
-    expect(result3.error.issues[0].message).toEqual('OVERRIDE')
+    expect(result3.error.issues[0]?.message).toEqual('OVERRIDE')
   }
 })
 
@@ -386,7 +386,7 @@ test('overrideErrorMap', () => {
   const result4 = stringWithCustomError.min(10).safeParse('tooshort')
   expect(result4.success).toEqual(false)
   if (!result4.success) {
-    expect(result4.error.issues[0].message).toEqual('OVERRIDE')
+    expect(result4.error.issues[0]?.message).toEqual('OVERRIDE')
   }
   z.setErrorMap(z.defaultErrorMap)
 })
@@ -399,12 +399,12 @@ test('invalid and required', () => {
   const result1 = str.safeParse(1234)
   expect(result1.success).toEqual(false)
   if (!result1.success) {
-    expect(result1.error.issues[0].message).toEqual('Invalid name')
+    expect(result1.error.issues[0]?.message).toEqual('Invalid name')
   }
   const result2 = str.safeParse(undefined)
   expect(result2.success).toEqual(false)
   if (!result2.success) {
-    expect(result2.error.issues[0].message).toEqual('Name is required')
+    expect(result2.error.issues[0]?.message).toEqual('Name is required')
   }
 })
 
@@ -417,7 +417,7 @@ test('Fallback to default required error', () => {
   const result2 = str.safeParse(undefined)
   expect(result2.success).toEqual(false)
   if (!result2.success) {
-    expect(result2.error.issues[0].message).toEqual('Required')
+    expect(result2.error.issues[0]?.message).toEqual('Required')
   }
 })
 
@@ -437,7 +437,7 @@ test('strict error message', () => {
   const result = obj.safeParse({ x: 'a', y: 'b' })
   expect(result.success).toEqual(false)
   if (!result.success) {
-    expect(result.error.issues[0].message).toEqual(errorMsg)
+    expect(result.error.issues[0]?.message).toEqual(errorMsg)
   }
 })
 
@@ -447,7 +447,7 @@ test('enum error message, invalid enum elementstring', () => {
   } catch (err) {
     const zerr: z.ZodError = err as any
     expect(zerr.issues.length).toEqual(1)
-    expect(zerr.issues[0].message).toEqual("Invalid enum value. Expected 'Tuna' | 'Trout', received 'Salmon'")
+    expect(zerr.issues[0]?.message).toEqual("Invalid enum value. Expected 'Tuna' | 'Trout', received 'Salmon'")
   }
 })
 
@@ -457,7 +457,7 @@ test('enum error message, invalid type', () => {
   } catch (err) {
     const zerr: z.ZodError = err as any
     expect(zerr.issues.length).toEqual(1)
-    expect(zerr.issues[0].message).toEqual("Expected 'Tuna' | 'Trout', received number")
+    expect(zerr.issues[0]?.message).toEqual("Expected 'Tuna' | 'Trout', received number")
   }
 })
 
@@ -471,7 +471,7 @@ test('nativeEnum default error message', () => {
   } catch (err) {
     const zerr: z.ZodError = err as any
     expect(zerr.issues.length).toEqual(1)
-    expect(zerr.issues[0].message).toEqual("Invalid enum value. Expected 'Tuna' | 'Trout', received 'Salmon'")
+    expect(zerr.issues[0]?.message).toEqual("Invalid enum value. Expected 'Tuna' | 'Trout', received 'Salmon'")
   }
 })
 
@@ -481,7 +481,7 @@ test('literal default error message', () => {
   } catch (err) {
     const zerr: z.ZodError = err as any
     expect(zerr.issues.length).toEqual(1)
-    expect(zerr.issues[0].message).toEqual(`Invalid literal value, expected "Tuna"`)
+    expect(zerr.issues[0]?.message).toEqual(`Invalid literal value, expected "Tuna"`)
   }
 })
 
@@ -491,7 +491,7 @@ test('literal bigint default error message', () => {
   } catch (err) {
     const zerr: z.ZodError = err as any
     expect(zerr.issues.length).toEqual(1)
-    expect(zerr.issues[0].message).toEqual(`Invalid literal value, expected "12"`)
+    expect(zerr.issues[0]?.message).toEqual(`Invalid literal value, expected "12"`)
   }
 })
 
@@ -500,7 +500,7 @@ test('when the message is falsy, it is used as is provided', () => {
   const result = schema.safeParse('asdf')
   expect(result.success).toEqual(false)
   if (!result.success) {
-    expect(result.error.issues[0].message).toEqual('')
+    expect(result.error.issues[0]?.message).toEqual('')
   }
 })
 

@@ -32,7 +32,7 @@ test('error params', () => {
   const result = z.enum(['test'], { required_error: 'REQUIRED' }).safeParse(undefined)
   expect(result.success).toEqual(false)
   if (!result.success) {
-    expect(result.error.issues[0].message).toEqual('REQUIRED')
+    expect(result.error.issues[0]?.message).toEqual('REQUIRED')
   }
 })
 
@@ -59,7 +59,7 @@ test('error map in extract/exclude', () => {
   const foodsError = FoodEnum.safeParse('Cucumbers')
   const italianError = ItalianEnum.safeParse('Tacos')
   if (!foodsError.success && !italianError.success) {
-    expect(foodsError.error.issues[0].message).toEqual(italianError.error.issues[0].message)
+    expect(foodsError.error.issues[0]?.message).toEqual(italianError.error.issues[0]?.message)
   }
 
   const UnhealthyEnum = FoodEnum.exclude(['Salad'], {
@@ -67,6 +67,6 @@ test('error map in extract/exclude', () => {
   })
   const unhealthyError = UnhealthyEnum.safeParse('Salad')
   if (!unhealthyError.success) {
-    expect(unhealthyError.error.issues[0].message).toEqual('This is not healthy food!')
+    expect(unhealthyError.error.issues[0]?.message).toEqual('This is not healthy food!')
   }
 })

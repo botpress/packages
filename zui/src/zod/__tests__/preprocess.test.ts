@@ -134,7 +134,7 @@ test('z.NEVER in preprocess', () => {
   util.assertEqual<foo, number>(true)
   const arg = foo.safeParse(undefined)
   if (!arg.success) {
-    expect(arg.error.issues[0].message).toEqual('bad')
+    expect(arg.error.issues[0]?.message).toEqual('bad')
   }
 })
 test('preprocess as the second property of object', () => {
@@ -149,8 +149,8 @@ test('preprocess as the second property of object', () => {
   expect(result.success).toEqual(false)
   if (!result.success) {
     expect(result.error.issues.length).toEqual(2)
-    expect(result.error.issues[0].code).toEqual(z.ZodIssueCode.too_small)
-    expect(result.error.issues[1].code).toEqual(z.ZodIssueCode.too_small)
+    expect(result.error.issues[0]?.code).toEqual(z.ZodIssueCode.too_small)
+    expect(result.error.issues[1]?.code).toEqual(z.ZodIssueCode.too_small)
   }
 })
 

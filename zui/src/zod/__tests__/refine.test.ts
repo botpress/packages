@@ -83,7 +83,7 @@ test('custom path', async () => {
     .spa({ password: 'asdf', confirm: 'qewr' })
   expect(result.success).toEqual(false)
   if (!result.success) {
-    expect(result.error.issues[0].path).toEqual(['confirm'])
+    expect(result.error.issues[0]?.path).toEqual(['confirm'])
   }
 })
 
@@ -110,7 +110,7 @@ test('use path in refinement context', async () => {
   expect(t1.success).toBe(true)
   expect(t2.success).toBe(false)
   if (t2.success === false) {
-    expect(t2.error.issues[0].message).toEqual('schema cannot be nested. path: foo')
+    expect(t2.error.issues[0]?.message).toEqual('schema cannot be nested. path: foo')
   }
 })
 

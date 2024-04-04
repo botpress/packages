@@ -171,17 +171,17 @@ test('url error overrides', () => {
   try {
     z.string().url().parse('https')
   } catch (err) {
-    expect((err as z.ZodError).issues[0].message).toEqual('Invalid url')
+    expect((err as z.ZodError).issues[0]?.message).toEqual('Invalid url')
   }
   try {
     z.string().url('badurl').parse('https')
   } catch (err) {
-    expect((err as z.ZodError).issues[0].message).toEqual('badurl')
+    expect((err as z.ZodError).issues[0]?.message).toEqual('badurl')
   }
   try {
     z.string().url({ message: 'badurl' }).parse('https')
   } catch (err) {
-    expect((err as z.ZodError).issues[0].message).toEqual('badurl')
+    expect((err as z.ZodError).issues[0]?.message).toEqual('badurl')
   }
 })
 
@@ -212,7 +212,7 @@ test('uuid', () => {
   const result = uuid.safeParse('9491d710-3185-4e06-bea0-6a2f275345e0X')
   expect(result.success).toEqual(false)
   if (!result.success) {
-    expect(result.error.issues[0].message).toEqual('custom error')
+    expect(result.error.issues[0]?.message).toEqual('custom error')
   }
 })
 
@@ -222,7 +222,7 @@ test('bad uuid', () => {
   const result = uuid.safeParse('invalid uuid')
   expect(result.success).toEqual(false)
   if (!result.success) {
-    expect(result.error.issues[0].message).toEqual('custom error')
+    expect(result.error.issues[0]?.message).toEqual('custom error')
   }
 })
 
@@ -232,7 +232,7 @@ test('cuid', () => {
   const result = cuid.safeParse('cifjhdsfhsd-invalid-cuid')
   expect(result.success).toEqual(false)
   if (!result.success) {
-    expect(result.error.issues[0].message).toEqual('Invalid cuid')
+    expect(result.error.issues[0]?.message).toEqual('Invalid cuid')
   }
 })
 
@@ -252,8 +252,8 @@ test('cuid2', () => {
   ]
   const results = invalidStrings.map((s) => cuid2.safeParse(s))
   expect(results.every((r) => !r.success)).toEqual(true)
-  if (!results[0].success) {
-    expect(results[0].error.issues[0].message).toEqual('Invalid cuid2')
+  if (!results[0]?.success) {
+    expect(results[0]?.error.issues[0]?.message).toEqual('Invalid cuid2')
   }
 })
 
@@ -265,7 +265,7 @@ test('ulid', () => {
   const tooLong = '01ARZ3NDEKTSV4RRFFQ69G5FAVA'
   expect(ulid.safeParse(tooLong).success).toEqual(false)
   if (!result.success) {
-    expect(result.error.issues[0].message).toEqual('Invalid ulid')
+    expect(result.error.issues[0]?.message).toEqual('Invalid ulid')
   }
 })
 
@@ -282,7 +282,7 @@ test('regexp error message', () => {
     .regex(/^moo+$/)
     .safeParse('boooo')
   if (!result.success) {
-    expect(result.error.issues[0].message).toEqual('Invalid')
+    expect(result.error.issues[0]?.message).toEqual('Invalid')
   } else {
     throw new Error('validation should have failed')
   }

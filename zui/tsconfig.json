@@ -19,7 +19,6 @@
     "declaration": false,
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
-    "noErrorTruncation": true,
     "noEmit": false,
     "resolveJsonModule": true,
     "isolatedModules": true,

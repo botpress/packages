@@ -247,6 +247,6 @@ export type ZuiReactComponent<
 
 export type ZuiComponentMap<UI extends UIComponentDefinitions = GlobalComponentDefinitions> = {
   type: BaseType
-  id: KeysOfType<UI, BaseType>
+  id: KeysOfType<UI, BaseType> | 'default'
   component: ZuiReactComponent<BaseType, KeysOfType<UI, BaseType>, UI>
 }[]

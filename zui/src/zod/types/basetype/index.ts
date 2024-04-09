@@ -43,7 +43,6 @@ import {
   ZodPromise,
   ZodReadonly,
   ZodUnion,
-  ZodArrayDef,
   KindToDef,
 } from '../index'
 import type { GlobalComponentDefinitions } from '../../../index'

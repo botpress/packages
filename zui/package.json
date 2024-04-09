@@ -39,6 +39,7 @@
     "@types/benchmark": "^2.1.5",
     "@types/jest": "^29.5.12",
     "@types/json-schema": "^7.0.15",
+    "@types/node": "^20.12.6",
     "@types/react": "^18.2.48",
     "@vitejs/plugin-react-swc": "^3.6.0",
     "ajv": "^8.12.0",

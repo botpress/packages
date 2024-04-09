@@ -43,6 +43,8 @@ import {
   ZodPromise,
   ZodReadonly,
   ZodUnion,
+  ZodArrayDef,
+  KindToDef,
 } from '../index'
 import type { GlobalComponentDefinitions } from '../../../index'
 import type { ZuiSchemaOptions } from '../../../transforms/zui-to-json-schema/zui-extension'
@@ -466,9 +468,45 @@ export abstract class ZodType<Output = any, Def extends ZodTypeDef = ZodTypeDef,
 
   // BOTPRESS EXTENSIONS
 
-  get ui() {
-    this._def[zuiKey] ??= {}
-    return this._def[zuiKey]
+  private _setZuiMeta(key: string, value: any) {
+    const def = this._def as KindToDef<any>
+    switch (def.typeName) {
+      case ZodFirstPartyTypeKind.ZodNullable:
+      case ZodFirstPartyTypeKind.ZodDefault:
+      case ZodFirstPartyTypeKind.ZodOptional:
+      case ZodFirstPartyTypeKind.ZodReadonly:
+        def.innerType._def[zuiKey] = {
+          ...def.innerType._def[zuiKey],
+          [key]: value,
+        }
+        break
+      case ZodFirstPartyTypeKind.ZodEffects:
+        def.schema._def[zuiKey] = {
+          ...def.schema._def[zuiKey],
+          [key]: value,
+        }
+        break
+      default:
+        def[zuiKey] = {
+          ...def[zuiKey],
+          [key]: value,
+        }
+    }
+  }
+
+  get ui(): object {
+    const def = this._def as KindToDef<any>
+    switch (def.typeName) {
+      case ZodFirstPartyTypeKind.ZodNullable:
+      case ZodFirstPartyTypeKind.ZodDefault:
+      case ZodFirstPartyTypeKind.ZodOptional:
+      case ZodFirstPartyTypeKind.ZodReadonly:
+        return def.innerType.ui
+      case ZodFirstPartyTypeKind.ZodEffects:
+        return def.schema.ui
+      default:
+        return def[zuiKey] || {}
+    }
   }
 
   /**
@@ -488,8 +526,7 @@ export abstract class ZodType<Output = any, Def extends ZodTypeDef = ZodTypeDef,
    * The title of the field. Defaults to the field name.
    */
   title(title: string): this {
-    this._def[zuiKey] ??= {}
-    this._def[zuiKey].title = title
+    this._setZuiMeta('title', title)
     return this
   }
 
@@ -498,8 +535,7 @@ export abstract class ZodType<Output = any, Def extends ZodTypeDef = ZodTypeDef,
    * @default false
    */
   hidden(hidden?: boolean): this {
-    this._def[zuiKey] ??= {}
-    this._def[zuiKey].hidden = typeof hidden === 'undefined' ? true : hidden
+    this._setZuiMeta('hidden', typeof hidden === 'undefined' ? true : hidden)
     return this
   }
 
@@ -508,8 +544,7 @@ export abstract class ZodType<Output = any, Def extends ZodTypeDef = ZodTypeDef,
    * @default false
    */
   disabled(disabled?: boolean): this {
-    this._def[zuiKey] ??= {}
-    this._def[zuiKey].disabled = typeof disabled === 'undefined' ? true : disabled
+    this._setZuiMeta('disabled', typeof disabled === 'undefined' ? true : disabled)
     return this
   }
 
@@ -517,8 +552,7 @@ export abstract class ZodType<Output = any, Def extends ZodTypeDef = ZodTypeDef,
    * Placeholder text for the field
    */
   placeholder(placeholder: string): this {
-    this._def[zuiKey] ??= {}
-    this._def[zuiKey].placeholder = placeholder
+    this._setZuiMeta('placeholder', placeholder)
     return this
   }
 

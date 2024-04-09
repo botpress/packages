@@ -1,4 +1,10 @@
 import {
+  ZodArray,
+  ZodEnum,
+  ZodNever,
+  ZodNullable,
+  ZodOptional,
+  ZodTuple,
   addIssueToContext,
   INVALID,
   objectUtil,
@@ -8,10 +14,6 @@ import {
   util,
   ZodIssueCode,
   ZodParsedType,
-} from '../'
-import { ZodArray } from '../array'
-import { createZodEnum, ZodEnum } from '../enum'
-import {
   ParseInputLazyPath,
   RawCreateParams,
   ZodFirstPartyTypeKind,
@@ -19,15 +21,12 @@ import {
   ZodType,
   ZodTypeAny,
   ZodTypeDef,
+  processCreateParams,
+  enumUtil,
+  errorUtil,
+  partialUtil,
+  createZodEnum,
 } from '../index'
-import { ZodNever } from '../never'
-import { ZodNullable } from '../nullable'
-import { ZodOptional } from '../optional'
-import { ZodTuple } from '../tuple'
-import { processCreateParams } from '../utils'
-import { enumUtil } from '../utils/enumUtil'
-import { errorUtil } from '../utils/errorUtil'
-import { partialUtil } from '../utils/partialUtil'
 
 export type UnknownKeysParam = 'passthrough' | 'strict' | 'strip'
 

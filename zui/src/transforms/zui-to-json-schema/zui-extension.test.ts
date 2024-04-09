@@ -2,6 +2,7 @@ import { describe, test, expect } from 'vitest'
 import { zuiToJsonSchema } from './zui-extension'
 import { z } from 'zod'
 import { zuiKey } from '../../ui/constants'
+import { traverseZodDefinitions } from '../json-schema-to-zui'
 
 describe('zuiToJsonSchema', () => {
   test('should work', () => {
@@ -9,7 +10,11 @@ describe('zuiToJsonSchema', () => {
       name: z.string().title('Name').default('No Name'),
       age: z.number().max(100).min(0).title('Age').describe('Age in years').default(20),
     })
-
+    traverseZodDefinitions(schema._def, (type, def) => {
+      if (type === 'ZodString') {
+        console.log('ZodString', def['x-zui'])
+      }
+    })
     const jsonSchema = zuiToJsonSchema(schema)
 
     expect(jsonSchema).toMatchInlineSnapshot(`

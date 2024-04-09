@@ -1,30 +1,39 @@
-import type { ZodAnyDef } from './any'
-import type { ZodArrayDef } from './array'
-import type { ZodBigIntDef } from './bigint'
-import type { ZodBooleanDef } from './boolean'
-import type { ZodDateDef } from './date'
-import type { ZodEnumDef } from './enum'
-import type { ZodFunctionDef } from './function'
-import type { ZodIntersectionDef } from './intersection'
-import type { ZodLazyDef } from './lazy'
-import type { ZodLiteralDef } from './literal'
-import type { ZodMapDef } from './map'
-import type { ZodNativeEnumDef } from './nativeEnum'
-import type { ZodNeverDef } from './never'
-import type { ZodNullDef } from './null'
-import type { ZodNullableDef } from './nullable'
-import type { ZodNumberDef } from './number'
-import type { ZodObjectDef } from './object'
-import type { ZodOptionalDef } from './optional'
-import type { ZodPromiseDef } from './promise'
-import type { ZodRecordDef } from './record'
-import type { ZodStringDef } from './string'
-import type { ZodEffectsDef as ZodTransformerDef } from './transformer'
-import type { ZodTupleDef } from './tuple'
-import type { ZodUndefinedDef } from './undefined'
-import type { ZodUnionDef } from './union'
-import type { ZodUnknownDef } from './unknown'
-import type { ZodVoidDef } from './void'
+import type {
+  ZodAnyDef,
+  ZodArrayDef,
+  ZodBigIntDef,
+  ZodBooleanDef,
+  ZodBrandedDef,
+  ZodCatchDef,
+  ZodDateDef,
+  ZodDefaultDef,
+  ZodDiscriminatedUnionDef,
+  ZodEnumDef,
+  ZodFunctionDef,
+  ZodIntersectionDef,
+  ZodLazyDef,
+  ZodLiteralDef,
+  ZodMapDef,
+  ZodNativeEnumDef,
+  ZodNeverDef,
+  ZodNullDef,
+  ZodNullableDef,
+  ZodNumberDef,
+  ZodObjectDef,
+  ZodOptionalDef,
+  ZodPipelineDef,
+  ZodPromiseDef,
+  ZodReadonlyDef,
+  ZodRecordDef,
+  ZodStringDef,
+  ZodTemplateLiteralDef,
+  ZodEffectsDef,
+  ZodTupleDef,
+  ZodUndefinedDef,
+  ZodUnionDef,
+  ZodUnknownDef,
+  ZodVoidDef,
+} from './index'
 
 export type ZodDef =
   | ZodStringDef
@@ -49,7 +58,7 @@ export type ZodDef =
   | ZodLazyDef
   | ZodLiteralDef
   | ZodEnumDef
-  | ZodTransformerDef
+  | ZodEffectsDef
   | ZodNativeEnumDef
   | ZodOptionalDef
   | ZodNullableDef
@@ -94,3 +103,73 @@ export enum ZodFirstPartyTypeKind {
   ZodTemplateLiteral = 'ZodTemplateLiteral',
   ZodReadonly = 'ZodReadonly',
 }
+
+export type KindToDef<T extends ZodFirstPartyTypeKind> = T extends ZodFirstPartyTypeKind.ZodString
+  ? ZodStringDef
+  : T extends ZodFirstPartyTypeKind.ZodNumber
+    ? ZodNumberDef
+    : T extends ZodFirstPartyTypeKind.ZodBigInt
+      ? ZodBigIntDef
+      : T extends ZodFirstPartyTypeKind.ZodBoolean
+        ? ZodBooleanDef
+        : T extends ZodFirstPartyTypeKind.ZodDate
+          ? ZodDateDef
+          : T extends ZodFirstPartyTypeKind.ZodUndefined
+            ? ZodUndefinedDef
+            : T extends ZodFirstPartyTypeKind.ZodNull
+              ? ZodNullDef
+              : T extends ZodFirstPartyTypeKind.ZodAny
+                ? ZodAnyDef
+                : T extends ZodFirstPartyTypeKind.ZodUnknown
+                  ? ZodUnknownDef
+                  : T extends ZodFirstPartyTypeKind.ZodNever
+                    ? ZodNeverDef
+                    : T extends ZodFirstPartyTypeKind.ZodVoid
+                      ? ZodVoidDef
+                      : T extends ZodFirstPartyTypeKind.ZodArray
+                        ? ZodArrayDef
+                        : T extends ZodFirstPartyTypeKind.ZodObject
+                          ? ZodObjectDef
+                          : T extends ZodFirstPartyTypeKind.ZodUnion
+                            ? ZodUnionDef
+                            : T extends ZodFirstPartyTypeKind.ZodIntersection
+                              ? ZodIntersectionDef
+                              : T extends ZodFirstPartyTypeKind.ZodTuple
+                                ? ZodTupleDef
+                                : T extends ZodFirstPartyTypeKind.ZodRecord
+                                  ? ZodRecordDef
+                                  : T extends ZodFirstPartyTypeKind.ZodMap
+                                    ? ZodMapDef
+                                    : T extends ZodFirstPartyTypeKind.ZodFunction
+                                      ? ZodFunctionDef
+                                      : T extends ZodFirstPartyTypeKind.ZodLazy
+                                        ? ZodLazyDef
+                                        : T extends ZodFirstPartyTypeKind.ZodLiteral
+                                          ? ZodLiteralDef
+                                          : T extends ZodFirstPartyTypeKind.ZodEnum
+                                            ? ZodEnumDef
+                                            : T extends ZodFirstPartyTypeKind.ZodEffects
+                                              ? ZodEffectsDef
+                                              : T extends ZodFirstPartyTypeKind.ZodNativeEnum
+                                                ? ZodNativeEnumDef
+                                                : T extends ZodFirstPartyTypeKind.ZodOptional
+                                                  ? ZodOptionalDef
+                                                  : T extends ZodFirstPartyTypeKind.ZodNullable
+                                                    ? ZodNullableDef
+                                                    : T extends ZodFirstPartyTypeKind.ZodPromise
+                                                      ? ZodPromiseDef
+                                                      : T extends ZodFirstPartyTypeKind.ZodDiscriminatedUnion
+                                                        ? ZodDiscriminatedUnionDef<any>
+                                                        : T extends ZodFirstPartyTypeKind.ZodCatch
+                                                          ? ZodCatchDef
+                                                          : T extends ZodFirstPartyTypeKind.ZodDefault
+                                                            ? ZodDefaultDef
+                                                            : T extends ZodFirstPartyTypeKind.ZodBranded
+                                                              ? ZodBrandedDef<any>
+                                                              : T extends ZodFirstPartyTypeKind.ZodPipeline
+                                                                ? ZodPipelineDef<any, any>
+                                                                : T extends ZodFirstPartyTypeKind.ZodTemplateLiteral
+                                                                  ? ZodTemplateLiteralDef
+                                                                  : T extends ZodFirstPartyTypeKind.ZodReadonly
+                                                                    ? ZodReadonlyDef
+                                                                    : never

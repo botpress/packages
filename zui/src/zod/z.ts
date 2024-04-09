@@ -1,3 +1,5 @@
+import { objectToZui } from '../transforms/object-to-zui'
+import { jsonSchemaToZui } from '..'
 import {
   custom,
   CustomParams,
@@ -36,6 +38,7 @@ import {
   ZodTemplateLiteral,
   ZodTuple,
   ZodType,
+  ZodTypeAny,
   ZodUndefined,
   ZodUnion,
   ZodUnknown,
@@ -200,9 +203,14 @@ export {
 
 export const NEVER = INVALID as never
 
+export const fromJsonSchema = (schema: any): ZodTypeAny => {
+  return jsonSchemaToZui(schema)
+}
+
+export const fromObject = objectToZui
+
 export * from './types'
 export * from './types/error'
 export * from './types/utils'
 export * from './types/utils/parseUtil'
 export * from './types/utils/typeAliases'
-export * from './z'

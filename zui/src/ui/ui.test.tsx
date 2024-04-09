@@ -1,10 +1,10 @@
 import { fireEvent, render } from '@testing-library/react'
 import { ZuiForm, ZuiFormProps } from './index'
-import { zui, ComponentDefinitions, ZuiComponentMap } from '../index'
+import { ComponentDefinitions, ZuiComponentMap } from '../index'
 import { ObjectSchema, JSONSchema, ZuiReactComponentBaseProps, BaseType } from './types'
 import { FC, PropsWithChildren, useState } from 'react'
 import { vi } from 'vitest'
-import { z } from 'zod'
+import { z as zui } from 'zod'
 
 const TestId = (type: JSONSchema['type'], path: string[], subpath?: string) =>
   `${type}:${path.length > 0 ? path.join('.') : 'root'}${subpath ? `:${subpath}` : ''}`
@@ -25,7 +25,7 @@ describe('UI', () => {
         schema={jsonSchema}
         components={testComponentImplementation}
         value={{}}
-        onChange={() => {}}
+        onChange={() => { }}
       />,
     )
 
@@ -429,7 +429,7 @@ const testComponentDefinitions = {
   string: {
     customstringcomponent: {
       id: 'customstringcomponent',
-      schema: z.object({ multiline: z.boolean() }),
+      schema: zui.object({ multiline: zui.boolean() }),
     },
   },
   number: {},
@@ -437,13 +437,13 @@ const testComponentDefinitions = {
   array: {
     stringList: {
       id: 'stringList',
-      schema: z.object({}),
+      schema: zui.object({}),
     },
   },
   object: {
     collapsible: {
       id: 'collapsible',
-      schema: z.object({ collapsed: z.boolean() }),
+      schema: zui.object({ collapsed: zui.boolean() }),
     },
   },
 } satisfies ComponentDefinitions

@@ -1,5 +1,4 @@
-import type { ZodSchema, ZodType, z } from 'zod'
-import { zuiKey } from '../zui'
+import type { ZodSchema, z } from 'zod'
 import { FC } from 'react'
 import { GlobalComponentDefinitions } from '..'
 
@@ -93,27 +92,44 @@ export const containerTypes = ['object', 'array'] as const
 export type ContainerType = (typeof containerTypes)[number]
 
 export type UIComponentDefinitions = {
-  [type in BaseType]: {
-    [id: string | number | symbol]: {
-      id: string
-      schema: ZodSchema
-    }
-  }
-}
+  id: string
+  type: BaseType
+  schema: ZodSchema
+}[]
 
-export type ZodToBaseType<T extends ZodType> = T extends z.ZodString
-  ? 'string'
-  : T extends z.ZodBoolean
-    ? 'boolean'
-    : T extends z.ZodNumber
+export type KeysOfType<UI extends UIComponentDefinitions, Type extends BaseType> = UI extends (infer T)[]
+  ? T extends { type: Type; id: string }
+    ? T['id']
+    : 'default'
+  : never
+
+export type SchemaOfType<
+  UI extends UIComponentDefinitions,
+  Type extends BaseType,
+  ID extends KeysOfType<UI, Type> | 'default' = KeysOfType<UI, Type>,
+> = UI[number] extends infer T
+  ? T extends { id: ID; type: Type; schema: ZodSchema }
+    ? z.infer<T['schema']>
+    : never
+  : never
+
+export type ZodKindToBaseType<T extends z.ZodTypeDef> = T extends infer U
+  ? U extends { typeName: z.ZodFirstPartyTypeKind.ZodString }
+    ? 'string'
+    : U extends { typeName: z.ZodFirstPartyTypeKind.ZodNumber }
       ? 'number'
-      : T extends z.ZodArray<any, any>
-        ? 'array'
-        : T extends z.ZodObject<any, any>
-          ? 'object'
-          : T extends z.ZodEnum<[string, ...string[]]>
-            ? 'string'
-            : any
+      : U extends { typeName: z.ZodFirstPartyTypeKind.ZodBoolean }
+        ? 'boolean'
+        : U extends { typeName: z.ZodFirstPartyTypeKind.ZodArray }
+          ? 'array'
+          : U extends { typeName: z.ZodFirstPartyTypeKind.ZodObject }
+            ? 'object'
+            : U extends { typeName: z.ZodFirstPartyTypeKind.ZodEnum }
+              ? 'string'
+              : U extends { typeName: z.ZodFirstPartyTypeKind.ZodOptional; innerType: any }
+                ? ZodKindToBaseType<U['innerType']>
+                : never
+  : never
 
 export type BaseTypeToType<T extends BaseType> = T extends 'string'
   ? string
@@ -131,7 +147,7 @@ export type AsBaseType<T> = T extends BaseType ? T : never
 
 export type SchemaContext<
   Type extends BaseType,
-  ID extends keyof UI[Type],
+  ID extends KeysOfType<UI, Type>,
   UI extends UIComponentDefinitions = GlobalComponentDefinitions,
 > = {
   type: Type
@@ -148,12 +164,12 @@ export type FormError = {
 
 export type ZuiReactComponentBaseProps<
   Type extends BaseType,
-  ID extends keyof UI[Type],
+  ID extends KeysOfType<UI, Type> | 'default',
   UI extends UIComponentDefinitions = GlobalComponentDefinitions,
 > = {
   type: Type
   componentID: ID
-  params: z.infer<UI[Type][ID]['schema']>
+  params: SchemaOfType<UI, Type, ID>
   data: BaseTypeToType<Type> | null
   enabled: boolean
   scope: string
@@ -184,7 +200,7 @@ export type ZuiReactArrayChildProps =
 
 export type ZuiReactObjectComponentProps<
   Type extends ContainerType,
-  ID extends keyof UI[Type],
+  ID extends KeysOfType<UI, Type> | 'default',
   UI extends UIComponentDefinitions = GlobalComponentDefinitions,
 > = ZuiReactComponentBaseProps<Type, ID, UI> & {
   children: JSX.Element | JSX.Element[]
@@ -192,7 +208,7 @@ export type ZuiReactObjectComponentProps<
 
 export type ZuiReactArrayComponentProps<
   Type extends ContainerType,
-  ID extends keyof UI[Type],
+  ID extends KeysOfType<UI, Type> | 'default',
   UI extends UIComponentDefinitions = GlobalComponentDefinitions,
 > = ZuiReactComponentBaseProps<Type, ID, UI> & {
   children: JSX.Element | JSX.Element[]
@@ -202,7 +218,7 @@ export type ZuiReactArrayComponentProps<
 
 export type ZuiReactControlComponentProps<
   Type extends BaseType,
-  ID extends keyof UI[Type],
+  ID extends KeysOfType<UI, Type> | 'default',
   UI extends UIComponentDefinitions = GlobalComponentDefinitions,
 > = ZuiReactComponentBaseProps<Type, ID, UI> & {
   description?: string
@@ -212,7 +228,7 @@ export type ZuiReactControlComponentProps<
 
 export type ZuiReactComponentProps<
   Type extends BaseType,
-  ID extends keyof UI[Type],
+  ID extends KeysOfType<UI, Type> | 'default',
   UI extends UIComponentDefinitions = GlobalComponentDefinitions,
 > = Type extends 'object'
   ? ZuiReactObjectComponentProps<Type, ID, UI>
@@ -222,14 +238,14 @@ export type ZuiReactComponentProps<
 
 export type ZuiReactComponent<
   Type extends BaseType,
-  ID extends keyof UI[Type] = 'default',
+  ID extends KeysOfType<UI, Type> | 'default' = 'default',
   UI extends UIComponentDefinitions = GlobalComponentDefinitions,
 > = FC<ZuiReactComponentProps<Type, ID, UI>>
 
 export type ZuiComponentMap<UI extends UIComponentDefinitions = GlobalComponentDefinitions> = {
-  [Type in BaseType]: {
-    [ID in keyof UI[Type]]: ZuiReactComponent<Type, ID, UI>
-  } & {
-    default: ZuiReactComponent<Type, 'default', UI>
-  }
-}
+  type: BaseType
+  id: KeysOfType<UI, BaseType>
+  component: ZuiReactComponent<BaseType, KeysOfType<UI, BaseType>, UI>
+}[]
+
+export const zuiKey = 'x-zui' as const

@@ -2,14 +2,6 @@ import { RawCreateParams, ZodFirstPartyTypeKind, ZodType, ZodTypeAny, ZodTypeDef
 import { processCreateParams, ZodParsedType } from '../utils'
 import { OK, ParseInput, ParseReturnType } from '../utils/parseUtil'
 
-///////////////////////////////////////////
-///////////////////////////////////////////
-//////////                       //////////
-//////////      ZodOptional      //////////
-//////////                       //////////
-///////////////////////////////////////////
-///////////////////////////////////////////
-
 export interface ZodOptionalDef<T extends ZodTypeAny = ZodTypeAny> extends ZodTypeDef {
   innerType: T
   typeName: ZodFirstPartyTypeKind.ZodOptional

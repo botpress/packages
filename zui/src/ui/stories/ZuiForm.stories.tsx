@@ -1,24 +1,22 @@
 import React, { FC, useState } from 'react'
 import type { Meta, StoryObj } from '@storybook/react'
 import { FormError, UIComponentDefinitions, ZuiComponentMap } from '../types'
-import { Zui, zui as zuiImport } from '../../index'
+import { z as zui } from 'zod'
 import { ZuiForm } from '..'
 import { z } from 'zod'
 
-const zui = zuiImport as Zui<typeof exampleExtensions>
-
-const exampleExtensions = {
-  string: {
-    debug: {
-      id: 'debug',
-      schema: z.null(),
-    },
-  },
-  number: {},
-  boolean: {},
-  array: {},
-  object: {},
-} satisfies UIComponentDefinitions
+declare module 'zod' {
+  interface ComponentDefinitions {
+    components: typeof exampleExtensions
+  }
+}
+const exampleExtensions = [
+  {
+    type: 'number',
+    id: 'debug',
+    schema: z.null(),
+  }
+] satisfies UIComponentDefinitions
 
 const exampleSchema = zui
   .object({
@@ -45,7 +43,7 @@ const exampleSchema = zui
       password: zui.string(),
       passwordConfirm: zui.string(),
     }),
-    debug: zui.string().optional().displayAs('debug', null),
+    debug: zui.number().optional().displayAs('debug', {}),
   })
   .title('User Information')
 

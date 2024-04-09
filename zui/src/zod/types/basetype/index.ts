@@ -1,4 +1,13 @@
 import {
+  BaseType,
+  zuiKey,
+  KeysOfType,
+  SchemaOfType,
+  UIComponentDefinitions,
+  ZodKindToBaseType,
+  JSONSchema,
+} from '../../../ui/types'
+import {
   AsyncParseReturnType,
   getParsedType,
   isAsync,
@@ -32,6 +41,9 @@ import {
   ZodReadonly,
   ZodUnion,
 } from '../index'
+import { GlobalComponentDefinitions, zuiToJsonSchema } from '../../../index'
+import { toTypescriptTypings } from '../../../transforms/zui-to-typescript'
+import { ZuiSchemaOptions } from '../../../transforms/zui-to-json-schema/zui-extension'
 
 export type RefinementCtx = {
   addIssue: (arg: IssueData) => void
@@ -46,9 +58,12 @@ export type { TypeOf as infer }
 
 export type CustomErrorParams = Partial<util.Omit<ZodCustomIssue, 'code'>>
 export interface ZodTypeDef {
+  typeName: ZodFirstPartyTypeKind
   errorMap?: ZodErrorMap
   description?: string
+  [zuiKey]?: any
 }
+
 export class ParseInputLazyPath implements ParseInput {
   parent: ParseContext
   data: any
@@ -433,6 +448,7 @@ export abstract class ZodType<Output = any, Def extends ZodTypeDef = ZodTypeDef,
   pipe<T extends ZodTypeAny>(target: T): ZodPipeline<this, T> {
     return ZodPipeline.create(this, target)
   }
+
   readonly(): ZodReadonly<this> {
     return ZodReadonly.create(this)
   }
@@ -440,7 +456,68 @@ export abstract class ZodType<Output = any, Def extends ZodTypeDef = ZodTypeDef,
   isOptional(): boolean {
     return this.safeParse(undefined).success
   }
+
   isNullable(): boolean {
     return this.safeParse(null).success
+  }
+
+  // BOTPRESS EXTENSIONS
+  /**
+   * The type of component to use to display the field and its options
+   */
+  displayAs<
+    UI extends UIComponentDefinitions = GlobalComponentDefinitions,
+    Type extends BaseType = ZodKindToBaseType<this['_def']>,
+    ID extends KeysOfType<UI, Type> = KeysOfType<UI, Type>,
+  >(id: ID, options: SchemaOfType<UI, Type, ID>): this {
+    this._def[zuiKey] ??= {}
+    this._def[zuiKey].displayAs = [id, options]
+    return null as any
+  }
+
+  /**
+   * The title of the field. Defaults to the field name.
+   */
+  title(title: string): this {
+    this._def[zuiKey] ??= {}
+    this._def[zuiKey].title = title
+    return this
+  }
+
+  /**
+   * Whether the field is hidden in the UI. Useful for internal fields.
+   * @default false
+   */
+  hidden(hidden?: boolean): this {
+    this._def[zuiKey] ??= {}
+    this._def[zuiKey].hidden = typeof hidden === 'undefined' ? true : hidden
+    return this
+  }
+
+  /**
+   * Whether the field is disabled
+   * @default false
+   */
+  disabled(disabled?: boolean): this {
+    this._def[zuiKey] ??= {}
+    this._def[zuiKey].disabled = typeof disabled === 'undefined' ? true : disabled
+    return this
+  }
+
+  /**
+   * Placeholder text for the field
+   */
+  placeholder(placeholder: string): this {
+    this._def[zuiKey] ??= {}
+    this._def[zuiKey].placeholder = placeholder
+    return this
+  }
+
+  toJsonSchema(opts?: ZuiSchemaOptions): JSONSchema {
+    return zuiToJsonSchema(this, opts)
+  }
+
+  async toTypescriptTypings(): Promise<string> {
+    return toTypescriptTypings(this)
   }
 }

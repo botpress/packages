@@ -56,7 +56,6 @@
   "dependencies": {
     "@bpinternal/json-schema-to-zod": "^2.0.15",
     "json-schema-to-typescript": "^13.1.2",
-    "lodash": "^4.17.21",
     "react": "^18.2.0"
   },
   "repository": {

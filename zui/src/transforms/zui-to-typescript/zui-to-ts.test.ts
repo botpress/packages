@@ -1,13 +1,13 @@
 import { describe, expect, test } from 'vitest'
-import { zui } from '../../zui'
+import { z } from 'zod'
 
 describe('zui-to-ts', () => {
   test('validate simple schema', async () => {
-    const schema = zui.object({
-      name: zui.string().title('Name'),
-      age: zui.number().max(100).min(0).title('Age').describe('Age in years').default(18),
-      job: zui.enum(['developer', 'designer', 'manager']).title('Job').default('developer'),
-      group: zui.union([zui.literal('avg'), zui.literal('key'), zui.literal('max')]),
+    const schema = z.object({
+      name: z.string().title('Name'),
+      age: z.number().max(100).min(0).title('Age').describe('Age in years').default(18),
+      job: z.enum(['developer', 'designer', 'manager']).title('Job').default('developer'),
+      group: z.union([z.literal('avg'), z.literal('key'), z.literal('max')]),
     })
 
     const def = await schema.toTypescriptTypings({ schemaName: 'User' })
@@ -26,8 +26,8 @@ describe('zui-to-ts', () => {
   })
 
   test('without schema, no export statement', async () => {
-    const schema = zui.object({
-      name: zui.string().title('Name'),
+    const schema = z.object({
+      name: z.string().title('Name'),
     })
 
     const def = await schema.toTypescriptTypings()

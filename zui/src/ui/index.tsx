@@ -12,7 +12,7 @@ import {
   PrimitiveSchema,
   ZuiReactArrayChildProps,
 } from './types'
-import { zuiKey } from '../zui'
+import { zuiKey } from "./types"
 import React, { type FC, useMemo } from 'react'
 import { GlobalComponentDefinitions } from '..'
 import { FormDataProvider, getDefaultItemData, useFormData } from './providers/FormDataProvider'
@@ -21,7 +21,7 @@ import { formatTitle } from './titleutils'
 
 type ComponentMeta<Type extends BaseType = BaseType> = {
   type: Type
-  Component: ZuiReactComponent<Type, string>
+  Component: ZuiReactComponent<Type>
   id: string
   params: any
 }
@@ -34,10 +34,10 @@ const resolveComponent = <Type extends BaseType>(
   const uiDefinition = fieldSchema[zuiKey]?.displayAs || null
 
   if (!uiDefinition || !Array.isArray(uiDefinition) || uiDefinition.length < 2) {
-    const defaultComponent = components[type]?.default
+    const defaultComponent = components.filter(c => c.type === type && c.id === 'default')[0]?.component
     if (defaultComponent) {
       return {
-        Component: defaultComponent as ZuiReactComponent<Type, string>,
+        Component: defaultComponent as ZuiReactComponent<Type, 'default'>,
         type: type as Type,
         id: 'default',
         params: {},
@@ -48,7 +48,7 @@ const resolveComponent = <Type extends BaseType>(
 
   const componentID: string = uiDefinition[0] || 'default'
 
-  const Component = components[type]?.[componentID] || null
+  const Component = components.find(c => c.type === type && c.id === componentID)?.component as ZuiReactComponent<Type> || null
 
   if (!Component) {
     console.warn(`Component ${type}.${componentID} not found`)
@@ -58,7 +58,7 @@ const resolveComponent = <Type extends BaseType>(
   const params = uiDefinition[1] || {}
 
   return {
-    Component: Component as ZuiReactComponent<Type, string>,
+    Component: Component as ZuiReactComponent<Type>,
     type: type as Type,
     id: componentID,
     params,
@@ -88,7 +88,7 @@ export const ZuiForm = <UI extends UIComponentDefinitions = GlobalComponentDefin
       disableValidation={disableValidation || false}
     >
       <FormElementRenderer
-        components={components}
+        components={components as any}
         fieldSchema={schema}
         path={[]}
         required={true}

@@ -19,13 +19,11 @@
     "declaration": false,
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
+    "noErrorTruncation": true,
     "noEmit": false,
     "resolveJsonModule": true,
     "isolatedModules": true,
     "paths": {
-      "~/*": [
-        "./src/*"
-      ],
       "zod": [
         "./src/zod/index.ts"
       ]

@@ -34,19 +34,21 @@ const resolveComponent = <Type extends BaseType>(
   const uiDefinition = fieldSchema[zuiKey]?.displayAs || null
 
   if (!uiDefinition || !Array.isArray(uiDefinition) || uiDefinition.length < 2) {
-    const defaultComponent = components?.filter?.(c => c.type === type && c.id === 'default')[0]?.component
-    if (defaultComponent) {
-      return {
-        Component: defaultComponent as ZuiReactComponent<Type, 'default'>,
-        type: type as Type,
-        id: 'default',
-        params: {},
-      }
+    const defaultComponent = components?.find?.(c => c.type === type && c.id === 'default')?.component
+
+    if (!defaultComponent) {
+      return null
     }
-    return null
+
+    return {
+      Component: defaultComponent as ZuiReactComponent<Type, 'default'>,
+      type: type as Type,
+      id: 'default',
+      params: {},
+    }
   }
 
-  const componentID: string = uiDefinition[0] || 'default'
+  const componentID: string = uiDefinition[0]
 
   const Component = components?.find(c => c.type === type && c.id === componentID)?.component as ZuiReactComponent<Type> || null
 

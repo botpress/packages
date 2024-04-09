@@ -1,4 +1,8 @@
-import { defaultErrorMap, Primitive, TypeOf, util, ZodFirstPartyTypeKind, ZodParsedType, ZodType } from '../index'
+import { TypeOf, ZodType } from '../basetype'
+import { ZodFirstPartyTypeKind } from '../defs'
+import defaultErrorMap from './locales/en'
+import { ZodParsedType, util } from '../utils'
+import { Primitive } from '../utils/typeAliases'
 
 type allKeys<T> = T extends any ? keyof T : never
 

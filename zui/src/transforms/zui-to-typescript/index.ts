@@ -1,12 +1,12 @@
 import type { Options } from 'json-schema-to-typescript'
 
-type ToTsOptions = Partial<Options>
+type ToTypescriptTyingsOptions = { schemaName: string } & Partial<Options>
 
-export type { ToTsOptions }
+export type { ToTypescriptTyingsOptions }
 /**
  * WARNING: Do not add node-specific libraries outside the below method
  */
-export const toTypescriptTypings = async (jsonSchema: any, options?: { schemaName: string } & ToTsOptions) => {
+export const toTypescriptTypings = async (jsonSchema: any, options?: ToTypescriptTyingsOptions) => {
   const module = await import('json-schema-to-typescript')
 
   const generatedType = await module.compile(jsonSchema, options?.schemaName ?? 'Schema', {

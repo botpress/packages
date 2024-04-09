@@ -49,6 +49,7 @@ import {
 import type { GlobalComponentDefinitions } from '../../../index'
 import type { ZuiSchemaOptions } from '../../../transforms/zui-to-json-schema/zui-extension'
 import { ObjectToZuiOptions } from '../../../transforms/object-to-zui'
+import { ToTypescriptTyingsOptions } from '../../../transforms/zui-to-typescript'
 
 export type RefinementCtx = {
   addIssue: (arg: IssueData) => void
@@ -560,13 +561,13 @@ export abstract class ZodType<Output = any, Def extends ZodTypeDef = ZodTypeDef,
     return zuiToJsonSchema(this, opts)
   }
 
-  async toTypescriptTypings(opts?: ZuiSchemaOptions): Promise<string> {
+  async toTypescriptTypings(opts?: ToTypescriptTyingsOptions): Promise<string> {
     if (!isNodeEnvironment()) {
       console.warn('toTypescriptTypings is not supported in browser')
       return ''
     }
     const module = await import('../../../transforms/zui-to-typescript')
-    return module.toTypescriptTypings(this.toJsonSchema(opts))
+    return module.toTypescriptTypings(this.toJsonSchema(), opts)
   }
   static fromObject(obj: any, opts?: ObjectToZuiOptions) {
     return objectToZui(obj, opts)

@@ -99,7 +99,7 @@ describe('UI', () => {
     })
 
     const jsonSchema = schema.toJsonSchema({ target: 'jsonSchema7' }) as ObjectSchema
-    const components = { ...testComponentImplementation, number: { default: () => null } }
+    const components = testComponentImplementation.map(c => c.type === 'number' && c.id === 'default' ? { type: 'number', id: 'default', component: () => null } : c)
 
     const rendered = render(
       <ZuiForm<typeof testComponentDefinitions>
@@ -452,7 +452,7 @@ const testComponentDefinitions = [
   },
 ] as const satisfies UIComponentDefinitions
 
-const ZuiFormWithState: FC<Omit<ZuiFormProps, 'onChange' | 'value'>> = (props) => {
+const ZuiFormWithState: FC<Omit<ZuiFormProps<any>, 'onChange' | 'value'>> = (props) => {
   const [state, setState] = useState({})
   return <ZuiForm {...props} value={state} onChange={(data) => setState(data)} />
 }

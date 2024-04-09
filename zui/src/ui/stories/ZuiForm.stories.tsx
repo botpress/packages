@@ -1,9 +1,8 @@
 import React, { FC, useState } from 'react'
 import type { Meta, StoryObj } from '@storybook/react'
 import { FormError, UIComponentDefinitions, ZuiComponentMap } from '../types'
-import { z as zui } from 'zod'
-import { ZuiForm } from '..'
 import { z } from 'zod'
+import { ZuiForm } from '..'
 
 // declare module 'zod' {
 //   interface ComponentDefinitions {
@@ -19,32 +18,33 @@ const exampleExtensions = [
   }
 ] as const satisfies UIComponentDefinitions
 
-const exampleSchema = zui
+const exampleSchema = z
   .object({
-    firstName: zui.string().title('first name').disabled().placeholder('Enter your name').nullable(),
-    lastName: zui.string().min(3).title('Last Name <3').optional().nullable(),
-    dates: zui
+    field: z.string(),
+    firstName: z.string().title('first name').disabled().placeholder('Enter your name').nullable(),
+    lastName: z.string().min(3).title('Last Name <3').optional().nullable(),
+    dates: z
       .array(
-        zui.object({
-          date: zui.string(),
-          time: zui.string(),
-          ids: zui.array(zui.number()).min(2),
+        z.object({
+          date: z.string(),
+          time: z.string(),
+          ids: z.array(z.number()).min(2),
         }),
       )
       .min(1)
       .nonempty(),
     // tests the hidden function
-    aRandomField: zui.string().optional().hidden(),
+    aRandomField: z.string().optional().hidden(),
 
-    stuff: zui.object({
-      birthday: zui.string(),
-      plan: zui.enum(['basic', 'premium']),
-      age: zui.number(),
-      email: zui.string().email().title('Email Address'),
-      password: zui.string(),
-      passwordConfirm: zui.string(),
+    stuff: z.object({
+      birthday: z.string(),
+      plan: z.enum(['basic', 'premium']),
+      age: z.number(),
+      email: z.string().email().title('Email Address'),
+      password: z.string(),
+      passwordConfirm: z.string(),
     }),
-    debug: zui.number().optional().displayAs<typeof exampleExtensions>('default', {} as never),
+    debug: z.number().optional().displayAs<typeof exampleExtensions>('default', {} as never),
   })
   .title('User Information')
 

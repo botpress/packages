@@ -25,7 +25,7 @@ describe('UI', () => {
         schema={jsonSchema}
         components={testComponentImplementation}
         value={{}}
-        onChange={() => { }}
+        onChange={() => {}}
       />,
     )
 
@@ -99,7 +99,9 @@ describe('UI', () => {
     })
 
     const jsonSchema = schema.toJsonSchema({ target: 'jsonSchema7' }) as ObjectSchema
-    const components = testComponentImplementation.map(c => c.type === 'number' && c.id === 'default' ? { type: 'number', id: 'default', component: () => null } : c)
+    const components = testComponentImplementation.map((c) =>
+      c.type === 'number' && c.id === 'default' ? { type: 'number', id: 'default', component: () => null } : c,
+    )
 
     const rendered = render(
       <ZuiForm<typeof testComponentDefinitions>

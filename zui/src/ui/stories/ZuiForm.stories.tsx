@@ -15,7 +15,7 @@ const exampleExtensions = [
     type: 'number',
     id: 'debug',
     schema: z.null(),
-  }
+  },
 ] as const satisfies UIComponentDefinitions
 
 const exampleSchema = z
@@ -44,7 +44,10 @@ const exampleSchema = z
       password: z.string(),
       passwordConfirm: z.string(),
     }),
-    debug: z.number().optional().displayAs<typeof exampleExtensions>('default', {} as never),
+    debug: z
+      .number()
+      .optional()
+      .displayAs<typeof exampleExtensions>('default', {} as never),
   })
   .title('User Information')
 
@@ -194,7 +197,7 @@ const componentMap: ZuiComponentMap<typeof exampleExtensions> = [
       )
     },
   },
-];
+]
 
 const ZuiFormExample = () => {
   const [formData, setFormData] = useState({})

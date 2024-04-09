@@ -5,18 +5,19 @@ import { z as zui } from 'zod'
 import { ZuiForm } from '..'
 import { z } from 'zod'
 
-declare module 'zod' {
-  interface ComponentDefinitions {
-    components: typeof exampleExtensions
-  }
-}
+// declare module 'zod' {
+//   interface ComponentDefinitions {
+//     components: typeof exampleExtensions
+//   }
+// }
+
 const exampleExtensions = [
   {
     type: 'number',
     id: 'debug',
     schema: z.null(),
   }
-] satisfies UIComponentDefinitions
+] as const satisfies UIComponentDefinitions
 
 const exampleSchema = zui
   .object({
@@ -43,7 +44,7 @@ const exampleSchema = zui
       password: zui.string(),
       passwordConfirm: zui.string(),
     }),
-    debug: zui.number().optional().displayAs('debug', {}),
+    debug: zui.number().optional().displayAs<typeof exampleExtensions>('default', {} as never),
   })
   .title('User Information')
 
@@ -57,9 +58,11 @@ const ErrorBox: FC<{ errors: FormError[]; data: any | null }> = ({ errors, data 
     </span>
   )
 
-const componentMap: ZuiComponentMap<typeof exampleExtensions> = {
-  string: {
-    default: ({ onChange, errors, required, label, data, zuiProps, schema }) => {
+const componentMap: ZuiComponentMap<typeof exampleExtensions> = [
+  {
+    type: 'string',
+    id: 'default',
+    component: ({ onChange, errors, required, label, data, zuiProps, schema }) => {
       if (schema.enum?.length) {
         return (
           <div style={{ padding: '1rem' }}>
@@ -85,7 +88,11 @@ const componentMap: ZuiComponentMap<typeof exampleExtensions> = {
         </div>
       )
     },
-    debug: ({ context }) => {
+  },
+  {
+    type: 'string',
+    id: 'debug',
+    component: ({ context }) => {
       return (
         <div>
           <pre>{JSON.stringify(context.formData, null, 2)}</pre>
@@ -107,8 +114,10 @@ const componentMap: ZuiComponentMap<typeof exampleExtensions> = {
       )
     },
   },
-  array: {
-    default: ({ children, scope, context, addItem, errors }) => (
+  {
+    type: 'array',
+    id: 'default',
+    component: ({ children, scope, context, addItem, errors }) => (
       <>
         <button onClick={() => addItem()}>Add item {context.path}</button>
         <p>{scope}</p>
@@ -117,8 +126,10 @@ const componentMap: ZuiComponentMap<typeof exampleExtensions> = {
       </>
     ),
   },
-  boolean: {
-    default: ({ data, enabled, label, errors, onChange }) => {
+  {
+    type: 'boolean',
+    id: 'default',
+    component: ({ data, enabled, label, errors, onChange }) => {
       return (
         <div style={{ padding: '1rem' }}>
           <label>
@@ -135,8 +146,10 @@ const componentMap: ZuiComponentMap<typeof exampleExtensions> = {
       )
     },
   },
-  number: {
-    default: ({ data, zuiProps, onChange, label, required, errors, schema }) => {
+  {
+    type: 'number',
+    id: 'default',
+    component: ({ data, zuiProps, onChange, label, required, errors, schema }) => {
       if (schema.enum?.length) {
         return (
           <div style={{ padding: '1rem' }}>
@@ -168,8 +181,10 @@ const componentMap: ZuiComponentMap<typeof exampleExtensions> = {
       )
     },
   },
-  object: {
-    default: ({ children, errors, data, ...rest }) => {
+  {
+    type: 'object',
+    id: 'default',
+    component: ({ children, errors, data, ...rest }) => {
       return (
         <section>
           <div style={{ border: '1px solid red' }}>{children}</div>
@@ -179,7 +194,7 @@ const componentMap: ZuiComponentMap<typeof exampleExtensions> = {
       )
     },
   },
-}
+];
 
 const ZuiFormExample = () => {
   const [formData, setFormData] = useState({})

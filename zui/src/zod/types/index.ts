@@ -5,6 +5,10 @@
  * @see https://medium.com/p/a04c987cf0de
  */
 import defaultErrorMap from './error/locales/en'
+import { jsonSchemaToZui } from '../../transforms/json-schema-to-zui'
+import { objectToZui } from '../../transforms/object-to-zui'
+import { zuiToJsonSchema } from '../../transforms/zui-to-json-schema'
+
 export * from './utils'
 export * from './utils/enumUtil'
 export * from './utils/errorUtil'
@@ -26,7 +30,6 @@ export * from './discriminatedUnion'
 export * from './enum'
 export * from './error'
 export * from './error'
-export { defaultErrorMap }
 export * from './function'
 export * from './index'
 export * from './intersection'
@@ -55,3 +58,4 @@ export * from './undefined'
 export * from './union'
 export * from './unknown'
 export * from './void'
+export { defaultErrorMap, jsonSchemaToZui, objectToZui, zuiToJsonSchema }

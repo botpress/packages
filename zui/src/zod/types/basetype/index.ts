@@ -1,18 +1,21 @@
-import {
+import type {
   BaseType,
-  zuiKey,
   KeysOfType,
   SchemaOfType,
   UIComponentDefinitions,
   ZodKindToBaseType,
   JSONSchema,
 } from '../../../ui/types'
+import { zuiKey } from '../../../ui/constants'
 import {
   AsyncParseReturnType,
   getParsedType,
   isAsync,
   IssueData,
   isValid,
+  jsonSchemaToZui,
+  zuiToJsonSchema,
+  objectToZui,
   ParseContext,
   ParseInput,
   ParseParams,
@@ -41,9 +44,9 @@ import {
   ZodReadonly,
   ZodUnion,
 } from '../index'
-import { GlobalComponentDefinitions, zuiToJsonSchema } from '../../../index'
-import { toTypescriptTypings } from '../../../transforms/zui-to-typescript'
-import { ZuiSchemaOptions } from '../../../transforms/zui-to-json-schema/zui-extension'
+import type { GlobalComponentDefinitions } from '../../../index'
+import type { ZuiSchemaOptions } from '../../../transforms/zui-to-json-schema/zui-extension'
+import { ObjectToZuiOptions } from '../../../transforms/object-to-zui'
 
 export type RefinementCtx = {
   addIssue: (arg: IssueData) => void
@@ -462,6 +465,12 @@ export abstract class ZodType<Output = any, Def extends ZodTypeDef = ZodTypeDef,
   }
 
   // BOTPRESS EXTENSIONS
+
+  get ui() {
+    this._def[zuiKey] ??= {}
+    return this._def[zuiKey]
+  }
+
   /**
    * The type of component to use to display the field and its options
    */
@@ -472,7 +481,7 @@ export abstract class ZodType<Output = any, Def extends ZodTypeDef = ZodTypeDef,
   >(id: ID, options: SchemaOfType<UI, Type, ID>): this {
     this._def[zuiKey] ??= {}
     this._def[zuiKey].displayAs = [id, options]
-    return null as any
+    return this
   }
 
   /**
@@ -517,7 +526,23 @@ export abstract class ZodType<Output = any, Def extends ZodTypeDef = ZodTypeDef,
     return zuiToJsonSchema(this, opts)
   }
 
-  async toTypescriptTypings(): Promise<string> {
-    return toTypescriptTypings(this)
+  async toTypescriptTypings(opts?: ZuiSchemaOptions): Promise<string> {
+    if (!isNodeEnvironment()) {
+      console.warn('toTypescriptTypings is not supported in browser')
+      return ''
+    }
+    const module = await import('../../../transforms/zui-to-typescript')
+    return module.toTypescriptTypings(this.toJsonSchema(opts))
   }
+  static fromObject(obj: any, opts?: ObjectToZuiOptions) {
+    return objectToZui(obj, opts)
+  }
+
+  static fromJsonSchema(schema: JSONSchema | any) {
+    return jsonSchemaToZui(schema)
+  }
+}
+
+export function isNodeEnvironment(): boolean {
+  return typeof process !== 'undefined' && process.versions != null && process.versions.node != null
 }

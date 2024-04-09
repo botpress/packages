@@ -1,7 +1,7 @@
 import { describe, test, expect } from 'vitest'
 import { zuiToJsonSchema } from './zui-extension'
 import { z } from 'zod'
-import { zuiKey } from '../../ui/types'
+import { zuiKey } from '../../ui/constants'
 
 describe('zuiToJsonSchema', () => {
   test('should work', () => {

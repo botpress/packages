@@ -18,9 +18,9 @@ import {
   ZodNumberDef,
   ZodEnumDef,
   ZodDefaultDef,
-} from 'zod'
-import { z } from 'zod'
-import { zuiKey } from '../../ui/types'
+  z,
+} from '../../zod/index'
+import { zuiKey } from '../../ui/constants'
 import { JsonSchema7Type } from '../zui-to-json-schema/parseDef'
 
 const jsonSchemaToZodStr = (schema: any): string => {

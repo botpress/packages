@@ -12,7 +12,7 @@ import {
   PrimitiveSchema,
   ZuiReactArrayChildProps,
 } from './types'
-import { zuiKey } from "./types"
+import { zuiKey } from './constants'
 import React, { type FC, useMemo } from 'react'
 import { GlobalComponentDefinitions } from '..'
 import { FormDataProvider, getDefaultItemData, useFormData } from './providers/FormDataProvider'
@@ -27,14 +27,14 @@ type ComponentMeta<Type extends BaseType = BaseType> = {
 }
 
 const resolveComponent = <Type extends BaseType>(
-  components: ZuiComponentMap<any>,
+  components: ZuiComponentMap<any> | undefined,
   fieldSchema: JSONSchema,
 ): ComponentMeta<Type> | null => {
   const type = fieldSchema.type as BaseType
   const uiDefinition = fieldSchema[zuiKey]?.displayAs || null
 
   if (!uiDefinition || !Array.isArray(uiDefinition) || uiDefinition.length < 2) {
-    const defaultComponent = components.filter(c => c.type === type && c.id === 'default')[0]?.component
+    const defaultComponent = components?.filter?.(c => c.type === type && c.id === 'default')[0]?.component
     if (defaultComponent) {
       return {
         Component: defaultComponent as ZuiReactComponent<Type, 'default'>,
@@ -48,7 +48,7 @@ const resolveComponent = <Type extends BaseType>(
 
   const componentID: string = uiDefinition[0] || 'default'
 
-  const Component = components.find(c => c.type === type && c.id === componentID)?.component as ZuiReactComponent<Type> || null
+  const Component = components?.find(c => c.type === type && c.id === componentID)?.component as ZuiReactComponent<Type> || null
 
   if (!Component) {
     console.warn(`Component ${type}.${componentID} not found`)

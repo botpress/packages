@@ -1,7 +1,7 @@
 import { fireEvent, render } from '@testing-library/react'
 import { ZuiForm, ZuiFormProps } from './index'
-import { ComponentDefinitions, ZuiComponentMap } from '../index'
-import { ObjectSchema, JSONSchema, ZuiReactComponentBaseProps, BaseType } from './types'
+import { ZuiComponentMap } from '../index'
+import { ObjectSchema, JSONSchema, ZuiReactComponentBaseProps, BaseType, UIComponentDefinitions } from './types'
 import { FC, PropsWithChildren, useState } from 'react'
 import { vi } from 'vitest'
 import { z as zui } from 'zod'
@@ -424,29 +424,33 @@ describe('UI', () => {
     expect(element).toBeTruthy()
   })
 })
-
-const testComponentDefinitions = {
-  string: {
-    customstringcomponent: {
-      id: 'customstringcomponent',
-      schema: zui.object({ multiline: zui.boolean() }),
-    },
+const testComponentDefinitions = [
+  {
+    type: 'string',
+    id: 'customstringcomponent',
+    schema: zui.object({ multiline: zui.boolean() }),
   },
-  number: {},
-  boolean: {},
-  array: {
-    stringList: {
-      id: 'stringList',
-      schema: zui.object({}),
-    },
+  {
+    type: 'number',
+    id: 'number',
+    schema: zui.object({}),
   },
-  object: {
-    collapsible: {
-      id: 'collapsible',
-      schema: zui.object({ collapsed: zui.boolean() }),
-    },
+  {
+    type: 'boolean',
+    id: 'boolean',
+    schema: zui.object({}),
   },
-} satisfies ComponentDefinitions
+  {
+    type: 'array',
+    id: 'stringList',
+    schema: zui.object({}),
+  },
+  {
+    type: 'object',
+    id: 'collapsible',
+    schema: zui.object({ collapsed: zui.boolean() }),
+  },
+] as const satisfies UIComponentDefinitions
 
 const ZuiFormWithState: FC<Omit<ZuiFormProps, 'onChange' | 'value'>> = (props) => {
   const [state, setState] = useState({})
@@ -489,9 +493,11 @@ const TestWrapper: FC<PropsWithChildren<ZuiReactComponentBaseProps<BaseType, any
   )
 }
 
-const testComponentImplementation: ZuiComponentMap<typeof testComponentDefinitions> = {
-  string: {
-    customstringcomponent: (props) => {
+const testComponentImplementation: ZuiComponentMap<typeof testComponentDefinitions> = [
+  {
+    type: 'string',
+    id: 'customstringcomponent',
+    component: (props) => {
       return (
         <TestWrapper {...props}>
           <input
@@ -502,7 +508,11 @@ const testComponentImplementation: ZuiComponentMap<typeof testComponentDefinitio
         </TestWrapper>
       )
     },
-    default: (props) => {
+  },
+  {
+    type: 'string',
+    id: 'default',
+    component: (props) => {
       return (
         <TestWrapper {...props}>
           <input
@@ -514,8 +524,10 @@ const testComponentImplementation: ZuiComponentMap<typeof testComponentDefinitio
       )
     },
   },
-  number: {
-    default: (props) => {
+  {
+    type: 'number',
+    id: 'default',
+    component: (props) => {
       return (
         <TestWrapper {...props}>
           <input
@@ -528,8 +540,10 @@ const testComponentImplementation: ZuiComponentMap<typeof testComponentDefinitio
       )
     },
   },
-  boolean: {
-    default: (props) => {
+  {
+    type: 'boolean',
+    id: 'default',
+    component: (props) => {
       return (
         <TestWrapper {...props}>
           <input
@@ -542,8 +556,10 @@ const testComponentImplementation: ZuiComponentMap<typeof testComponentDefinitio
       )
     },
   },
-  object: {
-    collapsible: (props) => {
+  {
+    type: 'object',
+    id: 'collapsible',
+    component: (props) => {
       return (
         <TestWrapper {...props}>
           <details data-iscollapsible>
@@ -553,12 +569,18 @@ const testComponentImplementation: ZuiComponentMap<typeof testComponentDefinitio
         </TestWrapper>
       )
     },
-    default: (props) => {
+  },
+  {
+    type: 'object',
+    id: 'default',
+    component: (props) => {
       return <TestWrapper {...props}>{props.children}</TestWrapper>
     },
   },
-  array: {
-    stringList: (props) => {
+  {
+    type: 'array',
+    id: 'stringList',
+    component: (props) => {
       const childrens = Array.isArray(props.children) ? props.children : [props.children]
       return (
         <TestWrapper {...props}>
@@ -574,7 +596,11 @@ const testComponentImplementation: ZuiComponentMap<typeof testComponentDefinitio
         </TestWrapper>
       )
     },
-    default: ({ type, scope, children, addItem, removeItem, schema }) => {
+  },
+  {
+    type: 'array',
+    id: 'default',
+    component: ({ type, scope, children, addItem, removeItem, schema }) => {
       return (
         <div data-testid={`${type}:${scope}`}>
           <section data-testid={`${type}:${scope}:container`}>{children}</section>
@@ -591,7 +617,7 @@ const testComponentImplementation: ZuiComponentMap<typeof testComponentDefinitio
       )
     },
   },
-}
+]
 
 const traverseSchemaTest = (schema: JSONSchema, callback: (path: string[], child: JSONSchema) => void) => {
   const traverse = (path: string[], child: JSONSchema) => {

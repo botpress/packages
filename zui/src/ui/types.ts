@@ -1,6 +1,7 @@
 import type { ZodSchema, z } from 'zod'
-import { FC } from 'react'
-import { GlobalComponentDefinitions } from '..'
+import type { FC } from 'react'
+import type { GlobalComponentDefinitions } from '..'
+import { zuiKey } from './constants'
 
 export type BaseSchema = {
   description?: string
@@ -128,7 +129,9 @@ export type ZodKindToBaseType<T extends z.ZodTypeDef> = T extends infer U
               ? 'string'
               : U extends { typeName: z.ZodFirstPartyTypeKind.ZodOptional; innerType: any }
                 ? ZodKindToBaseType<U['innerType']>
-                : never
+                : U extends { typeName: z.ZodFirstPartyTypeKind.ZodNullable; innerType: any }
+                  ? ZodKindToBaseType<U['innerType']>
+                  : never
   : never
 
 export type BaseTypeToType<T extends BaseType> = T extends 'string'
@@ -247,5 +250,3 @@ export type ZuiComponentMap<UI extends UIComponentDefinitions = GlobalComponentD
   id: KeysOfType<UI, BaseType>
   component: ZuiReactComponent<BaseType, KeysOfType<UI, BaseType>, UI>
 }[]
-
-export const zuiKey = 'x-zui' as const

@@ -30,7 +30,7 @@ import { JsonSchema7UnionType, parseUnionDef } from './parsers/union'
 import { JsonSchema7UnknownType, parseUnknownDef } from './parsers/unknown'
 import { Refs, Seen } from './Refs'
 import { parseReadonlyDef } from './parsers/readonly'
-import { zuiKey } from '../../ui/types'
+import { zuiKey } from '../../ui/constants'
 
 type JsonSchema7RefType = { $ref: string }
 type JsonSchema7Meta = {

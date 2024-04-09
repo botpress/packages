@@ -1,6 +1,6 @@
 import { describe, expect, test } from 'vitest'
 import { ZodTypeAny, z } from 'zod'
-import { zuiKey } from '../../ui/types'
+import { zuiKey } from '../../ui/constants'
 import { jsonSchemaToZui, traverseZodDefinitions } from '.'
 import { zuiToJsonSchema } from '../zui-to-json-schema/zui-extension'
 

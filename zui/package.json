@@ -16,6 +16,7 @@
     "build": "tsup",
     "watch": "tsup --watch",
     "test": "vitest run",
+    "dev": "tsx playground.ts",
     "test:watch": "vitest",
     "type:check": "tsc --noEmit",
     "format:check": "prettier --check src/",
@@ -49,6 +50,7 @@
     "react-dom": "^18.2.0",
     "storybook": "^8.0.4",
     "tsup": "^8.0.1",
+    "tsx": "^4.7.2",
     "typescript": "5.4.2",
     "vite": "^5.2.6",
     "vitest": "1.4.0"

@@ -25,7 +25,7 @@ describe('UI', () => {
         schema={jsonSchema}
         components={testComponentImplementation}
         value={{}}
-        onChange={() => {}}
+        onChange={() => { }}
       />,
     )
 
@@ -433,14 +433,9 @@ const testComponentDefinitions = [
     schema: zui.object({ multiline: zui.boolean() }),
   },
   {
-    type: 'number',
-    id: 'number',
-    schema: zui.object({}),
-  },
-  {
-    type: 'boolean',
-    id: 'boolean',
-    schema: zui.object({}),
+    type: 'string',
+    id: 'otherstringcomponent',
+    schema: zui.object({ multiline: zui.boolean() }),
   },
   {
     type: 'array',
@@ -510,6 +505,21 @@ const testComponentImplementation: ZuiComponentMap<typeof testComponentDefinitio
         </TestWrapper>
       )
     },
+  },
+  {
+    type: 'string',
+    id: 'otherstringcomponent',
+    component: (props) => {
+      return (
+        <TestWrapper {...props}>
+          <input
+            data-testid={`${props.type}:${props.scope}:input`}
+            value={props.data || ''}
+            onChange={(e) => props.onChange(e.target.value)}
+          />
+        </TestWrapper>
+      )
+    }
   },
   {
     type: 'string',
@@ -619,7 +629,7 @@ const testComponentImplementation: ZuiComponentMap<typeof testComponentDefinitio
       )
     },
   },
-]
+] as const
 
 const traverseSchemaTest = (schema: JSONSchema, callback: (path: string[], child: JSONSchema) => void) => {
   const traverse = (path: string[], child: JSONSchema) => {

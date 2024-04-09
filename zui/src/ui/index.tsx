@@ -21,7 +21,7 @@ import { formatTitle } from './titleutils'
 
 type ComponentMeta<Type extends BaseType = BaseType> = {
   type: Type
-  Component: ZuiReactComponent<Type>
+  Component: ZuiReactComponent<Type, 'default'>
   id: string
   params: any
 }
@@ -61,7 +61,7 @@ const resolveComponent = <Type extends BaseType>(
   const params = uiDefinition[1] || {}
 
   return {
-    Component: Component as ZuiReactComponent<Type>,
+    Component: Component as ZuiReactComponent<Type, 'default'>,
     type: type as Type,
     id: componentID,
     params,

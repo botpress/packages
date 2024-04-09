@@ -101,7 +101,7 @@ export type UIComponentDefinitions = {
 export type KeysOfType<UI extends UIComponentDefinitions, Type extends BaseType> = UI extends (infer T)[]
   ? T extends { type: Type; id: string }
     ? T['id']
-    : 'default'
+    : never
   : never
 
 export type SchemaOfType<
@@ -172,7 +172,7 @@ export type ZuiReactComponentBaseProps<
 > = {
   type: Type
   componentID: ID
-  params: SchemaOfType<UI, Type, ID>
+  params: ID extends 'default' ? {} : SchemaOfType<UI, Type, ID>
   data: BaseTypeToType<Type> | null
   enabled: boolean
   scope: string
@@ -241,12 +241,16 @@ export type ZuiReactComponentProps<
 
 export type ZuiReactComponent<
   Type extends BaseType,
-  ID extends KeysOfType<UI, Type> | 'default' = 'default',
+  ID extends KeysOfType<UI, Type> | 'default',
   UI extends UIComponentDefinitions = GlobalComponentDefinitions,
 > = FC<ZuiReactComponentProps<Type, ID, UI>>
 
-export type ZuiComponentMap<UI extends UIComponentDefinitions = GlobalComponentDefinitions> = {
-  type: BaseType
-  id: KeysOfType<UI, BaseType> | 'default'
-  component: ZuiReactComponent<BaseType, KeysOfType<UI, BaseType>, UI>
-}[]
+export type ZuiComponentEntry<UI extends UIComponentDefinitions = GlobalComponentDefinitions> = UI extends (infer T)[]
+  ? T extends { type: BaseType }
+    ? T extends { type: T['type']; id: KeysOfType<UI, T['type']> }
+      ? { type: T['type']; id: T['id']; component: ZuiReactComponent<T['type'], T['id'], UI> }
+      : { type: T['type']; id: 'default'; component: ZuiReactComponent<T['type'], 'default', UI> }
+    : never
+  : never
+
+export type ZuiComponentMap<UI extends UIComponentDefinitions = GlobalComponentDefinitions> = ZuiComponentEntry<UI>[]

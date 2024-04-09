@@ -16,6 +16,26 @@ const exampleExtensions = [
     id: 'debug',
     schema: z.null(),
   },
+  {
+    type: 'string',
+    id: 'debug',
+    schema: z.null(),
+  },
+  {
+    type: 'boolean',
+    id: 'debug',
+    schema: z.null(),
+  },
+  {
+    type: 'array',
+    id: 'debug',
+    schema: z.null(),
+  },
+  {
+    type: 'object',
+    id: 'debug',
+    schema: z.null(),
+  }
 ] as const satisfies UIComponentDefinitions
 
 const exampleSchema = z

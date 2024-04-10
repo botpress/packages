@@ -48,7 +48,7 @@ import {
 import type { GlobalComponentDefinitions } from '../../../index'
 import type { ZuiSchemaOptions } from '../../../transforms/zui-to-json-schema/zui-extension'
 import { ObjectToZuiOptions } from '../../../transforms/object-to-zui'
-import { ToTypescriptTyingsOptions } from '../../../transforms/zui-to-typescript'
+import { ToTypescriptTyingsOptions, toTypescriptTypings } from '../../../transforms/zui-to-typescript'
 
 export type RefinementCtx = {
   addIssue: (arg: IssueData) => void
@@ -561,13 +561,9 @@ export abstract class ZodType<Output = any, Def extends ZodTypeDef = ZodTypeDef,
   }
 
   async toTypescriptTypings(opts?: ToTypescriptTyingsOptions): Promise<string> {
-    if (!isNodeEnvironment()) {
-      console.warn('toTypescriptTypings is not supported in browser')
-      return ''
-    }
-    const module = await import('../../../transforms/zui-to-typescript')
-    return module.toTypescriptTypings(this.toJsonSchema(), opts)
+    return toTypescriptTypings(this.toJsonSchema(), opts)
   }
+
   static fromObject(obj: any, opts?: ObjectToZuiOptions) {
     return objectToZui(obj, opts)
   }
@@ -575,8 +571,4 @@ export abstract class ZodType<Output = any, Def extends ZodTypeDef = ZodTypeDef,
   static fromJsonSchema(schema: JSONSchema | any) {
     return jsonSchemaToZui(schema)
   }
-}
-
-export function isNodeEnvironment(): boolean {
-  return typeof process !== 'undefined' && process.versions != null && process.versions.node != null
 }

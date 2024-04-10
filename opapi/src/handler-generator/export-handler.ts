@@ -111,6 +111,16 @@ const getErrorBody = (thrown: unknown) => {
   }
 }
 
+type PlainRequest = {
+  body?: string;
+  path: string;
+  query: string;
+  method: string;
+  headers: {
+      [key: string]: string | undefined;
+  };
+}
+
 type PlainResponse = {
   body?: string
   headers?: {
@@ -119,7 +129,7 @@ type PlainResponse = {
   status?: number
 }
 
-export const handleRequest = async <T extends object>(routes: Record<string, Record<string, types.Route<T>>>, props: types.OperationProps<T>): Promise<PlainResponse> => {
+export const handleRequest = async <T extends { req: PlainRequest }>(routes: Record<string, Record<string, types.Route<T>>>, props: T): Promise<PlainResponse> => {
     try {
       const router = new Router(Object.keys(routes))
       const match = router.match(props.req.path)

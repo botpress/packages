@@ -13,11 +13,11 @@ const ajv = new Ajv()
 
 const PARSE_OPERATION_REQUEST = `type OperationName = keyof types.Requests
 const parseOperationRequest =
-  <Op extends OperationName, Tools extends object>(
-    op: types.Operations<Tools>[Op],
+  <Op extends OperationName, OperationProps extends object>(
+    op: types.Operations<OperationProps>[Op],
     requestSchema: JSONSchema7
   ) =>
-  async (props: types.OperationProps<Tools>, req: unknown): Promise<types.Response> => {
+  async (props: OperationProps, req: unknown): Promise<types.Response> => {
 
     const validate = ajv.compile(requestSchema)
     const isValid = validate(req)

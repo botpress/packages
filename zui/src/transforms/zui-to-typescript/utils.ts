@@ -1,6 +1,19 @@
 import { deburr, isPlainObject, trim, upperFirst } from 'lodash-es'
-import { basename, dirname, extname, normalize, sep, posix } from 'path'
 import { type JSONSchema, type LinkedJSONSchema, Parent } from './types/JSONSchema'
+
+const basename = (path: string, suffix?: string) => {
+  const base = path.split('/').pop() || ''
+  return suffix ? base.replaceAll(suffix, '') : base
+}
+const extname = (path: string) => {
+  const base = basename(path)
+  const index = base.lastIndexOf('.')
+  return index === -1 ? '' : base.slice(index)
+}
+const dirname = (path: string) => path.split('/').slice(0, -1).join('/')
+const normalize = (path: string) => path.replace(/\/+/g, '/')
+const sep = '/'
+const posix = { join: (...args: string[]) => args.join('/'), normalize }
 
 // TODO: pull out into a separate package
 export function Try<T>(fn: () => T, err: (e: Error) => any): T {

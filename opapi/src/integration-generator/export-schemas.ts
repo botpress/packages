@@ -1,5 +1,5 @@
 import { JSONSchema7 } from 'json-schema'
-import { jsonSchemaToZod } from '@bpinternal/json-schema-to-zod'
+import { jsonSchemaToZod } from 'json-schema-to-zod'
 import { compile } from 'json-schema-to-typescript'
 import * as utils from './utils'
 import pathlib from 'path'

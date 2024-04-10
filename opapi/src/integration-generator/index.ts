@@ -31,7 +31,6 @@ export type IntegrationHandlerProps<
   Signals extends SchemaMap,
 > = {
   state: State<Schema, Param, Section>
-  operations: Record<string, Operation<Param, Section, string, 'zod-schema'>>
   models: Models
   signals: Signals
 }
@@ -45,13 +44,13 @@ export const exportIntegrationHandler = <
 >(
   props: IntegrationHandlerProps<Param, Section, Path, Models, Signals>,
 ) => {
-  const operationsByName = _.mapKeys(props.operations, (v) => v.name)
+  const operationsByName = _.mapKeys(props.state.operations, (v) => v.name)
   const requestSchemas: SchemaMap = _.mapValues(operationsByName, (o) => toRequestSchema(o))
   const responseSchemas: SchemaMap = _.mapValues(operationsByName, (o) => toResponseSchema(o))
 
   const errorsGenerator = exportErrors(props.state.errors ?? [])
-  const typingsGenerator = exportTypings(props.operations)
-  const treeGenerator = exportRouteTree(props.operations)
+  const typingsGenerator = exportTypings(props.state.operations)
+  const treeGenerator = exportRouteTree(props.state.operations)
   const models = toExportableSchema(props.models)
   const signals = toExportableSchema(props.signals)
   const requests = toExportableSchema(requestSchemas)

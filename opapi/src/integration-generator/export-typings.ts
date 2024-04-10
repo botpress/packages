@@ -2,7 +2,9 @@ import { Operation } from '../state'
 import fs from 'fs/promises'
 import _ from 'lodash'
 
-const getRouting = (operations: Record<string, Operation<string, string>>): Record<string, Record<string, string>> => {
+const getRouting = (
+  operations: Record<string, Operation<string, string, string, 'json-schema'>>,
+): Record<string, Record<string, string>> => {
   const opList = _.values(operations)
   const byPath = _.groupBy(opList, (op) => op.path)
   const byMethod = _.mapValues(byPath, (ops) => _.groupBy(ops, (op) => op.method))
@@ -21,7 +23,9 @@ const getRouting = (operations: Record<string, Operation<string, string>>): Reco
   return names
 }
 
-const CONTENT = (operations: Record<string, Operation<string, string>>) => `import { IntegrationProps } from '.botpress'
+const CONTENT = (
+  operations: Record<string, Operation<string, string, string, 'json-schema'>>,
+) => `import { IntegrationProps } from '.botpress'
 import { z } from 'zod'
 import { zod as requests } from '../gen/requests'
 import { zod as responses } from '../gen/responses'
@@ -134,6 +138,7 @@ export type RouteTree<Tools extends object> = {
 export type Route<Tools extends object> = ValueOf<Routes<Tools>>
 `
 
-export const exportTypings = (operations: Record<string, Operation<string, string>>) => async (outFile: string) => {
-  await fs.writeFile(outFile, CONTENT(operations))
-}
+export const exportTypings =
+  (operations: Record<string, Operation<string, string, string, 'json-schema'>>) => async (outFile: string) => {
+    await fs.writeFile(outFile, CONTENT(operations))
+  }

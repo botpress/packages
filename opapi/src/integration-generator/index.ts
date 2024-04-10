@@ -18,41 +18,20 @@ const toExportableSchema = (schemas: JsonSchemaMap): ExportableSchema => ({
   exportSchemas: (outDir: string) => exportSchemas(schemas)(outDir),
 })
 
-export type GetSchemasInput<Custom extends string> = Record<Custom, JsonSchemaMap>
-
-export type GetSchemasOutput<Custom extends string> = Record<
-  'models' | 'requests' | 'responses' | Custom,
-  ExportableSchema
->
-
-export const getSchemas =
-  <Schema extends string, Param extends string, Section extends string>(state: State<Schema, Param, Section>) =>
-  <Custom extends string>(customSchemas: GetSchemasInput<Custom>): GetSchemasOutput<Custom> => {
-    const operationsByName = _.mapKeys(state.operations, (v) => v.name)
-
-    const requestSchemas: JsonSchemaMap = _.mapValues(operationsByName, (o) => toRequestSchema(state, o))
-    const responseSchemas: JsonSchemaMap = _.mapValues(operationsByName, (o) => toResponseSchema(state, o))
-    const modelSchemas: JsonSchemaMap = _.mapValues(state.schemas, (s) => s.schema as JSONSchema7)
-
-    const models: ExportableSchema = toExportableSchema(modelSchemas)
-    const requests: ExportableSchema = toExportableSchema(requestSchemas)
-    const responses: ExportableSchema = toExportableSchema(responseSchemas)
-
-    const customs: Record<Custom, ExportableSchema> = _.mapValues(customSchemas, (s) => toExportableSchema(s))
-
-    return {
-      models,
-      requests,
-      responses,
-      ...customs,
-    }
-  }
-
 export const generateIntegrationHandler = async <Schema extends string, Param extends string, Section extends string>(
   state: State<Schema, Param, Section>,
   outDir: string,
 ) => {
-  const { models, requests, responses } = getSchemas(state)({})
+  const operationsByName = _.mapKeys(state.operations, (v) => v.name)
+
+  const requestSchemas: JsonSchemaMap = _.mapValues(operationsByName, (o) => toRequestSchema(state, o))
+  const responseSchemas: JsonSchemaMap = _.mapValues(operationsByName, (o) => toResponseSchema(state, o))
+  const modelSchemas: JsonSchemaMap = _.mapValues(state.schemas, (s) => s.schema as JSONSchema7)
+
+  const models: ExportableSchema = toExportableSchema(modelSchemas)
+  const requests: ExportableSchema = toExportableSchema(requestSchemas)
+  const responses: ExportableSchema = toExportableSchema(responseSchemas)
+
   const errorsGenerator = exportErrors(state.errors ?? [])
   const typingsGenerator = exportTypings(state.operations)
   const treeGenerator = exportRouteTree(state.operations)

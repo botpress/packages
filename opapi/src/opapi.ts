@@ -9,7 +9,7 @@ import {
 import { addOperation } from './operation'
 import { ApiError, ComponentType, createState, getRef, Metadata, Operation, Options, Parameter, State } from './state'
 import { exportStateAsTypescript, ExportStateAsTypescriptOptions } from './generators/ts-state'
-import { getSchemas, generateIntegrationHandler } from './integration-generator'
+import { generateIntegrationHandler } from './integration-generator'
 export { Operation, Parameter } from './state'
 
 type ExtendApi = typeof extendApi
@@ -63,7 +63,6 @@ const createOpapiFromState = <
     exportState: (dir = '.', opts?: ExportStateAsTypescriptOptions) => exportStateAsTypescript(state, dir, opts),
     exportErrors: (dir = '.') => generateErrorsFile(state.errors ?? [], dir),
     exportIntegrationHandler: (dir = '.') => generateIntegrationHandler(state, dir),
-    getSchemas: getSchemas(state),
   }
 }
 

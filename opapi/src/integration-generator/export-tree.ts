@@ -3,29 +3,35 @@ import _ from 'lodash'
 import { Operation } from '../state'
 
 const IMPORTS = `import * as types from './typings'
-import { zod as requestSchemas } from './requests'
+import { json as requestSchemas } from './requests'
+import { JSONSchema7 } from 'json-schema'
+import Ajv from 'ajv'
+
+const ajv = new Ajv()
 
 `
 
-const PARSE_OPERATION_REQUEST = `type OperationName = keyof types.RequestSchemas
+const PARSE_OPERATION_REQUEST = `type OperationName = keyof types.Requests
 const parseOperationRequest =
   <Op extends OperationName, Tools extends object>(
     op: types.Operations<Tools>[Op],
-    requestSchema: types.RequestSchemas[Op]
+    requestSchema: JSONSchema7
   ) =>
   async (props: types.OperationProps<Tools>, req: unknown): Promise<types.Response> => {
-    const parseResult = requestSchema.safeParse(req)
-    if (!parseResult.success) {
+
+    const validate = ajv.compile(requestSchema)
+    const isValid = validate(req)
+    if (!isValid) {
+      const message = validate.errors?.[0]?.message ?? 'Invalid request'
       return {
         status: 400,
         body: {
-          message: parseResult.error.message,
+          message,
         },
       }
     }
-
-    const validReq = parseResult.data as types.Requests[Op]
-    const response: types.Responses[Op] = await op(props, validReq)
+    
+    const response: types.Responses[Op] = await op(props, req as types.Requests[Op])
     return response
   }
 

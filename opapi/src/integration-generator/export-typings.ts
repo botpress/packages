@@ -25,13 +25,8 @@ const getRouting = (
 
 const CONTENT = (
   operations: Record<string, Operation<string, string, string, 'json-schema'>>,
-) => `import { IntegrationProps } from '.botpress'
-import { z } from 'zod'
-import { zod as requests } from '../gen/requests'
-import { zod as responses } from '../gen/responses'
-
-type SdkHandler = IntegrationProps['handler']
-type HandlerProps = Parameters<SdkHandler>[0]
+) => `import { Types as _Requests } from '../gen/requests'
+import { Types as _Responses } from '../gen/responses'
 
 type ValueOf<T> = T[keyof T]
 type Cast<T, U> = T extends U ? T : U
@@ -40,37 +35,17 @@ type Routing = ${JSON.stringify(getRouting(operations), null, 2)}
 
 // requests
 
-export type RequestSchemas = typeof requests
-
-export type RequestSchemaTree = {
-  [R in keyof Routing]: {
-    [M in keyof Routing[R]]: RequestSchemas[Cast<Routing[R][M], keyof RequestSchemas>]
-  }
-}
-
-export type Requests = {
-  [K in keyof RequestSchemas]: z.infer<RequestSchemas[K]>
-}
+export type Requests = _Requests
 
 export type RequestTree = {
   [R in keyof Routing]: {
-    [M in keyof Routing[R]]: z.infer<RequestSchemaTree[R][M]>
+    [M in keyof Routing[R]]: Requests[Cast<Routing[R][M], keyof Requests>]
   }
 }
 
 // responses
 
-export type ResponseSchemas = typeof responses
-
-export type ResponseSchemaTree = {
-  [R in keyof Routing]: {
-    [M in keyof Routing[R]]: ResponseSchemas[Cast<Routing[R][M], keyof ResponseSchemas>]
-  }
-}
-
-export type Responses = {
-  [K in keyof ResponseSchemas]: z.infer<ResponseSchemas[K]>
-}
+export type Responses = _Responses
 
 export type ResponseTree = {
   [R in keyof Routing]: {
@@ -81,7 +56,7 @@ export type ResponseTree = {
 // handlers
 
 export type Handlers = {
-  [K in keyof RequestSchemas]: (req: Requests[K]) => Promise<Responses[K]>
+  [K in keyof Requests]: (req: Requests[K]) => Promise<Responses[K]>
 }
 
 export type HandlerTree = {
@@ -92,19 +67,17 @@ export type HandlerTree = {
 
 // operations
 
-export type OperationProps<Tools extends object> = HandlerProps & Tools
-
-export type Operations<Tools extends object> = {
-  [TName in keyof Handlers]: (props: OperationProps<Tools>, req: Requests[TName]) => Promise<Responses[TName]>
+export type Operations<OperationProps extends object> = {
+  [TName in keyof Handlers]: (props: OperationProps, req: Requests[TName]) => Promise<Responses[TName]>
 }
 
-export type OperationTree<Tools extends object> = {
+export type OperationTree<OperationProps extends object> = {
   [R in keyof Routing]: {
-    [M in keyof Routing[R]]: (props: OperationProps<Tools>, req: RequestTree[R][M]) => Promise<ResponseTree[R][M]>
+    [M in keyof Routing[R]]: (props: OperationProps, req: RequestTree[R][M]) => Promise<ResponseTree[R][M]>
   }
 }
 
-export type Operation<Tools extends object> = ValueOf<Operations<Tools>>
+export type Operation<OperationProps extends object> = ValueOf<OperationProps>
 
 // routes
 
@@ -125,17 +98,17 @@ export type Response = {
   status?: number
 }
 
-export type Routes<Tools extends object> = {
-  [TName in keyof Handlers]: (props: OperationProps<Tools>, req: Request) => Promise<Response>
+export type Routes<OperationProps extends object> = {
+  [TName in keyof Handlers]: (props: OperationProps, req: Request) => Promise<Response>
 }
 
-export type RouteTree<Tools extends object> = {
+export type RouteTree<OperationProps extends object> = {
   [R in keyof Routing]: {
-    [M in keyof Routing[R]]: (props: OperationProps<Tools>, req: Request) => Promise<Response>
+    [M in keyof Routing[R]]: (props: OperationProps, req: Request) => Promise<Response>
   }
 }
 
-export type Route<Tools extends object> = ValueOf<Routes<Tools>>
+export type Route<OperationProps extends object> = ValueOf<Routes<OperationProps>>
 `
 
 export const exportTypings =

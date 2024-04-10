@@ -2,7 +2,7 @@ import { describe, expect, test } from 'vitest'
 import { z } from 'zod'
 
 describe('zui-to-ts', () => {
-  test('validate simple schema', async () => {
+  test('generate typings for example schema', async () => {
     const schema = z.object({
       name: z.string().title('Name'),
       age: z.number().max(100).min(0).title('Age').describe('Age in years').default(18),
@@ -12,16 +12,16 @@ describe('zui-to-ts', () => {
 
     const def = await schema.toTypescriptTypings({ schemaName: 'User' })
     expect(def).toMatchInlineSnapshot(`
-      "export interface User {
-        name: string;
-        /**
-         * Age in years
-         */
-        age?: number;
-        job?: \"developer\" | \"designer\" | \"manager\";
-        group: \"avg\" | \"key\" | \"max\";
-      }
-      "
+"export interface User {
+name: string
+/**
+ * Age in years
+ */
+age?: number
+job?: (\"developer\" | \"designer\" | \"manager\")
+group: (\"avg\" | \"key\" | \"max\")
+}
+"
     `)
   })
 
@@ -32,10 +32,10 @@ describe('zui-to-ts', () => {
 
     const def = await schema.toTypescriptTypings()
     expect(def).toMatchInlineSnapshot(`
-      "{
-        name: string;
-      }
-      "
+"{
+name: string
+}
+"
     `)
   })
 })

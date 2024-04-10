@@ -12,8 +12,8 @@
     "allowSyntheticDefaultImports": true,
     "lib": [
       "dom",
+      "ESNext",
       "dom.iterable",
-      "esnext"
     ],
     "allowJs": false,
     "declaration": false,

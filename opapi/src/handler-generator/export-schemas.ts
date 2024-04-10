@@ -20,7 +20,8 @@ export const exportSchemas = (schemas: Record<string, JSONSchema7>) => async (ou
     const jsonFileName = `${name}.j`
     const jsonCode = [
       "import type { JSONSchema7 } from 'json-schema'",
-      `export default ${JSON.stringify(jsonSchema, null, 2)} as JSONSchema7`,
+      `const schema: JSONSchema7 = ${JSON.stringify(jsonSchema, null, 2)}`,
+      `export default schema`,
     ].join('\n')
     const jsonFilePath = pathlib.join(outDir, `${jsonFileName}.ts`)
     await fs.writeFile(jsonFilePath, jsonCode)

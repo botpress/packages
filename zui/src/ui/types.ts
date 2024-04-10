@@ -1,4 +1,4 @@
-import type { ZodSchema, z } from 'zod'
+import { ZodSchema, z } from 'zod'
 import type { FC } from 'react'
 import type { GlobalComponentDefinitions } from '..'
 import { zuiKey } from './constants'
@@ -92,11 +92,12 @@ export type BaseType = 'number' | 'string' | 'boolean' | 'object' | 'array'
 export const containerTypes = ['object', 'array'] as const
 export type ContainerType = (typeof containerTypes)[number]
 
-export type UIComponentDefinitions = {
+export type UIComponentDefinition = {
   id: string
   type: BaseType
   schema: ZodSchema
-}[]
+}
+export type UIComponentDefinitions = UIComponentDefinition[]
 
 export type KeysOfType<UI extends UIComponentDefinitions, Type extends BaseType> = UI extends (infer T)[]
   ? T extends { type: Type; id: string }
@@ -127,10 +128,10 @@ export type ZodKindToBaseType<T extends z.ZodTypeDef> = T extends infer U
             ? 'object'
             : U extends { typeName: z.ZodFirstPartyTypeKind.ZodEnum }
               ? 'string'
-              : U extends { typeName: z.ZodFirstPartyTypeKind.ZodOptional; innerType: any }
-                ? ZodKindToBaseType<U['innerType']>
-                : U extends { typeName: z.ZodFirstPartyTypeKind.ZodNullable; innerType: any }
-                  ? ZodKindToBaseType<U['innerType']>
+              : U extends { typeName: z.ZodFirstPartyTypeKind.ZodOptional; innerType: z.ZodTypeAny }
+                ? ZodKindToBaseType<U['innerType']['_def']>
+                : U extends { typeName: z.ZodFirstPartyTypeKind.ZodNullable; innerType: z.ZodTypeAny }
+                  ? ZodKindToBaseType<U['innerType']['_def']>
                   : never
   : never
 
@@ -253,4 +254,11 @@ export type ZuiComponentEntry<UI extends UIComponentDefinitions = GlobalComponen
     : never
   : never
 
-export type ZuiComponentMap<UI extends UIComponentDefinitions = GlobalComponentDefinitions> = ZuiComponentEntry<UI>[]
+export type ZuiComponentMap<UI extends UIComponentDefinitions = GlobalComponentDefinitions> = {
+  components: ZuiComponentEntry<UI>[]
+  defaults: ZuiDefaultComponentMap<UI>
+}
+
+export type ZuiDefaultComponentMap<UI extends UIComponentDefinitions = GlobalComponentDefinitions> = {
+  [T in BaseType]: ZuiReactComponent<T, 'default', UI>
+}

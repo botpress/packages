@@ -35,7 +35,7 @@ const exampleExtensions = [
     type: 'object',
     id: 'debug',
     schema: z.null(),
-  }
+  },
 ] as const satisfies UIComponentDefinitions
 
 const exampleSchema = z
@@ -64,10 +64,7 @@ const exampleSchema = z
       password: z.string(),
       passwordConfirm: z.string(),
     }),
-    debug: z
-      .number()
-      .optional()
-      .displayAs<typeof exampleExtensions>('debug', null)
+    debug: z.number().optional().displayAs<typeof exampleExtensions>('debug', null),
   })
   .title('User Information')
 
@@ -108,7 +105,8 @@ const componentMap: ZuiComponentMap<typeof exampleExtensions> = {
         )
       },
     },
-  ], defaults: {
+  ],
+  defaults: {
     object: ({ children, errors, data, ...rest }) => {
       return (
         <section>
@@ -199,7 +197,7 @@ const componentMap: ZuiComponentMap<typeof exampleExtensions> = {
         </div>
       )
     },
-  }
+  },
 }
 
 const ZuiFormExample = () => {

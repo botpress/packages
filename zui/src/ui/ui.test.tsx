@@ -25,7 +25,7 @@ describe('UI', () => {
         schema={jsonSchema}
         components={testComponentImplementation}
         value={{}}
-        onChange={() => { }}
+        onChange={() => {}}
       />,
     )
 
@@ -99,7 +99,10 @@ describe('UI', () => {
     })
 
     const jsonSchema = schema.toJsonSchema({ target: 'jsonSchema7' }) as ObjectSchema
-    const components = { ...testComponentImplementation, defaults: { ...testComponentImplementation.defaults, number: () => null } }
+    const components = {
+      ...testComponentImplementation,
+      defaults: { ...testComponentImplementation.defaults, number: () => null },
+    }
 
     const rendered = render(
       <ZuiForm<typeof testComponentDefinitions>
@@ -335,7 +338,9 @@ describe('UI', () => {
     const schema = zui.object({
       firstName: zui.string(),
       lastName: zui.string(),
-      customField: zui.string().displayAs<typeof testComponentDefinitions>('customstringcomponent', { multiline: true }),
+      customField: zui
+        .string()
+        .displayAs<typeof testComponentDefinitions>('customstringcomponent', { multiline: true }),
     })
 
     const jsonSchema = schema.toJsonSchema({ target: 'jsonSchema7' }) as ObjectSchema
@@ -488,7 +493,6 @@ const TestWrapper: FC<PropsWithChildren<ZuiReactComponentBaseProps<BaseType, any
   )
 }
 
-
 const testComponentImplementation: ZuiComponentMap<typeof testComponentDefinitions> = {
   components: [
     {
@@ -519,7 +523,7 @@ const testComponentImplementation: ZuiComponentMap<typeof testComponentDefinitio
             />
           </TestWrapper>
         )
-      }
+      },
     },
     {
       type: 'object',
@@ -611,7 +615,7 @@ const testComponentImplementation: ZuiComponentMap<typeof testComponentDefinitio
         </div>
       )
     },
-  }
+  },
 }
 
 const traverseSchemaTest = (schema: JSONSchema, callback: (path: string[], child: JSONSchema) => void) => {

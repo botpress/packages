@@ -51,7 +51,10 @@ const resolveComponent = <Type extends BaseType>(
   const componentID: string = uiDefinition[0]
 
   const Component =
-    (components?.components.find((c) => c.type === type && c.id === componentID)?.component as ZuiReactComponent<Type, any>) || null
+    (components?.components.find((c) => c.type === type && c.id === componentID)?.component as ZuiReactComponent<
+      Type,
+      any
+    >) || null
 
   if (!Component) {
     console.warn(`Component ${type}.${componentID} not found`)

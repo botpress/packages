@@ -18,7 +18,7 @@ const toExportableSchema = (schemas: JsonSchemaMap): ExportableSchema => ({
   exportSchemas: (outDir: string) => exportSchemas(schemas)(outDir),
 })
 
-export const generateIntegrationHandler = async <Schema extends string, Param extends string, Section extends string>(
+export const generateHandler = async <Schema extends string, Param extends string, Section extends string>(
   state: State<Schema, Param, Section>,
   outDir: string,
 ) => {

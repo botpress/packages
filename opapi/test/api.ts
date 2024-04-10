@@ -116,7 +116,7 @@ export const getMockApi = () => {
     },
     requestBody: {
       description: 'Foo information',
-      schema: schema(z.object({}), { description: 'Foo information' }),
+      schema: schema(z.record(z.any()), { description: 'Foo information' }),
     },
     section: 'foo',
     response: {
@@ -181,7 +181,17 @@ export const getMockApi = () => {
       enabled: {
         type: 'boolean',
         in: 'query',
-        description: 'Bar id',
+        description: 'Enabled',
+      },
+      limit: {
+        type: 'integer',
+        in: 'query',
+        description: 'Limit',
+      },
+      minimumScore: {
+        type: 'number',
+        in: 'query',
+        description: 'Minimum score',
       },
     },
     section: 'bar',

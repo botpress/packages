@@ -77,7 +77,7 @@ export type OperationTree<OperationProps extends object> = {
   }
 }
 
-export type Operation<OperationProps extends object> = ValueOf<OperationProps>
+export type Operation<OperationProps extends object> = ValueOf<Operations<OperationProps>>
 
 // routes
 

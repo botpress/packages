@@ -1,7 +1,8 @@
 import { JSONSchema7 } from 'json-schema'
-import { Operation, Parameter } from '../state'
+import { Operation, Parameter, State } from '../state'
 import * as utils from './utils'
 import _ from 'lodash'
+import { partiallyUnref } from './unref'
 
 const s = utils.jsonSchemaBuilder
 
@@ -31,7 +32,10 @@ const mapQuery = (q: Parameter<'json-schema'>): JSONSchema7 => {
 type PathParam = Extract<Parameter<'json-schema'>, { in: 'path' }>
 type OptionalParam = Exclude<Parameter<'json-schema'>, { in: 'path' }>
 
-export const toRequestSchema = (op: Operation<string, string, string, 'json-schema'>): JSONSchema7 => {
+export const toRequestSchema = (
+  _state: State<string, string, string>,
+  op: Operation<string, string, string, 'json-schema'>,
+): JSONSchema7 => {
   const headerParams = utils.filterObject(op.parameters ?? {}, (p): p is OptionalParam => p.in === 'header')
   const queryParams = utils.filterObject(op.parameters ?? {}, (p): p is OptionalParam => p.in === 'query')
   const pathParams = utils.filterObject(op.parameters ?? {}, (p): p is PathParam => p.in === 'path')
@@ -77,12 +81,25 @@ export const toRequestSchema = (op: Operation<string, string, string, 'json-sche
   return s.object(rawShape)
 }
 
-export const toResponseSchema = (op: Operation<string, string, string, 'json-schema'>): JSONSchema7 => {
+const unrefResponseSchema = (state: State<string, string, string>, responseSchema: JSONSchema7): JSONSchema7 => {
+  const models = _(state.schemas)
+    .mapKeys((_schema, name) => `#/components/schemas/${name}`)
+    .mapValues((s) => s.schema as JSONSchema7)
+    .value()
+
+  return partiallyUnref(responseSchema, models)
+}
+
+export const toResponseSchema = (
+  state: State<string, string, string>,
+  op: Operation<string, string, string, 'json-schema'>,
+): JSONSchema7 => {
+  const responseSchema = unrefResponseSchema(state, op.response.schema as JSONSchema7)
   return s.object(
     {
       status: s.number(),
       headers: s.record(s.string()),
-      body: op.response.schema as JSONSchema7,
+      body: responseSchema,
     },
     ['body'],
   )

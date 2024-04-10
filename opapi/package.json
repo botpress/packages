@@ -39,7 +39,6 @@
   "dependencies": {
     "@anatine/zod-openapi": "1.12.1",
     "json-schema-to-zod": "^1.1.1",
-    "zod-to-json-schema": "^3.21.4",
     "@readme/openapi-parser": "2.5.0",
     "axios": "1.6.8",
     "chalk": "4.1.2",

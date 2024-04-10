@@ -1,9 +1,7 @@
 import fs from 'fs'
 import pathlib from 'path'
 import _ from 'lodash'
-import { z } from 'zod'
 import { State } from '../state'
-import { zodToJsonSchema } from 'zod-to-json-schema'
 import { toRequestSchema, toResponseSchema } from './map-operation'
 import { exportErrors } from './export-errors'
 import { exportTypings } from './export-typings'
@@ -14,17 +12,16 @@ import { exportHandler } from './export-handler'
 import { generateOpenapi } from '../generator'
 
 type JsonSchemaMap = Record<string, JSONSchema7>
-type ZodSchemaMap = Record<string, z.ZodTypeAny>
 type ExportableSchema = { exportSchemas: (outDir: string) => Promise<void> }
 
 const toExportableSchema = (schemas: JsonSchemaMap): ExportableSchema => ({
   exportSchemas: (outDir: string) => exportSchemas(schemas)(outDir),
 })
 
-export type GetSchemasInput<Custom extends string> = Record<Custom, ZodSchemaMap>
+export type GetSchemasInput<Custom extends string> = Record<Custom, JsonSchemaMap>
 
 export type GetSchemasOutput<Custom extends string> = Record<
-  Custom | 'models' | 'requests' | 'responses',
+  'models' | 'requests' | 'responses' | Custom,
   ExportableSchema
 >
 
@@ -32,18 +29,16 @@ export const getSchemas =
   <Schema extends string, Param extends string, Section extends string>(state: State<Schema, Param, Section>) =>
   <Custom extends string>(customSchemas: GetSchemasInput<Custom>): GetSchemasOutput<Custom> => {
     const operationsByName = _.mapKeys(state.operations, (v) => v.name)
-    const requestSchemas: JsonSchemaMap = _.mapValues(operationsByName, (o) => toRequestSchema(o))
-    const responseSchemas: JsonSchemaMap = _.mapValues(operationsByName, (o) => toResponseSchema(o))
+
+    const requestSchemas: JsonSchemaMap = _.mapValues(operationsByName, (o) => toRequestSchema(state, o))
+    const responseSchemas: JsonSchemaMap = _.mapValues(operationsByName, (o) => toResponseSchema(state, o))
     const modelSchemas: JsonSchemaMap = _.mapValues(state.schemas, (s) => s.schema as JSONSchema7)
 
     const models: ExportableSchema = toExportableSchema(modelSchemas)
     const requests: ExportableSchema = toExportableSchema(requestSchemas)
     const responses: ExportableSchema = toExportableSchema(responseSchemas)
 
-    const customs: Record<Custom, ExportableSchema> = _.mapValues(customSchemas, (zodSchemas) => {
-      const jsonSchemas = _.mapValues(zodSchemas, (s) => zodToJsonSchema(s) as JSONSchema7)
-      return toExportableSchema(jsonSchemas)
-    })
+    const customs: Record<Custom, ExportableSchema> = _.mapValues(customSchemas, (s) => toExportableSchema(s))
 
     return {
       models,
@@ -57,7 +52,7 @@ export const generateIntegrationHandler = async <Schema extends string, Param ex
   state: State<Schema, Param, Section>,
   outDir: string,
 ) => {
-  const { models, requests, responses } = getSchemas(state)({ customSchemas: {} })
+  const { models, requests, responses } = getSchemas(state)({})
   const errorsGenerator = exportErrors(state.errors ?? [])
   const typingsGenerator = exportTypings(state.operations)
   const treeGenerator = exportRouteTree(state.operations)

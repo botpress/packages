@@ -111,7 +111,15 @@ const getErrorBody = (thrown: unknown) => {
   }
 }
 
-export const handleRequest = async <T extends object>(routes: Record<string, Record<string, types.Route<T>>>, props: types.OperationProps<T>): Promise<types.Response> => {
+type PlainResponse = {
+  body?: string
+  headers?: {
+    [key: string]: string
+  }
+  status?: number
+}
+
+export const handleRequest = async <T extends object>(routes: Record<string, Record<string, types.Route<T>>>, props: types.OperationProps<T>): Promise<PlainResponse> => {
     try {
       const router = new Router(Object.keys(routes))
       const match = router.match(props.req.path)

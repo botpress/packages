@@ -33,10 +33,8 @@ export type ExportIntegrationHandlerOutput<Custom extends string> = Record<
 }
 
 export const integrationHandlerExporter =
-  <Schema extends string, Param extends string, Section extends string, Custom extends string>(
-    state: State<Schema, Param, Section>,
-  ) =>
-  (input: ExportIntegrationHandlerInput<Custom>): ExportIntegrationHandlerOutput<Custom> => {
+  <Schema extends string, Param extends string, Section extends string>(state: State<Schema, Param, Section>) =>
+  <Custom extends string>(input: ExportIntegrationHandlerInput<Custom>): ExportIntegrationHandlerOutput<Custom> => {
     const { customSchemas } = input
 
     const operationsByName = _.mapKeys(state.operations, (v) => v.name)

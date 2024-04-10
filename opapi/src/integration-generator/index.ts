@@ -1,6 +1,6 @@
 import fs from 'fs'
 import pathlib from 'path'
-import { Operation, State } from '../state'
+import { State } from '../state'
 import { toRequestSchema, toResponseSchema } from './map-operation'
 import { exportErrors } from './export-errors'
 import { exportTypings } from './export-typings'
@@ -8,8 +8,8 @@ import { exportRouteTree } from './export-tree'
 import { exportSchemas } from './export-schemas'
 import { JSONSchema7 } from 'json-schema'
 import { exportHandler } from './export-handler'
+import { generateOpenapi } from '../generator'
 import _ from 'lodash'
-import { generateOpenapi } from 'src/generator'
 
 type SchemaMap = Record<string, JSONSchema7>
 
@@ -23,35 +23,23 @@ const toExportableSchema = <T extends SchemaMap>(schemas: T): ExportableSchema<T
   getSchemas: () => schemas,
 })
 
-export type IntegrationHandlerProps<
-  Schema extends string,
-  Param extends string,
-  Section extends string,
-  Models extends SchemaMap,
-  Signals extends SchemaMap,
-> = {
+export type IntegrationHandlerProps<Schema extends string, Param extends string, Section extends string> = {
   state: State<Schema, Param, Section>
-  models: Models
-  signals: Signals
+  signals: SchemaMap
 }
 
-export const exportIntegrationHandler = <
-  Param extends string,
-  Section extends string,
-  Path extends string,
-  Models extends SchemaMap,
-  Signals extends SchemaMap,
->(
-  props: IntegrationHandlerProps<Param, Section, Path, Models, Signals>,
+export const exportIntegrationHandler = <Param extends string, Section extends string, Path extends string>(
+  props: IntegrationHandlerProps<Param, Section, Path>,
 ) => {
   const operationsByName = _.mapKeys(props.state.operations, (v) => v.name)
   const requestSchemas: SchemaMap = _.mapValues(operationsByName, (o) => toRequestSchema(o))
   const responseSchemas: SchemaMap = _.mapValues(operationsByName, (o) => toResponseSchema(o))
+  const modelSchemas: SchemaMap = _.mapValues(props.state.schemas, (s) => s.schema as JSONSchema7)
 
   const errorsGenerator = exportErrors(props.state.errors ?? [])
   const typingsGenerator = exportTypings(props.state.operations)
   const treeGenerator = exportRouteTree(props.state.operations)
-  const models = toExportableSchema(props.models)
+  const models = toExportableSchema(modelSchemas)
   const signals = toExportableSchema(props.signals)
   const requests = toExportableSchema(requestSchemas)
   const responses = toExportableSchema(responseSchemas)

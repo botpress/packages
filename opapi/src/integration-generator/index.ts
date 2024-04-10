@@ -1,6 +1,7 @@
 import fs from 'fs'
 import pathlib from 'path'
 import { State } from '../state'
+import { zodToJsonSchema } from '@bpinternal/zod-to-json-schema'
 import { toRequestSchema, toResponseSchema } from './map-operation'
 import { exportErrors } from './export-errors'
 import { exportTypings } from './export-typings'
@@ -10,73 +11,86 @@ import { JSONSchema7 } from 'json-schema'
 import { exportHandler } from './export-handler'
 import { generateOpenapi } from '../generator'
 import _ from 'lodash'
+import { z } from 'zod'
 
-type SchemaMap = Record<string, JSONSchema7>
+type JsonSchemaMap = Record<string, JSONSchema7>
+type ZodSchemaMap = Record<string, z.ZodTypeAny>
+type ExportableSchema = { exportSchemas: (outDir: string) => Promise<void> }
 
-type ExportableSchema<T extends SchemaMap> = {
-  exportSchemas: (outDir: string) => Promise<void>
-  getSchemas: () => T
-}
-
-const toExportableSchema = <T extends SchemaMap>(schemas: T): ExportableSchema<T> => ({
+const toExportableSchema = (schemas: JsonSchemaMap): ExportableSchema => ({
   exportSchemas: (outDir: string) => exportSchemas(schemas)(outDir),
-  getSchemas: () => schemas,
 })
 
-export type IntegrationHandlerProps<Schema extends string, Param extends string, Section extends string> = {
-  state: State<Schema, Param, Section>
-  signals: SchemaMap
+export type ExportIntegrationHandlerInput<Custom extends string> = {
+  customSchemas: Record<Custom, ZodSchemaMap>
 }
 
-export const exportIntegrationHandler = <Param extends string, Section extends string, Path extends string>(
-  props: IntegrationHandlerProps<Param, Section, Path>,
-) => {
-  const operationsByName = _.mapKeys(props.state.operations, (v) => v.name)
-  const requestSchemas: SchemaMap = _.mapValues(operationsByName, (o) => toRequestSchema(o))
-  const responseSchemas: SchemaMap = _.mapValues(operationsByName, (o) => toResponseSchema(o))
-  const modelSchemas: SchemaMap = _.mapValues(props.state.schemas, (s) => s.schema as JSONSchema7)
+export type ExportIntegrationHandlerOutput<Custom extends string> = Record<
+  Custom | 'models' | 'requests' | 'responses',
+  ExportableSchema
+> & {
+  exportIntegrationHandler: (outDir: string) => Promise<void>
+}
 
-  const errorsGenerator = exportErrors(props.state.errors ?? [])
-  const typingsGenerator = exportTypings(props.state.operations)
-  const treeGenerator = exportRouteTree(props.state.operations)
-  const models = toExportableSchema(modelSchemas)
-  const signals = toExportableSchema(props.signals)
-  const requests = toExportableSchema(requestSchemas)
-  const responses = toExportableSchema(responseSchemas)
+export const integrationHandlerExporter =
+  <Schema extends string, Param extends string, Section extends string, Custom extends string>(
+    state: State<Schema, Param, Section>,
+  ) =>
+  (input: ExportIntegrationHandlerInput<Custom>): ExportIntegrationHandlerOutput<Custom> => {
+    const { customSchemas } = input
 
-  return {
-    models,
-    signals,
-    requests,
-    responses,
-    exportIntegrationHandler: async (outDir: string) => {
-      fs.mkdirSync(outDir, { recursive: true })
+    const operationsByName = _.mapKeys(state.operations, (v) => v.name)
+    const requestSchemas: JsonSchemaMap = _.mapValues(operationsByName, (o) => toRequestSchema(o))
+    const responseSchemas: JsonSchemaMap = _.mapValues(operationsByName, (o) => toResponseSchema(o))
+    const modelSchemas: JsonSchemaMap = _.mapValues(state.schemas, (s) => s.schema as JSONSchema7)
 
-      const errorFile = pathlib.join(outDir, 'errors.ts')
-      await errorsGenerator(errorFile)
+    const errorsGenerator = exportErrors(state.errors ?? [])
+    const typingsGenerator = exportTypings(state.operations)
+    const treeGenerator = exportRouteTree(state.operations)
+    const models: ExportableSchema = toExportableSchema(modelSchemas)
+    const requests: ExportableSchema = toExportableSchema(requestSchemas)
+    const responses: ExportableSchema = toExportableSchema(responseSchemas)
 
-      const modelsOutDir = pathlib.join(outDir, 'models')
-      await models.exportSchemas(modelsOutDir)
+    const customs: Record<Custom, ExportableSchema> = _.mapValues(customSchemas, (zodSchemas) => {
+      const jsonSchemas = _.mapValues(zodSchemas, (s) => zodToJsonSchema(s) as JSONSchema7)
+      return toExportableSchema(jsonSchemas)
+    })
 
-      const signalsOutDir = pathlib.join(outDir, 'signals')
-      await signals.exportSchemas(signalsOutDir)
+    return {
+      models,
+      requests,
+      responses,
+      ...customs,
+      exportIntegrationHandler: async (outDir: string) => {
+        fs.mkdirSync(outDir, { recursive: true })
 
-      const requestsOutDir = pathlib.join(outDir, 'requests')
-      await requests.exportSchemas(requestsOutDir)
+        const errorFile = pathlib.join(outDir, 'errors.ts')
+        await errorsGenerator(errorFile)
 
-      const responsesOutDir = pathlib.join(outDir, 'responses')
-      await responses.exportSchemas(responsesOutDir)
+        const modelsOutDir = pathlib.join(outDir, 'models')
+        await models.exportSchemas(modelsOutDir)
 
-      const typingsOutFile = pathlib.join(outDir, 'typings.ts')
-      await typingsGenerator(typingsOutFile)
+        for (const [name, schemas] of Object.entries(customs)) {
+          const signalsOutDir = pathlib.join(outDir, name)
+          await (schemas as ExportableSchema).exportSchemas(signalsOutDir)
+        }
 
-      const treeOutFile = pathlib.join(outDir, 'tree.ts')
-      await treeGenerator(treeOutFile)
+        const requestsOutDir = pathlib.join(outDir, 'requests')
+        await requests.exportSchemas(requestsOutDir)
 
-      const handlerFile = pathlib.join(outDir, 'handler.ts')
-      await exportHandler(handlerFile)
+        const responsesOutDir = pathlib.join(outDir, 'responses')
+        await responses.exportSchemas(responsesOutDir)
 
-      generateOpenapi(props.state, outDir)
-    },
+        const typingsOutFile = pathlib.join(outDir, 'typings.ts')
+        await typingsGenerator(typingsOutFile)
+
+        const treeOutFile = pathlib.join(outDir, 'tree.ts')
+        await treeGenerator(treeOutFile)
+
+        const handlerFile = pathlib.join(outDir, 'handler.ts')
+        await exportHandler(handlerFile)
+
+        generateOpenapi(state, outDir)
+      },
+    }
   }
-}

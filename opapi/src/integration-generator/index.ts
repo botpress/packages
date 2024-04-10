@@ -64,24 +64,31 @@ export const generateIntegrationHandler = async <Schema extends string, Param ex
 
   fs.mkdirSync(outDir, { recursive: true })
 
+  console.log('Generating error file')
   const errorFile = pathlib.join(outDir, 'errors.ts')
   await errorsGenerator(errorFile)
 
+  console.log('Generating models out directory')
   const modelsOutDir = pathlib.join(outDir, 'models')
   await models.exportSchemas(modelsOutDir)
 
+  console.log('Generating requests out directory')
   const requestsOutDir = pathlib.join(outDir, 'requests')
   await requests.exportSchemas(requestsOutDir)
 
+  console.log('Generating responses out directory')
   const responsesOutDir = pathlib.join(outDir, 'responses')
   await responses.exportSchemas(responsesOutDir)
 
+  console.log('Generating typings out file')
   const typingsOutFile = pathlib.join(outDir, 'typings.ts')
   await typingsGenerator(typingsOutFile)
 
+  console.log('Generating tree out file')
   const treeOutFile = pathlib.join(outDir, 'tree.ts')
   await treeGenerator(treeOutFile)
 
+  console.log('Generating handler file')
   const handlerFile = pathlib.join(outDir, 'handler.ts')
   await exportHandler(handlerFile)
 

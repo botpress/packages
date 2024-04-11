@@ -1,6 +1,6 @@
 {
   "name": "@bpinternal/es-node",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "description": "",
   "main": "dist/index.js",
   "bin": {
@@ -19,6 +19,6 @@
   },
   "devDependencies": {
     "@types/node": "^20.2.5",
-    "typescript": "5.4.2"
+    "typescript": "5.4.5"
   }
 }

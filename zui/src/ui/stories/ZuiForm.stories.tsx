@@ -1,4 +1,4 @@
-import React, { FC, useState } from 'react'
+import React, { FC, useEffect, useState } from 'react'
 import type { Meta, StoryObj } from '@storybook/react'
 import { FormError, UIComponentDefinitions, ZuiComponentMap } from '../types'
 import { z } from 'zod'
@@ -202,16 +202,21 @@ const componentMap: ZuiComponentMap<typeof exampleExtensions> = {
 
 const ZuiFormExample = () => {
   const [formData, setFormData] = useState({})
+  useEffect(() => {
+    exampleSchema.toTypescriptTypings().then(console.log)
+  }, [])
   return (
-    <ZuiForm<typeof exampleExtensions>
-      schema={exampleSchema.toJsonSchema({
-        target: 'openApi3',
-      })}
-      value={formData}
-      onChange={setFormData}
-      components={componentMap}
-      disableValidation={false}
-    />
+    <>
+      <ZuiForm<typeof exampleExtensions>
+        schema={exampleSchema.toJsonSchema({
+          target: 'openApi3',
+        })}
+        value={formData}
+        onChange={setFormData}
+        components={componentMap}
+        disableValidation={false}
+      />
+    </>
   )
 }
 const meta = {

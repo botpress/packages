@@ -119,8 +119,8 @@ export type Parameter<S extends SchemaType = 'zod-schema'> =
   | IntegerParameter
   | NumberParameter
   | PathParameter
-  | QueryParameterObject<S>
   | QueryParameterStringArray
+  | QueryParameterObject<S>
 
 export const operationsWithBodyMethod = ['post', 'put', 'patch'] as const
 type OperationsWithBodyMethod = (typeof operationsWithBodyMethod)[number]

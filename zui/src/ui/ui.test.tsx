@@ -1,3 +1,4 @@
+import React from 'react'
 import { fireEvent, render } from '@testing-library/react'
 import { ZuiForm, ZuiFormProps } from './index'
 import { ZuiComponentMap } from '../index'
@@ -429,7 +430,8 @@ describe('UI', () => {
     expect(element).toBeTruthy()
   })
 })
-const testComponentDefinitions = [
+
+export const testComponentDefinitions = [
   {
     type: 'string',
     id: 'customstringcomponent',

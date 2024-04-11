@@ -2,7 +2,7 @@ import { describe, test, expect } from 'vitest'
 import { zuiToJsonSchema } from './zui-extension'
 import { z } from 'zod'
 import { zuiKey } from '../../ui/constants'
-import { studioComponentDefinitions } from '../../ui/studioComponentDefinitions'
+import { testComponentDefinitions } from '../../ui/ui.test'
 
 describe('zuiToJsonSchema', () => {
   test('should work', () => {
@@ -67,8 +67,8 @@ describe('zuiToJsonSchema', () => {
 
   test('supported properties are available in the json schema', () => {
     const schema = z.object({
-      testExample: z.string().displayAs<typeof studioComponentDefinitions>('textInput', {
-        type: 'date',
+      testExample: z.string().displayAs<typeof testComponentDefinitions>('customstringcomponent', {
+        multiline: true,
       }),
     })
 
@@ -82,9 +82,9 @@ describe('zuiToJsonSchema', () => {
             "type": "string",
             "${zuiKey}": {
               "displayAs": [
-                "textInput",
+                "customstringcomponent",
                 {
-                  "type": "date",
+                  "multiline": true,
                 },
               ],
             },

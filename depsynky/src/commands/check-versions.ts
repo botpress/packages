@@ -9,8 +9,6 @@ export type CheckVersionsOpts = {
   targetVersions: Record<string, string>
 }
 
-const LOCAL_VERSION = 'workspace:*'
-
 const checker =
   (pkg: utils.pkgjson.PackageJson) => (current: Record<string, string>, target: Record<string, string>) => {
     for (const [name, version] of utils.objects.entries(target)) {
@@ -18,7 +16,7 @@ const checker =
       if (!currentVersion) {
         continue
       }
-      const isLocal = currentVersion === LOCAL_VERSION
+      const isLocal = utils.pnpm.isLocalVersion(currentVersion)
       const isPublic = !pkg.private
       if (isPublic && isLocal) {
         throw new errors.DepSynkyError(
@@ -42,6 +40,11 @@ export const checkVersions = (argv: YargsConfig<typeof config.checkSchema>, opts
 
     const check = checker(content)
     dependencies && check(dependencies, targetVersions)
+
+    if (argv.ignoreDev) {
+      continue
+    }
+
     devDependencies && check(devDependencies, targetVersions)
   }
 

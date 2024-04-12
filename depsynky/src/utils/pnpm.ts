@@ -48,3 +48,5 @@ export const listPublicPackages = (rootDir: string): string[] => {
   const workspaces = searchWorkspaces(rootDir)
   return workspaces.filter((w) => !w.content.private).map((w) => w.content.name)
 }
+
+export const isLocalVersion = (version: string) => version.startsWith('workspace:')

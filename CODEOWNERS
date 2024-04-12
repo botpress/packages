@@ -1,7 +1,9 @@
 * @botpress/cloud-services
 
 const @botpress/cloud-services
+
 entities @franklevasseur
+depsynky @franklevasseur
 es-node @franklevasseur
 expresso @franklevasseur
 jex @franklevasseur

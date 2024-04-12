@@ -23,6 +23,7 @@ process.on('unhandledRejection', onError)
 process.on('uncaughtException', onError)
 
 void yargs
+  .scriptName('depsynky')
   .command(
     'bump [package]',
     'Bump version of a package',

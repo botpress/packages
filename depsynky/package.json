@@ -1,6 +1,6 @@
 {
   "name": "@bpinternal/depsynky",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "CLI to synchronize dependencies accross a pnpm mono-repo",
   "main": "dist/index.js",
   "scripts": {

@@ -85,8 +85,10 @@ export class ZodBigInt<UI extends UIComponentDefinitions = DefaultComponentDefin
     return { status: status.value, value: input.data }
   }
 
-  static create = (params?: RawCreateParams & { coerce?: boolean }): ZodBigInt => {
-    return new ZodBigInt({
+  static create = <UI extends UIComponentDefinitions = DefaultComponentDefinitions>(
+    params?: RawCreateParams & { coerce?: boolean },
+  ): ZodBigInt<UI> => {
+    return new ZodBigInt<UI>({
       checks: [],
       typeName: ZodFirstPartyTypeKind.ZodBigInt,
       coerce: params?.coerce ?? false,

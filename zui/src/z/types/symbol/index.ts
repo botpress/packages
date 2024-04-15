@@ -29,8 +29,10 @@ export class ZodSymbol<UI extends UIComponentDefinitions = DefaultComponentDefin
     return OK(input.data)
   }
 
-  static create = (params?: RawCreateParams): ZodSymbol => {
-    return new ZodSymbol({
+  static create = <UI extends UIComponentDefinitions = DefaultComponentDefinitions>(
+    params?: RawCreateParams,
+  ): ZodSymbol<UI> => {
+    return new ZodSymbol<UI>({
       typeName: ZodFirstPartyTypeKind.ZodSymbol,
       ...processCreateParams(params),
     })

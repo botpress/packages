@@ -29,8 +29,10 @@ export class ZodUndefined<UI extends UIComponentDefinitions = DefaultComponentDe
   }
   params?: RawCreateParams
 
-  static create = (params?: RawCreateParams): ZodUndefined => {
-    return new ZodUndefined({
+  static create = <UI extends UIComponentDefinitions = DefaultComponentDefinitions>(
+    params?: RawCreateParams,
+  ): ZodUndefined<UI> => {
+    return new ZodUndefined<UI>({
       typeName: ZodFirstPartyTypeKind.ZodUndefined,
       ...processCreateParams(params),
     })

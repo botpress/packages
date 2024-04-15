@@ -40,10 +40,11 @@ export type FilterEnum<Values, ToExclude> = Values extends []
 
 export type typecast<A, T> = A extends T ? A : never
 
-export function createZodEnum<U extends string, T extends Readonly<[U, ...U[]]>>(
-  values: T,
-  params?: RawCreateParams,
-): ZodEnum<Writeable<T>>
+export function createZodEnum<
+  U extends string,
+  T extends Readonly<[U, ...U[]]>,
+  UI extends UIComponentDefinitions = DefaultComponentDefinitions,
+>(values: T, params?: RawCreateParams): ZodEnum<Writeable<T>, UI>
 export function createZodEnum<U extends string, T extends [U, ...U[]]>(values: T, params?: RawCreateParams): ZodEnum<T>
 export function createZodEnum(values: [string, ...string[]], params?: RawCreateParams) {
   return new ZodEnum({

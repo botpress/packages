@@ -1,3 +1,4 @@
+import { DefaultComponentDefinitions, UIComponentDefinitions } from '../ui/types'
 import {
   custom,
   CustomParams,
@@ -28,6 +29,7 @@ import {
   ZodOptional,
   ZodPipeline,
   ZodPromise,
+  ZodRawShape,
   ZodReadonly,
   ZodRecord,
   ZodSet,
@@ -112,7 +114,7 @@ const anyType = ZodAny.create
 const unknownType = ZodUnknown.create
 const neverType = ZodNever.create
 const voidType = ZodVoid.create
-const arrayType = ZodArray.create
+const arrayType = ZodArray.create // Array<T extends ZodTypeAny>
 const objectType = ZodObject.create
 const strictObjectType = ZodObject.strictCreate
 const unionType = ZodUnion.create
@@ -156,6 +158,102 @@ export const coerce = {
       coerce: true,
     })) as (typeof ZodTemplateLiteral)['create'],
 }
+
+type Func = (...args: any[]) => any
+type Args<F extends Func> = Parameters<F>
+type Res<F extends Func> = ReturnType<F>
+
+export type ZodFunctions<UI extends UIComponentDefinitions = DefaultComponentDefinitions> = {
+  any: typeof anyType<UI>
+  array: typeof arrayType
+  bigint: typeof bigIntType<UI>
+  boolean: typeof booleanType<UI>
+  date: typeof dateType<UI>
+  discriminatedUnion: typeof discriminatedUnionType
+  effect: typeof effectsType
+  enum: <U extends string, T extends Readonly<[U, ...U[]]>>(
+    ...args: Args<typeof enumType<U, T, UI>>
+  ) => Res<typeof enumType<U, T, UI>>
+  function: typeof functionType
+  instanceof: typeof instanceOfType
+  intersection: typeof intersectionType
+  lazy: typeof lazyType
+  literal: typeof literalType
+  map: typeof mapType
+  nan: typeof nanType<UI>
+  nativeEnum: typeof nativeEnumType
+  never: typeof neverType<UI>
+  null: typeof nullType<UI>
+  nullable: typeof nullableType
+  number: typeof numberType<UI>
+  object: <T extends ZodRawShape>(...args: Args<typeof objectType<T, UI>>) => Res<typeof objectType<T, UI>>
+  oboolean: typeof oboolean
+  onumber: typeof onumber
+  optional: typeof optionalType
+  ostring: typeof ostring
+  pipeline: typeof pipelineType
+  preprocess: typeof preprocessType
+  promise: typeof promiseType
+  record: typeof recordType
+  set: typeof setType
+  strictObject: typeof strictObjectType
+  string: typeof stringType<UI>
+  symbol: typeof symbolType<UI>
+  templateLiteral: typeof templateLiteralType
+  transformer: typeof effectsType
+  tuple: typeof tupleType
+  undefined: typeof undefinedType<UI>
+  union: typeof unionType
+  unknown: typeof unknownType<UI>
+  void: typeof voidType<UI>
+  fromJsonSchema: typeof fromJsonSchema
+  fromObject: typeof fromObject
+}
+
+export const ui = <UI extends UIComponentDefinitions>(): ZodFunctions<UI> => ({
+  any: anyType,
+  array: arrayType,
+  bigint: bigIntType,
+  boolean: booleanType,
+  date: dateType,
+  discriminatedUnion: discriminatedUnionType,
+  effect: effectsType,
+  enum: enumType,
+  function: functionType,
+  instanceof: instanceOfType,
+  intersection: intersectionType,
+  lazy: lazyType,
+  literal: literalType,
+  map: mapType,
+  nan: nanType,
+  nativeEnum: nativeEnumType,
+  never: neverType,
+  null: nullType,
+  nullable: nullableType,
+  number: numberType,
+  object: objectType,
+  oboolean: oboolean,
+  onumber: onumber,
+  optional: optionalType,
+  ostring: ostring,
+  pipeline: pipelineType,
+  preprocess: preprocessType,
+  promise: promiseType,
+  record: recordType,
+  set: setType,
+  strictObject: strictObjectType,
+  string: stringType,
+  symbol: symbolType,
+  templateLiteral: templateLiteralType,
+  transformer: effectsType,
+  tuple: tupleType,
+  undefined: undefinedType,
+  union: unionType,
+  unknown: unknownType,
+  void: voidType,
+  fromJsonSchema: fromJsonSchema,
+  fromObject: fromObject,
+})
 
 export {
   anyType as any,

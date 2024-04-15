@@ -27,8 +27,10 @@ export class ZodNull<UI extends UIComponentDefinitions = DefaultComponentDefinit
     }
     return OK(input.data)
   }
-  static create = (params?: RawCreateParams): ZodNull => {
-    return new ZodNull({
+  static create = <UI extends UIComponentDefinitions = DefaultComponentDefinitions>(
+    params?: RawCreateParams,
+  ): ZodNull<UI> => {
+    return new ZodNull<UI>({
       typeName: ZodFirstPartyTypeKind.ZodNull,
       ...processCreateParams(params),
     })

@@ -18,8 +18,10 @@ export class ZodAny<UI extends UIComponentDefinitions = DefaultComponentDefiniti
   _parse(input: ParseInput): ParseReturnType<this['_output']> {
     return OK(input.data)
   }
-  static create = (params?: RawCreateParams): ZodAny => {
-    return new ZodAny({
+  static create = <UI extends UIComponentDefinitions = DefaultComponentDefinitions>(
+    params?: RawCreateParams,
+  ): ZodAny<UI> => {
+    return new ZodAny<UI>({
       typeName: ZodFirstPartyTypeKind.ZodAny,
       ...processCreateParams(params),
     })

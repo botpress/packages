@@ -58,7 +58,7 @@ export type ZodTypeAny = ZodType<any, any, any, any>
 export type TypeOf<T extends ZodType<any, any, any, any>> = T['_output']
 export type input<T extends ZodType<any, any, any, any>> = T['_input']
 export type output<T extends ZodType<any, any, any, any>> = T['_output']
-export type UiOf<T extends ZodType<any, any, any, any>> = T extends ZodType<any, any, any, infer U> ? U : never
+export type UiOf<T extends ZodType<any, any, any, any>> = T['_ui']
 export type { TypeOf as infer }
 
 export type CustomErrorParams = Partial<util.Omit<ZodCustomIssue, 'code'>>
@@ -151,6 +151,7 @@ export abstract class ZodType<
   readonly _output!: Output
   readonly _input!: Input
   readonly _def!: Def
+  readonly _ui!: UI
 
   get description() {
     return this._def.description

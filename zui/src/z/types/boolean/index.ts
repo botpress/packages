@@ -33,8 +33,10 @@ export class ZodBoolean<UI extends UIComponentDefinitions = DefaultComponentDefi
     return OK(input.data)
   }
 
-  static create = (params?: RawCreateParams & { coerce?: boolean }): ZodBoolean => {
-    return new ZodBoolean({
+  static create = <UI extends UIComponentDefinitions = DefaultComponentDefinitions>(
+    params?: RawCreateParams & { coerce?: boolean },
+  ): ZodBoolean<UI> => {
+    return new ZodBoolean<UI>({
       typeName: ZodFirstPartyTypeKind.ZodBoolean,
       coerce: params?.coerce || false,
       ...processCreateParams(params),

@@ -28,7 +28,7 @@ export class ZodVoid<UI extends UIComponentDefinitions = DefaultComponentDefinit
     return OK(input.data)
   }
 
-  static create = (params?: RawCreateParams): ZodVoid => {
+  static create = <UI extends UIComponentDefinitions>(params?: RawCreateParams): ZodVoid<UI> => {
     return new ZodVoid({
       typeName: ZodFirstPartyTypeKind.ZodVoid,
       ...processCreateParams(params),

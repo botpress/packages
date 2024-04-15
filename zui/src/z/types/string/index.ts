@@ -523,8 +523,10 @@ export class ZodString<UI extends UIComponentDefinitions = DefaultComponentDefin
     return max
   }
 
-  static create = (params?: RawCreateParams & { coerce?: true }): ZodString => {
-    return new ZodString({
+  static create = <UI extends UIComponentDefinitions = DefaultComponentDefinitions>(
+    params?: RawCreateParams & { coerce?: true },
+  ): ZodString<UI> => {
+    return new ZodString<UI>({
       checks: [],
       typeName: ZodFirstPartyTypeKind.ZodString,
       coerce: params?.coerce ?? false,

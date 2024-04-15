@@ -564,8 +564,25 @@ export class ZodObject<
     return createZodEnum(util.objectKeys(this.shape) as [string, ...string[]]) as any
   }
 
-  static create = <T extends ZodRawShape>(shape: T, params?: RawCreateParams): ZodObject<T, 'strip'> => {
-    return new ZodObject({
+  static create = <T extends ZodRawShape, UI extends UIComponentDefinitions = DefaultComponentDefinitions>(
+    shape: T,
+    params?: RawCreateParams,
+  ): ZodObject<
+    T,
+    'strip',
+    ZodTypeAny,
+    objectOutputType<T, ZodTypeAny, UnknownKeysParam>,
+    objectInputType<T, ZodTypeAny, UnknownKeysParam>,
+    UI
+  > => {
+    return new ZodObject<
+      T,
+      'strip',
+      ZodTypeAny,
+      objectOutputType<T, ZodTypeAny, UnknownKeysParam>,
+      objectInputType<T, ZodTypeAny, UnknownKeysParam>,
+      UI
+    >({
       shape: () => shape,
       unknownKeys: 'strip',
       catchall: ZodNever.create(),

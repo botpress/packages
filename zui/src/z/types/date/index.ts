@@ -130,8 +130,10 @@ export class ZodDate<UI extends UIComponentDefinitions = DefaultComponentDefinit
     return max != null ? new Date(max) : null
   }
 
-  static create = (params?: RawCreateParams & { coerce?: boolean }): ZodDate => {
-    return new ZodDate({
+  static create = <UI extends UIComponentDefinitions = DefaultComponentDefinitions>(
+    params?: RawCreateParams & { coerce?: boolean },
+  ): ZodDate<UI> => {
+    return new ZodDate<UI>({
       checks: [],
       coerce: params?.coerce || false,
       typeName: ZodFirstPartyTypeKind.ZodDate,

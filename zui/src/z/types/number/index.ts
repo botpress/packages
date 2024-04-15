@@ -118,8 +118,10 @@ export class ZodNumber<UI extends UIComponentDefinitions = DefaultComponentDefin
     return { status: status.value, value: input.data }
   }
 
-  static create = (params?: RawCreateParams & { coerce?: boolean }): ZodNumber => {
-    return new ZodNumber({
+  static create = <UI extends UIComponentDefinitions = DefaultComponentDefinitions>(
+    params?: RawCreateParams & { coerce?: boolean },
+  ): ZodNumber<UI> => {
+    return new ZodNumber<UI>({
       checks: [],
       typeName: ZodFirstPartyTypeKind.ZodNumber,
       coerce: params?.coerce || false,

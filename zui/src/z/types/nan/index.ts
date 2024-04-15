@@ -29,8 +29,10 @@ export class ZodNaN<UI extends UIComponentDefinitions = DefaultComponentDefiniti
     return { status: 'valid', value: input.data }
   }
 
-  static create = (params?: RawCreateParams): ZodNaN => {
-    return new ZodNaN({
+  static create = <UI extends UIComponentDefinitions = DefaultComponentDefinitions>(
+    params?: RawCreateParams,
+  ): ZodNaN<UI> => {
+    return new ZodNaN<UI>({
       typeName: ZodFirstPartyTypeKind.ZodNaN,
       ...processCreateParams(params),
     })

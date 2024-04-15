@@ -23,7 +23,9 @@ export class ZodNever<UI extends UIComponentDefinitions = DefaultComponentDefini
     })
     return INVALID
   }
-  static create = (params?: RawCreateParams): ZodNever => {
+  static create = <UI extends UIComponentDefinitions = DefaultComponentDefinitions>(
+    params?: RawCreateParams,
+  ): ZodNever<UI> => {
     return new ZodNever({
       typeName: ZodFirstPartyTypeKind.ZodNever,
       ...processCreateParams(params),

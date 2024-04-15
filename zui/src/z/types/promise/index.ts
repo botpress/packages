@@ -1,5 +1,5 @@
 import { ZodIssueCode } from '../error'
-import { RawCreateParams, ZodFirstPartyTypeKind, ZodType, ZodTypeAny, ZodTypeDef } from '../index'
+import { RawCreateParams, UiOf, ZodFirstPartyTypeKind, ZodType, ZodTypeAny, ZodTypeDef } from '../index'
 import { processCreateParams, ZodParsedType } from '../utils'
 import { addIssueToContext, INVALID, OK, ParseInput, ParseReturnType } from '../utils/parseUtil'
 
@@ -11,7 +11,8 @@ export interface ZodPromiseDef<T extends ZodTypeAny = ZodTypeAny> extends ZodTyp
 export class ZodPromise<T extends ZodTypeAny> extends ZodType<
   Promise<T['_output']>,
   ZodPromiseDef<T>,
-  Promise<T['_input']>
+  Promise<T['_input']>,
+  UiOf<T>
 > {
   unwrap() {
     return this._def.type

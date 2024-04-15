@@ -1,4 +1,4 @@
-import { RawCreateParams, ZodFirstPartyTypeKind, ZodType, ZodTypeAny, ZodTypeDef } from '../index'
+import { RawCreateParams, UiOf, ZodFirstPartyTypeKind, ZodType, ZodTypeAny, ZodTypeDef } from '../index'
 import { processCreateParams } from '../utils'
 import { isValid, ParseInput, ParseReturnType } from '../utils/parseUtil'
 
@@ -32,7 +32,8 @@ export interface ZodReadonlyDef<T extends ZodTypeAny = ZodTypeAny> extends ZodTy
 export class ZodReadonly<T extends ZodTypeAny> extends ZodType<
   MakeReadonly<T['_output']>,
   ZodReadonlyDef<T>,
-  MakeReadonly<T['_input']>
+  MakeReadonly<T['_input']>,
+  UiOf<T>
 > {
   _parse(input: ParseInput): ParseReturnType<this['_output']> {
     const result = this._def.innerType._parse(input)

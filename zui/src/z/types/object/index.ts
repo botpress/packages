@@ -1,3 +1,4 @@
+import { DefaultComponentDefinitions, UIComponentDefinitions } from '../../../ui/types'
 import {
   ZodArray,
   ZodEnum,
@@ -114,7 +115,8 @@ export class ZodObject<
   Catchall extends ZodTypeAny = ZodTypeAny,
   Output = objectOutputType<T, Catchall, UnknownKeys>,
   Input = objectInputType<T, Catchall, UnknownKeys>,
-> extends ZodType<Output, ZodObjectDef<T, UnknownKeys, Catchall>, Input> {
+  UI extends UIComponentDefinitions = DefaultComponentDefinitions,
+> extends ZodType<Output, ZodObjectDef<T, UnknownKeys, Catchall>, Input, UI> {
   private _cached: { shape: T; keys: string[] } | null = null
 
   _getCached(): { shape: T; keys: string[] } {

@@ -1,3 +1,4 @@
+import { DefaultComponentDefinitions, UIComponentDefinitions } from '../../../ui/types'
 import { ZodIssueCode } from '../error'
 import { RawCreateParams, ZodFirstPartyTypeKind, ZodType, ZodTypeDef } from '../index'
 import { processCreateParams, ZodParsedType } from '../utils'
@@ -8,7 +9,12 @@ export interface ZodBooleanDef extends ZodTypeDef {
   coerce: boolean
 }
 
-export class ZodBoolean extends ZodType<boolean, ZodBooleanDef> {
+export class ZodBoolean<UI extends UIComponentDefinitions = DefaultComponentDefinitions> extends ZodType<
+  boolean,
+  ZodBooleanDef,
+  boolean,
+  UI
+> {
   _parse(input: ParseInput): ParseReturnType<boolean> {
     if (this._def.coerce) {
       input.data = Boolean(input.data)

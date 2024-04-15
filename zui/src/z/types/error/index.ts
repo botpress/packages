@@ -6,7 +6,7 @@ import { Primitive } from '../utils/typeAliases'
 
 type allKeys<T> = T extends any ? keyof T : never
 
-export type inferFlattenedErrors<T extends ZodType<any, any, any>, U = string> = typeToFlattenedError<TypeOf<T>, U>
+export type inferFlattenedErrors<T extends ZodType<any, any, any, any>, U = string> = typeToFlattenedError<TypeOf<T>, U>
 export type typeToFlattenedError<T, U = string> = {
   formErrors: U[]
   fieldErrors: {
@@ -183,7 +183,7 @@ export type ZodFormattedError<T, U = string> = {
   _errors: U[]
 } & recursiveZodFormattedError<NonNullable<T>>
 
-export type inferFormattedError<T extends ZodType<any, any, any>, U = string> = ZodFormattedError<TypeOf<T>, U>
+export type inferFormattedError<T extends ZodType<any, any, any, any>, U = string> = ZodFormattedError<TypeOf<T>, U>
 
 export class ZodError<T = any> extends Error {
   issues: ZodIssue[] = []

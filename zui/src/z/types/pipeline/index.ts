@@ -1,4 +1,4 @@
-import { ZodFirstPartyTypeKind, ZodType, ZodTypeAny, ZodTypeDef } from '../index'
+import { UiOf, ZodFirstPartyTypeKind, ZodType, ZodTypeAny, ZodTypeDef } from '../index'
 import { DIRTY, INVALID, ParseInput, ParseReturnType } from '../utils/parseUtil'
 
 export interface ZodPipelineDef<A extends ZodTypeAny, B extends ZodTypeAny> extends ZodTypeDef {
@@ -10,7 +10,8 @@ export interface ZodPipelineDef<A extends ZodTypeAny, B extends ZodTypeAny> exte
 export class ZodPipeline<A extends ZodTypeAny, B extends ZodTypeAny> extends ZodType<
   B['_output'],
   ZodPipelineDef<A, B>,
-  A['_input']
+  A['_input'],
+  UiOf<B>
 > {
   _parse(input: ParseInput): ParseReturnType<any> {
     const { status, ctx } = this._processInputParams(input)

@@ -1,4 +1,5 @@
 import { addIssueToContext, INVALID, ParseContext, ParseInput, ParseReturnType, ParseStatus } from '../'
+import { DefaultComponentDefinitions, UIComponentDefinitions } from '../../../ui/types'
 import { ZodIssueCode } from '../error'
 import { RawCreateParams, ZodFirstPartyTypeKind, ZodType, ZodTypeDef } from '../index'
 import { processCreateParams, util, ZodParsedType } from '../utils'
@@ -15,7 +16,12 @@ export interface ZodBigIntDef extends ZodTypeDef {
   coerce: boolean
 }
 
-export class ZodBigInt extends ZodType<bigint, ZodBigIntDef> {
+export class ZodBigInt<UI extends UIComponentDefinitions = DefaultComponentDefinitions> extends ZodType<
+  bigint,
+  ZodBigIntDef,
+  bigint,
+  UI
+> {
   _parse(input: ParseInput): ParseReturnType<bigint> {
     if (this._def.coerce) {
       input.data = BigInt(input.data)

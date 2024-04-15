@@ -1,3 +1,4 @@
+import { DefaultComponentDefinitions, UIComponentDefinitions } from '../../../ui/types'
 import { ZodIssueCode } from '../error'
 import { RawCreateParams, ZodFirstPartyTypeKind, ZodType, ZodTypeDef } from '../index'
 import { processCreateParams, ZodParsedType } from '../utils'
@@ -7,7 +8,12 @@ export interface ZodNaNDef extends ZodTypeDef {
   typeName: ZodFirstPartyTypeKind.ZodNaN
 }
 
-export class ZodNaN extends ZodType<number, ZodNaNDef> {
+export class ZodNaN<UI extends UIComponentDefinitions = DefaultComponentDefinitions> extends ZodType<
+  number,
+  ZodNaNDef,
+  number,
+  UI
+> {
   _parse(input: ParseInput): ParseReturnType<any> {
     const parsedType = this._getType(input)
     if (parsedType !== ZodParsedType.nan) {

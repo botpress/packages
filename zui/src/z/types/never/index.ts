@@ -1,3 +1,4 @@
+import { DefaultComponentDefinitions, UIComponentDefinitions } from '../../../ui/types'
 import { ZodIssueCode } from '../error'
 import { RawCreateParams, ZodFirstPartyTypeKind, ZodType, ZodTypeDef } from '../index'
 import { processCreateParams, ZodParsedType } from '../utils'
@@ -7,7 +8,12 @@ export interface ZodNeverDef extends ZodTypeDef {
   typeName: ZodFirstPartyTypeKind.ZodNever
 }
 
-export class ZodNever extends ZodType<never, ZodNeverDef> {
+export class ZodNever<UI extends UIComponentDefinitions = DefaultComponentDefinitions> extends ZodType<
+  never,
+  ZodNeverDef,
+  never,
+  UI
+> {
   _parse(input: ParseInput): ParseReturnType<this['_output']> {
     const ctx = this._getOrReturnCtx(input)
     addIssueToContext(ctx, {

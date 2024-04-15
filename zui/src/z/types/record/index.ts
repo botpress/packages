@@ -28,6 +28,7 @@ export class ZodRecord<Key extends KeySchema = ZodString, Value extends ZodTypeA
   RecordType<Key['_output'], Value['_output']>,
   ZodRecordDef<Key, Value>,
   RecordType<Key['_input'], Value['_input']>
+  // TODO: UI
 > {
   get keySchema() {
     return this._def.keyType

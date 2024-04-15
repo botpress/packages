@@ -1,4 +1,4 @@
-import { RawCreateParams, ZodFirstPartyTypeKind, ZodType, ZodTypeAny, ZodTypeDef } from '../index'
+import { RawCreateParams, UiOf, ZodFirstPartyTypeKind, ZodType, ZodTypeAny, ZodTypeDef } from '../index'
 import { processCreateParams, util, ZodParsedType } from '../utils'
 import { ParseInput, ParseReturnType } from '../utils/parseUtil'
 
@@ -19,7 +19,8 @@ export interface ZodDefaultDef<T extends ZodTypeAny = ZodTypeAny> extends ZodTyp
 export class ZodDefault<T extends ZodTypeAny> extends ZodType<
   util.noUndefined<T['_output']>,
   ZodDefaultDef<T>,
-  T['_input'] | undefined
+  T['_input'] | undefined,
+  UiOf<T>
 > {
   _parse(input: ParseInput): ParseReturnType<this['_output']> {
     const { ctx } = this._processInputParams(input)

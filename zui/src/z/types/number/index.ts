@@ -1,3 +1,4 @@
+import { DefaultComponentDefinitions, UIComponentDefinitions } from '../../../ui/types'
 import { ZodIssueCode } from '../error'
 import { RawCreateParams, ZodFirstPartyTypeKind, ZodType, ZodTypeDef } from '../index'
 import { processCreateParams, util, ZodParsedType } from '../utils'
@@ -26,7 +27,12 @@ export interface ZodNumberDef extends ZodTypeDef {
   coerce: boolean
 }
 
-export class ZodNumber extends ZodType<number, ZodNumberDef> {
+export class ZodNumber<UI extends UIComponentDefinitions = DefaultComponentDefinitions> extends ZodType<
+  number,
+  ZodNumberDef,
+  number,
+  UI
+> {
   _parse(input: ParseInput): ParseReturnType<number> {
     if (this._def.coerce) {
       input.data = Number(input.data)

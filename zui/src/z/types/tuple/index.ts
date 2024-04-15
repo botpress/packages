@@ -1,3 +1,4 @@
+import { DefaultComponentDefinitions, UIComponentDefinitions } from '../../../ui/types'
 import { ZodIssueCode } from '../error'
 import { ParseInputLazyPath, RawCreateParams, ZodFirstPartyTypeKind, ZodType, ZodTypeAny, ZodTypeDef } from '../index'
 import { processCreateParams, ZodParsedType } from '../utils'
@@ -39,7 +40,8 @@ export type AnyZodTuple = ZodTuple<[ZodTypeAny, ...ZodTypeAny[]] | [], ZodTypeAn
 export class ZodTuple<
   T extends [ZodTypeAny, ...ZodTypeAny[]] | [] = [ZodTypeAny, ...ZodTypeAny[]],
   Rest extends ZodTypeAny | null = null,
-> extends ZodType<OutputTypeOfTupleWithRest<T, Rest>, ZodTupleDef<T, Rest>, InputTypeOfTupleWithRest<T, Rest>> {
+  UI extends UIComponentDefinitions = DefaultComponentDefinitions,
+> extends ZodType<OutputTypeOfTupleWithRest<T, Rest>, ZodTupleDef<T, Rest>, InputTypeOfTupleWithRest<T, Rest>, UI> {
   _parse(input: ParseInput): ParseReturnType<this['_output']> {
     const { status, ctx } = this._processInputParams(input)
     if (ctx.parsedType !== ZodParsedType.array) {

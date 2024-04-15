@@ -151,8 +151,8 @@ test('template literal type inference', () => {
 
   util.assertEqual<z.infer<typeof url>, `https://${string}.com` | `https://${string}.net`>(true)
 
-  util.assertEqual<
-    z.infer<typeof measurement>,
+  type Actual = z.infer<typeof measurement>
+  type Expected =
     | `${number}`
     | `${number}px`
     | `${number}em`
@@ -161,7 +161,7 @@ test('template literal type inference', () => {
     | `${number}vw`
     | `${number}vmin`
     | `${number}vmax`
-  >(true)
+  util.assertEqual<Actual, Expected>(true)
 
   util.assertEqual<
     z.infer<typeof connectionString>,

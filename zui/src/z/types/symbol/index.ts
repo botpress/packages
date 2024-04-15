@@ -1,3 +1,4 @@
+import { DefaultComponentDefinitions, UIComponentDefinitions } from '../../../ui/types'
 import { ZodIssueCode } from '../error'
 import { RawCreateParams, ZodFirstPartyTypeKind, ZodType, ZodTypeDef } from '../index'
 import { processCreateParams, ZodParsedType } from '../utils'
@@ -7,7 +8,12 @@ export interface ZodSymbolDef extends ZodTypeDef {
   typeName: ZodFirstPartyTypeKind.ZodSymbol
 }
 
-export class ZodSymbol extends ZodType<symbol, ZodSymbolDef, symbol> {
+export class ZodSymbol<UI extends UIComponentDefinitions = DefaultComponentDefinitions> extends ZodType<
+  symbol,
+  ZodSymbolDef,
+  symbol,
+  UI
+> {
   _parse(input: ParseInput): ParseReturnType<this['_output']> {
     const parsedType = this._getType(input)
     if (parsedType !== ZodParsedType.symbol) {

@@ -1,9 +1,10 @@
+import { DefaultComponentDefinitions, UIComponentDefinitions } from '../../../ui/types'
 import { ZodAny } from '../any'
-import { CustomErrorParams, ZodType } from '../index'
+import { CustomErrorParams, ZodType, ZodTypeDef } from '../index'
 
 export type CustomParams = CustomErrorParams & { fatal?: boolean }
 
-export const custom = <T>(
+export const custom = <T, UI extends UIComponentDefinitions = DefaultComponentDefinitions>(
   check?: (data: unknown) => any,
   params: string | CustomParams | ((input: any) => CustomParams) = {},
   /**
@@ -17,7 +18,7 @@ export const custom = <T>(
    *
    */
   fatal?: boolean,
-): ZodType<T> => {
+): ZodType<T, ZodTypeDef, T, UI> => {
   if (check)
     return ZodAny.create().superRefine((data, ctx) => {
       if (!check(data)) {

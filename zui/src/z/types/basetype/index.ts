@@ -1,4 +1,11 @@
-import type { BaseType, UIComponentDefinitions, ZodKindToBaseType, JSONSchema, ParseSchema } from '../../../ui/types'
+import type {
+  BaseType,
+  UIComponentDefinitions,
+  ZodKindToBaseType,
+  JSONSchema,
+  ParseSchema,
+  DefaultComponentDefinitions,
+} from '../../../ui/types'
 import { zuiKey } from '../../../ui/constants'
 import {
   AsyncParseReturnType,
@@ -38,7 +45,6 @@ import {
   ZodUnion,
   KindToDef,
 } from '../index'
-import type { GlobalComponentDefinitions } from '../../../index'
 import type { ZuiSchemaOptions } from '../../../transforms/zui-to-json-schema/zui-extension'
 import { ObjectToZuiOptions } from '../../../transforms/object-to-zui'
 import { ToTypescriptTyingsOptions, toTypescriptTypings } from '../../../transforms/zui-to-typescript'
@@ -48,10 +54,11 @@ export type RefinementCtx = {
   path: (string | number)[]
 }
 export type ZodRawShape = { [k: string]: ZodTypeAny }
-export type ZodTypeAny = ZodType<any, any, any>
-export type TypeOf<T extends ZodType<any, any, any>> = T['_output']
-export type input<T extends ZodType<any, any, any>> = T['_input']
-export type output<T extends ZodType<any, any, any>> = T['_output']
+export type ZodTypeAny = ZodType<any, any, any, any>
+export type TypeOf<T extends ZodType<any, any, any, any>> = T['_output']
+export type input<T extends ZodType<any, any, any, any>> = T['_input']
+export type output<T extends ZodType<any, any, any, any>> = T['_output']
+export type UiOf<T extends ZodType<any, any, any, any>> = T extends ZodType<any, any, any, infer U> ? U : never
 export type { TypeOf as infer }
 
 export type CustomErrorParams = Partial<util.Omit<ZodCustomIssue, 'code'>>
@@ -134,7 +141,12 @@ export type SafeParseError<Input> = {
 
 export type SafeParseReturnType<Input, Output> = SafeParseSuccess<Output> | SafeParseError<Input>
 
-export abstract class ZodType<Output = any, Def extends ZodTypeDef = ZodTypeDef, Input = Output> {
+export abstract class ZodType<
+  Output = any,
+  Def extends ZodTypeDef = ZodTypeDef,
+  Input = Output,
+  UI extends UIComponentDefinitions = DefaultComponentDefinitions,
+> {
   readonly _type!: Output
   readonly _output!: Output
   readonly _input!: Input
@@ -505,10 +517,9 @@ export abstract class ZodType<Output = any, Def extends ZodTypeDef = ZodTypeDef,
   /**
    * The type of component to use to display the field and its options
    */
-  displayAs<
-    UI extends UIComponentDefinitions = GlobalComponentDefinitions,
-    Type extends BaseType = ZodKindToBaseType<this['_def']>,
-  >(options: ParseSchema<UI[Type][keyof UI[Type]]>): this {
+  displayAs<Type extends BaseType = ZodKindToBaseType<this['_def']>>(
+    options: ParseSchema<UI[Type][keyof UI[Type]]>,
+  ): this {
     this._def[zuiKey] ??= {}
     this._def[zuiKey].displayAs = [options.id, options.params]
     return this

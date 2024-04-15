@@ -4,6 +4,7 @@ import {
   output,
   RawCreateParams,
   RefinementCtx,
+  UiOf,
   ZodFirstPartyTypeKind,
   ZodType,
   ZodTypeAny,
@@ -38,7 +39,8 @@ export interface ZodEffectsDef<T extends ZodTypeAny = ZodTypeAny> extends ZodTyp
 export class ZodEffects<T extends ZodTypeAny, Output = output<T>, Input = input<T>> extends ZodType<
   Output,
   ZodEffectsDef<T>,
-  Input
+  Input,
+  UiOf<T>
 > {
   innerType() {
     return this._def.schema

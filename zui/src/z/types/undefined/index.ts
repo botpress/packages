@@ -1,3 +1,4 @@
+import { DefaultComponentDefinitions, UIComponentDefinitions } from '../../../ui/types'
 import { ZodIssueCode } from '../error'
 import { RawCreateParams, ZodFirstPartyTypeKind, ZodType, ZodTypeDef } from '../index'
 import { processCreateParams, ZodParsedType } from '../utils'
@@ -7,7 +8,12 @@ export interface ZodUndefinedDef extends ZodTypeDef {
   typeName: ZodFirstPartyTypeKind.ZodUndefined
 }
 
-export class ZodUndefined extends ZodType<undefined, ZodUndefinedDef> {
+export class ZodUndefined<UI extends UIComponentDefinitions = DefaultComponentDefinitions> extends ZodType<
+  undefined,
+  ZodUndefinedDef,
+  undefined,
+  UI
+> {
   _parse(input: ParseInput): ParseReturnType<this['_output']> {
     const parsedType = this._getType(input)
     if (parsedType !== ZodParsedType.undefined) {

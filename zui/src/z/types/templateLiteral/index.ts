@@ -1,3 +1,4 @@
+import { DefaultComponentDefinitions, UIComponentDefinitions } from '../../../ui/types'
 import { ZodAny } from '../any'
 import { ZodBigInt } from '../bigint'
 import { ZodBoolean } from '../boolean'
@@ -43,7 +44,7 @@ type appendToTemplateLiteral<
     ? Template | appendToTemplateLiteral<Template, UnderlyingType>
     : Suffix extends ZodBranded<infer UnderlyingType, any>
       ? appendToTemplateLiteral<Template, UnderlyingType>
-      : Suffix extends ZodType<infer Output, any, any>
+      : Suffix extends ZodType<infer Output, any, any, any>
         ? Output extends TemplateLiteralPrimitive | bigint
           ? `${Template}${Output}`
           : never
@@ -56,7 +57,10 @@ export interface ZodTemplateLiteralDef extends ZodTypeDef {
   typeName: ZodFirstPartyTypeKind.ZodTemplateLiteral
 }
 
-export class ZodTemplateLiteral<Template extends string = ''> extends ZodType<Template, ZodTemplateLiteralDef> {
+export class ZodTemplateLiteral<
+  Template extends string = '',
+  UI extends UIComponentDefinitions = DefaultComponentDefinitions,
+> extends ZodType<Template, ZodTemplateLiteralDef, Template, UI> {
   interpolated<I extends TemplateLiteralInterpolatedPosition>(
     type: Exclude<I, ZodNever | ZodNaN | ZodPipeline<any, any> | ZodLazy<any>>,
   ): ZodTemplateLiteral<appendToTemplateLiteral<Template, I>> {

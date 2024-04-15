@@ -1,3 +1,4 @@
+import { DefaultComponentDefinitions, UIComponentDefinitions } from '../../../ui/types'
 import { ZodBranded } from '../branded'
 import { ZodCatch } from '../catch'
 import { ZodDefault } from '../default'
@@ -88,7 +89,13 @@ export interface ZodDiscriminatedUnionDef<
 export class ZodDiscriminatedUnion<
   Discriminator extends string,
   Options extends ZodDiscriminatedUnionOption<Discriminator>[],
-> extends ZodType<output<Options[number]>, ZodDiscriminatedUnionDef<Discriminator, Options>, input<Options[number]>> {
+  UI extends UIComponentDefinitions = DefaultComponentDefinitions,
+> extends ZodType<
+  output<Options[number]>,
+  ZodDiscriminatedUnionDef<Discriminator, Options>,
+  input<Options[number]>,
+  UI
+> {
   _parse(input: ParseInput): ParseReturnType<this['_output']> {
     const { ctx } = this._processInputParams(input)
 

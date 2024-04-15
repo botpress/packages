@@ -1,4 +1,5 @@
 import { StringValidation, ZodIssueCode } from '../'
+import { DefaultComponentDefinitions, UIComponentDefinitions } from '../../../ui/types'
 import { RawCreateParams, ZodFirstPartyTypeKind, ZodType, ZodTypeDef } from '../index'
 import { processCreateParams, util, ZodParsedType } from '../utils'
 import { errorUtil } from '../utils/errorUtil'
@@ -87,7 +88,12 @@ function isValidIP(ip: string, version?: IpVersion) {
   return false
 }
 
-export class ZodString extends ZodType<string, ZodStringDef> {
+export class ZodString<UI extends UIComponentDefinitions = DefaultComponentDefinitions> extends ZodType<
+  string,
+  ZodStringDef,
+  string,
+  UI
+> {
   _parse(input: ParseInput): ParseReturnType<string> {
     if (this._def.coerce) {
       input.data = String(input.data)

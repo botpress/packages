@@ -1,4 +1,4 @@
-import { RawCreateParams, ZodFirstPartyTypeKind, ZodType, ZodTypeAny, ZodTypeDef } from '../index'
+import { RawCreateParams, UiOf, ZodFirstPartyTypeKind, ZodType, ZodTypeAny, ZodTypeDef } from '../index'
 import { processCreateParams, ZodParsedType } from '../utils'
 import { OK, ParseInput, ParseReturnType } from '../utils/parseUtil'
 
@@ -12,7 +12,8 @@ export type ZodNullableType<T extends ZodTypeAny> = ZodNullable<T>
 export class ZodNullable<T extends ZodTypeAny> extends ZodType<
   T['_output'] | null,
   ZodNullableDef<T>,
-  T['_input'] | null
+  T['_input'] | null,
+  UiOf<T>
 > {
   _parse(input: ParseInput): ParseReturnType<this['_output']> {
     const parsedType = this._getType(input)

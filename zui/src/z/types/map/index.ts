@@ -14,6 +14,7 @@ export class ZodMap<Key extends ZodTypeAny = ZodTypeAny, Value extends ZodTypeAn
   Map<Key['_output'], Value['_output']>,
   ZodMapDef<Key, Value>,
   Map<Key['_input'], Value['_input']>
+  // TODO: UI
 > {
   get keySchema() {
     return this._def.keyType

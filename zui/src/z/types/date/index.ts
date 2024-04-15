@@ -1,3 +1,4 @@
+import { DefaultComponentDefinitions, UIComponentDefinitions } from '../../../ui/types'
 import { ZodIssueCode } from '../error'
 import { RawCreateParams, ZodFirstPartyTypeKind, ZodType, ZodTypeDef } from '../index'
 import { processCreateParams, util, ZodParsedType } from '../utils'
@@ -13,7 +14,12 @@ export interface ZodDateDef extends ZodTypeDef {
   typeName: ZodFirstPartyTypeKind.ZodDate
 }
 
-export class ZodDate extends ZodType<Date, ZodDateDef> {
+export class ZodDate<UI extends UIComponentDefinitions = DefaultComponentDefinitions> extends ZodType<
+  Date,
+  ZodDateDef,
+  Date,
+  UI
+> {
   _parse(input: ParseInput): ParseReturnType<this['_output']> {
     if (this._def.coerce) {
       input.data = new Date(input.data)

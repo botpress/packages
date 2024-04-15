@@ -1,3 +1,4 @@
+import { DefaultComponentDefinitions, UIComponentDefinitions } from '../../../ui/types'
 import { ZodIssueCode } from '../error'
 import { RawCreateParams, ZodFirstPartyTypeKind, ZodType, ZodTypeDef } from '../index'
 import { processCreateParams, util } from '../utils'
@@ -52,7 +53,10 @@ export function createZodEnum(values: [string, ...string[]], params?: RawCreateP
   })
 }
 
-export class ZodEnum<T extends [string, ...string[]]> extends ZodType<T[number], ZodEnumDef<T>> {
+export class ZodEnum<
+  T extends [string, ...string[]],
+  UI extends UIComponentDefinitions = DefaultComponentDefinitions,
+> extends ZodType<T[number], ZodEnumDef<T>, T[number], UI> {
   _parse(input: ParseInput): ParseReturnType<this['_output']> {
     if (typeof input.data !== 'string') {
       const ctx = this._getOrReturnCtx(input)

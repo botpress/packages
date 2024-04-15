@@ -1,4 +1,4 @@
-import { ZodFirstPartyTypeKind, ZodType, ZodTypeAny, ZodTypeDef } from '../index'
+import { UiOf, ZodFirstPartyTypeKind, ZodType, ZodTypeAny, ZodTypeDef } from '../index'
 import { ParseInput, ParseReturnType } from '../utils/parseUtil'
 
 export interface ZodBrandedDef<T extends ZodTypeAny> extends ZodTypeDef {
@@ -16,7 +16,8 @@ export type BRAND<T extends string | number | symbol> = {
 export class ZodBranded<T extends ZodTypeAny, B extends string | number | symbol> extends ZodType<
   T['_output'] & BRAND<B>,
   ZodBrandedDef<T>,
-  T['_input']
+  T['_input'],
+  UiOf<T>
 > {
   _parse(input: ParseInput): ParseReturnType<any> {
     const { ctx } = this._processInputParams(input)

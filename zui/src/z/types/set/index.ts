@@ -1,5 +1,13 @@
 import { ZodIssueCode } from '../error'
-import { ParseInputLazyPath, RawCreateParams, ZodFirstPartyTypeKind, ZodType, ZodTypeAny, ZodTypeDef } from '../index'
+import {
+  ParseInputLazyPath,
+  RawCreateParams,
+  UiOf,
+  ZodFirstPartyTypeKind,
+  ZodType,
+  ZodTypeAny,
+  ZodTypeDef,
+} from '../index'
 import { processCreateParams, ZodParsedType } from '../utils'
 import { errorUtil } from '../utils/errorUtil'
 import { addIssueToContext, INVALID, ParseInput, ParseReturnType, SyncParseReturnType } from '../utils/parseUtil'
@@ -14,7 +22,8 @@ export interface ZodSetDef<Value extends ZodTypeAny = ZodTypeAny> extends ZodTyp
 export class ZodSet<Value extends ZodTypeAny = ZodTypeAny> extends ZodType<
   Set<Value['_output']>,
   ZodSetDef<Value>,
-  Set<Value['_input']>
+  Set<Value['_input']>,
+  UiOf<Value>
 > {
   _parse(input: ParseInput): ParseReturnType<this['_output']> {
     const { status, ctx } = this._processInputParams(input)

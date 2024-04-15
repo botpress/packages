@@ -86,22 +86,22 @@ test('recursion involving union type', () => {
 //   a: A;
 // }
 
-// const A: z.ZodType<A> = z.late.object(() => ({
+// const A: z.ZodType<A, UI> = z.late.object(() => ({
 //   val: z.number(),
 //   b: B,
 // }));
 
-// const B: z.ZodType<B> = z.late.object(() => ({
+// const B: z.ZodType<B, UI> = z.late.object(() => ({
 //   val: z.number(),
 //   a: A,
 // }));
 
-// const Alazy: z.ZodType<A> = z.lazy(() => z.object({
+// const Alazy: z.ZodType<A, UI> = z.lazy(() => z.object({
 //   val: z.number(),
 //   b: B,
 // }));
 
-// const Blazy: z.ZodType<B> = z.lazy(() => z.object({
+// const Blazy: z.ZodType<B, UI> = z.lazy(() => z.object({
 //   val: z.number(),
 //   a: A,
 // }));
@@ -156,7 +156,7 @@ test('recursion involving union type', () => {
 //     subcategories: Category[];
 //   }
 
-//   const Category: z.ZodType<Category> = z.late.object(() => ({
+//   const Category: z.ZodType<Category, UI> = z.late.object(() => ({
 //     name: z.string(),
 //     subcategories: z.array(Category),
 //   }));
@@ -177,7 +177,7 @@ test('recursion involving union type', () => {
 
 //   type Category = BaseCategory & { subcategories: Category[] };
 
-//   const Category: z.ZodType<Category> = z.late
+//   const Category: z.ZodType<Category, UI> = z.late
 //     .object(() => ({
 //       subcategories: z.array(Category),
 //     }))

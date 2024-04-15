@@ -1,4 +1,4 @@
-import { input, output, RawCreateParams, ZodFirstPartyTypeKind, ZodType, ZodTypeAny, ZodTypeDef } from '../index'
+import { input, output, RawCreateParams, UiOf, ZodFirstPartyTypeKind, ZodType, ZodTypeAny, ZodTypeDef } from '../index'
 import { processCreateParams } from '../utils'
 import { ParseInput, ParseReturnType } from '../utils/parseUtil'
 
@@ -15,7 +15,7 @@ export interface ZodLazyDef<T extends ZodTypeAny = ZodTypeAny> extends ZodTypeDe
   typeName: ZodFirstPartyTypeKind.ZodLazy
 }
 
-export class ZodLazy<T extends ZodTypeAny> extends ZodType<output<T>, ZodLazyDef<T>, input<T>> {
+export class ZodLazy<T extends ZodTypeAny> extends ZodType<output<T>, ZodLazyDef<T>, input<T>, UiOf<T>> {
   get schema(): T {
     return this._def.getter()
   }

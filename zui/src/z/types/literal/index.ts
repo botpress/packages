@@ -1,3 +1,4 @@
+import { DefaultComponentDefinitions, UIComponentDefinitions } from '../../../ui/types'
 import { ZodIssueCode } from '../error'
 import { RawCreateParams, ZodFirstPartyTypeKind, ZodType, ZodTypeDef } from '../index'
 import { processCreateParams } from '../utils'
@@ -9,7 +10,12 @@ export interface ZodLiteralDef<T = any> extends ZodTypeDef {
   typeName: ZodFirstPartyTypeKind.ZodLiteral
 }
 
-export class ZodLiteral<T> extends ZodType<T, ZodLiteralDef<T>> {
+export class ZodLiteral<T, UI extends UIComponentDefinitions = DefaultComponentDefinitions> extends ZodType<
+  T,
+  ZodLiteralDef<T>,
+  T,
+  UI
+> {
   _parse(input: ParseInput): ParseReturnType<this['_output']> {
     if (input.data !== this._def.value) {
       const ctx = this._getOrReturnCtx(input)

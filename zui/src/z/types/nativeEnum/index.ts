@@ -1,3 +1,4 @@
+import { DefaultComponentDefinitions, UIComponentDefinitions } from '../../../ui/types'
 import { ZodIssueCode } from '../error'
 import { RawCreateParams, ZodFirstPartyTypeKind, ZodType, ZodTypeDef } from '../index'
 import { processCreateParams, util, ZodParsedType } from '../utils'
@@ -10,7 +11,10 @@ export interface ZodNativeEnumDef<T extends EnumLike = EnumLike> extends ZodType
 
 export type EnumLike = { [k: string]: string | number; [nu: number]: string }
 
-export class ZodNativeEnum<T extends EnumLike> extends ZodType<T[keyof T], ZodNativeEnumDef<T>> {
+export class ZodNativeEnum<
+  T extends EnumLike,
+  UI extends UIComponentDefinitions = DefaultComponentDefinitions,
+> extends ZodType<T[keyof T], ZodNativeEnumDef<T>, T[keyof T], UI> {
   _parse(input: ParseInput): ParseReturnType<T[keyof T]> {
     const nativeEnumValues = util.getValidEnumValues(this._def.values)
 

@@ -22,6 +22,7 @@ export class ZodUnion<T extends ZodUnionOptions> extends ZodType<
   T[number]['_output'],
   ZodUnionDef<T>,
   T[number]['_input']
+  // TODO: UI
 > {
   _parse(input: ParseInput): ParseReturnType<this['_output']> {
     const { ctx } = this._processInputParams(input)

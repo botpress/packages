@@ -1,4 +1,5 @@
 import { ZodError } from '../error'
+import { UiOf } from '../basetype'
 import { RawCreateParams, ZodFirstPartyTypeKind, ZodType, ZodTypeAny, ZodTypeDef } from '../index'
 import { processCreateParams } from '../utils'
 import { isAsync, ParseContext, ParseInput, ParseReturnType } from '../utils/parseUtil'
@@ -20,7 +21,8 @@ export interface ZodCatchDef<T extends ZodTypeAny = ZodTypeAny> extends ZodTypeD
 export class ZodCatch<T extends ZodTypeAny> extends ZodType<
   T['_output'],
   ZodCatchDef<T>,
-  unknown // any input will pass validation // T["_input"]
+  unknown, // any input will pass validation // T["_input"]
+  UiOf<T>
 > {
   _parse(input: ParseInput): ParseReturnType<this['_output']> {
     const { ctx } = this._processInputParams(input)

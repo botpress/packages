@@ -1,3 +1,4 @@
+import { DefaultComponentDefinitions, UIComponentDefinitions } from '../../../ui/types'
 import { ZodIssueCode } from '../error'
 import { ParseInputLazyPath, RawCreateParams, ZodFirstPartyTypeKind, ZodType, ZodTypeAny, ZodTypeDef } from '../index'
 import { processCreateParams, ZodParsedType } from '../utils'
@@ -18,10 +19,15 @@ export type arrayOutputType<
   Cardinality extends ArrayCardinality = 'many',
 > = Cardinality extends 'atleastone' ? [T['_output'], ...T['_output'][]] : T['_output'][]
 
-export class ZodArray<T extends ZodTypeAny, Cardinality extends ArrayCardinality = 'many'> extends ZodType<
+export class ZodArray<
+  T extends ZodTypeAny,
+  Cardinality extends ArrayCardinality = 'many',
+  UI extends UIComponentDefinitions = DefaultComponentDefinitions,
+> extends ZodType<
   arrayOutputType<T, Cardinality>,
   ZodArrayDef<T>,
-  Cardinality extends 'atleastone' ? [T['_input'], ...T['_input'][]] : T['_input'][]
+  Cardinality extends 'atleastone' ? [T['_input'], ...T['_input'][]] : T['_input'][],
+  UI
 > {
   _parse(input: ParseInput): ParseReturnType<this['_output']> {
     const { ctx, status } = this._processInputParams(input)

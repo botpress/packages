@@ -29,5 +29,6 @@
     "@types/pg": "^8.6.6",
     "esbuild": "^0.20.0",
     "typescript": "5.4.5"
-  }
+  },
+  "packageManager": "pnpm@8.6.0+"
 }

@@ -29,5 +29,6 @@
     "type:check": "tsc --noEmit",
     "test": "vitest",
     "clean": "rimraf ./dist && rimraf ./node_modules"
-  }
+  },
+  "packageManager": "pnpm@8.6.0+"
 }

@@ -41,5 +41,6 @@
   "bugs": {
     "url": "https://github.com/botpress/packages/issues"
   },
-  "homepage": "https://github.com/botpress/packages#readme"
+  "homepage": "https://github.com/botpress/packages#readme",
+  "packageManager": "pnpm@8.6.0+"
 }

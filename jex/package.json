@@ -34,5 +34,6 @@
     "@types/json-schema": "^7.0.15",
     "lodash": "^4.17.21",
     "node-fetch": "^3.3.2"
-  }
+  },
+  "packageManager": "pnpm@8.6.0+"
 }

@@ -1,19 +1,18 @@
 * @botpress/cloud-services
 
 const @botpress/cloud-services
-
-entities @franklevasseur
-depsynky @franklevasseur
-es-node @franklevasseur
-expresso @franklevasseur
-jex @franklevasseur
-log4bot @franklevasseur
-opapi @michaelmass @franklevasseur
-promex @michaelmass
-ptb-schema @franklevasseur
-readiness @franklevasseur
-trail @michaelmass
-tunnel @franklevasseur
-verel @franklevasseur
-yargs-extra @franklevasseur
-zui @charlescatta
+entities @franklevasseur @botpress/cloud-services
+depsynky @franklevasseur @botpress/cloud-services
+es-node @franklevasseur @botpress/cloud-services
+expresso @franklevasseur @botpress/cloud-services
+jex @franklevasseur @botpress/cloud-services
+log4bot @franklevasseur @botpress/cloud-services
+opapi @michaelmass @franklevasseur @botpress/cloud-services
+promex @michaelmass @botpress/cloud-services
+ptb-schema @franklevasseur @botpress/cloud-services
+readiness @franklevasseur @botpress/cloud-services
+trail @michaelmass @botpress/cloud-services
+tunnel @franklevasseur @botpress/cloud-services
+verel @franklevasseur @botpress/cloud-services
+yargs-extra @franklevasseur @botpress/cloud-services
+zui @charlescatta @botpress/cloud-services

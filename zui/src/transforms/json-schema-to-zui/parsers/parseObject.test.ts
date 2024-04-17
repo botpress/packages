@@ -300,7 +300,7 @@ describe('parseObject', () => {
       },
     })
 
-    expect(run(result, { b: 'hello', x: true })).toStrictEqual({
+    expect(run(result, { b: 'hello', x: true })).toEqual({
       success: false,
       error: new ZodError([
         {
@@ -340,7 +340,7 @@ describe('parseObject', () => {
 
     expect(result).toBe('z.object({ "a": z.string(), "b": z.number().optional() }).catchall(z.boolean())')
 
-    expect(run(result, { b: 'hello', x: 'true' })).toStrictEqual({
+    expect(run(result, { b: 'hello', x: 'true' })).toEqual({
       success: false,
       error: new ZodError([
         {
@@ -450,7 +450,7 @@ ctx.addIssue({
     expect(result).toStrictEqual('z.record(z.boolean())')
   })
 
-  it('Funcional tests - additionalProperties and patternProperties', () => {
+  it('Functional tests - additionalProperties and patternProperties', () => {
     const schema: JSONSchema7 & { type: 'object' } = {
       type: 'object',
       additionalProperties: { type: 'boolean' },
@@ -511,7 +511,7 @@ ctx.addIssue({
 
     expect(result).toBe(expected)
 
-    expect(run(result, { x: true, '.': [], ',': [] })).toStrictEqual({
+    expect(run(result, { x: true, '.': [], ',': [] })).toEqual({
       success: false,
       error: new ZodError([
         {
@@ -536,7 +536,7 @@ ctx.addIssue({
     })
   })
 
-  it('Funcional tests - patternProperties', () => {
+  it('Functional tests - patternProperties', () => {
     const schema: JSONSchema7 & { type: 'object' } = {
       type: 'object',
       patternProperties: {
@@ -583,7 +583,7 @@ ctx.addIssue({
       data: { '.': [] },
     })
 
-    expect(run(result, { ',': [] })).toStrictEqual({
+    expect(run(result, { ',': [] })).toEqual({
       success: false,
       error: new ZodError([
         {

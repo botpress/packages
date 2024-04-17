@@ -9,7 +9,10 @@ describe('parseString', () => {
   it('DateTime format', () => {
     const datetime = '2018-11-13T20:20:39Z'
 
-    expect(run(parseString({ type: 'string', format: 'date-time' }), datetime)).toBe({ success: true, data: datetime })
+    expect(run(parseString({ type: 'string', format: 'date-time' }), datetime)).toStrictEqual({
+      success: true,
+      data: datetime,
+    })
   })
 
   it('should accept errorMessage', () => {

@@ -1,6 +1,6 @@
 {
   "name": "@bpinternal/tunnel",
-  "version": "0.1.6",
+  "version": "0.1.7",
   "description": "Tunneling logic for client and server",
   "main": "./dist/index.cjs",
   "browser": "./dist/index.mjs",
@@ -27,7 +27,7 @@
     "@tsconfig/node18-strictest": "^1.0.0",
     "@types/lodash": "^4.14.195",
     "@types/node": "^18.11.17",
-    "@types/web": "^0.0.142",
+    "@types/web": "^0.0.143",
     "esbuild": "^0.20.0",
     "puppeteer": "^22.0.0",
     "ts-node": "^10.9.1",

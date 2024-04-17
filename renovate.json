@@ -11,6 +11,9 @@
   "timezone": "America/Toronto",
   "schedule": ["before 3am every monday"],
   "bumpVersion": "patch",
+  "constraints": {
+    "pnpm": ">=8.6.0 <9"
+  },
   "packageRules": [
     {
       "matchPackageNames": ["@types/react", "react-dom", "react"],

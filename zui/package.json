@@ -61,7 +61,6 @@
   },
   "dependencies": {
     "@apidevtools/json-schema-ref-parser": "^11.5.4",
-    "@bpinternal/json-schema-to-zod": "^2.0.15",
     "lodash": "^4.17.21",
     "react": "^18.2.0"
   },

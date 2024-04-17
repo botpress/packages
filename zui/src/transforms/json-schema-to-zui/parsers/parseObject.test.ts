@@ -259,7 +259,7 @@ describe('parseObject', () => {
     eval(`const {z} = require("@bpinternal/zui"); ${output}.safeParse(${JSON.stringify(data)})`)
 
   it('Functional tests - run', () => {
-    expect(run('z.string()', 'hello')).toBe({
+    expect(run('z.string()', 'hello')).toStrictEqual({
       success: true,
       data: 'hello',
     })
@@ -283,16 +283,16 @@ describe('parseObject', () => {
 
     const result = parseObject(schema, { path: [], seen: new Map() })
 
-    expect(result).toBe(expected)
+    expect(result).toStrictEqual(expected)
 
-    expect(run(result, { a: 'hello' })).toBe({
+    expect(run(result, { a: 'hello' })).toStrictEqual({
       success: true,
       data: {
         a: 'hello',
       },
     })
 
-    expect(run(result, { a: 'hello', b: 123 })).toBe({
+    expect(run(result, { a: 'hello', b: 123 })).toStrictEqual({
       success: true,
       data: {
         a: 'hello',
@@ -300,7 +300,7 @@ describe('parseObject', () => {
       },
     })
 
-    expect(run(result, { b: 'hello', x: true })).toBe({
+    expect(run(result, { b: 'hello', x: true })).toStrictEqual({
       success: false,
       error: new ZodError([
         {
@@ -340,7 +340,7 @@ describe('parseObject', () => {
 
     expect(result).toBe('z.object({ "a": z.string(), "b": z.number().optional() }).catchall(z.boolean())')
 
-    expect(run(result, { b: 'hello', x: 'true' })).toBe({
+    expect(run(result, { b: 'hello', x: 'true' })).toStrictEqual({
       success: false,
       error: new ZodError([
         {
@@ -511,7 +511,7 @@ ctx.addIssue({
 
     expect(result).toBe(expected)
 
-    expect(run(result, { x: true, '.': [], ',': [] })).toEqual({
+    expect(run(result, { x: true, '.': [], ',': [] })).toStrictEqual({
       success: false,
       error: new ZodError([
         {
@@ -578,12 +578,12 @@ ctx.addIssue({
 
     const result = parseObject(schema, { path: [], seen: new Map() })
 
-    expect(run(result, { '.': [] })).toBe({
+    expect(run(result, { '.': [] })).toStrictEqual({
       success: true,
       data: { '.': [] },
     })
 
-    expect(run(result, { ',': [] })).toBe({
+    expect(run(result, { ',': [] })).toStrictEqual({
       success: false,
       error: new ZodError([
         {

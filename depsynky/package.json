@@ -1,6 +1,6 @@
 {
   "name": "@bpinternal/depsynky",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "CLI to synchronize dependencies accross a pnpm mono-repo",
   "main": "dist/index.js",
   "scripts": {
@@ -16,7 +16,7 @@
   "author": "",
   "license": "MIT",
   "dependencies": {
-    "@bpinternal/yargs-extra": "^0.0.3",
+    "@bpinternal/yargs-extra": "^0.0.5",
     "chalk": "^4.1.2",
     "glob": "^9.3.4",
     "prettier": "^2.8.1",

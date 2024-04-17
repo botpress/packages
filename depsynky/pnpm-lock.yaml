@@ -6,8 +6,8 @@ settings:
 
 dependencies:
   '@bpinternal/yargs-extra':
-    specifier: ^0.0.3
-    version: 0.0.3
+    specifier: ^0.0.5
+    version: 0.0.5
   chalk:
     specifier: ^4.1.2
     version: 4.1.2
@@ -52,8 +52,8 @@ devDependencies:
 
 packages:
 
-  /@bpinternal/yargs-extra@0.0.3:
-    resolution: {integrity: sha512-e/unlq0LX4CJUv1jGOv1UgwB/h2M0NCXnwD4lEw496GpkQikO668RS+BBlRhkqdGfZmvKDkXZZ96xJCn+i6Ymg==}
+  /@bpinternal/yargs-extra@0.0.5:
+    resolution: {integrity: sha512-1mMFhaIQLh7biz086Fcq3MvIGEgVj5Qq7Vd+dDEnip4aBdrXeMDtwFQIfvEx+uhp6lzXPf8ScpGBmaraQjgdGw==}
     dependencies:
       '@types/yargs': 17.0.32
       decamelize: 5.0.1

@@ -33,5 +33,9 @@
   "keywords": [],
   "author": "",
   "license": "MIT",
+  "engines": {
+    "node": ">=16.0.0",
+    "pnpm": ">=8.6.0 <9"
+  },
   "packageManager": "pnpm@8.6.0+"
 }

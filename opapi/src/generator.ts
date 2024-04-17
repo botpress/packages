@@ -170,14 +170,13 @@ export const generateClientWithHeyApi = async (state: State<string, string, stri
     input: openapiFile,
     output: clientDir,
     name: 'DefaultClient',
-    format: true,
   })
 
   console.log('Generating index file')
-  await heyApiGen.exportHeyApiIndex(indexFile)
+  await heyApiGen.exportHeyApiIndex(state, indexFile)
 
   console.log('Generating request file')
-  await heyApiGen.exportHeyApiRequest(requestFile, state.metadata.version)
+  await heyApiGen.exportHeyApiRequest(state, requestFile)
 }
 
 export function generateErrorsFile(errors: ApiError[], dir = '.') {

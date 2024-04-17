@@ -1,6 +1,6 @@
 import { camel } from 'radash'
-import { saveFile } from 'src/file'
-import log from 'src/log'
+import { saveFile } from '../file'
+import log from '../log'
 import * as helpers from './helpers'
 import { Block, BlockComposer, DefaultState, OperationParser, SectionParser } from './types'
 

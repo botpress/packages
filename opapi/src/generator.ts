@@ -27,6 +27,8 @@ import {
 import { Block } from './section-types-generator/types'
 import { ApiError, isOperationWithBodyProps, type Operation, type State } from './state'
 import { generateSectionsFile } from './section-types-generator/generator'
+import { renderTemplate } from './generators/openapi-generator-template'
+import fs from 'fs'
 
 /**
  * Generates files containing typescript types for each item in the state object - Sections, Operations, Responses, etc.
@@ -110,6 +112,10 @@ export const generateClient = async (
   const openapi = createOpenapi(state)
   const openapiSpecString = openapi.getSpecAsJson()
   const openapiSpec = JSON.parse(openapiSpecString)
+
+  const output = renderTemplate()
+  fs.writeFileSync(`${dir}/test.ts`, output)
+
   log.info('')
 
   log.info('Running OpenAPI code generator')

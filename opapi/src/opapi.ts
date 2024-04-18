@@ -1,6 +1,7 @@
 import { extendApi, OpenApiZodAny } from '@anatine/zod-openapi'
 import {
   generateClientWithOpenapiGenerator,
+  generateClientWithOpapi,
   generateErrorsFile,
   generateOpenapi,
   generateServer,
@@ -10,7 +11,6 @@ import { addOperation } from './operation'
 import { ApiError, ComponentType, createState, getRef, Metadata, Operation, Options, Parameter, State } from './state'
 import { exportStateAsTypescript, ExportStateAsTypescriptOptions } from './generators/ts-state'
 import { generateHandler } from './handler-generator'
-import { generateClientWithOpapi } from './client-generator'
 export { Operation, Parameter } from './state'
 
 type ExtendApi = typeof extendApi

@@ -4,9 +4,12 @@ import * as utils from './utils'
 import _ from 'lodash'
 import { partiallyUnref } from './unref'
 
-const s = utils.jsonSchemaBuilder
+// ### request ###
 
-const mapQuery = (q: Parameter<'json-schema'>): JSONSchema7 => {
+type PathParam = Extract<Parameter<'json-schema'>, { in: 'path' }>
+type OptionalParam = Exclude<Parameter<'json-schema'>, { in: 'path' }>
+
+const _mapQuery = (q: Parameter<'json-schema'>, s: utils.JsonSchemaBuilder): JSONSchema7 => {
   if (q.in !== 'query') {
     throw new Error(`Expected query parameter, got ${q.in}`)
   }
@@ -29,13 +32,15 @@ const mapQuery = (q: Parameter<'json-schema'>): JSONSchema7 => {
   return schema
 }
 
-type PathParam = Extract<Parameter<'json-schema'>, { in: 'path' }>
-type OptionalParam = Exclude<Parameter<'json-schema'>, { in: 'path' }>
+type RequestProp = 'headers' | 'query' | 'params' | 'path' | 'method'
+type RequestOptionalProps = 'body'
+export type RequestShape = Record<RequestProp, JSONSchema7> & Record<RequestOptionalProps, JSONSchema7 | undefined>
 
-export const toRequestSchema = (
+export const toRequestShape = (
   _state: State<string, string, string>,
   op: Operation<string, string, string, 'json-schema'>,
-): JSONSchema7 => {
+  s: utils.JsonSchemaBuilder = utils.jsonSchemaBuilder,
+): RequestShape => {
   const headerParams = utils.filterObject(op.parameters ?? {}, (p): p is OptionalParam => p.in === 'header')
   const queryParams = utils.filterObject(op.parameters ?? {}, (p): p is OptionalParam => p.in === 'query')
   const pathParams = utils.filterObject(op.parameters ?? {}, (p): p is PathParam => p.in === 'path')
@@ -52,7 +57,7 @@ export const toRequestSchema = (
     .filter(([_, q]) => q.required)
     .map(([k]) => k)
   const queryParamsSchema = s.object(
-    _.mapValues(queryParams, (q) => mapQuery(q)),
+    _.mapValues(queryParams, (q) => _mapQuery(q, s)),
     requiredQueryParams,
   )
 
@@ -72,35 +77,63 @@ export const toRequestSchema = (
 
   if (op.method === 'post' || op.method === 'put' || op.method === 'patch') {
     const bodySchema = op.requestBody.schema as JSONSchema7
-    return s.object({
+    return {
       ...rawShape,
-      body: { ...bodySchema, additionalProperties: true }, // passthrough
-    })
+      body: bodySchema,
+    }
   }
-
-  return s.object(rawShape)
+  return { ...rawShape, body: undefined }
 }
 
-const unrefResponseSchema = (state: State<string, string, string>, responseSchema: JSONSchema7): JSONSchema7 => {
+export const toRequestSchema = (
+  state: State<string, string, string>,
+  op: Operation<string, string, string, 'json-schema'>,
+  s: utils.JsonSchemaBuilder = utils.jsonSchemaBuilder,
+): JSONSchema7 => {
+  const { body, ...shape } = toRequestShape(state, op, s)
+  if (body) {
+    return s.object({
+      ...shape,
+      body: {
+        ...body,
+        additionalProperties: true, // passthrough
+      },
+    })
+  }
+  return s.object(shape)
+}
+
+// ### response ###
+
+type ResponseProp = 'status' | 'headers' | 'body'
+export type ResponseShape = Record<ResponseProp, JSONSchema7>
+
+const _unrefResponseSchema = (state: State<string, string, string>, responseSchema: JSONSchema7): JSONSchema7 => {
   const models = _(state.schemas)
     .mapKeys((_schema, name) => `#/components/schemas/${name}`)
     .mapValues((s) => s.schema as JSONSchema7)
     .value()
-
   return partiallyUnref(responseSchema, models)
+}
+
+export const toResponseShape = (
+  state: State<string, string, string>,
+  op: Operation<string, string, string, 'json-schema'>,
+  s: utils.JsonSchemaBuilder = utils.jsonSchemaBuilder,
+): ResponseShape => {
+  const responseSchema = _unrefResponseSchema(state, op.response.schema as JSONSchema7)
+  return {
+    status: s.number(),
+    headers: s.record(s.string()),
+    body: responseSchema,
+  }
 }
 
 export const toResponseSchema = (
   state: State<string, string, string>,
   op: Operation<string, string, string, 'json-schema'>,
+  s: utils.JsonSchemaBuilder = utils.jsonSchemaBuilder,
 ): JSONSchema7 => {
-  const responseSchema = unrefResponseSchema(state, op.response.schema as JSONSchema7)
-  return s.object(
-    {
-      status: s.number(),
-      headers: s.record(s.string()),
-      body: responseSchema,
-    },
-    ['body'],
-  )
+  const rawShape = toResponseShape(state, op, s)
+  return s.object(rawShape, ['body'])
 }

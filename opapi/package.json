@@ -17,8 +17,7 @@
     "build": "tsup src/index.ts --dts --format cjs,esm --clean",
     "type:check": "tsc --noEmit",
     "format:check": "prettier --check .",
-    "format:fix": "prettier --write .",
-    "prettier": "3.2.5"
+    "format:fix": "prettier --write ."
   },
   "devDependencies": {
     "@swc/core": "1.4.15",
@@ -29,6 +28,7 @@
     "@types/lodash": "^4.17.0",
     "@types/node": "18.19.31",
     "@types/verror": "1.10.10",
+    "prettier": "3.2.5",
     "ts-node": "10.9.2",
     "tsup": "8.0.2",
     "typescript": "5.4.5",

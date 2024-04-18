@@ -9,13 +9,19 @@ import { State } from '../state'
 import { generateErrors } from '../generators/errors'
 
 const HEADER = `// this file was automatically generated, do not edit
-// @ts-nocheck\n`
+/* eslint-disable */
+`
 
 const toTs = async (schema: JSONSchema7, name: string): Promise<string> => {
   const { title, ...rest } = schema
   type jsonSchemaToTsInput = Parameters<typeof compile>[0]
   const typeCode = await compile(rest as jsonSchemaToTsInput, name, { unknownAny: false, bannerComment: '' })
   return `${typeCode}\n`
+}
+
+const writeTs = async (file: string, tsCode: string) => {
+  // TODO: format code here
+  await fslib.promises.writeFile(file, tsCode)
 }
 
 class Names {
@@ -61,7 +67,7 @@ export const generateClientWithOpapi = async (state: State<string, string, strin
   for (const [name, schema] of Object.entries(modelSchemas)) {
     modelCode += await toTs(schema, name)
   }
-  fslib.writeFileSync(modelsFile, modelCode)
+  await writeTs(modelsFile, modelCode)
 
   console.log('Generating operations')
   for (const [name, op] of Object.entries(operationsByName)) {
@@ -116,17 +122,18 @@ export const generateClientWithOpapi = async (state: State<string, string, strin
 
     const code = `${HEADER}\n${requestCode}\n${responseCode}`
     const file = pathlib.join(operationsDir, `${name}.ts`)
-    fslib.writeFileSync(file, code)
+    await writeTs(file, code)
   }
 
   console.log('generating errors file')
   const errorsFileContent = generateErrors(state.errors ?? [])
-  await fslib.promises.writeFile(errorsFile, errorsFileContent)
+  await writeTs(errorsFile, errorsFileContent)
 
   console.log('Generating index file')
-
   let indexCode = `${HEADER}\n`
-  indexCode += 'import { AxiosInstance } from "axios"\n'
+  indexCode += "import axios, { AxiosInstance } from 'axios'\n"
+  indexCode += "import { errorFrom } from './errors'\n\n"
+
   for (const [name] of Object.entries(operationsByName)) {
     indexCode += `import * as ${name} from './operations/${name}'\n`
   }
@@ -139,7 +146,7 @@ export const generateClientWithOpapi = async (state: State<string, string, strin
   for (const [name, operation] of Object.entries(operationsByName)) {
     const { inputName, resName } = Names.of(name)
     indexCode += [
-      `  public async ${name}(input: ${name}.${inputName}): Promise<${name}.${resName}> {`,
+      `  public readonly ${name} = async (input: ${name}.${inputName}): Promise<${name}.${resName}> => {`,
       `    const { path, headers, query, body } = ${name}.parseReq(input)`,
       `    return this.axiosInstance.request<${name}.${resName}>({`,
       `      method: '${operation.method}',`,
@@ -147,10 +154,22 @@ export const generateClientWithOpapi = async (state: State<string, string, strin
       `      headers,`,
       `      params: query,`,
       `      data: body,`,
-      `    }).then((res) => res.data)`,
+      `    })`,
+      `      .then((res) => res.data)`,
+      `      .catch((e) => { throw getError(e) })`,
       '  }\n\n',
     ].join('\n')
   }
   indexCode += '}\n'
-  fslib.writeFileSync(indexFile, indexCode)
+
+  indexCode += [
+    'function getError(err: Error) {',
+    '  if (axios.isAxiosError(err) && err.response?.data) {',
+    '    return errorFrom(err.response.data)',
+    '  }',
+    '  return errorFrom(err)',
+    '}\n',
+  ].join('\n')
+
+  await writeTs(indexFile, indexCode)
 }

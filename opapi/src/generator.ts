@@ -98,7 +98,7 @@ export const generateServer = async (state: State<string, string, string>, dir: 
   log.info('')
 }
 
-export const generateClient = async (
+export const generateClientWithOpenapiGenerator = async (
   state: State<string, string, string>,
   dir = '.',
   openApiGeneratorEndpoint: string,

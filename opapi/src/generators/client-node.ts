@@ -25,10 +25,14 @@ const HEADER = `// this file was automatically generated, do not edit
 `
 
 // replace all occurences of { type: T, nullable: true } with { anyOf: [{ type: T }, { type: 'null' }] }
-const fixJsonSchema = (schema: JSONSchema7): JSONSchema7 => {
-  if ((schema as any).nullable) {
-    return { anyOf: [{ type: schema.type }, { type: 'null' }] }
+type NullableJsonSchema = JSONSchema7 & { nullable?: boolean }
+const fixJsonSchema = (nullableSchema: NullableJsonSchema): JSONSchema7 => {
+  const { nullable, ...schema } = nullableSchema
+  if (nullable) {
+    const { title, description, ...rest } = schema
+    return { title, description, anyOf: [rest, { type: 'null' }] }
   }
+
   if (schema.type === 'object') {
     const properties = schema.properties ? _.mapValues(schema.properties, fixJsonSchema) : schema.properties
     const additionalProperties =
@@ -37,12 +41,13 @@ const fixJsonSchema = (schema: JSONSchema7): JSONSchema7 => {
         : schema.additionalProperties
     return { ...schema, properties, additionalProperties }
   }
+
   return schema
 }
 
 const toTs = async (originalSchema: JSONSchema7, name: string): Promise<string> => {
   let { title, ...schema } = originalSchema
-  schema = fixJsonSchema(schema)
+  schema = fixJsonSchema(schema as NullableJsonSchema)
 
   type jsonSchemaToTsInput = Parameters<typeof compile>[0]
   const typeCode = await compile(schema as jsonSchemaToTsInput, name, { unknownAny: false, bannerComment: '' })

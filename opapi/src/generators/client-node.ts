@@ -24,10 +24,29 @@ const HEADER = `// this file was automatically generated, do not edit
 /* eslint-disable */
 `
 
-const toTs = async (schema: JSONSchema7, name: string): Promise<string> => {
-  const { title, ...rest } = schema
+// replace all occurences of { type: T, nullable: true } with { anyOf: [{ type: T }, { type: 'null' }] }
+const fixJsonSchema = (schema: JSONSchema7): JSONSchema7 => {
+  if ((schema as any).nullable) {
+    return { anyOf: [{ type: schema.type }, { type: 'null' }] }
+  }
+  if (schema.type === 'object') {
+    const properties = schema.properties ? _.mapValues(schema.properties, fixJsonSchema) : schema.properties
+    const additionalProperties =
+      typeof schema.additionalProperties === 'object'
+        ? fixJsonSchema(schema.additionalProperties)
+        : schema.additionalProperties
+    return { ...schema, properties, additionalProperties }
+  }
+  return schema
+}
+
+const toTs = async (originalSchema: JSONSchema7, name: string): Promise<string> => {
+  let { title, ...schema } = originalSchema
+  schema = fixJsonSchema(schema)
+
   type jsonSchemaToTsInput = Parameters<typeof compile>[0]
-  const typeCode = await compile(rest as jsonSchemaToTsInput, name, { unknownAny: false, bannerComment: '' })
+  const typeCode = await compile(schema as jsonSchemaToTsInput, name, { unknownAny: false, bannerComment: '' })
+
   return `${typeCode}\n`
 }
 
@@ -94,7 +113,8 @@ export const generateOperations = async (state: State<string, string, string>, o
     requestCode += await toTs(query, queryName)
     requestCode += await toTs(params, paramsName)
     if (reqBody) {
-      requestCode += await toTs(reqBody, reqBodyName)
+      const tsCode = await toTs(reqBody, reqBodyName)
+      requestCode += tsCode
     } else {
       requestCode += `export interface ${reqBodyName} {}\n\n`
     }

@@ -4,7 +4,12 @@ import _ from 'lodash'
 import * as utils from '../handler-generator/utils'
 import { partiallyUnref } from '../handler-generator/unref'
 
-const s = utils.jsonSchemaBuilder
+type ObjectBuilder = typeof utils.jsonSchemaBuilder.object
+const objectBuilder: ObjectBuilder = (...args) => ({
+  ...utils.jsonSchemaBuilder.object(...args),
+  additionalProperties: false,
+})
+const s = { ...utils.jsonSchemaBuilder, object: objectBuilder }
 
 const mapQuery = (q: Parameter<'json-schema'>): JSONSchema7 => {
   if (q.in !== 'query') {
@@ -89,7 +94,7 @@ export const toRequestSchema = (
     const bodySchema = op.requestBody.schema as JSONSchema7
     return {
       ...rawShape,
-      body: { ...bodySchema }, // passthrough
+      body: { ...bodySchema },
     }
   }
 

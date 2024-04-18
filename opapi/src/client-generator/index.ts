@@ -2,11 +2,11 @@ import { compile } from 'json-schema-to-typescript'
 import * as utils from '../handler-generator/utils'
 import fslib from 'fs'
 import pathlib from 'path'
-import prettier from 'prettier'
 import _ from 'lodash'
 import { toRequestSchema, toResponseSchema } from './map-operation'
 import { JSONSchema7 } from 'json-schema'
 import { State } from '../state'
+import { generateErrors } from '../generators/errors'
 
 const HEADER = `// this file was automatically generated, do not edit
 // @ts-nocheck\n`
@@ -47,11 +47,14 @@ class Names {
 }
 
 export const generateClientWithOpapi = async (state: State<string, string, string>, dir: string) => {
+  const errorsFile = pathlib.join(dir, 'errors.ts')
+  const indexFile = pathlib.join(dir, 'index.ts')
   const operationsDir = pathlib.join(dir, 'operations')
   fslib.mkdirSync(operationsDir, { recursive: true })
 
   const operationsByName = _.mapKeys(state.operations, (v) => v.name)
 
+  console.log('Generating operations')
   for (const [name, op] of Object.entries(operationsByName)) {
     const { headersName, queryName, paramsName, reqBodyName, inputName, reqName, resName } = Names.of(name)
     const requestSchemas = toRequestSchema(state, op)
@@ -103,15 +106,17 @@ export const generateClientWithOpapi = async (state: State<string, string, strin
     responseCode += await toTs(resBody, resName)
 
     const code = `${HEADER}\n${requestCode}\n${responseCode}`
-    const formattedCode = await prettier.format(code, { parser: 'typescript' })
     const file = pathlib.join(operationsDir, `${name}.ts`)
-    fslib.writeFileSync(file, formattedCode)
+    fslib.writeFileSync(file, code)
   }
 
-  const indexFile = pathlib.join(dir, 'index.ts')
+  console.log('generating errors file')
+  const errorsFileContent = generateErrors(state.errors ?? [])
+  await fslib.promises.writeFile(errorsFile, errorsFileContent)
+
+  console.log('Generating index file')
 
   let indexCode = `${HEADER}\n`
-
   indexCode += 'import { AxiosInstance } from "axios"\n'
   for (const [name] of Object.entries(operationsByName)) {
     indexCode += `import * as ${name} from './operations/${name}'\n`
@@ -136,7 +141,5 @@ export const generateClientWithOpapi = async (state: State<string, string, strin
     ].join('\n')
   }
   indexCode += '}\n'
-
-  const formattedIndexCode = await prettier.format(indexCode, { parser: 'typescript' })
-  fslib.writeFileSync(indexFile, formattedIndexCode)
+  fslib.writeFileSync(indexFile, indexCode)
 }

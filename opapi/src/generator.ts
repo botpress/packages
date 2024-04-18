@@ -1,4 +1,7 @@
+import pathlib from 'path'
+import fslib from 'fs'
 import chalk from 'chalk'
+import _ from 'lodash'
 import { VError } from 'verror'
 import { defaultResponseStatus, invalidLine, tsFileHeader } from './const'
 import { appendHeaders, initDirectory, removeLineFromFiles, saveFile } from './file'
@@ -9,6 +12,7 @@ import {
   generateHandlers,
   generateTypes,
   runOpenApiCodeGenerator,
+  clientNode,
 } from './generators'
 import { generateErrors } from './generators/errors'
 import { generateOpenapiTypescript } from './generators/openapi-typescript'
@@ -98,7 +102,7 @@ export const generateServer = async (state: State<string, string, string>, dir: 
   log.info('')
 }
 
-export const generateClient = async (
+export const generateClientWithOpenapiGenerator = async (
   state: State<string, string, string>,
   dir = '.',
   openApiGeneratorEndpoint: string,
@@ -144,6 +148,29 @@ export const generateClient = async (
   log.info('Removing invalid line from typescript files')
   removeLineFromFiles(dir, invalidLine)
   log.info('')
+}
+
+export const generateClientWithOpapi = async (state: State<string, string, string>, dir: string) => {
+  initDirectory(dir)
+
+  const modelsFile = pathlib.join(dir, 'models.ts')
+  const errorsFile = pathlib.join(dir, 'errors.ts')
+  const indexFile = pathlib.join(dir, 'index.ts')
+  const operationsDir = pathlib.join(dir, 'operations')
+  fslib.mkdirSync(operationsDir, { recursive: true })
+
+  log.info('Generating models')
+  await clientNode.generateModels(state, modelsFile)
+
+  log.info('Generating operations')
+  await clientNode.generateOperations(state, operationsDir)
+
+  log.info('generating errors file')
+  const errorsFileContent = generateErrors(state.errors ?? [])
+  await fslib.promises.writeFile(errorsFile, errorsFileContent)
+
+  log.info('Generating index file')
+  await clientNode.generateIndex(state, indexFile)
 }
 
 export function generateErrorsFile(errors: ApiError[], dir = '.') {

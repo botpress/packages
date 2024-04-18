@@ -48,6 +48,7 @@ type TypeOf<T extends PrimitiveType> = T extends 'string'
       : never
 const typeOf = <T extends PrimitiveType>(schema: T): TypeOf<T> => typeof schema as TypeOf<T>
 
+export type JsonSchemaBuilder = typeof jsonSchemaBuilder
 export const jsonSchemaBuilder = {
   object: <K extends string>(
     properties: Record<K, JSONSchema7>,

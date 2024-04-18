@@ -1,6 +1,7 @@
 import { extendApi, OpenApiZodAny } from '@anatine/zod-openapi'
 import {
-  generateClient,
+  generateClientWithOpenapiGenerator,
+  generateClientWithOpapi,
   generateErrorsFile,
   generateOpenapi,
   generateServer,
@@ -43,6 +44,42 @@ export type OpenApiPostProcessors = {
   apiCode: CodePostProcessor
 }
 
+export type GenerateClientProps =
+  | {
+      generator: 'openapi-generator'
+      endpoint: string
+      postProcessors?: OpenApiPostProcessors
+    }
+  | {
+      generator: 'opapi'
+    }
+
+function exportClient(state: State<string, string, string>) {
+  function _exportClient(
+    dir: string,
+    openapiGeneratorEndpoint: string,
+    postProcessors?: OpenApiPostProcessors,
+  ): Promise<void>
+  function _exportClient(dir: string, props: GenerateClientProps): Promise<void>
+  function _exportClient(dir = '.', props: GenerateClientProps | string, postProcessors?: OpenApiPostProcessors) {
+    let options: GenerateClientProps
+    if (typeof props === 'string') {
+      options = { generator: 'openapi-generator', endpoint: props, postProcessors }
+    } else {
+      options = props
+    }
+
+    if (options.generator === 'openapi-generator') {
+      return generateClientWithOpenapiGenerator(state, dir, options.endpoint, options.postProcessors)
+    }
+    if (options.generator === 'opapi') {
+      return generateClientWithOpapi(state, dir)
+    }
+    throw new Error('Unknown generator')
+  }
+  return _exportClient
+}
+
 const createOpapiFromState = <
   SchemaName extends string,
   DefaultParameterName extends string,
@@ -55,8 +92,7 @@ const createOpapiFromState = <
     addOperation: <Path extends string>(
       operationProps: Operation<DefaultParameterName, SectionName, Path, 'zod-schema'>,
     ) => addOperation(state, operationProps),
-    exportClient: (dir = '.', openapiGeneratorEndpoint: string, postProcessors?: OpenApiPostProcessors) =>
-      generateClient(state, dir, openapiGeneratorEndpoint, postProcessors),
+    exportClient: exportClient(state),
     exportTypesBySection: (dir = '.') => generateTypesBySection(state, dir),
     exportServer: (dir = '.', useExpressTypes: boolean) => generateServer(state, dir, useExpressTypes),
     exportOpenapi: (dir = '.') => generateOpenapi(state, dir),

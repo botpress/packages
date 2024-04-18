@@ -1,6 +1,6 @@
 {
   "name": "@bpinternal/opapi",
-  "version": "0.10.1",
+  "version": "0.10.2",
   "description": "",
   "main": "./dist/index.js",
   "module": "./dist/index.mjs",
@@ -13,7 +13,7 @@
     }
   },
   "scripts": {
-    "test": "vitest",
+    "test": "vitest run",
     "build": "tsup src/index.ts --dts --format cjs,esm --clean",
     "type:check": "tsc --noEmit",
     "format:check": "prettier --check .",

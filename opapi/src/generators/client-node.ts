@@ -5,7 +5,6 @@ import pathlib from 'path'
 import _ from 'lodash'
 import { JSONSchema7 } from 'json-schema'
 import { Operation, State } from '../state'
-import { generateErrors } from '../generators/errors'
 import { toRequestShape, toResponseShape } from '../handler-generator/map-operation'
 
 type ObjectBuilder = utils.JsonSchemaBuilder['object']

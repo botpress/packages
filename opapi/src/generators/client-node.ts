@@ -5,7 +5,6 @@ import pathlib from 'path'
 import _ from 'lodash'
 import { JSONSchema7 } from 'json-schema'
 import { Operation, State } from '../state'
-import { generateErrors } from '../generators/errors'
 import { toRequestShape, toResponseShape } from '../handler-generator/map-operation'
 
 type ObjectBuilder = utils.JsonSchemaBuilder['object']
@@ -25,10 +24,34 @@ const HEADER = `// this file was automatically generated, do not edit
 /* eslint-disable */
 `
 
-const toTs = async (schema: JSONSchema7, name: string): Promise<string> => {
-  const { title, ...rest } = schema
+// replace all occurences of { type: T, nullable: true } with { anyOf: [{ type: T }, { type: 'null' }] }
+type NullableJsonSchema = JSONSchema7 & { nullable?: boolean }
+const fixJsonSchema = (nullableSchema: NullableJsonSchema): JSONSchema7 => {
+  const { nullable, ...schema } = nullableSchema
+  if (nullable) {
+    const { title, description, ...rest } = schema
+    return { title, description, anyOf: [rest, { type: 'null' }] }
+  }
+
+  if (schema.type === 'object') {
+    const properties = schema.properties ? _.mapValues(schema.properties, fixJsonSchema) : schema.properties
+    const additionalProperties =
+      typeof schema.additionalProperties === 'object'
+        ? fixJsonSchema(schema.additionalProperties)
+        : schema.additionalProperties
+    return { ...schema, properties, additionalProperties }
+  }
+
+  return schema
+}
+
+const toTs = async (originalSchema: JSONSchema7, name: string): Promise<string> => {
+  let { title, ...schema } = originalSchema
+  schema = fixJsonSchema(schema as NullableJsonSchema)
+
   type jsonSchemaToTsInput = Parameters<typeof compile>[0]
-  const typeCode = await compile(rest as jsonSchemaToTsInput, name, { unknownAny: false, bannerComment: '' })
+  const typeCode = await compile(schema as jsonSchemaToTsInput, name, { unknownAny: false, bannerComment: '' })
+
   return `${typeCode}\n`
 }
 
@@ -95,7 +118,8 @@ export const generateOperations = async (state: State<string, string, string>, o
     requestCode += await toTs(query, queryName)
     requestCode += await toTs(params, paramsName)
     if (reqBody) {
-      requestCode += await toTs(reqBody, reqBodyName)
+      const tsCode = await toTs(reqBody, reqBodyName)
+      requestCode += tsCode
     } else {
       requestCode += `export interface ${reqBodyName} {}\n\n`
     }
@@ -110,7 +134,7 @@ export const generateOperations = async (state: State<string, string, string>, o
     ].join('\n')
 
     const toObject = (keys: string[]) => '{ ' + keys.map((k) => `${k}: input.${k}`).join(', ') + ' }'
-    const path = op.path.replace(/{([^}]+)}/g, (_, p) => `\${input.${p}}`)
+    const path = op.path.replace(/{([^}]+)}/g, (_, p) => `\${encodeURIComponent(input.${p})}`)
 
     const allParams = [...headerKeys, ...queryKeys, ...paramsKeys, ...reqBodyKeys]
 

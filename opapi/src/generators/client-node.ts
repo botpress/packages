@@ -112,8 +112,15 @@ export const generateOperations = async (state: State<string, string, string>, o
     const toObject = (keys: string[]) => '{ ' + keys.map((k) => `${k}: input.${k}`).join(', ') + ' }'
     const path = op.path.replace(/{([^}]+)}/g, (_, p) => `\${input.${p}}`)
 
+    const allParams = [...headerKeys, ...queryKeys, ...paramsKeys, ...reqBodyKeys]
+
+    const functionDeclaration =
+      allParams.length === 0
+        ? `export const parseReq = (_: ${inputName}): ${reqName} & { path: string } => {` // no input parameter
+        : `export const parseReq = (input: ${inputName}): ${reqName} & { path: string } => {`
+
     requestCode += [
-      `export const parseReq = (input: ${inputName}): ${reqName} & { path: string } => {`,
+      functionDeclaration,
       `  return {`,
       `    path: \`${path}\`,`,
       `    headers: ${toObject(headerKeys)},`,

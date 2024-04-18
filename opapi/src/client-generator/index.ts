@@ -47,12 +47,21 @@ class Names {
 }
 
 export const generateClientWithOpapi = async (state: State<string, string, string>, dir: string) => {
+  const modelsFile = pathlib.join(dir, 'models.ts')
   const errorsFile = pathlib.join(dir, 'errors.ts')
   const indexFile = pathlib.join(dir, 'index.ts')
   const operationsDir = pathlib.join(dir, 'operations')
   fslib.mkdirSync(operationsDir, { recursive: true })
 
   const operationsByName = _.mapKeys(state.operations, (v) => v.name)
+
+  console.log('Generating models')
+  const modelSchemas = _.mapValues(state.schemas, (s) => s.schema as JSONSchema7)
+  let modelCode: string = `${HEADER}\n`
+  for (const [name, schema] of Object.entries(modelSchemas)) {
+    modelCode += await toTs(schema, name)
+  }
+  fslib.writeFileSync(modelsFile, modelCode)
 
   console.log('Generating operations')
   for (const [name, op] of Object.entries(operationsByName)) {
@@ -122,6 +131,8 @@ export const generateClientWithOpapi = async (state: State<string, string, strin
     indexCode += `import * as ${name} from './operations/${name}'\n`
   }
   indexCode += '\n'
+
+  indexCode += "export * from './models'\n"
 
   indexCode += 'export class Client {\n\n'
   indexCode += 'constructor(private axiosInstance: AxiosInstance) {}\n\n'

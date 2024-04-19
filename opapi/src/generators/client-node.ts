@@ -134,7 +134,7 @@ export const generateOperations = async (state: State<string, string, string>, o
     ].join('\n')
 
     const getKey = (variable: string, key: string) => `${variable}['${key}']`
-    const toObject = (keys: string[]) => '{ ' + keys.map((k) => `${k}: ${getKey('input', k)}`).join(', ') + ' }'
+    const toObject = (keys: string[]) => '{ ' + keys.map((k) => `'${k}': ${getKey('input', k)}`).join(', ') + ' }'
     const path = op.path.replace(/{([^}]+)}/g, (_, p) => `\${encodeURIComponent(${getKey('input', p)})}`)
 
     const allParams = [...headerKeys, ...queryKeys, ...paramsKeys, ...reqBodyKeys]

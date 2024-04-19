@@ -1,6 +1,8 @@
 import { OpenApiZodAny, generateSchema as generateJsonSchema } from '@anatine/zod-openapi'
+import { JSONSchema7 } from 'json-schema'
 import type { SchemaObject } from 'openapi3-ts'
 import { removeFromArray } from './util'
+import _ from 'lodash'
 
 export type GenerateSchemaFromZodOpts = {
   useOutput?: boolean
@@ -62,4 +64,30 @@ export function schemaIsEmptyObject(schema: SchemaObject) {
   }
 
   return false
+}
+
+/**
+ * Lib "@anatine/zod-openapi" transforms zod to json-schema using the nullable property.
+ * This property is not officially supported by json-schema, but supported by ajv (see: https://ajv.js.org/json-schema.html#nullable)
+ * Since it's not officially supported, some tools like "json-schema-to-typescript" don't support it.
+ * This function replaces all occurences of { type: T, nullable: true } with { anyOf: [{ type: T }, { type: 'null' }] }
+ */
+export type NullableJsonSchema = JSONSchema7 & { nullable?: boolean }
+export const replaceNullableWithUnion = (nullableSchema: NullableJsonSchema): JSONSchema7 => {
+  const { nullable, ...schema } = nullableSchema
+  if (nullable) {
+    const { title, description, ...rest } = replaceNullableWithUnion(schema)
+    return { title, description, anyOf: [rest, { type: 'null' }] }
+  }
+
+  if (schema.type === 'object') {
+    const properties = schema.properties ? _.mapValues(schema.properties, replaceNullableWithUnion) : schema.properties
+    const additionalProperties =
+      typeof schema.additionalProperties === 'object'
+        ? replaceNullableWithUnion(schema.additionalProperties)
+        : schema.additionalProperties
+    return { ...schema, properties, additionalProperties }
+  }
+
+  return schema
 }

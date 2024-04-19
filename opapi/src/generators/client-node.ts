@@ -177,7 +177,11 @@ export const generateIndex = async (state: State<string, string, string>, indexF
   }
   indexCode += '\n'
 
-  indexCode += "export * from './models'\n"
+  indexCode += "export * from './models'\n\n"
+  for (const [name] of Object.entries(operationsByName)) {
+    indexCode += `export * as ${name} from './operations/${name}'\n`
+  }
+  indexCode += '\n'
 
   indexCode += 'export class Client {\n\n'
   indexCode += 'constructor(private axiosInstance: AxiosInstance) {}\n\n'
@@ -185,7 +189,8 @@ export const generateIndex = async (state: State<string, string, string>, indexF
     const { inputName, resName } = Names.of(name)
     indexCode += [
       `  public readonly ${name} = async (input: ${name}.${inputName}): Promise<${name}.${resName}> => {`,
-      `    const { path, headers, query, body } = ${name}.parseReq(input)`,
+      `    const { path, headers: _headers, query, body } = ${name}.parseReq(input)`,
+      `    const headers: Record<string, string> = { ..._headers }`,
       `    return this.axiosInstance.request<${name}.${resName}>({`,
       `      method: '${operation.method}',`,
       `      url: path,`,

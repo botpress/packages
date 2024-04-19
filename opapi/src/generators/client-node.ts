@@ -25,6 +25,67 @@ const HEADER = `// this file was automatically generated, do not edit
 /* eslint-disable */
 `
 
+const GET_ERROR_FUNCTION = `// maps axios error to api error type
+function getError(err: Error) {
+  if (axios.isAxiosError(err) && err.response?.data) {
+    return errorFrom(err.response.data)
+  }
+  return errorFrom(err)
+}
+`
+
+const GET_AXIOS_REQ_FUNCTION = `// ensures axios request is properly formatted
+type QueryValue = string | string[] | Record<string, string> | undefined
+type AnyQueryParams = Record<string, QueryValue>
+type HeaderValue = string | undefined
+type AnyHeaderParams = Record<string, HeaderValue>
+type AnyBodyParams = Record<string, any>
+
+type ParsedRequest = {
+  method: string
+  path: string
+  query: AnyQueryParams
+  headers: AnyHeaderParams
+  body: AnyBodyParams
+}
+
+export const toAxiosRequest = (req: ParsedRequest): AxiosRequestConfig => {
+  const { method, path: url, query, headers: headerParams, body: data } = req
+
+  // prepare headers
+  const headers: Record<string, string> = {}
+  for (const [key, value] of Object.entries(headerParams)) {
+    if (value !== undefined) {
+      headers[key] = value
+    }
+  }
+
+  // prepare query params
+  const params = new URLSearchParams()
+  for (const [key, value] of Object.entries(query)) {
+    if (Array.isArray(value)) {
+      value.forEach((v) => params.append(key, v))
+      continue
+    }
+    if (typeof value === 'object') {
+      Object.entries(value).forEach(([k, v]) => params.append(\`\${key}[\${k}]\`, v))
+      continue
+    }
+    if (value !== undefined) {
+      params.append(key, value)
+    }
+  }
+
+  return {
+    method,
+    url,
+    headers,
+    params,
+    data,
+  }
+}
+`
+
 const toTs = async (originalSchema: JSONSchema7, name: string): Promise<string> => {
   let { title, ...schema } = originalSchema
   schema = replaceNullableWithUnion(schema as NullableJsonSchema)
@@ -149,7 +210,7 @@ export const generateIndex = async (state: State<string, string, string>, indexF
   const operationsByName = _.mapKeys(state.operations, (v) => v.name)
 
   let indexCode = `${HEADER}\n`
-  indexCode += "import axios, { AxiosInstance } from 'axios'\n"
+  indexCode += "import axios, { AxiosInstance, AxiosRequestConfig } from 'axios'\n"
   indexCode += "import { errorFrom } from './errors'\n\n"
 
   for (const [name] of Object.entries(operationsByName)) {
@@ -169,30 +230,24 @@ export const generateIndex = async (state: State<string, string, string>, indexF
     const { inputName, resName } = Names.of(name)
     indexCode += [
       `  public readonly ${name} = async (input: ${name}.${inputName}): Promise<${name}.${resName}> => {`,
-      `    const { path, headers: _headers, query, body } = ${name}.parseReq(input)`,
-      `    const headers: Record<string, string> = { ..._headers }`,
-      `    return this.axiosInstance.request<${name}.${resName}>({`,
-      `      method: '${operation.method}',`,
-      `      url: path,`,
-      `      headers,`,
-      `      params: query,`,
-      `      data: body,`,
-      `    })`,
+      `    const { path, headers, query, body } = ${name}.parseReq(input)`,
+      `    const axiosReq = toAxiosRequest({`,
+      `        method: "${operation.method}",`,
+      '        path,',
+      '        headers: { ...headers },',
+      '        query: { ...query },',
+      '        body,',
+      '    })',
+      `    return this.axiosInstance.request<${name}.${resName}>(axiosReq)`,
       `      .then((res) => res.data)`,
       `      .catch((e) => { throw getError(e) })`,
       '  }\n\n',
     ].join('\n')
   }
-  indexCode += '}\n'
+  indexCode += '}\n\n'
 
-  indexCode += [
-    'function getError(err: Error) {',
-    '  if (axios.isAxiosError(err) && err.response?.data) {',
-    '    return errorFrom(err.response.data)',
-    '  }',
-    '  return errorFrom(err)',
-    '}\n',
-  ].join('\n')
+  indexCode += `${GET_ERROR_FUNCTION}\n`
+  indexCode += `${GET_AXIOS_REQ_FUNCTION}\n`
 
   await writeTs(indexFile, indexCode)
 }

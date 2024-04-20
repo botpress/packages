@@ -21,6 +21,20 @@ const mapRequest = (state: State<string, string, string>, op: Operation<string, 
 const mapResponse = (state: State<string, string, string>, op: Operation<string, string, string, 'json-schema'>) =>
   toResponseShape(state, op, s)
 
+// usefull for debugging, remove when generator is stable
+const debugSchema =
+  (inputSchema: JSONSchema7, key: string, enable: boolean = false) =>
+  (tsCode: string) => {
+    if (!enable) {
+      return tsCode
+    }
+    console.info(`### ${key}`)
+    console.info('### schema', JSON.stringify(inputSchema, null, 2))
+    console.info('### fixed', JSON.stringify(replaceNullableWithUnion(inputSchema), null, 2))
+    console.info('### tsCode', tsCode)
+    return tsCode
+  }
+
 const HEADER = `// this file was automatically generated, do not edit
 /* eslint-disable */
 `
@@ -34,8 +48,21 @@ function getError(err: Error) {
 }
 `
 
+/**
+ * The function:
+ * (query: any) => qs.stringify(query, { encode: true, arrayFormat: 'repeat', allowDots: true })
+ *
+ * Yields the following results:
+ * { dev: false }                        ->  ?dev=false
+ * { tags: { foo: 'bar', baz: 'qux' } }  ->  ?tags.foo=bar&tags.baz=qux
+ * { participantIds: ['foo', 'bar'] }    ->  ?participantIds=foo&participantIds=bar
+ * { limit: 10 }                         ->  ?limit=10
+ */
+
 const GET_AXIOS_REQ_FUNCTION = `// ensures axios request is properly formatted
-type QueryValue = string | string[] | Record<string, string> | undefined
+type Primitive = string | number | boolean
+type Value<P extends Primitive> = P | P[] | Record<string, P>
+type QueryValue = Value<string> | Value<boolean> | Value<number> | undefined
 type AnyQueryParams = Record<string, QueryValue>
 type HeaderValue = string | undefined
 type AnyHeaderParams = Record<string, HeaderValue>
@@ -53,28 +80,12 @@ export const toAxiosRequest = (req: ParsedRequest): AxiosRequestConfig => {
   const { method, path: url, query, headers: headerParams, body: data } = req
 
   // prepare headers
-  const headers: Record<string, string> = {}
-  for (const [key, value] of Object.entries(headerParams)) {
-    if (value !== undefined) {
-      headers[key] = value
-    }
-  }
+  const headerEntries = Object.entries(headerParams).filter(([_, v]) => v !== undefined)
+  const headers = Object.fromEntries(headerEntries)
 
   // prepare query params
-  const params = new URLSearchParams()
-  for (const [key, value] of Object.entries(query)) {
-    if (Array.isArray(value)) {
-      value.forEach((v) => params.append(key, v))
-      continue
-    }
-    if (typeof value === 'object') {
-      Object.entries(value).forEach(([k, v]) => params.append(\`\${key}[\${k}]\`, v))
-      continue
-    }
-    if (value !== undefined) {
-      params.append(key, value)
-    }
-  }
+  const queryString = qs.stringify(query, { encode: true, arrayFormat: 'repeat', allowDots: true })
+  const params = new URLSearchParams(queryString)
 
   return {
     method,
@@ -91,7 +102,12 @@ const toTs = async (originalSchema: JSONSchema7, name: string): Promise<string> 
   schema = replaceNullableWithUnion(schema as NullableJsonSchema)
 
   type jsonSchemaToTsInput = Parameters<typeof compile>[0]
-  const typeCode = await compile(schema as jsonSchemaToTsInput, name, { unknownAny: false, bannerComment: '' })
+  const typeCode = await compile(schema as jsonSchemaToTsInput, name, {
+    unknownAny: false,
+    bannerComment: '',
+    additionalProperties: false,
+    ignoreMinAndMaxItems: true,
+  })
 
   return `${typeCode}\n`
 }
@@ -155,12 +171,11 @@ export const generateOperations = async (state: State<string, string, string>, o
     const reqBodyKeys = Object.keys(reqBody?.properties ?? {})
 
     let requestCode = ''
-    requestCode += await toTs(headers, headersName)
-    requestCode += await toTs(query, queryName)
-    requestCode += await toTs(params, paramsName)
+    requestCode += await toTs(headers, headersName).then(debugSchema(headers, 'headers'))
+    requestCode += await toTs(query, queryName).then(debugSchema(query, 'query'))
+    requestCode += await toTs(params, paramsName).then(debugSchema(params, 'params'))
     if (reqBody) {
-      const tsCode = await toTs(reqBody, reqBodyName)
-      requestCode += tsCode
+      requestCode += await toTs(reqBody, reqBodyName).then(debugSchema(reqBody, 'reqBody'))
     } else {
       requestCode += `export interface ${reqBodyName} {}\n\n`
     }
@@ -198,7 +213,7 @@ export const generateOperations = async (state: State<string, string, string>, o
     ].join('\n')
 
     let responseCode = ''
-    responseCode += await toTs(resBody, resName)
+    responseCode += await toTs(resBody, resName).then(debugSchema(resBody, 'resBody'))
 
     const code = `${HEADER}\n${requestCode}\n${responseCode}`
     const file = pathlib.join(operationsDir, `${name}.ts`)
@@ -209,9 +224,13 @@ export const generateOperations = async (state: State<string, string, string>, o
 export const generateIndex = async (state: State<string, string, string>, indexFile: string) => {
   const operationsByName = _.mapKeys(state.operations, (v) => v.name)
 
-  let indexCode = `${HEADER}\n`
-  indexCode += "import axios, { AxiosInstance, AxiosRequestConfig } from 'axios'\n"
-  indexCode += "import { errorFrom } from './errors'\n\n"
+  let indexCode = [
+    `${HEADER}`,
+    "import qs from 'qs'",
+    "import axios, { AxiosInstance, AxiosRequestConfig } from 'axios'",
+    "import { errorFrom } from './errors'",
+    '',
+  ].join('\n')
 
   for (const [name] of Object.entries(operationsByName)) {
     indexCode += `import * as ${name} from './operations/${name}'\n`

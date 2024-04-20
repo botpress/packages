@@ -64,6 +64,7 @@ export const jsonSchemaBuilder = {
   boolean: () => ({ type: 'boolean' }),
   null: () => ({ type: 'null' }),
   array: (items: JSONSchema7) => ({ type: 'array', items }),
+  tuple: (items: JSONSchema7[]) => ({ type: 'array', items }),
   record: (values: JSONSchema7) => ({ type: 'object', additionalProperties: values }),
   any: () => ({}),
   union: <T extends JSONSchema7[]>(...schemas: T) => ({ anyOf: schemas }),

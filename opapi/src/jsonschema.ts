@@ -89,5 +89,15 @@ export const replaceNullableWithUnion = (nullableSchema: NullableJsonSchema): JS
     return { ...schema, properties, additionalProperties }
   }
 
+  if (schema.type === 'array') {
+    if (schema.items === undefined) {
+      return schema
+    }
+    if (Array.isArray(schema.items)) {
+      return { ...schema, items: schema.items.map((s) => replaceNullableWithUnion(s as NullableJsonSchema)) }
+    }
+    return { ...schema, items: replaceNullableWithUnion(schema.items as NullableJsonSchema) }
+  }
+
   return schema
 }

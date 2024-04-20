@@ -34,8 +34,21 @@ function getError(err: Error) {
 }
 `
 
+/**
+ * The function:
+ * (query: any) => qs.stringify(query, { encode: true, arrayFormat: 'repeat', allowDots: true })
+ *
+ * Yields the following results:
+ * { dev: false }                        ->  ?dev=false
+ * { tags: { foo: 'bar', baz: 'qux' } }  ->  ?tags.foo=bar&tags.baz=qux
+ * { participantIds: ['foo', 'bar'] }    ->  ?participantIds=foo&participantIds=bar
+ * { limit: 10 }                         ->  ?limit=10
+ */
+
 const GET_AXIOS_REQ_FUNCTION = `// ensures axios request is properly formatted
-type QueryValue = string | string[] | Record<string, string> | undefined
+type Primitive = string | number | boolean
+type Value<P extends Primitive> = P | P[] | Record<string, P>
+type QueryValue = Value<string> | Value<boolean> | Value<number> | undefined
 type AnyQueryParams = Record<string, QueryValue>
 type HeaderValue = string | undefined
 type AnyHeaderParams = Record<string, HeaderValue>
@@ -53,28 +66,12 @@ export const toAxiosRequest = (req: ParsedRequest): AxiosRequestConfig => {
   const { method, path: url, query, headers: headerParams, body: data } = req
 
   // prepare headers
-  const headers: Record<string, string> = {}
-  for (const [key, value] of Object.entries(headerParams)) {
-    if (value !== undefined) {
-      headers[key] = value
-    }
-  }
+  const headerEntries = Object.entries(headerParams).filter(([_, v]) => v !== undefined)
+  const headers = Object.fromEntries(headerEntries)
 
   // prepare query params
-  const params = new URLSearchParams()
-  for (const [key, value] of Object.entries(query)) {
-    if (Array.isArray(value)) {
-      value.forEach((v) => params.append(key, v))
-      continue
-    }
-    if (typeof value === 'object') {
-      Object.entries(value).forEach(([k, v]) => params.append(\`\${key}[\${k}]\`, v))
-      continue
-    }
-    if (value !== undefined) {
-      params.append(key, value)
-    }
-  }
+  const queryString = qs.stringify(query, { encode: true, arrayFormat: 'repeat', allowDots: true })
+  const params = new URLSearchParams(queryString)
 
   return {
     method,
@@ -209,9 +206,13 @@ export const generateOperations = async (state: State<string, string, string>, o
 export const generateIndex = async (state: State<string, string, string>, indexFile: string) => {
   const operationsByName = _.mapKeys(state.operations, (v) => v.name)
 
-  let indexCode = `${HEADER}\n`
-  indexCode += "import axios, { AxiosInstance, AxiosRequestConfig } from 'axios'\n"
-  indexCode += "import { errorFrom } from './errors'\n\n"
+  let indexCode = [
+    `${HEADER}`,
+    "import qs from 'qs'",
+    "import axios, { AxiosInstance, AxiosRequestConfig } from 'axios'",
+    "import { errorFrom } from './errors'",
+    '',
+  ].join('\n')
 
   for (const [name] of Object.entries(operationsByName)) {
     indexCode += `import * as ${name} from './operations/${name}'\n`

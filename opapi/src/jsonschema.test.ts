@@ -27,6 +27,14 @@ const buildSchemas = (s: JsonSchemaBuilder) => {
     s.record(s.nullable(s.object({ b: nullableString }))),
     // { [key: string]: { [key: string]: string | null } | null }
     s.record(s.nullable(s.record(nullableString))),
+    // (string | null)[]
+    s.array(nullableString),
+    // ({ a: string | null } | null)[]
+    s.array(s.nullable(s.object({ a: nullableString }))),
+    // [string, string | null]
+    s.tuple([s.string(), nullableString]),
+    // [string, { a: string | null } | null]
+    s.tuple([s.string(), s.nullable(s.object({ a: nullableString }))]),
   ]
 }
 

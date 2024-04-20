@@ -21,6 +21,20 @@ const mapRequest = (state: State<string, string, string>, op: Operation<string, 
 const mapResponse = (state: State<string, string, string>, op: Operation<string, string, string, 'json-schema'>) =>
   toResponseShape(state, op, s)
 
+// usefull for debugging, remove when generator is stable
+const debugSchema =
+  (inputSchema: JSONSchema7, key: string, enable: boolean = false) =>
+  (tsCode: string) => {
+    if (!enable) {
+      return tsCode
+    }
+    console.info(`### ${key}`)
+    console.info('### schema', JSON.stringify(inputSchema, null, 2))
+    console.info('### fixed', JSON.stringify(replaceNullableWithUnion(inputSchema), null, 2))
+    console.info('### tsCode', tsCode)
+    return tsCode
+  }
+
 const HEADER = `// this file was automatically generated, do not edit
 /* eslint-disable */
 `
@@ -152,12 +166,11 @@ export const generateOperations = async (state: State<string, string, string>, o
     const reqBodyKeys = Object.keys(reqBody?.properties ?? {})
 
     let requestCode = ''
-    requestCode += await toTs(headers, headersName)
-    requestCode += await toTs(query, queryName)
-    requestCode += await toTs(params, paramsName)
+    requestCode += await toTs(headers, headersName).then(debugSchema(headers, 'headers'))
+    requestCode += await toTs(query, queryName).then(debugSchema(query, 'query'))
+    requestCode += await toTs(params, paramsName).then(debugSchema(params, 'params'))
     if (reqBody) {
-      const tsCode = await toTs(reqBody, reqBodyName)
-      requestCode += tsCode
+      requestCode += await toTs(reqBody, reqBodyName).then(debugSchema(reqBody, 'reqBody'))
     } else {
       requestCode += `export interface ${reqBodyName} {}\n\n`
     }
@@ -195,7 +208,7 @@ export const generateOperations = async (state: State<string, string, string>, o
     ].join('\n')
 
     let responseCode = ''
-    responseCode += await toTs(resBody, resName)
+    responseCode += await toTs(resBody, resName).then(debugSchema(resBody, 'resBody'))
 
     const code = `${HEADER}\n${requestCode}\n${responseCode}`
     const file = pathlib.join(operationsDir, `${name}.ts`)

@@ -102,7 +102,12 @@ const toTs = async (originalSchema: JSONSchema7, name: string): Promise<string> 
   schema = replaceNullableWithUnion(schema as NullableJsonSchema)
 
   type jsonSchemaToTsInput = Parameters<typeof compile>[0]
-  const typeCode = await compile(schema as jsonSchemaToTsInput, name, { unknownAny: false, bannerComment: '' })
+  const typeCode = await compile(schema as jsonSchemaToTsInput, name, {
+    unknownAny: false,
+    bannerComment: '',
+    additionalProperties: false,
+    ignoreMinAndMaxItems: true,
+  })
 
   return `${typeCode}\n`
 }

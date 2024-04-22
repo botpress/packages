@@ -67,6 +67,9 @@ export const useFormData = () => {
 }
 
 export function setObjectPath(obj: any, path: string, data: any): any {
+  if (path === 'root') {
+    return data
+  }
   const pathArray = path.split('.')
   const pathArrayLength = pathArray.length
   pathArray.reduce((current: any, key: string, index: number) => {

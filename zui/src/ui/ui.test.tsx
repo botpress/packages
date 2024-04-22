@@ -1,11 +1,12 @@
 import React from 'react'
 import { fireEvent, render } from '@testing-library/react'
-import { ZuiForm, ZuiFormProps, resolveDiscriminator } from './index'
+import { ZuiForm, ZuiFormProps, resolveDiscriminatedSchema, resolveDiscriminator } from './index'
 import { ZuiComponentMap } from '../index'
 import { ObjectSchema, JSONSchema, ZuiReactComponentBaseProps, BaseType, UIComponentDefinitions } from './types'
 import { FC, PropsWithChildren, useState } from 'react'
 import { vi } from 'vitest'
 import { z as zui } from '../z/index'
+import { zuiKey } from './constants'
 
 const TestId = (type: JSONSchema['type'], path: string[], subpath?: string) =>
   `${type}:${path.length > 0 ? path.join('.') : 'root'}${subpath ? `:${subpath}` : ''}`
@@ -26,7 +27,7 @@ describe('UI', () => {
         schema={jsonSchema}
         components={testComponentImplementation}
         value={{}}
-        onChange={() => {}}
+        onChange={() => { }}
       />,
     )
 
@@ -432,10 +433,8 @@ describe('UI', () => {
 
     expect(element).toBeTruthy()
   })
-})
 
-describe('utils', () => {
-  it('can resolve a discriminated union discriminator', () => {
+  it('renders discriminated union correctly', () => {
     const aDUSchema = zui
       .discriminatedUnion('type', [
         zui.object({
@@ -451,26 +450,103 @@ describe('utils', () => {
           type: zui.literal('image'),
         }),
       ])
-      .toJsonSchema()
 
-    const discriminators = resolveDiscriminator(aDUSchema.anyOf)
+    const jsonSchema = aDUSchema.toJsonSchema()
 
-    expect(discriminators).toEqual({
-      key: 'type',
-      values: ['text', 'number', 'image'],
-    })
+    const rendered = render(
+      <ZuiFormWithState schema={jsonSchema} components={testComponentImplementation} />
+    )
+
+    const select = rendered.getByTestId('discriminatedUnion:root:select')
+    expect(select).toBeTruthy()
+
+    const textInput = rendered.getByTestId('string:name:input')
+    expect(textInput).toBeTruthy()
+
+    const options = Array.from(select!.querySelectorAll('option')).map((option) => option.textContent)
+    expect(options).toEqual(['text', 'number', 'image'])
+
+    fireEvent.change(select!, { target: { value: 'number' } })
+
+    const numberInput = rendered.getByTestId('number:value:input')
+
+    expect(numberInput).toBeTruthy()
+    expect(rendered.queryByTestId('string:name:input')).toBeFalsy()
   })
 
-  it('can resolve null on a non-discriminated union', () => {
-    const aSchema = zui
-      .object({
-        test: zui.string().min(3).optional().nullable(),
+  describe('utils', () => {
+    it('can resolve a discriminated union discriminator', () => {
+      const aDUSchema = zui
+        .discriminatedUnion('type', [
+          zui.object({
+            type: zui.literal('text'),
+            name: zui.string(),
+          }),
+          zui.object({
+            type: zui.literal('number'),
+            value: zui.number(),
+          }),
+          zui.object({
+            value: zui.string(),
+            type: zui.literal('image'),
+          }),
+        ])
+        .toJsonSchema()
+
+      const discriminators = resolveDiscriminator(aDUSchema.anyOf)
+
+      expect(discriminators).toEqual({
+        key: 'type',
+        values: ['text', 'number', 'image'],
       })
-      .toJsonSchema()
+    })
 
-    const discriminators = resolveDiscriminator(aSchema.anyOf)
+    it('can resolve null when resolving discriminator on a non-discriminated union', () => {
+      const aSchema = zui
+        .object({
+          test: zui.string().min(3).optional().nullable(),
+        })
+        .toJsonSchema()
 
-    expect(discriminators).toBeNull()
+      const discriminators = resolveDiscriminator(aSchema.anyOf)
+
+      expect(discriminators).toBeNull()
+    })
+
+    it('can resolve the discriminated schema for a given discriminator value', () => {
+      const aDUSchema = zui
+        .discriminatedUnion('type', [
+          zui.object({
+            type: zui.literal('text'),
+            name: zui.string(),
+          }),
+          zui.object({
+            type: zui.literal('number'),
+            value: zui.number(),
+          }),
+          zui.object({
+            value: zui.string(),
+            type: zui.literal('image'),
+          }),
+        ])
+        .toJsonSchema()
+
+      const schema = resolveDiscriminatedSchema('type', 'text', aDUSchema.anyOf)
+
+      expect(schema).toEqual({
+        type: 'object',
+        properties: {
+          type: {
+            type: 'string', const: 'text', [zuiKey]: {
+              hidden: true
+            }
+          },
+          name: { type: 'string' },
+        },
+        required: ['type', 'name'],
+        additionalProperties: false,
+      })
+    })
   })
 })
 
@@ -519,7 +595,7 @@ const TestWrapper: FC<PropsWithChildren<ZuiReactComponentBaseProps<BaseType, str
     <div
       data-testid={`${type}:${scope}`}
       data-componentid={props.componentID}
-      data-elementdata={props.data}
+      data-elementdata={JSON.stringify(props.data || {})}
       data-label={props.label}
       data-ischild={props.isArrayChild}
       data-index={props.isArrayChild ? props.index : undefined}
@@ -658,10 +734,10 @@ const testComponentImplementation: ZuiComponentMap<typeof testComponentDefinitio
     default: (props) => {
       return (
         <TestWrapper {...props}>
-          <select onChange={(e) => props.setDiscriminator(e.target.value)}>
+          <select data-testid={`${props.type}:${props.scope}:select`} onChange={(e) => props.setDiscriminator(e.target.value)} value={props.discriminatorValue || undefined}>
             {props.discriminatorOptions?.map((option) => <option key={option}>{option}</option>)}
           </select>
-          <div>{props.children}</div>
+          <div data-testid={`${props.type}:${props.scope}:inner`}>{props.children}</div>
         </TestWrapper>
       )
     },

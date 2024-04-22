@@ -58,6 +58,14 @@ const exampleSchema = z
     aDiscriminatedUnion: z.discriminatedUnion('type', [
       z.object({ type: z.literal('text'), text: z.string().placeholder('Some text') }),
       z.object({ type: z.literal('number'), b: z.number().placeholder('42').default(5) }),
+      z.object({
+        type: z.literal('complex'), address: z.object({
+          street: z.string().placeholder('1234 Main St'),
+          city: z.string().placeholder('San Francisco'),
+          state: z.string().placeholder('CA'),
+          zip: z.string().placeholder('94111'),
+        })
+      }),
     ]),
     stuff: z.object({
       birthday: z.string(),
@@ -213,7 +221,7 @@ const componentMap: ZuiComponentMap<typeof exampleExtensions> = {
     default: ({ children, discriminatorKey, discriminatorOptions, discriminatorValue, setDiscriminator }) => {
       return (
         <div>
-          <p>{discriminatorKey}</p>
+          <span>{discriminatorKey}</span>
           <select value={discriminatorValue || undefined} onChange={(e) => setDiscriminator(e.target.value)}>
             {discriminatorOptions?.map((option) => (
               <option key={option} value={option}>
@@ -236,9 +244,7 @@ const ZuiFormExample = () => {
   return (
     <>
       <ZuiForm<typeof exampleExtensions>
-        schema={exampleSchema.toJsonSchema({
-          target: 'jsonSchema7',
-        })}
+        schema={exampleSchema.toJsonSchema()}
         value={formData}
         onChange={setFormData}
         components={componentMap}

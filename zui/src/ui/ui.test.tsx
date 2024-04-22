@@ -1,14 +1,14 @@
 import React from 'react'
 import { fireEvent, render } from '@testing-library/react'
-import { ROOT, ZuiForm, ZuiFormProps, resolveDiscriminatedSchema, resolveDiscriminator } from './index'
+import { ZuiForm, ZuiFormProps, getSchemaType, resolveDiscriminatedSchema, resolveDiscriminator } from './index'
 import { ZuiComponentMap } from '../index'
 import { ObjectSchema, JSONSchema, ZuiReactComponentBaseProps, BaseType, UIComponentDefinitions } from './types'
 import { FC, PropsWithChildren, useState } from 'react'
 import { vi } from 'vitest'
 import { z as zui } from '../z/index'
-import { zuiKey } from './constants'
+import { ROOT, zuiKey } from './constants'
 
-const TestId = (type: JSONSchema['type'], path: string[], subpath?: string) =>
+const TestId = (type: BaseType, path: string[], subpath?: string) =>
   `${type}:${path.length > 0 ? path.join('.') : ROOT}${subpath ? `:${subpath}` : ''}`
 
 describe('UI', () => {
@@ -54,7 +54,7 @@ describe('UI', () => {
     )
 
     traverseSchemaTest(jsonSchema, (path, child) => {
-      const element = rendered.getByTestId(TestId(child.type, path))
+      const element = rendered.getByTestId(TestId(getSchemaType(child), path))
       expect(element).toBeTruthy()
     })
   })
@@ -82,7 +82,7 @@ describe('UI', () => {
     )
 
     traverseSchemaTest(jsonSchema, (path, child) => {
-      const element = rendered.getByTestId(TestId(child.type, path))
+      const element = rendered.getByTestId(TestId(getSchemaType(child), path))
       expect(element).toBeTruthy()
     })
   })
@@ -162,7 +162,7 @@ describe('UI', () => {
     )
 
     traverseSchemaTest(jsonSchema, (path, child) => {
-      const element = rendered.getByTestId(TestId(child.type, path))
+      const element = rendered.getByTestId(TestId(getSchemaType(child), path))
       expect(element).toBeTruthy()
     })
   })
@@ -207,10 +207,10 @@ describe('UI', () => {
     fireEvent.click(addButton)
 
     traverseSchemaTest(jsonSchema, (path, child) => {
-      const element = rendered.getByTestId(TestId(child.type, path))
+      const element = rendered.getByTestId(TestId(getSchemaType(child), path))
       expect(element).toBeTruthy()
 
-      const schemaElement = rendered.getByTestId(TestId(child.type, path, 'schema'))
+      const schemaElement = rendered.getByTestId(TestId(getSchemaType(child), path, 'schema'))
 
       expect(schemaElement).toBeTruthy()
       expect(JSON.parse(schemaElement.innerHTML)).toEqual(child)
@@ -454,10 +454,10 @@ describe('UI', () => {
 
     const rendered = render(<ZuiFormWithState schema={jsonSchema} components={testComponentImplementation} />)
 
-    const select = rendered.getByTestId('discriminatedUnion:root:select')
+    const select = rendered.getByTestId(TestId('discriminatedUnion', [], 'select'))
     expect(select).toBeTruthy()
 
-    const textInput = rendered.getByTestId('string:name:input')
+    const textInput = rendered.getByTestId(TestId('string', ['name'], 'input'))
     expect(textInput).toBeTruthy()
 
     const options = Array.from(select!.querySelectorAll('option')).map((option) => option.textContent)
@@ -465,10 +465,10 @@ describe('UI', () => {
 
     fireEvent.change(select!, { target: { value: 'number' } })
 
-    const numberInput = rendered.getByTestId('number:value:input')
+    const numberInput = rendered.getByTestId(TestId('number', ['value'], 'input'))
 
     expect(numberInput).toBeTruthy()
-    expect(rendered.queryByTestId('string:name:input')).toBeFalsy()
+    expect(rendered.queryByTestId(TestId('string', ['name'], 'input'))).toBeFalsy()
   })
 
   describe('utils', () => {

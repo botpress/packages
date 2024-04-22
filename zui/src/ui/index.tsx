@@ -13,7 +13,7 @@ import {
   ZuiReactArrayChildProps,
   DefaultComponentDefinitions,
 } from './types'
-import { zuiKey } from './constants'
+import { ROOT, zuiKey } from './constants'
 import React, { type FC, useMemo, useEffect } from 'react'
 import { FormDataProvider, getDefaultItemData, useFormData } from './providers/FormDataProvider'
 import { getPathData } from './providers/FormDataProvider'
@@ -26,7 +26,7 @@ type ComponentMeta<Type extends BaseType = BaseType> = {
   params: any
 }
 
-const getSchemaType = (schema: JSONSchema): BaseType => {
+export const getSchemaType = (schema: JSONSchema): BaseType => {
   if (schema.anyOf?.length) {
     const discriminator = resolveDiscriminator(schema.anyOf)
     return discriminator ? 'discriminatedUnion' : 'object'
@@ -173,8 +173,6 @@ export const ZuiForm = <UI extends UIComponentDefinitions = DefaultComponentDefi
     </FormDataProvider>
   )
 }
-
-export const ROOT = '$_ZROOT_$'
 
 type FormRendererProps = {
   components: ZuiComponentMap<any>

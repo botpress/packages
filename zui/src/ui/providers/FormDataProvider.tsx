@@ -2,7 +2,7 @@ import { PropsWithChildren, createContext, useContext, useMemo } from 'react'
 import React from 'react'
 import { JSONSchema } from '../types'
 import { jsonSchemaToZui } from '../../transforms/json-schema-to-zui'
-import { ROOT } from '..'
+import { ROOT } from '../constants'
 
 export type FormFieldContextProps = {
   formData: any

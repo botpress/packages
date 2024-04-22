@@ -212,6 +212,7 @@ export type ZuiReactDiscriminatedUnionComponentProps<
   UI extends UIComponentDefinitions = DefaultComponentDefinitions,
 > = ZuiReactComponentBaseProps<Type, ID, UI> & {
   discriminatorKey: string | null
+  discriminatorLabel: string
   discriminatorOptions: string[] | null
   discriminatorValue: string | null
   setDiscriminator: (discriminator: string) => void

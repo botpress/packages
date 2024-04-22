@@ -299,6 +299,7 @@ const FormElementRenderer: FC<FormRendererProps> = ({ components, fieldSchema, p
       schema: baseProps.schema as any as ObjectSchema,
       data: data || {},
       discriminatorKey: discriminator?.key || null,
+      discriminatorLabel: formatTitle(discriminator?.key || 'Unknown'),
       discriminatorOptions: discriminator?.values || null,
       discriminatorValue,
       setDiscriminator: (disc: string) => {

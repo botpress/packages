@@ -9,6 +9,9 @@ export type GenerateSchemaFromZodOpts = {
   allowUnions?: boolean
 }
 
+export type JsonSchema = JSONSchema7
+export type NullableJsonSchema = JSONSchema7 & { nullable?: boolean }
+
 export const generateSchemaFromZod = (zodRef: OpenApiZodAny, opts?: GenerateSchemaFromZodOpts) => {
   const jsonSchema = generateJsonSchema(zodRef, opts?.useOutput) as SchemaObject
   formatJsonSchema(jsonSchema, opts?.allowUnions ?? false)
@@ -72,7 +75,6 @@ export function schemaIsEmptyObject(schema: SchemaObject) {
  * Since it's not officially supported, some tools like "json-schema-to-typescript" don't support it.
  * This function replaces all occurences of { type: T, nullable: true } with { anyOf: [{ type: T }, { type: 'null' }] }
  */
-export type NullableJsonSchema = JSONSchema7 & { nullable?: boolean }
 export const replaceNullableWithUnion = (nullableSchema: NullableJsonSchema): JSONSchema7 => {
   const { nullable, ...schema } = nullableSchema
   if (nullable) {
@@ -100,4 +102,36 @@ export const replaceNullableWithUnion = (nullableSchema: NullableJsonSchema): JS
   }
 
   return schema
+}
+
+export const setDefaultAdditionalProperties = (schema: JsonSchema, additionalProperties: boolean): void => {
+  if (schema.type === 'object') {
+    if (schema.additionalProperties === undefined) {
+      schema.additionalProperties = additionalProperties
+    }
+
+    _.mapValues(
+      schema.properties,
+      (s) => typeof s === 'object' && setDefaultAdditionalProperties(s, additionalProperties),
+    )
+
+    if (typeof schema.additionalProperties === 'object') {
+      setDefaultAdditionalProperties(schema.additionalProperties, additionalProperties)
+    }
+  }
+
+  if (schema.type === 'array') {
+    if (schema.items === undefined) {
+      return
+    }
+
+    if (Array.isArray(schema.items)) {
+      schema.items.forEach((s) => typeof s === 'object' && setDefaultAdditionalProperties(s, additionalProperties))
+      return
+    }
+
+    if (typeof schema.items === 'object') {
+      setDefaultAdditionalProperties(schema.items, additionalProperties)
+    }
+  }
 }

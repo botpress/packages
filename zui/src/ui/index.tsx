@@ -81,30 +81,38 @@ const resolveComponent = <Type extends BaseType>(
 }
 
 export const resolveDiscriminator = (anyOf: ObjectSchema['anyOf']) => {
-  const output = anyOf?.map(schema => {
-    if (schema.type !== 'object') {
-      return null
-    }
-    return Object.entries(schema.properties).map(([key, def]) => {
-      if (def.type === 'string' && def.const?.length) {
-        return { key, value: def.const }
+  const output = anyOf
+    ?.map((schema) => {
+      if (schema.type !== 'object') {
+        return null
       }
-      return null
-    }).filter((v): v is { key: string, value: string } => !!v)
-  }).flat().reduce((acc, data) => {
-    if (!data) {
-      return acc
-    }
-    const { key, value } = data
-    if (acc.key === null) {
-      acc.key = key
-    }
-    if (acc.key === key) {
-      acc.values.push(value)
-    }
+      return Object.entries(schema.properties)
+        .map(([key, def]) => {
+          if (def.type === 'string' && def.const?.length) {
+            return { key, value: def.const }
+          }
+          return null
+        })
+        .filter((v): v is { key: string; value: string } => !!v)
+    })
+    .flat()
+    .reduce(
+      (acc, data) => {
+        if (!data) {
+          return acc
+        }
+        const { key, value } = data
+        if (acc.key === null) {
+          acc.key = key
+        }
+        if (acc.key === key) {
+          acc.values.push(value)
+        }
 
-    return acc
-  }, { key: null as string | null, values: [] as string[] })
+        return acc
+      },
+      { key: null as string | null, values: [] as string[] },
+    )
 
   if (output?.key === null || !output?.values.length) {
     return null
@@ -123,10 +131,11 @@ export const resolveDiscriminatedSchema = (key: string | null, value: string | n
     const discriminator = schema.properties[key]
     if (discriminator?.type === 'string' && discriminator.const === value) {
       return {
-        ...schema, properties: {
+        ...schema,
+        properties: {
           ...schema.properties,
-          [key]: { ...discriminator, [zuiKey]: { hidden: true } }
-        }
+          [key]: { ...discriminator, [zuiKey]: { hidden: true } },
+        },
       } as ObjectSchema
     }
   }
@@ -302,7 +311,10 @@ const FormElementRenderer: FC<FormRendererProps> = ({ components, fieldSchema, p
       },
       ...childProps,
     }
-    const discriminatedSchema = useMemo(() => resolveDiscriminatedSchema(discriminator?.key || null, discriminatorValue, fieldSchema.anyOf), [fieldSchema.anyOf, data, discriminator?.key])
+    const discriminatedSchema = useMemo(
+      () => resolveDiscriminatedSchema(discriminator?.key || null, discriminatorValue, fieldSchema.anyOf),
+      [fieldSchema.anyOf, data, discriminator?.key],
+    )
     console.info('DU', JSON.stringify(discriminatedSchema, null, 2))
     return (
       <Component key={baseProps.scope} {...props} isArrayChild={props.isArrayChild as any}>

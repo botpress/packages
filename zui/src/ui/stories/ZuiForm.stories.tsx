@@ -210,9 +210,9 @@ const componentMap: ZuiComponentMap<typeof exampleExtensions> = {
     },
   },
   discriminatedUnion: {
-    default: ({ children, errors, data, discriminatorKey, discriminatorOptions, discriminatorValue, setDiscriminator }) => {
+    default: ({ children, discriminatorKey, discriminatorOptions, discriminatorValue, setDiscriminator }) => {
       return (
-        <div style={{ background: '#eee' }}>
+        <div>
           <p>{discriminatorKey}</p>
           <select value={discriminatorValue || undefined} onChange={(e) => setDiscriminator(e.target.value)}>
             {discriminatorOptions?.map((option) => (
@@ -222,11 +222,10 @@ const componentMap: ZuiComponentMap<typeof exampleExtensions> = {
             ))}
           </select>
           {children}
-          <ErrorBox errors={errors} data={data} />
         </div>
       )
     },
-  }
+  },
 }
 
 const ZuiFormExample = () => {

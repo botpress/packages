@@ -174,6 +174,8 @@ export const ZuiForm = <UI extends UIComponentDefinitions = DefaultComponentDefi
   )
 }
 
+export const ROOT = '$_ZROOT_$'
+
 type FormRendererProps = {
   components: ZuiComponentMap<any>
   fieldSchema: JSONSchema
@@ -196,7 +198,7 @@ const FormElementRenderer: FC<FormRendererProps> = ({ components, fieldSchema, p
 
   const { Component: _component, type } = componentMeta
 
-  const pathString = path.length > 0 ? path.join('.') : 'root'
+  const pathString = path.length > 0 ? path.join('.') : ROOT
 
   const baseProps: Omit<ZuiReactComponentBaseProps<BaseType, string, any>, 'data' | 'isArrayChild'> = {
     type,

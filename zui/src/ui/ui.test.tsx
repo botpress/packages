@@ -1,6 +1,6 @@
 import React from 'react'
 import { fireEvent, render } from '@testing-library/react'
-import { ZuiForm, ZuiFormProps, resolveDiscriminatedSchema, resolveDiscriminator } from './index'
+import { ROOT, ZuiForm, ZuiFormProps, resolveDiscriminatedSchema, resolveDiscriminator } from './index'
 import { ZuiComponentMap } from '../index'
 import { ObjectSchema, JSONSchema, ZuiReactComponentBaseProps, BaseType, UIComponentDefinitions } from './types'
 import { FC, PropsWithChildren, useState } from 'react'
@@ -9,7 +9,7 @@ import { z as zui } from '../z/index'
 import { zuiKey } from './constants'
 
 const TestId = (type: JSONSchema['type'], path: string[], subpath?: string) =>
-  `${type}:${path.length > 0 ? path.join('.') : 'root'}${subpath ? `:${subpath}` : ''}`
+  `${type}:${path.length > 0 ? path.join('.') : ROOT}${subpath ? `:${subpath}` : ''}`
 
 describe('UI', () => {
   it('renders a simple form from a json schema', () => {
@@ -27,7 +27,7 @@ describe('UI', () => {
         schema={jsonSchema}
         components={testComponentImplementation}
         value={{}}
-        onChange={() => {}}
+        onChange={() => { }}
       />,
     )
 

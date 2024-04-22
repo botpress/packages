@@ -40,6 +40,7 @@ const exampleExtensions = {
 
 const exampleSchema = z
   .object({
+    root: z.string().title('Root').placeholder('Root').default('root'),
     field: z.enum(['yes', 'no']).displayAs<typeof exampleExtensions>({ id: 'debug', params: {} }),
     firstName: z.string().title('first name').disabled().placeholder('Enter your name').nullable(),
     lastName: z.string().min(3).title('Last Name <3').optional().nullable(),
@@ -66,6 +67,8 @@ const exampleSchema = z
           state: z.string().placeholder('CA'),
           zip: z.string().placeholder('94111'),
         }),
+        root: z.string().placeholder('root'),
+        babies: z.array(z.object({ name: z.string(), age: z.number() })),
       }),
     ]),
     stuff: z.object({

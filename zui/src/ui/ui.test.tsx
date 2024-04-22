@@ -27,7 +27,7 @@ describe('UI', () => {
         schema={jsonSchema}
         components={testComponentImplementation}
         value={{}}
-        onChange={() => { }}
+        onChange={() => {}}
       />,
     )
 
@@ -435,27 +435,24 @@ describe('UI', () => {
   })
 
   it('renders discriminated union correctly', () => {
-    const aDUSchema = zui
-      .discriminatedUnion('type', [
-        zui.object({
-          type: zui.literal('text'),
-          name: zui.string(),
-        }),
-        zui.object({
-          type: zui.literal('number'),
-          value: zui.number(),
-        }),
-        zui.object({
-          value: zui.string(),
-          type: zui.literal('image'),
-        }),
-      ])
+    const aDUSchema = zui.discriminatedUnion('type', [
+      zui.object({
+        type: zui.literal('text'),
+        name: zui.string(),
+      }),
+      zui.object({
+        type: zui.literal('number'),
+        value: zui.number(),
+      }),
+      zui.object({
+        value: zui.string(),
+        type: zui.literal('image'),
+      }),
+    ])
 
     const jsonSchema = aDUSchema.toJsonSchema()
 
-    const rendered = render(
-      <ZuiFormWithState schema={jsonSchema} components={testComponentImplementation} />
-    )
+    const rendered = render(<ZuiFormWithState schema={jsonSchema} components={testComponentImplementation} />)
 
     const select = rendered.getByTestId('discriminatedUnion:root:select')
     expect(select).toBeTruthy()
@@ -537,9 +534,11 @@ describe('UI', () => {
         type: 'object',
         properties: {
           type: {
-            type: 'string', const: 'text', [zuiKey]: {
-              hidden: true
-            }
+            type: 'string',
+            const: 'text',
+            [zuiKey]: {
+              hidden: true,
+            },
           },
           name: { type: 'string' },
         },
@@ -734,7 +733,11 @@ const testComponentImplementation: ZuiComponentMap<typeof testComponentDefinitio
     default: (props) => {
       return (
         <TestWrapper {...props}>
-          <select data-testid={`${props.type}:${props.scope}:select`} onChange={(e) => props.setDiscriminator(e.target.value)} value={props.discriminatorValue || undefined}>
+          <select
+            data-testid={`${props.type}:${props.scope}:select`}
+            onChange={(e) => props.setDiscriminator(e.target.value)}
+            value={props.discriminatorValue || undefined}
+          >
             {props.discriminatorOptions?.map((option) => <option key={option}>{option}</option>)}
           </select>
           <div data-testid={`${props.type}:${props.scope}:inner`}>{props.children}</div>

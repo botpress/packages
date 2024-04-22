@@ -82,11 +82,13 @@ type ParsedRequest = {
   body: AnyBodyParams
 }
 
+const isDefined = <T>(pair: [string, T | undefined]): pair is [string, T] => pair[1] !== undefined
+
 export const toAxiosRequest = (req: ParsedRequest): AxiosRequestConfig => {
   const { method, path: url, query, headers: headerParams, body: data } = req
 
   // prepare headers
-  const headerEntries = Object.entries(headerParams).filter(([_, v]) => v !== undefined)
+  const headerEntries: [string, string][] = Object.entries(headerParams).filter(isDefined)
   const headers = Object.fromEntries(headerEntries)
 
   // prepare query params

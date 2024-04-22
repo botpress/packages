@@ -1,6 +1,6 @@
 import React from 'react'
 import { fireEvent, render } from '@testing-library/react'
-import { ZuiForm, ZuiFormProps } from './index'
+import { ZuiForm, ZuiFormProps, resolveDiscriminator } from './index'
 import { ZuiComponentMap } from '../index'
 import { ObjectSchema, JSONSchema, ZuiReactComponentBaseProps, BaseType, UIComponentDefinitions } from './types'
 import { FC, PropsWithChildren, useState } from 'react'
@@ -26,7 +26,7 @@ describe('UI', () => {
         schema={jsonSchema}
         components={testComponentImplementation}
         value={{}}
-        onChange={() => {}}
+        onChange={() => { }}
       />,
     )
 
@@ -434,6 +434,42 @@ describe('UI', () => {
   })
 })
 
+describe('utils', () => {
+  it('can resolve a discriminated union discriminator', () => {
+    const aDUSchema = zui.discriminatedUnion('type', [
+      zui.object({
+        type: zui.literal('text'),
+        name: zui.string(),
+      }),
+      zui.object({
+        type: zui.literal('number'),
+        value: zui.number(),
+      }),
+      zui.object({
+        value: zui.string(),
+        type: zui.literal('image')
+      })
+    ]).toJsonSchema()
+
+    const discriminators = resolveDiscriminator(aDUSchema.anyOf)
+
+    expect(discriminators).toEqual({
+      key: 'type', values: ['text', 'number', 'image']
+    })
+  })
+
+  it('can resolve null on a non-discriminated union', () => {
+    const aSchema = zui.object({
+      test: zui.string().min(3).optional().nullable()
+    }).toJsonSchema()
+
+    const discriminators = resolveDiscriminator(aSchema.anyOf)
+
+    expect(discriminators).toBeNull()
+  })
+})
+
+
 export const testComponentDefinitions = {
   string: {
     customstringcomponent: {
@@ -459,6 +495,7 @@ export const testComponentDefinitions = {
   },
   boolean: {},
   number: {},
+  discriminatedUnion: {}
 } as const satisfies UIComponentDefinitions
 
 const ZuiFormWithState: FC<Omit<ZuiFormProps<any>, 'onChange' | 'value'>> = (props) => {
@@ -613,6 +650,22 @@ const testComponentImplementation: ZuiComponentMap<typeof testComponentDefinitio
       )
     },
   },
+  discriminatedUnion: {
+    default: (props) => {
+      return (
+        <TestWrapper {...props}>
+          <select onChange={e => props.setDiscriminator(e.target.value)}>
+            {props.discriminatorOptions?.map((option) => (
+              <option key={option}>{option}</option>
+            ))}
+          </select>
+          <div>
+            {props.children}
+          </div>
+        </TestWrapper>
+      )
+    }
+  }
 }
 
 const traverseSchemaTest = (schema: JSONSchema, callback: (path: string[], child: JSONSchema) => void) => {

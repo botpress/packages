@@ -35,6 +35,7 @@ const exampleExtensions = {
       params: z.object({}),
     },
   },
+  discriminatedUnion: {},
 } as const satisfies UIComponentDefinitions
 
 const exampleSchema = z
@@ -54,7 +55,10 @@ const exampleSchema = z
       .nonempty(),
     // tests the hidden function
     aRandomField: z.string().optional().hidden(),
-
+    aDiscriminatedUnion: z.discriminatedUnion('type', [
+      z.object({ type: z.literal('text'), text: z.string().placeholder('Some text') }),
+      z.object({ type: z.literal('number'), b: z.number().placeholder('42').default(5) }),
+    ]),
     stuff: z.object({
       birthday: z.string(),
       plan: z.enum(['basic', 'premium']),
@@ -155,6 +159,7 @@ const componentMap: ZuiComponentMap<typeof exampleExtensions> = {
             placeholder={zuiProps?.placeholder}
             onChange={(e) => onChange(parseFloat(e.target.value))}
             value={data || 0}
+            defaultValue={schema.default || 0}
           />
           {required && <span>*</span>}
           <ErrorBox errors={errors} data={data} />
@@ -204,6 +209,24 @@ const componentMap: ZuiComponentMap<typeof exampleExtensions> = {
       )
     },
   },
+  discriminatedUnion: {
+    default: ({ children, errors, data, discriminatorKey, discriminatorOptions, discriminatorValue, setDiscriminator }) => {
+      return (
+        <div style={{ background: '#eee' }}>
+          <p>{discriminatorKey}</p>
+          <select value={discriminatorValue || undefined} onChange={(e) => setDiscriminator(e.target.value)}>
+            {discriminatorOptions?.map((option) => (
+              <option key={option} value={option}>
+                {option}
+              </option>
+            ))}
+          </select>
+          {children}
+          <ErrorBox errors={errors} data={data} />
+        </div>
+      )
+    },
+  }
 }
 
 const ZuiFormExample = () => {

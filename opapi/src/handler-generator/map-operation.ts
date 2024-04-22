@@ -9,24 +9,31 @@ import { partiallyUnref } from './unref'
 type PathParam = Extract<Parameter<'json-schema'>, { in: 'path' }>
 type OptionalParam = Exclude<Parameter<'json-schema'>, { in: 'path' }>
 
-const _mapQuery = (q: Parameter<'json-schema'>, s: utils.JsonSchemaBuilder): JSONSchema7 => {
-  if (q.in !== 'query') {
-    throw new Error(`Expected query parameter, got ${q.in}`)
+const _mapPathParam = (p: PathParam, s: utils.JsonSchemaBuilder): JSONSchema7 => {
+  if (p.enum) {
+    return s.enum(...p.enum)
   }
+  return s.string()
+}
 
+const _mapOptionalParameter = (p: OptionalParam, s: utils.JsonSchemaBuilder): JSONSchema7 => {
   let schema: JSONSchema7
-  if (q.type === 'string') {
+  if (p.type === 'string' && p.enum) {
+    schema = s.enum(...p.enum)
+  } else if (p.type === 'string') {
     schema = s.string()
-  } else if (q.type === 'string[]') {
+  } else if (p.type === 'string[]' && p.enum) {
+    schema = s.array(s.enum(...p.enum))
+  } else if (p.type === 'string[]') {
     schema = s.array(s.string())
-  } else if (q.type === 'boolean') {
+  } else if (p.type === 'boolean') {
     schema = s.boolean()
-  } else if (q.type === 'number') {
+  } else if (p.type === 'number') {
     schema = s.number()
-  } else if (q.type === 'integer') {
+  } else if (p.type === 'integer') {
     schema = s.integer()
   } else {
-    schema = q.schema as JSONSchema7
+    schema = p.schema as JSONSchema7
   }
 
   return schema
@@ -49,7 +56,7 @@ export const toRequestShape = (
     .filter(([_, h]) => h.required)
     .map(([k]) => k)
   const headerParamsSchema = s.object(
-    _.mapValues(headerParams, () => s.string()),
+    _.mapValues(headerParams, (h) => _mapOptionalParameter(h, s)),
     requiredHeaderParams,
   )
 
@@ -57,13 +64,13 @@ export const toRequestShape = (
     .filter(([_, q]) => q.required)
     .map(([k]) => k)
   const queryParamsSchema = s.object(
-    _.mapValues(queryParams, (q) => _mapQuery(q, s)),
+    _.mapValues(queryParams, (q) => _mapOptionalParameter(q, s)),
     requiredQueryParams,
   )
 
   const requiredPathParams: string[] = Object.keys(pathParams)
   const pathParamsSchema = s.object(
-    _.mapValues(pathParams, () => s.string()),
+    _.mapValues(pathParams, (p) => _mapPathParam(p, s)),
     requiredPathParams,
   )
 

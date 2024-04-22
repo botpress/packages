@@ -22,10 +22,9 @@ const mapResponse = (state: State<string, string, string>, op: Operation<string,
   toResponseShape(state, op, s)
 
 const fixSchema = (schema: JSONSchema7): JSONSchema7 => {
-  let copy = _.cloneDeep(schema)
-  copy = replaceNullableWithUnion(copy as NullableJsonSchema)
-  setDefaultAdditionalProperties(copy, false)
-  return copy
+  schema = replaceNullableWithUnion(schema as NullableJsonSchema)
+  schema = setDefaultAdditionalProperties(schema, false)
+  return schema
 }
 
 // usefull for debugging, remove when generator is stable

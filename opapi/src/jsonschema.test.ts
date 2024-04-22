@@ -110,8 +110,8 @@ test('setDefaultAdditionalProperties', () => {
   for (let i = 0; i < inputSchemas.length; i++) {
     const inputSchema = inputSchemas[i] as JsonSchema
     const expectedSchema = expectedSchemas[i]
-    setDefaultAdditionalProperties(inputSchema, defaultAdditionalProperties)
-    expect(inputSchema).toEqual(expectedSchema)
+    const actual = setDefaultAdditionalProperties(inputSchema, defaultAdditionalProperties)
+    expect(actual).toEqual(expectedSchema)
   }
 })
 
@@ -173,8 +173,6 @@ test('setDefaultAdditionalProperties with real example', () => {
     additionalProperties: false,
   }
 
-  const copy = _.cloneDeep(input)
-  setDefaultAdditionalProperties(copy, false)
-
-  expect(copy).toEqual(expected)
+  const actual = setDefaultAdditionalProperties(input, false)
+  expect(actual).toEqual(expected)
 })

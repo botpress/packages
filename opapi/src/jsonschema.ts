@@ -104,20 +104,19 @@ export const replaceNullableWithUnion = (nullableSchema: NullableJsonSchema): JS
   return schema
 }
 
-export const setDefaultAdditionalProperties = (schema: JsonSchema, additionalProperties: boolean): void => {
+const _setDefaultAdditionalPropertiesInPlace = (schema: JsonSchema, additionalProperties: boolean): void => {
   if (schema.type === 'object') {
-    if (schema.additionalProperties === undefined) {
-      schema.additionalProperties = additionalProperties
-    }
+    schema.additionalProperties ??= additionalProperties
 
-    _.mapValues(
-      schema.properties,
-      (s) => typeof s === 'object' && setDefaultAdditionalProperties(s, additionalProperties),
+    Object.values(schema.properties ?? {}).forEach(
+      (s) => typeof s === 'object' && _setDefaultAdditionalPropertiesInPlace(s, additionalProperties),
     )
 
     if (typeof schema.additionalProperties === 'object') {
-      setDefaultAdditionalProperties(schema.additionalProperties, additionalProperties)
+      _setDefaultAdditionalPropertiesInPlace(schema.additionalProperties, additionalProperties)
     }
+
+    return
   }
 
   if (schema.type === 'array') {
@@ -126,12 +125,24 @@ export const setDefaultAdditionalProperties = (schema: JsonSchema, additionalPro
     }
 
     if (Array.isArray(schema.items)) {
-      schema.items.forEach((s) => typeof s === 'object' && setDefaultAdditionalProperties(s, additionalProperties))
+      schema.items.forEach(
+        (s) => typeof s === 'object' && _setDefaultAdditionalPropertiesInPlace(s, additionalProperties),
+      )
       return
     }
 
     if (typeof schema.items === 'object') {
-      setDefaultAdditionalProperties(schema.items, additionalProperties)
+      _setDefaultAdditionalPropertiesInPlace(schema.items, additionalProperties)
     }
+
+    return
   }
+
+  return
+}
+
+export const setDefaultAdditionalProperties = (schema: JsonSchema, additionalProperties: boolean): JsonSchema => {
+  const copy = _.cloneDeep(schema)
+  _setDefaultAdditionalPropertiesInPlace(copy, additionalProperties)
+  return copy
 }

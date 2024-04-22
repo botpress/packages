@@ -6,7 +6,7 @@ import _ from 'lodash'
 import { JSONSchema7 } from 'json-schema'
 import { Operation, State } from '../state'
 import { toRequestShape, toResponseShape } from '../handler-generator/map-operation'
-import { replaceNullableWithUnion, NullableJsonSchema } from '../jsonschema'
+import { replaceNullableWithUnion, NullableJsonSchema, setDefaultAdditionalProperties } from '../jsonschema'
 
 type ObjectBuilder = utils.JsonSchemaBuilder['object']
 const objectBuilder: ObjectBuilder = (...args) => ({
@@ -21,6 +21,12 @@ const mapRequest = (state: State<string, string, string>, op: Operation<string, 
 const mapResponse = (state: State<string, string, string>, op: Operation<string, string, string, 'json-schema'>) =>
   toResponseShape(state, op, s)
 
+const fixSchema = (schema: JSONSchema7): JSONSchema7 => {
+  schema = replaceNullableWithUnion(schema as NullableJsonSchema)
+  schema = setDefaultAdditionalProperties(schema, false)
+  return schema
+}
+
 // usefull for debugging, remove when generator is stable
 const debugSchema =
   (inputSchema: JSONSchema7, key: string, enable: boolean = false) =>
@@ -30,7 +36,7 @@ const debugSchema =
     }
     console.info(`### ${key}`)
     console.info('### schema', JSON.stringify(inputSchema, null, 2))
-    console.info('### fixed', JSON.stringify(replaceNullableWithUnion(inputSchema), null, 2))
+    console.info('### fixed', JSON.stringify(fixSchema(inputSchema), null, 2))
     console.info('### tsCode', tsCode)
     return tsCode
   }
@@ -99,7 +105,7 @@ export const toAxiosRequest = (req: ParsedRequest): AxiosRequestConfig => {
 
 const toTs = async (originalSchema: JSONSchema7, name: string): Promise<string> => {
   let { title, ...schema } = originalSchema
-  schema = replaceNullableWithUnion(schema as NullableJsonSchema)
+  schema = fixSchema(schema)
 
   type jsonSchemaToTsInput = Parameters<typeof compile>[0]
   const typeCode = await compile(schema as jsonSchemaToTsInput, name, {

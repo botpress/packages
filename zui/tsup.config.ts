@@ -15,6 +15,9 @@ export default defineConfig({
   bundle: true,
   plugins: [
     polyfillNode({
+      globals: {
+        process: true,
+      },
       polyfills: {
         path: true,
         process: true,

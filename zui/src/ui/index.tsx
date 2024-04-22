@@ -27,7 +27,6 @@ type ComponentMeta<Type extends BaseType = BaseType> = {
 }
 
 const getSchemaType = (schema: JSONSchema): BaseType => {
-  console.log(schema)
   if (schema.anyOf?.length) {
     const discriminator = resolveDiscriminator(schema.anyOf)
     return discriminator ? 'discriminatedUnion' : 'object'
@@ -315,7 +314,7 @@ const FormElementRenderer: FC<FormRendererProps> = ({ components, fieldSchema, p
       () => resolveDiscriminatedSchema(discriminator?.key || null, discriminatorValue, fieldSchema.anyOf),
       [fieldSchema.anyOf, data, discriminator?.key],
     )
-    console.info('DU', JSON.stringify(discriminatedSchema, null, 2))
+
     return (
       <Component key={baseProps.scope} {...props} isArrayChild={props.isArrayChild as any}>
         {discriminatedSchema && (

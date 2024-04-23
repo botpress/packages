@@ -1,7 +1,7 @@
 {
   "name": "@bpinternal/yargs-extra",
   "description": "Utils functions that leverage yargs.",
-  "version": "0.0.5",
+  "version": "0.0.6",
   "author": "Botpress, Inc.",
   "repository": {
     "type": "git",
@@ -21,11 +21,11 @@
   },
   "devDependencies": {
     "@types/json-schema": "^7.0.9",
-    "@types/lodash": "4.14.202",
+    "@types/lodash": "4.17.0",
     "@types/node": "^20.1.3",
-    "vitest": "1.3.1",
+    "vitest": "1.5.0",
     "cross-env": "^7.0.0",
-    "typescript": "5.3.3"
+    "typescript": "5.4.5"
   },
   "scripts": {
     "build": "tsc --build",

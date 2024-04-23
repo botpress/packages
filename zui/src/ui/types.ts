@@ -1,4 +1,4 @@
-import { z } from '../z/index'
+import { ZodEnumDef, z } from '../z/index'
 import type { FC } from 'react'
 import { zuiKey } from './constants'
 
@@ -125,7 +125,7 @@ export type ZodKindToBaseType<T extends z.ZodTypeDef> = T extends infer U
           ? 'array'
           : U extends { typeName: z.ZodFirstPartyTypeKind.ZodObject }
             ? 'object'
-            : U extends { typeName: z.ZodFirstPartyTypeKind.ZodEnum }
+            : U extends ZodEnumDef
               ? 'string'
               : U extends { typeName: z.ZodFirstPartyTypeKind.ZodOptional; innerType: z.ZodTypeAny }
                 ? ZodKindToBaseType<U['innerType']['_def']>

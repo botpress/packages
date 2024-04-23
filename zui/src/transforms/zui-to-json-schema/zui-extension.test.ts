@@ -198,10 +198,12 @@ describe('zuiToJsonSchema', () => {
           "properties": {
             "id": {
               "type": "number",
+              "${zuiKey}": {},
             },
             "title": {
               "minLength": 5,
               "type": "string",
+              "${zuiKey}": {},
             },
           },
           "required": [
@@ -209,6 +211,7 @@ describe('zuiToJsonSchema', () => {
             "title",
           ],
           "type": "object",
+          "${zuiKey}": {},
         },
         "minItems": 1,
         "type": "array",
@@ -359,5 +362,26 @@ describe('zuiToJsonSchema', () => {
       "x-zui": {},
     }
   `)
+  })
+
+  test('array of array', () => {
+    const schema = z.array(z.array(z.string()))
+
+    const jsonSchema = zuiToJsonSchema(schema)
+    expect(jsonSchema).toMatchInlineSnapshot(`
+      {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "items": {
+          "items": {
+            "type": "string",
+            "${zuiKey}": {},
+          },
+          "type": "array",
+          "${zuiKey}": {},
+        },
+        "type": "array",
+        "${zuiKey}": {},
+      }
+    `)
   })
 })

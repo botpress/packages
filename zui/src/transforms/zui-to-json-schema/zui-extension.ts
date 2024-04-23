@@ -85,10 +85,11 @@ const mergeZuiIntoJsonSchema = (
   }
 
   if (isArray(jsonSchema)) {
+    const zuiSchemaTyped = zuiSchema as z.ZodArray<any>
     if (Array.isArray(jsonSchema.items)) {
-      jsonSchema.items.forEach((item, index) => mergeZuiIntoJsonSchema(item, zuiSchema._def.typeOf[index], opts))
+      jsonSchema.items.forEach((item, index) => mergeZuiIntoJsonSchema(item, zuiSchemaTyped._def.type[index], opts))
     } else if (jsonSchema.items) {
-      mergeZuiIntoJsonSchema(jsonSchema.items, zuiSchema._def.typeOf, opts)
+      mergeZuiIntoJsonSchema(jsonSchema.items, zuiSchemaTyped._def.type, opts)
     }
   }
 

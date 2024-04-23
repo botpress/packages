@@ -28,6 +28,10 @@ async function main() {
     }
   })
 
+  if (config.length === 0) {
+    ready = true
+  }
+
   await startServer(logger, (_, res) => {
     if (ready) {
       logger.debug(`Received readiness probe ${chalk.green('OK')}`)

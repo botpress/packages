@@ -127,16 +127,18 @@ export type ZodKindToBaseType<T extends z.ZodTypeDef> = T extends infer U
             ? 'object'
             : U extends ZodEnumDef
               ? 'string'
-              : U extends { typeName: z.ZodFirstPartyTypeKind.ZodOptional; innerType: z.ZodTypeAny }
+              : U extends { typeName: z.ZodFirstPartyTypeKind.ZodDefault; innerType: z.ZodTypeAny }
                 ? ZodKindToBaseType<U['innerType']['_def']>
-                : U extends { typeName: z.ZodFirstPartyTypeKind.ZodNullable; innerType: z.ZodTypeAny }
+                : U extends { typeName: z.ZodFirstPartyTypeKind.ZodOptional; innerType: z.ZodTypeAny }
                   ? ZodKindToBaseType<U['innerType']['_def']>
-                  : U extends {
-                        typeName: z.ZodFirstPartyTypeKind.ZodDiscriminatedUnion
-                        options: z.ZodDiscriminatedUnionOption<any>[]
-                      }
-                    ? 'discriminatedUnion'
-                    : never
+                  : U extends { typeName: z.ZodFirstPartyTypeKind.ZodNullable; innerType: z.ZodTypeAny }
+                    ? ZodKindToBaseType<U['innerType']['_def']>
+                    : U extends {
+                          typeName: z.ZodFirstPartyTypeKind.ZodDiscriminatedUnion
+                          options: z.ZodDiscriminatedUnionOption<any>[]
+                        }
+                      ? 'discriminatedUnion'
+                      : never
   : never
 
 export type BaseTypeToType<T extends BaseType> = T extends 'string'

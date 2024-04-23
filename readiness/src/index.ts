@@ -29,6 +29,7 @@ async function main() {
   })
 
   if (config.length === 0) {
+    logger.info(chalk.green('All checks passed!'))
     ready = true
   }
 

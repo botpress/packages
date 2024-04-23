@@ -19,7 +19,7 @@ const parseOperationRequest =
   ) =>
   async (props: OperationProps, req: unknown): Promise<types.Response> => {
 
-    const validate = ajv.compile(requestSchema)
+    const validate = ajv.compile<unknown>(requestSchema)
     const isValid = validate(req)
     if (!isValid) {
       const message = validate.errors?.[0]?.message ?? 'Invalid request'

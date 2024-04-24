@@ -18,6 +18,7 @@ import React, { type FC, useMemo, useEffect } from 'react'
 import { FormDataProvider, getDefaultItemData, useFormData } from './providers/FormDataProvider'
 import { getPathData } from './providers/FormDataProvider'
 import { formatTitle } from './titleutils'
+import { BoundaryFallbackComponent } from './ErrorBoundary'
 
 type ComponentMeta<Type extends BaseType = BaseType> = {
   type: Type
@@ -87,8 +88,8 @@ export const resolveDiscriminator = (anyOf: ObjectSchema['anyOf']) => {
       }
       return Object.entries(schema.properties)
         .map(([key, def]) => {
-          if (def.type === 'string' && def.const?.length) {
-            return { key, value: def.const }
+          if (def.type === 'string' && def.enum?.length) {
+            return { key, value: def.enum[0] }
           }
           return null
         })
@@ -128,7 +129,7 @@ export const resolveDiscriminatedSchema = (key: string | null, value: string | n
       continue
     }
     const discriminator = schema.properties[key]
-    if (discriminator?.type === 'string' && discriminator.const === value) {
+    if (discriminator?.type === 'string' && discriminator.enum?.length && discriminator.enum[0] === value) {
       return {
         ...schema,
         properties: {
@@ -147,6 +148,7 @@ export type ZuiFormProps<UI extends UIComponentDefinitions = DefaultComponentDef
   value: any
   onChange: (value: any) => void
   disableValidation?: boolean
+  fallback?: BoundaryFallbackComponent
 }
 
 export const ZuiForm = <UI extends UIComponentDefinitions = DefaultComponentDefinitions>({
@@ -155,6 +157,7 @@ export const ZuiForm = <UI extends UIComponentDefinitions = DefaultComponentDefi
   onChange,
   value,
   disableValidation,
+  fallback
 }: ZuiFormProps<UI>): JSX.Element | null => {
   return (
     <FormDataProvider
@@ -167,11 +170,28 @@ export const ZuiForm = <UI extends UIComponentDefinitions = DefaultComponentDefi
         components={components as any}
         fieldSchema={schema}
         path={[]}
+        fallback={fallback}
         required={true}
         isArrayChild={false}
       />
     </FormDataProvider>
   )
+}
+const parseBooleanMaskField = (currentData: any, value: string | boolean | undefined) => {
+  if (typeof value === 'undefined') {
+    return false
+  }
+  if (typeof value === 'boolean') {
+    return value
+  }
+  if (typeof value === 'string') {
+    const evaluator = new Function(value)
+    const returnvalue = evaluator(currentData)
+    if (typeof returnvalue === 'object') {
+
+    }
+  }
+  return false
 }
 
 type FormRendererProps = {
@@ -179,13 +199,16 @@ type FormRendererProps = {
   fieldSchema: JSONSchema
   path: string[]
   required: boolean
+  fallback?: BoundaryFallbackComponent
 } & ZuiReactArrayChildProps
 
-const FormElementRenderer: FC<FormRendererProps> = ({ components, fieldSchema, path, required, ...childProps }) => {
+const FormElementRenderer: FC<FormRendererProps> = ({ components, fieldSchema, path, required, fallback, ...childProps }) => {
   const { formData, handlePropertyChange, addArrayItem, removeArrayItem, formErrors, formValid } = useFormData()
   const data = useMemo(() => getPathData(formData, path), [formData, path])
   const componentMeta = useMemo(() => resolveComponent(components, fieldSchema), [fieldSchema, components])
+  const disabled = useMemo(() => {
 
+  }, [])
   if (!componentMeta) {
     return null
   }
@@ -198,7 +221,7 @@ const FormElementRenderer: FC<FormRendererProps> = ({ components, fieldSchema, p
 
   const pathString = path.length > 0 ? path.join('.') : ROOT
 
-  const baseProps: Omit<ZuiReactComponentBaseProps<BaseType, string, any>, 'data' | 'isArrayChild'> = {
+  const baseProps: Omit<ZuiReactComponentBaseProps<BaseType, string, any>, 'data' | 'isArrayChild' | 'enabled'> = {
     type,
     componentID: componentMeta.id,
     scope: pathString,
@@ -210,7 +233,6 @@ const FormElementRenderer: FC<FormRendererProps> = ({ components, fieldSchema, p
       formValid,
       updateForm: handlePropertyChange,
     },
-    enabled: fieldSchema[zuiKey]?.disabled !== true,
     onChange: (data: any) => handlePropertyChange(pathString, data),
     errors: formErrors?.filter((e) => e.path.join('.') === pathString) || [],
     label: fieldSchema[zuiKey]?.title || formatTitle(path[path.length - 1]?.toString() || ''),
@@ -222,12 +244,13 @@ const FormElementRenderer: FC<FormRendererProps> = ({ components, fieldSchema, p
   if (fieldSchema.type === 'array' && type === 'array') {
     const Component = _component as any as ZuiReactComponent<'array', string, any>
     const schema = baseProps.schema as ArraySchema
-
+    const dataArray = Array.isArray(data) ? data : typeof data === 'object' ? data : []
     const props: Omit<ZuiReactComponentProps<'array', string, any>, 'children'> = {
       ...baseProps,
       type,
       schema,
-      data: Array.isArray(data) ? data : [],
+      data: dataArray,
+      enabled: parseBooleanMaskField(dataArray, fieldSchema[zuiKey]?.disabled),
       addItem: (data = undefined) =>
         addArrayItem(baseProps.context.path, typeof data === 'undefined' ? getDefaultItemData(schema.items) : data),
       removeItem: (index) => removeArrayItem(baseProps.context.path, index),
@@ -236,7 +259,7 @@ const FormElementRenderer: FC<FormRendererProps> = ({ components, fieldSchema, p
 
     return (
       <Component key={baseProps.scope} {...props} isArrayChild={props.isArrayChild as any}>
-        {props.data?.map((_, index) => {
+        {Array.isArray(props.data) ? props.data.map((_, index) => {
           const childPath = [...path, index.toString()]
           return (
             <FormElementRenderer
@@ -250,7 +273,7 @@ const FormElementRenderer: FC<FormRendererProps> = ({ components, fieldSchema, p
               removeSelf={() => removeArrayItem(baseProps.context.path, index)}
             />
           )
-        }) || []}
+        }) : []}
       </Component>
     )
   }
@@ -262,6 +285,7 @@ const FormElementRenderer: FC<FormRendererProps> = ({ components, fieldSchema, p
       type,
       schema: baseProps.schema as any as ObjectSchema,
       data: data || {},
+      enabled: parseBooleanMaskField(data, fieldSchema[zuiKey]?.disabled),
       ...childProps,
     }
     return (
@@ -298,6 +322,7 @@ const FormElementRenderer: FC<FormRendererProps> = ({ components, fieldSchema, p
       type,
       schema: baseProps.schema as any as ObjectSchema,
       data: data || {},
+      enabled: parseBooleanMaskField(data, fieldSchema[zuiKey]?.disabled),
       discriminatorKey: discriminator?.key || null,
       discriminatorLabel: formatTitle(discriminator?.key || 'Unknown'),
       discriminatorOptions: discriminator?.values || null,

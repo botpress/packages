@@ -2,6 +2,7 @@ import { ZodEnumDef, z } from '../z/index'
 import type { FC } from 'react'
 import { zuiKey } from './constants'
 
+export type SerializedFunction = string
 export type BaseSchema = {
   description?: string
   anyOf?: JSONSchema[]
@@ -9,10 +10,10 @@ export type BaseSchema = {
   allOf?: JSONSchema[]
   [zuiKey]?: {
     tooltip?: boolean
-    disabled?: boolean
     displayAs?: [string, any]
     title?: string
-    hidden?: boolean
+    disabled?: boolean | SerializedFunction
+    hidden?: boolean | SerializedFunction
     placeholder?: string
   }
 }
@@ -47,7 +48,6 @@ export type ObjectSchema = {
 export type StringSchema = {
   type: 'string'
   enum?: string[]
-  const?: string
   minLength?: number
   maxLength?: number
   pattern?: string

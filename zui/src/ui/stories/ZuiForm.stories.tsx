@@ -66,7 +66,7 @@ const exampleSchema = z
           city: z.string().placeholder('San Francisco'),
           state: z.string().placeholder('CA'),
           zip: z.string().placeholder('94111'),
-        }),
+        }).disabled((obj) => !obj?.street && { city: false }),
         root: z.string().placeholder('root'),
         babies: z.array(z.object({ name: z.string(), age: z.number() })),
       }),
@@ -81,7 +81,9 @@ const exampleSchema = z
     }),
     debug: z.number().optional().displayAs<typeof exampleExtensions>({ id: 'debug', params: {} }),
   })
-  .title('User Information')
+  .title('User Information').disabled(s => ({
+    aDiscriminatedUnion: s?.root === 'root',
+  }))
 
 const ErrorBox: FC<{ errors: FormError[]; data: any | null }> = ({ errors, data }) =>
   errors &&
@@ -245,10 +247,11 @@ const ZuiFormExample = () => {
   useEffect(() => {
     exampleSchema.toTypescriptTypings().then(console.log)
   }, [])
+
   return (
     <>
       <ZuiForm<typeof exampleExtensions>
-        schema={exampleSchema.toJsonSchema()}
+        schema={exampleSchema.toJsonSchema({ target: 'openApi3' })}
         value={formData}
         onChange={setFormData}
         components={componentMap}
@@ -257,6 +260,7 @@ const ZuiFormExample = () => {
     </>
   )
 }
+
 const meta = {
   title: 'Form/Example',
   component: ZuiFormExample,

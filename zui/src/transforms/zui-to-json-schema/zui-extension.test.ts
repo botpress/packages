@@ -15,7 +15,6 @@ describe('zuiToJsonSchema', () => {
 
     expect(jsonSchema).toMatchInlineSnapshot(`
       {
-        "$schema": "http://json-schema.org/draft-07/schema#",
         "additionalProperties": false,
         "properties": {
           "age": {
@@ -50,7 +49,6 @@ describe('zuiToJsonSchema', () => {
         }),
       ),
     ).toEqual({
-      $schema: 'http://json-schema.org/draft-07/schema#',
       additionalProperties: false,
       properties: {
         fruit: {
@@ -75,7 +73,6 @@ describe('zuiToJsonSchema', () => {
     const jsonSchema = zuiToJsonSchema(schema)
     expect(jsonSchema).toMatchInlineSnapshot(`
       {
-        "$schema": "http://json-schema.org/draft-07/schema#",
         "additionalProperties": false,
         "properties": {
           "testExample": {
@@ -191,7 +188,6 @@ describe('zuiToJsonSchema', () => {
     const jsonSchema = zuiToJsonSchema(arrayWithObjects)
     expect(jsonSchema).toMatchInlineSnapshot(`
       {
-        "$schema": "http://json-schema.org/draft-07/schema#",
         "description": "Array of objects with validation",
         "items": {
           "additionalProperties": false,
@@ -229,13 +225,14 @@ describe('zuiToJsonSchema', () => {
     const jsonSchema = zuiToJsonSchema(schema)
     expect(jsonSchema).toMatchInlineSnapshot(`
       {
-        "$schema": "http://json-schema.org/draft-07/schema#",
         "anyOf": [
           {
             "additionalProperties": false,
             "properties": {
               "kek": {
-                "const": "A",
+                "enum": [
+                  "A",
+                ],
                 "type": "string",
               },
               "lel": {
@@ -252,7 +249,9 @@ describe('zuiToJsonSchema', () => {
             "additionalProperties": false,
             "properties": {
               "kek": {
-                "const": "B",
+                "enum": [
+                  "B",
+                ],
                 "type": "string",
               },
               "lel": {
@@ -338,7 +337,6 @@ describe('zuiToJsonSchema', () => {
 
     expect(schema.toJsonSchema()).toMatchInlineSnapshot(`
     {
-      "$schema": "http://json-schema.org/draft-07/schema#",
       "additionalProperties": false,
       "properties": {
         "type": {
@@ -370,7 +368,6 @@ describe('zuiToJsonSchema', () => {
     const jsonSchema = zuiToJsonSchema(schema)
     expect(jsonSchema).toMatchInlineSnapshot(`
       {
-        "$schema": "http://json-schema.org/draft-07/schema#",
         "items": {
           "items": {
             "type": "string",

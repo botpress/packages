@@ -24,10 +24,7 @@ export type ZuiSchemaOptions = {
   target?: 'jsonSchema7' | 'openApi3'
 } & Partial<Pick<Options, 'unionStrategy' | 'discriminator'>>
 
-export const zuiToJsonSchema = (
-  zuiType: z.ZodTypeAny,
-  opts: ZuiSchemaOptions = { target: 'jsonSchema7' },
-): JSONSchema => {
+export const zuiToJsonSchema = (zuiType: z.ZodTypeAny, opts: ZuiSchemaOptions = { target: 'openApi3' }): JSONSchema => {
   const jsonSchema = zodToJsonSchema(zuiType as z.ZodType, opts)
 
   if (opts.$schemaUrl === false) {

@@ -160,7 +160,7 @@ export const ZuiForm = <UI extends UIComponentDefinitions = DefaultComponentDefi
   onChange,
   value,
   disableValidation,
-  fallback
+  fallback,
 }: ZuiFormProps<UI>): JSX.Element | null => {
   return (
     <FormDataProvider
@@ -199,7 +199,7 @@ const useDiscriminator = (fieldSchema: JSONSchema, path: string[], data: any | n
     return {
       discriminator,
       value,
-      discriminatedSchema
+      discriminatedSchema,
     }
   }, [fieldSchema.anyOf, data])
 
@@ -212,8 +212,16 @@ const useDiscriminator = (fieldSchema: JSONSchema, path: string[], data: any | n
   return { discriminator, discriminatorValue: value, discriminatedSchema }
 }
 
-const FormElementRenderer: FC<FormRendererProps> = ({ components, fieldSchema, path, required, fallback, ...childProps }) => {
-  const { formData, disabled, hidden, handlePropertyChange, addArrayItem, removeArrayItem, formErrors, formValid } = useFormData(fieldSchema, path)
+const FormElementRenderer: FC<FormRendererProps> = ({
+  components,
+  fieldSchema,
+  path,
+  required,
+  fallback,
+  ...childProps
+}) => {
+  const { formData, disabled, hidden, handlePropertyChange, addArrayItem, removeArrayItem, formErrors, formValid } =
+    useFormData(fieldSchema, path)
   const data = useMemo(() => getPathData(formData, path), [formData, path])
   const componentMeta = useMemo(() => resolveComponent(components, fieldSchema), [fieldSchema, components])
   const { discriminator, discriminatedSchema, discriminatorValue } = useDiscriminator(fieldSchema, path, data)
@@ -268,21 +276,23 @@ const FormElementRenderer: FC<FormRendererProps> = ({ components, fieldSchema, p
 
     return (
       <Component key={baseProps.scope} {...props} isArrayChild={props.isArrayChild as any}>
-        {Array.isArray(props.data) ? props.data.map((_, index) => {
-          const childPath = [...path, index.toString()]
-          return (
-            <FormElementRenderer
-              key={childPath.join('.')}
-              components={components}
-              fieldSchema={fieldSchema.items}
-              path={childPath}
-              required={required}
-              isArrayChild={true}
-              index={index}
-              removeSelf={() => removeArrayItem(path, index)}
-            />
-          )
-        }) : []}
+        {Array.isArray(props.data)
+          ? props.data.map((_, index) => {
+              const childPath = [...path, index.toString()]
+              return (
+                <FormElementRenderer
+                  key={childPath.join('.')}
+                  components={components}
+                  fieldSchema={fieldSchema.items}
+                  path={childPath}
+                  required={required}
+                  isArrayChild={true}
+                  index={index}
+                  removeSelf={() => removeArrayItem(path, index)}
+                />
+              )
+            })
+          : []}
       </Component>
     )
   }
@@ -317,7 +327,6 @@ const FormElementRenderer: FC<FormRendererProps> = ({ components, fieldSchema, p
 
   if (type === 'discriminatedUnion') {
     const Component = _component as any as ZuiReactComponent<'discriminatedUnion', string, any>
-
 
     const props: Omit<ZuiReactComponentProps<'discriminatedUnion', string, any>, 'children'> = {
       ...baseProps,

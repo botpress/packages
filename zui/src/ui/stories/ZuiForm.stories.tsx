@@ -40,7 +40,11 @@ const exampleExtensions = {
 
 const exampleSchema = z
   .object({
-    root: z.string().title('Root').placeholder('Root').disabled(s => s?.includes('9') || false),
+    root: z
+      .string()
+      .title('Root')
+      .placeholder('Root')
+      .disabled((s) => s?.includes('9') || false),
     firstName: z.string().title('first name').placeholder('Enter your name').nullable(),
     lastName: z.string().min(3).title('Last Name <3').optional().nullable(),
     dates: z
@@ -60,12 +64,14 @@ const exampleSchema = z
       z.object({ type: z.literal('number'), b: z.number().placeholder('42').default(5) }),
       z.object({
         type: z.literal('complex'),
-        address: z.object({
-          street: z.string().placeholder('1234 Main St'),
-          city: z.string().placeholder('San Francisco'),
-          state: z.string().placeholder('CA'),
-          zip: z.string().placeholder('94111'),
-        }).disabled((obj) => !obj?.street && { city: false }),
+        address: z
+          .object({
+            street: z.string().placeholder('1234 Main St'),
+            city: z.string().placeholder('San Francisco'),
+            state: z.string().placeholder('CA'),
+            zip: z.string().placeholder('94111'),
+          })
+          .disabled((obj) => !obj?.street && { city: false }),
         root: z.string().placeholder('root'),
         babies: z.array(z.object({ name: z.string(), age: z.number() })),
       }),
@@ -80,9 +86,11 @@ const exampleSchema = z
     }),
     debug: z.number().optional().displayAs<typeof exampleExtensions>({ id: 'debug', params: {} }),
   })
-  .title('User Information').disabled(s => {
+  .title('User Information')
+  .disabled((s) => {
     return { firstName: s?.root?.includes('6') || false }
-  }).hidden(v => ({
+  })
+  .hidden((v) => ({
     aDiscriminatedUnion: v?.root === 'hidden',
   }))
 
@@ -140,7 +148,12 @@ const componentMap: ZuiComponentMap<typeof exampleExtensions> = {
       return (
         <div style={{ padding: '1rem' }}>
           <span>{label}</span>
-          <input disabled={disabled} placeholder={zuiProps?.placeholder} onChange={(e) => onChange(e.target.value)} value={data || ''} />
+          <input
+            disabled={disabled}
+            placeholder={zuiProps?.placeholder}
+            onChange={(e) => onChange(e.target.value)}
+            value={data || ''}
+          />
           {required && <span>*</span>}
           <ErrorBox errors={errors} data={data} />
         </div>

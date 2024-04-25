@@ -40,15 +40,19 @@ export type ObjectSchema = {
   dependentRequired?: {
     [key: string]: string[]
   }
-} & ({
-  properties: {
-    [key: string]: JSONSchema
-  }
-  additionalProperties?: false
-} | {
-  properties?: never
-  additionalProperties: JSONSchema
-}) & BaseSchema
+} & (
+  | {
+      properties: {
+        [key: string]: JSONSchema
+      }
+      additionalProperties?: false
+    }
+  | {
+      properties?: never
+      additionalProperties: JSONSchema
+    }
+) &
+  BaseSchema
 
 export type StringSchema = {
   type: 'string'

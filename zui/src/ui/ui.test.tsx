@@ -27,7 +27,7 @@ describe('UI', () => {
         schema={jsonSchema}
         components={testComponentImplementation}
         value={{}}
-        onChange={() => { }}
+        onChange={() => {}}
       />,
     )
 
@@ -421,7 +421,6 @@ describe('UI', () => {
 
     const ageInput = rendered.getByTestId('number:age:input')
     expect(ageInput).toBeTruthy()
-
   })
   it('render multilevel arrays with custom components correctly', () => {
     const schema = zui

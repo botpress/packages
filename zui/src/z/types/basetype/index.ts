@@ -59,7 +59,7 @@ export type TypeOf<T extends ZodType<any, any, any>> = T['_output']
 export type input<T extends ZodType<any, any, any>> = T['_input']
 export type output<T extends ZodType<any, any, any>> = T['_output']
 export type { TypeOf as infer }
-export type DeepMask<T> = util.DeepPartialBoolean<T>
+export type Maskable<T = any> = boolean | ((shape: T | null) => util.DeepPartialBoolean<T> | boolean)
 export type CustomErrorParams = Partial<util.Omit<ZodCustomIssue, 'code'>>
 export interface ZodTypeDef {
   typeName: ZodFirstPartyTypeKind

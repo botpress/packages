@@ -177,22 +177,6 @@ export const ZuiForm = <UI extends UIComponentDefinitions = DefaultComponentDefi
     </FormDataProvider>
   )
 }
-const parseBooleanMaskField = (currentData: any, value: string | boolean | undefined) => {
-  if (typeof value === 'undefined') {
-    return false
-  }
-  if (typeof value === 'boolean') {
-    return value
-  }
-  if (typeof value === 'string') {
-    const evaluator = new Function(value)
-    const returnvalue = evaluator(currentData)
-    if (typeof returnvalue === 'object') {
-
-    }
-  }
-  return false
-}
 
 type FormRendererProps = {
   components: ZuiComponentMap<any>
@@ -202,18 +186,40 @@ type FormRendererProps = {
   fallback?: BoundaryFallbackComponent
 } & ZuiReactArrayChildProps
 
+const useDiscriminator = (fieldSchema: JSONSchema, path: string[], data: any | null) => {
+  const { handlePropertyChange } = useFormData(fieldSchema, path)
+
+  const { discriminator, value, discriminatedSchema } = useMemo(() => {
+    const discriminator = resolveDiscriminator(fieldSchema.anyOf)
+    const value = discriminator?.key ? data?.[discriminator.key] : null
+    const discriminatedSchema = resolveDiscriminatedSchema(discriminator?.key || null, value, fieldSchema.anyOf)
+    return {
+      discriminator,
+      value,
+      discriminatedSchema
+    }
+  }, [fieldSchema.anyOf, data])
+
+  useEffect(() => {
+    if (discriminator?.key && discriminator?.values.length) {
+      handlePropertyChange(path, { [discriminator.key]: discriminator.values[0] })
+    }
+  }, [])
+
+  return { discriminator, discriminatorValue: value, discriminatedSchema }
+}
+
 const FormElementRenderer: FC<FormRendererProps> = ({ components, fieldSchema, path, required, fallback, ...childProps }) => {
-  const { formData, handlePropertyChange, addArrayItem, removeArrayItem, formErrors, formValid } = useFormData()
+  const { formData, disabled, hidden, handlePropertyChange, addArrayItem, removeArrayItem, formErrors, formValid } = useFormData(fieldSchema, path)
   const data = useMemo(() => getPathData(formData, path), [formData, path])
   const componentMeta = useMemo(() => resolveComponent(components, fieldSchema), [fieldSchema, components])
-  const disabled = useMemo(() => {
+  const { discriminator, discriminatedSchema, discriminatorValue } = useDiscriminator(fieldSchema, path, data)
 
-  }, [])
   if (!componentMeta) {
     return null
   }
 
-  if (fieldSchema[zuiKey]?.hidden === true) {
+  if (hidden === true) {
     return null
   }
 
@@ -221,10 +227,10 @@ const FormElementRenderer: FC<FormRendererProps> = ({ components, fieldSchema, p
 
   const pathString = path.length > 0 ? path.join('.') : ROOT
 
-  const baseProps: Omit<ZuiReactComponentBaseProps<BaseType, string, any>, 'data' | 'isArrayChild' | 'enabled'> = {
+  const baseProps: Omit<ZuiReactComponentBaseProps<BaseType, string, any>, 'data' | 'isArrayChild'> = {
     type,
     componentID: componentMeta.id,
-    scope: pathString,
+    scope: path.join('.'),
     context: {
       path: pathString,
       readonly: false,
@@ -233,8 +239,9 @@ const FormElementRenderer: FC<FormRendererProps> = ({ components, fieldSchema, p
       formValid,
       updateForm: handlePropertyChange,
     },
-    onChange: (data: any) => handlePropertyChange(pathString, data),
-    errors: formErrors?.filter((e) => e.path.join('.') === pathString) || [],
+    onChange: (data: any) => handlePropertyChange(path, data),
+    disabled,
+    errors: formErrors?.filter((e) => e.path === path) || [],
     label: fieldSchema[zuiKey]?.title || formatTitle(path[path.length - 1]?.toString() || ''),
     params: componentMeta.params,
     schema: fieldSchema,
@@ -250,10 +257,9 @@ const FormElementRenderer: FC<FormRendererProps> = ({ components, fieldSchema, p
       type,
       schema,
       data: dataArray,
-      enabled: parseBooleanMaskField(dataArray, fieldSchema[zuiKey]?.disabled),
       addItem: (data = undefined) =>
-        addArrayItem(baseProps.context.path, typeof data === 'undefined' ? getDefaultItemData(schema.items) : data),
-      removeItem: (index) => removeArrayItem(baseProps.context.path, index),
+        addArrayItem(path, typeof data === 'undefined' ? getDefaultItemData(schema.items) : data),
+      removeItem: (index) => removeArrayItem(path, index),
       ...childProps,
     }
 
@@ -270,7 +276,7 @@ const FormElementRenderer: FC<FormRendererProps> = ({ components, fieldSchema, p
               required={required}
               isArrayChild={true}
               index={index}
-              removeSelf={() => removeArrayItem(baseProps.context.path, index)}
+              removeSelf={() => removeArrayItem(path, index)}
             />
           )
         }) : []}
@@ -285,7 +291,6 @@ const FormElementRenderer: FC<FormRendererProps> = ({ components, fieldSchema, p
       type,
       schema: baseProps.schema as any as ObjectSchema,
       data: data || {},
-      enabled: parseBooleanMaskField(data, fieldSchema[zuiKey]?.disabled),
       ...childProps,
     }
     return (
@@ -310,19 +315,12 @@ const FormElementRenderer: FC<FormRendererProps> = ({ components, fieldSchema, p
   if (type === 'discriminatedUnion') {
     const Component = _component as any as ZuiReactComponent<'discriminatedUnion', string, any>
 
-    const discriminator = useMemo(() => resolveDiscriminator(fieldSchema.anyOf), [fieldSchema.anyOf])
-    const discriminatorValue = discriminator?.key ? data?.[discriminator.key] : null
-    useEffect(() => {
-      if (discriminator?.key && discriminator?.values.length) {
-        handlePropertyChange(pathString, { [discriminator.key]: discriminator.values[0] })
-      }
-    }, [])
+
     const props: Omit<ZuiReactComponentProps<'discriminatedUnion', string, any>, 'children'> = {
       ...baseProps,
       type,
       schema: baseProps.schema as any as ObjectSchema,
       data: data || {},
-      enabled: parseBooleanMaskField(data, fieldSchema[zuiKey]?.disabled),
       discriminatorKey: discriminator?.key || null,
       discriminatorLabel: formatTitle(discriminator?.key || 'Unknown'),
       discriminatorOptions: discriminator?.values || null,
@@ -332,14 +330,10 @@ const FormElementRenderer: FC<FormRendererProps> = ({ components, fieldSchema, p
           console.warn('No discriminator key found, cannot set discriminator')
           return
         }
-        handlePropertyChange(pathString, { [discriminator.key]: disc })
+        handlePropertyChange(path, { [discriminator.key]: disc })
       },
       ...childProps,
     }
-    const discriminatedSchema = useMemo(
-      () => resolveDiscriminatedSchema(discriminator?.key || null, discriminatorValue, fieldSchema.anyOf),
-      [fieldSchema.anyOf, data, discriminator?.key],
-    )
 
     return (
       <Component key={baseProps.scope} {...props} isArrayChild={props.isArrayChild as any}>

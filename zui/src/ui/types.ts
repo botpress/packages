@@ -181,7 +181,7 @@ export type ZuiReactComponentBaseProps<
   componentID: ID
   params: ID extends 'default' ? {} : z.infer<UI[Type][ID]['params']>
   data: BaseTypeToType<Type> | null
-  enabled: boolean
+  disabled: boolean
   scope: string
   onChange: (data: any) => void
   schema: JSONSchemaOfType<Type>
@@ -193,7 +193,7 @@ export type ZuiReactComponentBaseProps<
     formErrors: FormError[] | null
     formData?: any
     readonly: boolean
-    updateForm: (path: string, data: any) => void
+    updateForm: (path: string[], data: any) => void
   }
   zuiProps: BaseSchema[typeof zuiKey]
 } & ZuiReactArrayChildProps

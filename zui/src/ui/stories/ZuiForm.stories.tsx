@@ -40,9 +40,8 @@ const exampleExtensions = {
 
 const exampleSchema = z
   .object({
-    root: z.string().title('Root').placeholder('Root').default('root'),
-    field: z.enum(['yes', 'no']).displayAs<typeof exampleExtensions>({ id: 'debug', params: {} }),
-    firstName: z.string().title('first name').disabled().placeholder('Enter your name').nullable(),
+    root: z.string().title('Root').placeholder('Root').disabled(s => s?.includes('9') || false),
+    firstName: z.string().title('first name').placeholder('Enter your name').nullable(),
     lastName: z.string().min(3).title('Last Name <3').optional().nullable(),
     dates: z
       .array(
@@ -81,8 +80,10 @@ const exampleSchema = z
     }),
     debug: z.number().optional().displayAs<typeof exampleExtensions>({ id: 'debug', params: {} }),
   })
-  .title('User Information').disabled(s => ({
-    aDiscriminatedUnion: s?.root === 'root',
+  .title('User Information').disabled(s => {
+    return { firstName: s?.root?.includes('6') || false }
+  }).hidden(v => ({
+    aDiscriminatedUnion: v?.root === 'hidden',
   }))
 
 const ErrorBox: FC<{ errors: FormError[]; data: any | null }> = ({ errors, data }) =>
@@ -119,12 +120,12 @@ const componentMap: ZuiComponentMap<typeof exampleExtensions> = {
         </div>
       )
     },
-    default: ({ onChange, errors, required, label, data, zuiProps, schema }) => {
+    default: ({ onChange, errors, required, disabled, label, data, zuiProps, schema }) => {
       if (schema.enum?.length) {
         return (
           <div style={{ padding: '1rem' }}>
             <span>{label}</span>
-            <select onChange={(e) => onChange(e.target.value)} value={data || ''}>
+            <select disabled={disabled} onChange={(e) => onChange(e.target.value)} value={data || ''}>
               {schema.enum.map((e) => (
                 <option key={e} value={e}>
                   {e}
@@ -139,7 +140,7 @@ const componentMap: ZuiComponentMap<typeof exampleExtensions> = {
       return (
         <div style={{ padding: '1rem' }}>
           <span>{label}</span>
-          <input placeholder={zuiProps?.placeholder} onChange={(e) => onChange(e.target.value)} value={data || ''} />
+          <input disabled={disabled} placeholder={zuiProps?.placeholder} onChange={(e) => onChange(e.target.value)} value={data || ''} />
           {required && <span>*</span>}
           <ErrorBox errors={errors} data={data} />
         </div>
@@ -183,7 +184,7 @@ const componentMap: ZuiComponentMap<typeof exampleExtensions> = {
   },
   boolean: {
     debug: () => null,
-    default: ({ data, enabled, label, errors, onChange }) => {
+    default: ({ data, disabled: enabled, label, errors, onChange }) => {
       return (
         <div style={{ padding: '1rem' }}>
           <label>
@@ -244,9 +245,6 @@ const componentMap: ZuiComponentMap<typeof exampleExtensions> = {
 
 const ZuiFormExample = () => {
   const [formData, setFormData] = useState({})
-  useEffect(() => {
-    exampleSchema.toTypescriptTypings().then(console.log)
-  }, [])
 
   return (
     <>

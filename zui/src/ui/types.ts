@@ -32,9 +32,6 @@ export type ArraySchema = {
 
 export type ObjectSchema = {
   type: 'object'
-  properties: {
-    [key: string]: JSONSchema
-  }
   required?: string[]
   additionalProperties: boolean
   default?: any
@@ -43,7 +40,15 @@ export type ObjectSchema = {
   dependentRequired?: {
     [key: string]: string[]
   }
-} & BaseSchema
+} & ({
+  properties: {
+    [key: string]: JSONSchema
+  }
+  additionalProperties?: false
+} | {
+  properties?: never
+  additionalProperties: JSONSchema
+}) & BaseSchema
 
 export type StringSchema = {
   type: 'string'

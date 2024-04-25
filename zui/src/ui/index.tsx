@@ -13,7 +13,7 @@ import {
   ZuiReactArrayChildProps,
   DefaultComponentDefinitions,
 } from './types'
-import { ROOT, zuiKey } from './constants'
+import { zuiKey } from './constants'
 import React, { type FC, useMemo, useEffect } from 'react'
 import { FormDataProvider, getDefaultItemData, useFormData } from './providers/FormDataProvider'
 import { getPathData } from './providers/FormDataProvider'
@@ -86,6 +86,9 @@ export const resolveDiscriminator = (anyOf: ObjectSchema['anyOf']) => {
       if (schema.type !== 'object') {
         return null
       }
+      if (!schema.properties) {
+        return null
+      }
       return Object.entries(schema.properties)
         .map(([key, def]) => {
           if (def.type === 'string' && def.enum?.length) {
@@ -128,7 +131,7 @@ export const resolveDiscriminatedSchema = (key: string | null, value: string | n
     if (schema.type !== 'object') {
       continue
     }
-    const discriminator = schema.properties[key]
+    const discriminator = schema.properties?.[key]
     if (discriminator?.type === 'string' && discriminator.enum?.length && discriminator.enum[0] === value) {
       return {
         ...schema,
@@ -225,7 +228,7 @@ const FormElementRenderer: FC<FormRendererProps> = ({ components, fieldSchema, p
 
   const { Component: _component, type } = componentMeta
 
-  const pathString = path.length > 0 ? path.join('.') : ROOT
+  const pathString = path.length > 0 ? path.join('.') : ''
 
   const baseProps: Omit<ZuiReactComponentBaseProps<BaseType, string, any>, 'data' | 'isArrayChild'> = {
     type,
@@ -284,7 +287,7 @@ const FormElementRenderer: FC<FormRendererProps> = ({ components, fieldSchema, p
     )
   }
 
-  if (fieldSchema.type === 'object' && type === 'object') {
+  if (fieldSchema.type === 'object' && type === 'object' && fieldSchema.properties) {
     const Component = _component as any as ZuiReactComponent<'object', string, any>
     const props: Omit<ZuiReactComponentProps<'object', string, any>, 'children'> = {
       ...baseProps,

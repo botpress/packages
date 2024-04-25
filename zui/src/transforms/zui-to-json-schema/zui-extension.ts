@@ -83,9 +83,9 @@ const mergeZuiIntoJsonSchema = (
 
   if (isArray(jsonSchema)) {
     if (Array.isArray(jsonSchema.items)) {
-      jsonSchema.items.forEach((item, index) => mergeZuiIntoJsonSchema(item, zuiSchema._def.typeOf[index], opts))
+      jsonSchema.items.forEach((item, index) => mergeZuiIntoJsonSchema(item, zuiSchema._def.type[index], opts))
     } else if (jsonSchema.items) {
-      mergeZuiIntoJsonSchema(jsonSchema.items, zuiSchema._def.typeOf, opts)
+      mergeZuiIntoJsonSchema(jsonSchema.items, zuiSchema._def.type, opts)
     }
   }
 

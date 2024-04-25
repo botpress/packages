@@ -5,7 +5,7 @@ import { jsonSchemaToZui } from '../../transforms/json-schema-to-zui'
 import { zuiKey } from '../constants'
 import { Maskable } from '../../z'
 
-export type FormFieldContextProps = {
+export type FormDataContextProps = {
   formData: any
   formSchema: JSONSchema | any
   setFormData: (data: any) => void
@@ -15,8 +15,9 @@ export type FormFieldContextProps = {
   disabledState: object
   disableValidation: boolean
 }
+export type FormDataProviderProps = Omit<FormDataContextProps, 'setHiddenState' | 'setDisabledState' | 'hiddenState' | 'disabledState'>
 
-export const FormDataContext = createContext<FormFieldContextProps>({
+export const FormDataContext = createContext<FormDataContextProps>({
   formData: undefined,
   formSchema: undefined,
   setFormData: () => {
@@ -166,7 +167,7 @@ export const getDefaultItemData = (schema: JSONSchema): any => {
   return null
 }
 
-export const FormDataProvider: React.FC<PropsWithChildren<FormFieldContextProps>> = ({
+export const FormDataProvider: React.FC<PropsWithChildren<FormDataProviderProps>> = ({
   children,
   setFormData,
   formData,

@@ -1,6 +1,6 @@
 import { JSONSchema } from '../../ui/types'
 import { zuiKey } from '../../ui/constants'
-import type { z } from '../../z/index'
+import { z } from '../../z/index'
 import { ArraySchema, ObjectSchema } from '../../ui/types'
 import { zodToJsonSchema } from './zodToJsonSchema'
 import { Options } from './Options'
@@ -82,11 +82,10 @@ const mergeZuiIntoJsonSchema = (
   }
 
   if (isArray(jsonSchema)) {
-    const zuiSchemaTyped = zuiSchema as z.ZodArray<any>
     if (Array.isArray(jsonSchema.items)) {
-      jsonSchema.items.forEach((item, index) => mergeZuiIntoJsonSchema(item, zuiSchemaTyped._def.type[index], opts))
+      jsonSchema.items.forEach((item, index) => mergeZuiIntoJsonSchema(item, zuiSchema._def.typeOf[index], opts))
     } else if (jsonSchema.items) {
-      mergeZuiIntoJsonSchema(jsonSchema.items, zuiSchemaTyped._def.type, opts)
+      mergeZuiIntoJsonSchema(jsonSchema.items, zuiSchema._def.typeOf, opts)
     }
   }
 

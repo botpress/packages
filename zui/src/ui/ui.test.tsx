@@ -498,15 +498,13 @@ describe('UI', () => {
 
   it('handles disabled functions correctly on simple fields', () => {
     const schema = zui.object({
-      name: zui.string().disabled(n => n?.includes('Charles') || false),
-      value: zui.number().disabled(n => n === 5),
+      name: zui.string().disabled((n) => n?.includes('Charles') || false),
+      value: zui.number().disabled((n) => n === 5),
     })
 
     const jsonSchema = schema.toJsonSchema({ target: 'openApi3' }) as ObjectSchema
 
-    const rendered = render(
-      <ZuiFormWithState schema={jsonSchema} components={testComponentImplementation} />,
-    )
+    const rendered = render(<ZuiFormWithState schema={jsonSchema} components={testComponentImplementation} />)
     const numberInput = rendered.getByTestId('number:value:input') as HTMLInputElement
 
     expect(numberInput.disabled).toBeFalsy()
@@ -521,29 +519,28 @@ describe('UI', () => {
   })
 
   it('handles conditional disabled functions on object fields', () => {
-    const schema = zui.object({
-      name: zui.string(),
-      address: zui.object({
-        street: zui.string(),
-        city: zui.string(),
+    const schema = zui
+      .object({
+        name: zui.string(),
+        address: zui.object({
+          street: zui.string(),
+          city: zui.string(),
+        }),
       })
-    }).disabled(obj => ({
-      address: {
-        city: !obj?.name,
-        street: !obj?.name
-      }
-    }))
+      .disabled((obj) => ({
+        address: {
+          city: !obj?.name,
+          street: !obj?.name,
+        },
+      }))
 
     const jsonSchema = schema.toJsonSchema({ target: 'openApi3' }) as ObjectSchema
 
-    const rendered = render(
-      <ZuiFormWithState schema={jsonSchema} components={testComponentImplementation} />,
-    )
+    const rendered = render(<ZuiFormWithState schema={jsonSchema} components={testComponentImplementation} />)
 
     const cityInput = rendered.getByTestId('string:address.city:input') as HTMLInputElement
     const streetInput = rendered.getByTestId('string:address.street:input') as HTMLInputElement
     const nameInput = rendered.getByTestId('string:name:input') as HTMLInputElement
-
 
     expect(cityInput.disabled).toBeTruthy()
     expect(streetInput.disabled).toBeTruthy()
@@ -554,20 +551,17 @@ describe('UI', () => {
     expect(cityInput.disabled).toBeFalsy()
     expect(streetInput.disabled).toBeFalsy()
     expect(nameInput.disabled).toBeFalsy()
-
   })
 
-  it("handles conditional rendering on simple fields", () => {
+  it('handles conditional rendering on simple fields', () => {
     const schema = zui.object({
-      name: zui.string().hidden(n => n === 'Charles'),
-      value: zui.number().hidden(n => n === 5),
+      name: zui.string().hidden((n) => n === 'Charles'),
+      value: zui.number().hidden((n) => n === 5),
     })
 
     const jsonSchema = schema.toJsonSchema({ target: 'openApi3' }) as ObjectSchema
 
-    const rendered = render(
-      <ZuiFormWithState schema={jsonSchema} components={testComponentImplementation} />,
-    )
+    const rendered = render(<ZuiFormWithState schema={jsonSchema} components={testComponentImplementation} />)
 
     const numberInput = rendered.getByTestId('number:value:input') as HTMLInputElement
 

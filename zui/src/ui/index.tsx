@@ -278,24 +278,31 @@ const FormElementRenderer: FC<FormRendererProps> = ({
 
     return (
       <Component key={baseProps.scope} {...props} isArrayChild={props.isArrayChild as any}>
-        {Array.isArray(props.data) ? props.data.map((_, index) => {
-          const childPath = [...path, index.toString()]
-          return (
-            <ErrorBoundary key={childPath.join('.')} fallback={fallback} fieldSchema={fieldSchema.items} path={childPath}>
-              <FormElementRenderer
-                key={childPath.join('.')}
-                components={components}
-                fieldSchema={fieldSchema.items}
-                path={childPath}
-                required={required}
-                isArrayChild={true}
-                index={index}
-                removeSelf={() => removeArrayItem(path, index)}
-                fallback={fallback}
-              />
-            </ErrorBoundary>
-          )
-        }) : []}
+        {Array.isArray(props.data)
+          ? props.data.map((_, index) => {
+              const childPath = [...path, index.toString()]
+              return (
+                <ErrorBoundary
+                  key={childPath.join('.')}
+                  fallback={fallback}
+                  fieldSchema={fieldSchema.items}
+                  path={childPath}
+                >
+                  <FormElementRenderer
+                    key={childPath.join('.')}
+                    components={components}
+                    fieldSchema={fieldSchema.items}
+                    path={childPath}
+                    required={required}
+                    isArrayChild={true}
+                    index={index}
+                    removeSelf={() => removeArrayItem(path, index)}
+                    fallback={fallback}
+                  />
+                </ErrorBoundary>
+              )
+            })
+          : []}
       </Component>
     )
   }
@@ -366,9 +373,8 @@ const FormElementRenderer: FC<FormRendererProps> = ({
               fallback={fallback}
             />
           </ErrorBoundary>
-        )
-        }
-      </Component >
+        )}
+      </Component>
     )
   }
   const Component = _component as any as ZuiReactComponent<any, any>

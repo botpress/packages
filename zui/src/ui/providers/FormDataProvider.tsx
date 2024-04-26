@@ -15,7 +15,10 @@ export type FormDataContextProps = {
   disabledState: object
   disableValidation: boolean
 }
-export type FormDataProviderProps = Omit<FormDataContextProps, 'setHiddenState' | 'setDisabledState' | 'hiddenState' | 'disabledState'>
+export type FormDataProviderProps = Omit<
+  FormDataContextProps,
+  'setHiddenState' | 'setDisabledState' | 'hiddenState' | 'disabledState'
+>
 
 export const FormDataContext = createContext<FormDataContextProps>({
   formData: undefined,
@@ -34,7 +37,6 @@ export const FormDataContext = createContext<FormDataContextProps>({
   disableValidation: false,
 })
 
-
 const parseMaskableField = (key: 'hidden' | 'disabled', fieldSchema: JSONSchema, data: any): Maskable => {
   const value = fieldSchema[zuiKey]?.[key]
   if (typeof value === 'undefined') {
@@ -46,7 +48,6 @@ const parseMaskableField = (key: 'hidden' | 'disabled', fieldSchema: JSONSchema,
   }
 
   if (typeof value === 'string') {
-
     if (typeof window === 'undefined') {
       console.warn('Function evaluation is not supported in server side rendering')
       return false
@@ -110,20 +111,29 @@ export const useFormData = (fieldSchema: JSONSchema, path: string[]) => {
     return { hidden: hidden === true, disabled: disabled === true }
   }, [context.hiddenState, context.disabledState, path])
 
-  const handlePropertyChange = useCallback((path: string[], data: any) => {
-    context.setFormData(setObjectPath(context.formData, path, data))
-  }, [context.formData])
+  const handlePropertyChange = useCallback(
+    (path: string[], data: any) => {
+      context.setFormData(setObjectPath(context.formData, path, data))
+    },
+    [context.formData],
+  )
 
-  const addArrayItem = useCallback((path: string[], data: any) => {
-    const currentData = getPathData(context.formData, path) || []
-    context.setFormData(setObjectPath(context.formData, path, [...currentData, data]))
-  }, [context.formData])
+  const addArrayItem = useCallback(
+    (path: string[], data: any) => {
+      const currentData = getPathData(context.formData, path) || []
+      context.setFormData(setObjectPath(context.formData, path, [...currentData, data]))
+    },
+    [context.formData],
+  )
 
-  const removeArrayItem = useCallback((path: string[], index: number) => {
-    const currentData = getPathData(context.formData, path)
-    currentData.splice(index, 1)
-    context.setFormData(setObjectPath(context.formData, path, currentData))
-  }, [context.formData])
+  const removeArrayItem = useCallback(
+    (path: string[], index: number) => {
+      const currentData = getPathData(context.formData, path)
+      currentData.splice(index, 1)
+      context.setFormData(setObjectPath(context.formData, path, currentData))
+    },
+    [context.formData],
+  )
 
   return { ...context, data, disabled, hidden, handlePropertyChange, addArrayItem, removeArrayItem, ...validation }
 }
@@ -177,7 +187,18 @@ export const FormDataProvider: React.FC<PropsWithChildren<FormDataProviderProps>
   const [hiddenState, setHiddenState] = useState({})
   const [disabledState, setDisabledState] = useState({})
   return (
-    <FormDataContext.Provider value={{ formData, setFormData, formSchema, disableValidation, hiddenState, setHiddenState, disabledState, setDisabledState }}>
+    <FormDataContext.Provider
+      value={{
+        formData,
+        setFormData,
+        formSchema,
+        disableValidation,
+        hiddenState,
+        setHiddenState,
+        disabledState,
+        setDisabledState,
+      }}
+    >
       {children}
     </FormDataContext.Provider>
   )

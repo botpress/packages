@@ -185,7 +185,7 @@ describe('zuiToJsonSchema', () => {
       .min(1)
       .describe('Array of objects with validation')
 
-    const jsonSchema = zuiToJsonSchema(arrayWithObjects)
+    const jsonSchema = zuiToJsonSchema(arrayWithObjects, { target: 'openApi3' })
     expect(jsonSchema).toMatchInlineSnapshot(`
       {
         "description": "Array of objects with validation",

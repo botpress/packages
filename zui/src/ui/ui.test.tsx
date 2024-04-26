@@ -27,7 +27,7 @@ describe('UI', () => {
         schema={jsonSchema}
         components={testComponentImplementation}
         value={{}}
-        onChange={() => { }}
+        onChange={() => {}}
       />,
     )
 
@@ -423,7 +423,6 @@ describe('UI', () => {
 
     const ageInput = rendered.getByTestId('number:age:input')
     expect(ageInput).toBeTruthy()
-
   })
 
   it('render multilevel arrays with custom components correctly', () => {
@@ -867,7 +866,7 @@ const testComponentImplementation: ZuiComponentMap<typeof testComponentDefinitio
 
 const traverseSchemaTest = (schema: JSONSchema, callback: (path: string[], child: JSONSchema) => void) => {
   const traverse = (path: string[], child: JSONSchema) => {
-    if (child.type === 'object') {
+    if (child.type === 'object' && child.properties) {
       for (const [key, value] of Object.entries(child.properties)) {
         traverse([...path, key], value)
       }

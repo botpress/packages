@@ -3,6 +3,7 @@ import type { Meta, StoryObj } from '@storybook/react'
 import { FormError, UIComponentDefinitions, ZuiComponentMap } from '../types'
 import { z } from '../../z/index'
 import { ZuiForm } from '..'
+import { BoundaryFallbackComponent } from '../ErrorBoundary'
 
 const exampleExtensions = {
   string: {
@@ -140,6 +141,7 @@ const componentMap: ZuiComponentMap<typeof exampleExtensions> = {
       return (
         <div style={{ padding: '1rem' }}>
           <span>{label}</span>
+
           <input disabled={disabled} placeholder={zuiProps?.placeholder} onChange={(e) => onChange(e.target.value)} value={data || ''} />
           {required && <span>*</span>}
           <ErrorBox errors={errors} data={data} />
@@ -242,7 +244,14 @@ const componentMap: ZuiComponentMap<typeof exampleExtensions> = {
     },
   },
 }
-
+const Fallback: BoundaryFallbackComponent = ({ error, schema }) => {
+  return (
+    <div style={{ background: '#F44', color: '#FFF' }}>
+      <h1>Something went wrong rendering {schema?.type}</h1>
+      <p>{error.message}</p>
+    </div>
+  )
+}
 const ZuiFormExample = () => {
   const [formData, setFormData] = useState({})
 
@@ -253,6 +262,7 @@ const ZuiFormExample = () => {
         value={formData}
         onChange={setFormData}
         components={componentMap}
+        fallback={Fallback}
         disableValidation={false}
       />
     </>

@@ -13,12 +13,12 @@ import {
   ZuiReactArrayChildProps,
   DefaultComponentDefinitions,
 } from './types'
-import { ROOT, zuiKey } from './constants'
+import { zuiKey } from './constants'
 import React, { type FC, useMemo, useEffect } from 'react'
 import { FormDataProvider, getDefaultItemData, useFormData } from './providers/FormDataProvider'
 import { getPathData } from './providers/FormDataProvider'
 import { formatTitle } from './titleutils'
-import { BoundaryFallbackComponent } from './ErrorBoundary'
+import { BoundaryFallbackComponent, ErrorBoundary } from './ErrorBoundary'
 
 type ComponentMeta<Type extends BaseType = BaseType> = {
   type: Type
@@ -166,14 +166,16 @@ export const ZuiForm = <UI extends UIComponentDefinitions = DefaultComponentDefi
       formSchema={schema}
       disableValidation={disableValidation || false}
     >
-      <FormElementRenderer
-        components={components as any}
-        fieldSchema={schema}
-        path={[]}
-        fallback={fallback}
-        required={true}
-        isArrayChild={false}
-      />
+      <ErrorBoundary fallback={fallback} fieldSchema={schema} path={[]}>
+        <FormElementRenderer
+          components={components as any}
+          fieldSchema={schema}
+          path={[]}
+          fallback={fallback}
+          required={true}
+          isArrayChild={false}
+        />
+      </ErrorBoundary>
     </FormDataProvider>
   )
 }
@@ -225,7 +227,7 @@ const FormElementRenderer: FC<FormRendererProps> = ({ components, fieldSchema, p
 
   const { Component: _component, type } = componentMeta
 
-  const pathString = path.length > 0 ? path.join('.') : ROOT
+  const pathString = path.length > 0 ? path.join('.') : ''
 
   const baseProps: Omit<ZuiReactComponentBaseProps<BaseType, string, any>, 'data' | 'isArrayChild'> = {
     type,
@@ -268,16 +270,19 @@ const FormElementRenderer: FC<FormRendererProps> = ({ components, fieldSchema, p
         {Array.isArray(props.data) ? props.data.map((_, index) => {
           const childPath = [...path, index.toString()]
           return (
-            <FormElementRenderer
-              key={childPath.join('.')}
-              components={components}
-              fieldSchema={fieldSchema.items}
-              path={childPath}
-              required={required}
-              isArrayChild={true}
-              index={index}
-              removeSelf={() => removeArrayItem(path, index)}
-            />
+            <ErrorBoundary key={childPath.join('.')} fallback={fallback} fieldSchema={fieldSchema.items} path={childPath}>
+              <FormElementRenderer
+                key={childPath.join('.')}
+                components={components}
+                fieldSchema={fieldSchema.items}
+                path={childPath}
+                required={required}
+                isArrayChild={true}
+                index={index}
+                removeSelf={() => removeArrayItem(path, index)}
+                fallback={fallback}
+              />
+            </ErrorBoundary>
           )
         }) : []}
       </Component>
@@ -298,14 +303,17 @@ const FormElementRenderer: FC<FormRendererProps> = ({ components, fieldSchema, p
         {Object.entries(fieldSchema.properties).map(([fieldName, childSchema]) => {
           const childPath = [...path, fieldName]
           return (
-            <FormElementRenderer
-              key={childPath.join('.')}
-              components={components}
-              fieldSchema={childSchema}
-              path={childPath}
-              required={fieldSchema.required?.includes(fieldName) || false}
-              isArrayChild={false}
-            />
+            <ErrorBoundary key={childPath.join('.')} fallback={fallback} fieldSchema={childSchema} path={childPath}>
+              <FormElementRenderer
+                key={childPath.join('.')}
+                components={components}
+                fieldSchema={childSchema}
+                path={childPath}
+                required={fieldSchema.required?.includes(fieldName) || false}
+                isArrayChild={false}
+                fallback={fallback}
+              />
+            </ErrorBoundary>
           )
         })}
       </Component>
@@ -338,16 +346,19 @@ const FormElementRenderer: FC<FormRendererProps> = ({ components, fieldSchema, p
     return (
       <Component key={baseProps.scope} {...props} isArrayChild={props.isArrayChild as any}>
         {discriminatedSchema && (
-          <FormElementRenderer
-            components={components}
-            fieldSchema={discriminatedSchema}
-            path={path}
-            required={required}
-            key={path.join('.')}
-            isArrayChild={false}
-          />
-        )}
-      </Component>
+          <ErrorBoundary key={path.join('.')} fallback={fallback} fieldSchema={discriminatedSchema} path={path}>
+            <FormElementRenderer
+              components={components}
+              fieldSchema={discriminatedSchema}
+              path={path}
+              required={required}
+              isArrayChild={false}
+              fallback={fallback}
+            />
+          </ErrorBoundary>
+        )
+        }
+      </Component >
     )
   }
   const Component = _component as any as ZuiReactComponent<any, any>

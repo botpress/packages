@@ -1,11 +1,32 @@
 import { JSONSchema7 } from 'json-schema'
 import { compile } from 'json-schema-to-typescript'
+import * as jsonschema from '../jsonschema'
 import * as utils from './utils'
 import pathlib from 'path'
 import fs from 'fs/promises'
 
-type jsonSchemaToTsInput = Parameters<typeof compile>[0]
 type Module = { name: string; filename: string }
+
+const fixSchema = (schema: JSONSchema7): JSONSchema7 => {
+  schema = jsonschema.replaceNullableWithUnion(schema as jsonschema.NullableJsonSchema)
+  schema = jsonschema.setDefaultAdditionalProperties(schema, false)
+  return schema
+}
+
+const toTs = async (originalSchema: JSONSchema7, name: string): Promise<string> => {
+  let { title, ...schema } = originalSchema
+  schema = fixSchema(schema)
+
+  type jsonSchemaToTsInput = Parameters<typeof compile>[0]
+  const typeCode = await compile(schema as jsonSchemaToTsInput, name, {
+    unknownAny: false,
+    bannerComment: '',
+    additionalProperties: false,
+    ignoreMinAndMaxItems: true,
+  })
+
+  return `${typeCode}\n`
+}
 
 export const exportSchemas = (schemas: Record<string, JSONSchema7>) => async (outDir: string) => {
   await fs.mkdir(outDir, { recursive: true })
@@ -29,7 +50,7 @@ export const exportSchemas = (schemas: Record<string, JSONSchema7>) => async (ou
 
     // type file
     const typeFileName = `${name}.t`
-    const typeCode = await compile(jsonSchema as jsonSchemaToTsInput, name, { unknownAny: false })
+    const typeCode = await toTs(jsonSchema, name)
     const typeFilePath = pathlib.join(outDir, `${typeFileName}.ts`)
     await fs.writeFile(typeFilePath, typeCode)
     typeFiles.push({ name, filename: typeFileName })

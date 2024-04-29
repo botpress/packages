@@ -55,7 +55,7 @@
     "tsx": "^4.7.2",
     "typescript": "5.4.5",
     "vite": "^5.2.6",
-    "vitest": "1.5.0"
+    "vitest": "1.5.2"
   },
   "dependencies": {
     "@apidevtools/json-schema-ref-parser": "^11.5.5",

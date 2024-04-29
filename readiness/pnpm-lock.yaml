@@ -6,8 +6,8 @@ settings:
 
 dependencies:
   '@bpinternal/log4bot':
-    specifier: 0.0.10
-    version: 0.0.10
+    specifier: 0.0.11
+    version: 0.0.11
   chalk:
     specifier: 4.1.2
     version: 4.1.2
@@ -16,7 +16,7 @@ dependencies:
     version: 4.19.2
   ioredis:
     specifier: ^5.2.4
-    version: 5.4.0
+    version: 5.4.1
   node-fetch:
     specifier: ^3.3.1
     version: 3.3.2
@@ -52,8 +52,9 @@ devDependencies:
 
 packages:
 
-  /@bpinternal/log4bot@0.0.10:
-    resolution: {integrity: sha512-bsEMdS984vdQuoh5VGIyVzBk50zDcYqVj8dURayCkwaPXZCOSFmWp/aiAF8Vue3dkH+V8zWD6YXlLPIhejY4dQ==}
+  /@bpinternal/log4bot@0.0.11:
+    resolution: {integrity: sha512-sEQ8nTy1iKZoTKG/Ikx4QuFA8IpsPGzAflNgDQLjoAZjbOWvKv/ygpN9Morr3i3GF6+ExlB6yF8cRGwiFeOfOA==}
+    engines: {node: '>=16.0.0', pnpm: '>=8.6.0 <9'}
     dependencies:
       chalk: 4.1.2
       lodash: 4.17.21
@@ -774,8 +775,8 @@ packages:
     resolution: {integrity: sha512-k/vGaX4/Yla3WzyMCvTQOXYeIHvqOKtnqBduzTHpzpQZzAskKMhZ2K+EnBiSM9zGSoIFeMpXKxa4dYeZIQqewQ==}
     dev: false
 
-  /ioredis@5.4.0:
-    resolution: {integrity: sha512-lGiiZyWFOskPu3pH4P8+uicHOZHpzYpgfKZFre68wLK6059zBo+KDTQpwxAVibBajKqpcrRJ5k+jl/uNHcCo3A==}
+  /ioredis@5.4.1:
+    resolution: {integrity: sha512-2YZsvl7jopIa1gaePkeMtd9rAcSjOOjPtpcLlOeusyO+XH2SK5ZcT+UCrElPP+WVIInh2TzeI4XW9ENaSLVVHA==}
     engines: {node: '>=12.22.0'}
     dependencies:
       '@ioredis/commands': 1.2.0

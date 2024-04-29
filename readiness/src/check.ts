@@ -5,12 +5,8 @@ import { Client } from 'pg'
 import fetch from 'node-fetch'
 import type { Config, HttpCheck, PostgresCheck, RedisCheck } from './config'
 
-export async function checkAll(
-  logger: Logger,
-  configs: Config,
-  setReadiness: (name: string, isReady: boolean) => void
-) {
-  configs.map(async (config) => {
+export function checkAll(logger: Logger, configs: Config, setReadiness: (name: string, isReady: boolean) => void) {
+  const promises = configs.map(async (config) => {
     while (true) {
       try {
         logger.debug(`${chalk.green(config.name)} check of type ${chalk.blue(config.type)} is being checked`)
@@ -26,6 +22,7 @@ export async function checkAll(
       await delay(1000)
     }
   })
+  return Promise.all(promises)
 }
 
 async function check(config: Config[number]) {

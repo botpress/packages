@@ -274,32 +274,37 @@ const FormElementRenderer: FC<FormRendererProps> = ({
       ...childProps,
     }
 
+    // Tuple
+    if (Array.isArray(fieldSchema.items)) {
+      return null
+    }
+
     return (
       <Component key={baseProps.scope} {...props} isArrayChild={props.isArrayChild as any}>
         {Array.isArray(props.data)
           ? props.data.map((_, index) => {
-              const childPath = [...path, index.toString()]
-              return (
-                <ErrorBoundary
+            const childPath = [...path, index.toString()]
+            return (
+              <ErrorBoundary
+                key={childPath.join('.')}
+                fallback={fallback}
+                fieldSchema={fieldSchema.items as JSONSchema}
+                path={childPath}
+              >
+                <FormElementRenderer
                   key={childPath.join('.')}
-                  fallback={fallback}
-                  fieldSchema={fieldSchema.items}
+                  components={components}
+                  fieldSchema={fieldSchema.items as JSONSchema}
                   path={childPath}
-                >
-                  <FormElementRenderer
-                    key={childPath.join('.')}
-                    components={components}
-                    fieldSchema={fieldSchema.items}
-                    path={childPath}
-                    required={required}
-                    isArrayChild={true}
-                    index={index}
-                    removeSelf={() => removeArrayItem(path, index)}
-                    fallback={fallback}
-                  />
-                </ErrorBoundary>
-              )
-            })
+                  required={required}
+                  isArrayChild={true}
+                  index={index}
+                  removeSelf={() => removeArrayItem(path, index)}
+                  fallback={fallback}
+                />
+              </ErrorBoundary>
+            )
+          })
           : []}
       </Component>
     )

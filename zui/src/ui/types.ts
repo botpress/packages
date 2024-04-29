@@ -197,7 +197,7 @@ export type ZuiReactComponentBaseProps<
   label: string
   errors: FormError[]
   context: {
-    path: string
+    path: string[]
     formValid: boolean | null
     formErrors: FormError[] | null
     formData?: any

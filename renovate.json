@@ -1,10 +1,6 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-  "extends": [
-    "config:recommended", 
-    ":rebaseStalePrs", 
-    ":disableDependencyDashboard"
-  ],
+  "extends": ["config:recommended", ":rebaseStalePrs", ":disableDependencyDashboard"],
   "enabledManagers": ["dockerfile", "npm", "github-actions"],
   "prHourlyLimit": 16,
   "separateMajorMinor": false,
@@ -58,6 +54,11 @@
     },
     {
       "matchUpdateTypes": ["major"],
+      "enabled": false
+    },
+    {
+      "matchFileNames": ["jex/**"],
+      "matchPackageNames": ["typescript"],
       "enabled": false
     }
   ]

@@ -3,7 +3,8 @@ import chalk from 'chalk'
 import Redis from 'ioredis'
 import { Client } from 'pg'
 import fetch from 'node-fetch'
-import type { Config, HttpCheck, PostgresCheck, RedisCheck } from './config'
+import * as dynamoDb from '@aws-sdk/client-dynamodb'
+import type { Config, DynamoDbCheck, HttpCheck, PostgresCheck, RedisCheck } from './config'
 
 export function checkAll(logger: Logger, configs: Config, setReadiness: (name: string, isReady: boolean) => void) {
   const promises = configs.map(async (config) => {
@@ -35,6 +36,8 @@ async function check(config: Config[number]) {
       return checkHttp(config)
     case 'redis':
       return checkRedis(config)
+    case 'dynamodb':
+      return checkDynamoDb(config)
     default:
       throw new Error(`Unknown check type: ${type}`)
   }
@@ -59,6 +62,11 @@ async function checkRedis(config: RedisCheck) {
   const client = new Redis(config.uri)
   await client.ping()
   await client.quit()
+}
+
+async function checkDynamoDb(config: DynamoDbCheck) {
+  const client = new dynamoDb.DynamoDBClient({ endpoint: config.uri })
+  await client.send(new dynamoDb.ListTablesCommand({}))
 }
 
 async function delay(delayInms: number) {

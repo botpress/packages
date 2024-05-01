@@ -25,7 +25,16 @@ const redisCheck = z.object({
 
 export type RedisCheck = z.infer<typeof redisCheck>
 
-const configSchema = z.array(z.discriminatedUnion('type', [postgresCheck, httpCheck, redisCheck]))
+const dynamoDbCheck = z.object({
+  type: z.literal('dynamodb'),
+  name: z.string(),
+  uri: z.string()
+  // other fields are passed by environment variables
+})
+
+export type DynamoDbCheck = z.infer<typeof dynamoDbCheck>
+
+const configSchema = z.array(z.discriminatedUnion('type', [postgresCheck, httpCheck, redisCheck, dynamoDbCheck]))
 
 export type Config = z.infer<typeof configSchema>
 

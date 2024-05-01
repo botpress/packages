@@ -13,21 +13,21 @@ dependencies:
     version: 2.1.1
   isomorphic-ws:
     specifier: ^5.0.0
-    version: 5.0.0(ws@8.16.0)
+    version: 5.0.0(ws@8.17.0)
   ws:
     specifier: ^8.13.0
-    version: 8.16.0
+    version: 8.17.0
   zod:
     specifier: ^3.20.6
     version: 3.22.4
 
 devDependencies:
   '@bpinternal/log4bot':
-    specifier: 0.0.10
-    version: 0.0.10
+    specifier: 0.0.11
+    version: 0.0.11
   '@bpinternal/yargs-extra':
-    specifier: 0.0.5
-    version: 0.0.5
+    specifier: 0.0.6
+    version: 0.0.6
   '@tsconfig/node18-strictest':
     specifier: ^1.0.0
     version: 1.0.0
@@ -45,7 +45,7 @@ devDependencies:
     version: 0.20.2
   puppeteer:
     specifier: ^22.0.0
-    version: 22.7.0(typescript@5.4.5)
+    version: 22.7.1(typescript@5.4.5)
   ts-node:
     specifier: ^10.9.1
     version: 10.9.2(@types/node@18.19.31)(typescript@5.4.5)
@@ -59,27 +59,28 @@ packages:
     resolution: {integrity: sha512-y5+tLQyV8pg3fsiln67BVLD1P13Eg4lh5RW9mF0zUuvLrv9uIQ4MCL+CRT+FTsBlBjcIan6PGsLcBN0m3ClUyQ==}
     engines: {node: '>=6.9.0'}
     dependencies:
-      '@babel/highlight': 7.24.2
+      '@babel/highlight': 7.24.5
       picocolors: 1.0.0
     dev: true
 
-  /@babel/helper-validator-identifier@7.22.20:
-    resolution: {integrity: sha512-Y4OZ+ytlatR8AI+8KZfKuL5urKp7qey08ha31L8b3BwewJAoJamTzyvxPR/5D+KkdJCGPq/+8TukHBlY10FX9A==}
+  /@babel/helper-validator-identifier@7.24.5:
+    resolution: {integrity: sha512-3q93SSKX2TWCG30M2G2kwaKeTYgEUp5Snjuj8qm729SObL6nbtUldAi37qbxkD5gg3xnBio+f9nqpSepGZMvxA==}
     engines: {node: '>=6.9.0'}
     dev: true
 
-  /@babel/highlight@7.24.2:
-    resolution: {integrity: sha512-Yac1ao4flkTxTteCDZLEvdxg2fZfz1v8M4QpaGypq/WPDqg3ijHYbDfs+LG5hvzSoqaSZ9/Z9lKSP3CjZjv+pA==}
+  /@babel/highlight@7.24.5:
+    resolution: {integrity: sha512-8lLmua6AVh/8SLJRRVD6V8p73Hir9w5mJrhE+IPpILG31KKlI9iz5zmBYKcWPS59qSfgP9RaSBQSHHE81WKuEw==}
     engines: {node: '>=6.9.0'}
     dependencies:
-      '@babel/helper-validator-identifier': 7.22.20
+      '@babel/helper-validator-identifier': 7.24.5
       chalk: 2.4.2
       js-tokens: 4.0.0
       picocolors: 1.0.0
     dev: true
 
-  /@bpinternal/log4bot@0.0.10:
-    resolution: {integrity: sha512-bsEMdS984vdQuoh5VGIyVzBk50zDcYqVj8dURayCkwaPXZCOSFmWp/aiAF8Vue3dkH+V8zWD6YXlLPIhejY4dQ==}
+  /@bpinternal/log4bot@0.0.11:
+    resolution: {integrity: sha512-sEQ8nTy1iKZoTKG/Ikx4QuFA8IpsPGzAflNgDQLjoAZjbOWvKv/ygpN9Morr3i3GF6+ExlB6yF8cRGwiFeOfOA==}
+    engines: {node: '>=16.0.0', pnpm: '>=8.6.0 <9'}
     dependencies:
       chalk: 4.1.2
       lodash: 4.17.21
@@ -87,8 +88,9 @@ packages:
       regex-parser: 2.3.0
     dev: true
 
-  /@bpinternal/yargs-extra@0.0.5:
-    resolution: {integrity: sha512-1mMFhaIQLh7biz086Fcq3MvIGEgVj5Qq7Vd+dDEnip4aBdrXeMDtwFQIfvEx+uhp6lzXPf8ScpGBmaraQjgdGw==}
+  /@bpinternal/yargs-extra@0.0.6:
+    resolution: {integrity: sha512-wuLdYyBJN41rnlWqUArIWIb/8/P4OKm3zFaKHud+So0f/gjDfR9zPhYT7L5BgunY043nJTLtxOeh84BNaT+52A==}
+    engines: {node: '>=16.0.0', pnpm: '>=8.6.0 <9'}
     dependencies:
       '@types/yargs': 17.0.24
       decamelize: 5.0.1
@@ -328,8 +330,8 @@ packages:
       '@jridgewell/sourcemap-codec': 1.4.15
     dev: true
 
-  /@puppeteer/browsers@2.2.2:
-    resolution: {integrity: sha512-hZ/JhxPIceWaGSEzUZp83/8M49CoxlkuThfTR7t4AoCu5+ZvJ3vktLm60Otww2TXeROB5igiZ8D9oPQh6ckBVg==}
+  /@puppeteer/browsers@2.2.3:
+    resolution: {integrity: sha512-bJ0UBsk0ESOs6RFcLXOt99a3yTDcOKlzfjad+rhFwdaG1Lu/Wzq58GHYCDTlZ9z6mldf4g+NTb+TXEfe0PpnsQ==}
     engines: {node: '>=18'}
     hasBin: true
     dependencies:
@@ -471,27 +473,35 @@ packages:
     dev: true
     optional: true
 
-  /bare-fs@2.2.3:
-    resolution: {integrity: sha512-amG72llr9pstfXOBOHve1WjiuKKAMnebcmMbPWDZ7BCevAoJLpugjuAPRsDINEyjT0a6tbaVx3DctkXIRbLuJw==}
+  /bare-fs@2.3.0:
+    resolution: {integrity: sha512-TNFqa1B4N99pds2a5NYHR15o0ZpdNKbAeKTE/+G6ED/UeOavv8RY3dr/Fu99HW3zU3pXpo2kDNO8Sjsm2esfOw==}
     requiresBuild: true
     dependencies:
       bare-events: 2.2.2
-      bare-path: 2.1.1
-      streamx: 2.16.1
+      bare-path: 2.1.2
+      bare-stream: 1.0.0
     dev: true
     optional: true
 
-  /bare-os@2.2.1:
-    resolution: {integrity: sha512-OwPyHgBBMkhC29Hl3O4/YfxW9n7mdTr2+SsO29XBWKKJsbgj3mnorDB80r5TiCQgQstgE5ga1qNYrpes6NvX2w==}
+  /bare-os@2.3.0:
+    resolution: {integrity: sha512-oPb8oMM1xZbhRQBngTgpcQ5gXw6kjOaRsSWsIeNyRxGed2w/ARyP7ScBYpWR1qfX2E5rS3gBw6OWcSQo+s+kUg==}
     requiresBuild: true
     dev: true
     optional: true
 
-  /bare-path@2.1.1:
-    resolution: {integrity: sha512-OHM+iwRDRMDBsSW7kl3dO62JyHdBKO3B25FB9vNQBPcGHMo4+eA8Yj41Lfbk3pS/seDY+siNge0LdRTulAau/A==}
+  /bare-path@2.1.2:
+    resolution: {integrity: sha512-o7KSt4prEphWUHa3QUwCxUI00R86VdjiuxmJK0iNVDHYPGo+HsDaVCnqCmPbf/MiW1ok8F4p3m8RTHlWk8K2ig==}
     requiresBuild: true
     dependencies:
-      bare-os: 2.2.1
+      bare-os: 2.3.0
+    dev: true
+    optional: true
+
+  /bare-stream@1.0.0:
+    resolution: {integrity: sha512-KhNUoDL40iP4gFaLSsoGE479t0jHijfYdIcxRn/XtezA2BaUD0NRf/JGRpsMq6dMNM+SrCrB0YSSo/5wBY4rOQ==}
+    requiresBuild: true
+    dependencies:
+      streamx: 2.16.1
     dev: true
     optional: true
 
@@ -541,8 +551,8 @@ packages:
       supports-color: 7.2.0
     dev: true
 
-  /chromium-bidi@0.5.17(devtools-protocol@0.0.1273771):
-    resolution: {integrity: sha512-BqOuIWUgTPj8ayuBFJUYCCuwIcwjBsb3/614P7tt1bEPJ4i1M0kCdIl0Wi9xhtswBXnfO2bTpTMkHD71H8rJMg==}
+  /chromium-bidi@0.5.19(devtools-protocol@0.0.1273771):
+    resolution: {integrity: sha512-UA6zL77b7RYCjJkZBsZ0wlvCTD+jTjllZ8f6wdO4buevXgTZYjV+XLB9CiEa2OuuTGGTLnI7eN9I60YxuALGQg==}
     peerDependencies:
       devtools-protocol: '*'
     dependencies:
@@ -852,12 +862,12 @@ packages:
     engines: {node: '>=8'}
     dev: true
 
-  /isomorphic-ws@5.0.0(ws@8.16.0):
+  /isomorphic-ws@5.0.0(ws@8.17.0):
     resolution: {integrity: sha512-muId7Zzn9ywDsyXgTIafTry2sV3nySZeUDe6YedVd1Hvuuep5AsIlqK+XefWpYTyJG5e503F2xIuT2lcU6rCSw==}
     peerDependencies:
       ws: '*'
     dependencies:
-      ws: 8.16.0
+      ws: 8.17.0
     dev: false
 
   /js-tokens@4.0.0:
@@ -1019,12 +1029,12 @@ packages:
       once: 1.4.0
     dev: true
 
-  /puppeteer-core@22.7.0:
-    resolution: {integrity: sha512-9Q+L3VD7cfhXnxv6AqwTHsVb/+/uXENByhPrgvwQ49wvzQwtf1d6b7v6gpoG3tpRdwYjxoV1eHTD8tFahww09g==}
+  /puppeteer-core@22.7.1:
+    resolution: {integrity: sha512-jD7T7yN7PWGuJmNT0TAEboA26s0VVnvbgCxqgQIF+eNQW2u71ENaV2JwzSJiCHO+e72H4Ue6AgKD9USQ8xAcOQ==}
     engines: {node: '>=18'}
     dependencies:
-      '@puppeteer/browsers': 2.2.2
-      chromium-bidi: 0.5.17(devtools-protocol@0.0.1273771)
+      '@puppeteer/browsers': 2.2.3
+      chromium-bidi: 0.5.19(devtools-protocol@0.0.1273771)
       debug: 4.3.4
       devtools-protocol: 0.0.1273771
       ws: 8.16.0
@@ -1034,16 +1044,16 @@ packages:
       - utf-8-validate
     dev: true
 
-  /puppeteer@22.7.0(typescript@5.4.5):
-    resolution: {integrity: sha512-s1ulKFZKW3lwWCtNu0VrRLfRaanFHxIv7F8UFYpLo8dPTZcI4wB4EAOD0sKT3SKP+1Rsjodb9WFsK78yKQ6i9Q==}
+  /puppeteer@22.7.1(typescript@5.4.5):
+    resolution: {integrity: sha512-JBCBCwQ9+dyPp5haqeecgv0N0vgWFx44woUeKJaPeJT8CU3RXrd8F/tqJQbuAmcWlbMhYJSlTJkIFrwVAs6BNA==}
     engines: {node: '>=18'}
     hasBin: true
     requiresBuild: true
     dependencies:
-      '@puppeteer/browsers': 2.2.2
+      '@puppeteer/browsers': 2.2.3
       cosmiconfig: 9.0.0(typescript@5.4.5)
       devtools-protocol: 0.0.1273771
-      puppeteer-core: 22.7.0
+      puppeteer-core: 22.7.1
     transitivePeerDependencies:
       - bufferutil
       - supports-color
@@ -1158,8 +1168,8 @@ packages:
       pump: 3.0.0
       tar-stream: 3.1.7
     optionalDependencies:
-      bare-fs: 2.2.3
-      bare-path: 2.1.1
+      bare-fs: 2.3.0
+      bare-path: 2.1.2
     dev: true
 
   /tar-stream@3.1.7:
@@ -1262,6 +1272,20 @@ packages:
         optional: true
       utf-8-validate:
         optional: true
+    dev: true
+
+  /ws@8.17.0:
+    resolution: {integrity: sha512-uJq6108EgZMAl20KagGkzCKfMEjxmKvZHG7Tlq0Z6nOky7YF7aq4mOx6xK8TJ/i1LeK4Qus7INktacctDgY8Ow==}
+    engines: {node: '>=10.0.0'}
+    peerDependencies:
+      bufferutil: ^4.0.1
+      utf-8-validate: '>=5.0.2'
+    peerDependenciesMeta:
+      bufferutil:
+        optional: true
+      utf-8-validate:
+        optional: true
+    dev: false
 
   /y18n@5.0.8:
     resolution: {integrity: sha512-0pfFzegeDWJHJIAmTLRP2DwHjdF5s7jo9tuztdQxAhINCdvS+3nGINqPd00AphqJR/0LhANUS6/+7SCb98YOfA==}

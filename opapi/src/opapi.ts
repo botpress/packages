@@ -11,7 +11,6 @@ import { addOperation } from './operation'
 import { ApiError, ComponentType, createState, getRef, Metadata, Operation, Options, Parameter, State } from './state'
 import { exportStateAsTypescript, ExportStateAsTypescriptOptions } from './generators/ts-state'
 import { generateHandler } from './handler-generator'
-import _ from 'lodash'
 export { Operation, Parameter } from './state'
 
 type AnatineSchemaObject = NonNullable<Parameters<typeof extendApi>[1]>
@@ -20,7 +19,8 @@ export const schema = <T extends OpenApiZodAny>(
   schema: T,
   schemaObject?: AnatineSchemaObject & { $ref?: string },
 ): T => {
-  const copy = _.cloneDeep(schema)
+  const This = (schema as any).constructor
+  const copy = new This(schema._def) as T
   return extendApi(copy, schemaObject)
 }
 

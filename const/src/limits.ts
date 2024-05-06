@@ -81,7 +81,7 @@ export const limitConfigs = {
     value: 25,
     unit: 'count'
   },
-  files_api_query_length: {
+  files_api_query_bytes: {
     value: 1024, // 1 KB  
     unit: 'bytes'
   }

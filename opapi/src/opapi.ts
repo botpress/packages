@@ -13,11 +13,16 @@ import { exportStateAsTypescript, ExportStateAsTypescriptOptions } from './gener
 import { generateHandler } from './handler-generator'
 export { Operation, Parameter } from './state'
 
-type ExtendApi = typeof extendApi
-type AnatineSchemaObject = NonNullable<Parameters<ExtendApi>[1]>
+type AnatineSchemaObject = NonNullable<Parameters<typeof extendApi>[1]>
 
-export const schema: <T extends OpenApiZodAny>(schema: T, schemaObject?: AnatineSchemaObject & { $ref?: string }) => T =
-  extendApi
+export const schema = <T extends OpenApiZodAny>(
+  schema: T,
+  schemaObject?: AnatineSchemaObject & { $ref?: string },
+): T => {
+  const This = (schema as any).constructor
+  const copy = new This(schema._def) as T
+  return extendApi(copy, schemaObject)
+}
 
 export type OpenApi<
   SchemaName extends string = string,

@@ -269,7 +269,7 @@ export function createState<SchemaName extends string, DefaultParameterName exte
     }
 
     if (schemas[name]) {
-      throw new VError(`Operation ${name} already exists`)
+      throw new VError(`Schema ${name} already exists`)
     }
 
     schemas[name] = {

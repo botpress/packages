@@ -80,5 +80,9 @@ export const limitConfigs = {
   bot_integration_secret_count: {
     value: 25,
     unit: 'count'
+  },
+  files_api_query_bytes: {
+    value: 1024, // 1 KB  
+    unit: 'bytes'
   }
 } as const satisfies Record<string, Limit>

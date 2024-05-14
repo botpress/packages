@@ -1,6 +1,6 @@
 import React, { FC, useState } from 'react'
 import type { Meta, StoryObj } from '@storybook/react'
-import { FormError, UIComponentDefinitions, ZuiComponentMap } from '../types'
+import { DeepPartial, FormError, UIComponentDefinitions, ZuiComponentMap } from '../types'
 import { z } from '../../z/index'
 import { ZuiForm } from '..'
 import { BoundaryFallbackComponent } from '../ErrorBoundary'
@@ -58,35 +58,52 @@ const exampleSchema = z
         }),
       )
       .min(1)
-      .nonempty().default([{ date: '2021-01-01', time: '12:00', ids: [1, 2] }]),
+      .nonempty()
+      .default([{ date: '2021-01-01', time: '12:00', ids: [1, 2] }]),
     aTuple: z.tuple([z.string(), z.number(), z.object({ pointsScored: z.number() })]),
     // tests the hidden function
     aRandomField: z.string().optional().hidden(),
-    aDiscriminatedUnion: z.discriminatedUnion('type', [
-      z.object({ type: z.literal('text'), text: z.string().placeholder('Some text') }),
-      z.object({ type: z.literal('number'), b: z.number().placeholder('42').default(5) }),
-      z.object({
-        type: z.literal('complex'),
-        address: z
-          .object({
-            street: z.string().placeholder('1234 Main St'),
-            city: z.string().placeholder('San Francisco'),
-            state: z.string().placeholder('CA'),
-            zip: z.string().placeholder('94111'),
-          })
-          .disabled((obj) => !obj?.street && { city: false }),
-        root: z.string().placeholder('root'),
-        babies: z.array(z.object({ name: z.string(), age: z.number() })),
+    aDiscriminatedUnion: z
+      .discriminatedUnion('type', [
+        z.object({ type: z.literal('text'), text: z.string().placeholder('Some text') }),
+        z.object({ type: z.literal('number'), b: z.number().placeholder('42').default(5) }),
+        z.object({
+          type: z.literal('complex'),
+          address: z
+            .object({
+              street: z.string().placeholder('1234 Main St'),
+              city: z.string().placeholder('San Francisco'),
+              state: z.string().placeholder('CA'),
+              zip: z.string().placeholder('94111'),
+            })
+            .disabled((obj) => !obj?.street && { city: false }),
+          root: z.string().placeholder('root'),
+          babies: z.array(z.object({ name: z.string(), age: z.number() })),
+        }),
+      ])
+      .default({
+        type: 'complex',
+        address: { street: '1234 Main St', city: 'San Francisco', state: 'CA', zip: '94111' },
+        babies: [],
+        root: 'root',
       }),
-    ]),
-    stuff: z.object({
-      birthday: z.string(),
-      plan: z.enum(['basic', 'premium']),
-      age: z.number(),
-      email: z.string().email().title('Email Address'),
-      password: z.string(),
-      passwordConfirm: z.string(),
-    }),
+    stuff: z
+      .object({
+        birthday: z.string(),
+        plan: z.enum(['basic', 'premium']),
+        age: z.number(),
+        email: z.string().email().title('Email Address'),
+        password: z.string(),
+        passwordConfirm: z.string(),
+      })
+      .default({
+        password: 'this is a password',
+        passwordConfirm: 'this is a password',
+        age: 42,
+        plan: 'premium',
+        email: '',
+        birthday: '2021-01-01',
+      }),
     debug: z.number().optional().displayAs<typeof exampleExtensions>({ id: 'debug', params: {} }),
   })
   .title('User Information')
@@ -273,11 +290,18 @@ const Fallback: BoundaryFallbackComponent = ({ error, schema }) => {
   )
 }
 const ZuiFormExample = () => {
-  const [formData, setFormData] = useState({})
+  const [formData, setFormData] = useState<DeepPartial<z.infer<typeof exampleSchema>>>({
+    firstName: 'John',
+    lastName: 'Doe',
+    stuff: {
+      password: 'password',
+      passwordConfirm: 'password',
+    },
+  })
 
   return (
     <>
-    <pre>{JSON.stringify(formData, null, 2)}</pre>
+      <pre>{JSON.stringify(formData, null, 2)}</pre>
       <ZuiForm<typeof exampleExtensions>
         schema={exampleSchema.toJsonSchema({ target: 'openApi3' })}
         value={formData}

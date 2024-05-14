@@ -73,14 +73,13 @@ export const useFormData = (fieldSchema: JSONSchema, path: string[]) => {
   }
 
   const data = useMemo(() => getPathData(context.formData, path), [context.formData, path])
+
   useEffect(() => {
-    if (typeof fieldSchema.default === 'undefined') {
-      return
-    }
     if (data === null || typeof data === 'undefined') {
       context.setFormData(setObjectPath(context.formData, path, getDefaultItemData(fieldSchema)))
     }
-  })
+  }, [fieldSchema])
+
   const validation = useMemo(() => {
     if (context.disableValidation) {
       return { formValid: null, formErrors: null }
@@ -165,7 +164,7 @@ export function setObjectPath(obj: any, path: string[], data: any): any {
   return { ...obj }
 }
 
-export const getDefaultItemData = (schema: JSONSchema | JSONSchema[]): any => {
+export const getDefaultItemData = (schema: JSONSchema | JSONSchema[]): any | null => {
   if (Array.isArray(schema)) {
     return schema.map((s) => getDefaultItemData(s))
   }
@@ -176,7 +175,7 @@ export const getDefaultItemData = (schema: JSONSchema | JSONSchema[]): any => {
     return schema.default || []
   }
   if (schema.type === 'string') {
-    return  schema.default || ''
+    return schema.default || ''
   }
   if (schema.type === 'number') {
     return typeof schema.default === 'number' ? schema.default : 0
@@ -184,6 +183,11 @@ export const getDefaultItemData = (schema: JSONSchema | JSONSchema[]): any => {
   if (schema.type === 'boolean') {
     return typeof schema.default === 'boolean' ? schema.default : false
   }
+
+  if (schema.default) {
+    return schema.default
+  }
+
   return null
 }
 
@@ -196,6 +200,7 @@ export const FormDataProvider: React.FC<PropsWithChildren<FormDataProviderProps>
 }) => {
   const [hiddenState, setHiddenState] = useState({})
   const [disabledState, setDisabledState] = useState({})
+
   return (
     <FormDataContext.Provider
       value={{

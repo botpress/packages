@@ -1,15 +1,14 @@
-import { useMemo, useEffect } from 'react';
-import { JSONSchema, ObjectSchema } from '../types';
-import { useFormData } from './useFormData';
-import { zuiKey } from '../constants';
+import { useMemo, useEffect } from 'react'
+import { JSONSchema, ObjectSchema } from '../types'
+import { useFormData } from './useFormData'
+import { zuiKey } from '../constants'
 
-
-export const useDiscriminator = (fieldSchema: JSONSchema, path: string[], data: any | null) => {
-  const { handlePropertyChange } = useFormData(fieldSchema, path)
+export const useDiscriminator = (fieldSchema: JSONSchema, path: string[]) => {
+  const { handlePropertyChange, data } = useFormData(fieldSchema, path)
 
   const { discriminator, value, discriminatedSchema } = useMemo(() => {
     const discriminator = resolveDiscriminator(fieldSchema.anyOf)
-    const value = discriminator?.key ? data?.[discriminator.key] : null
+    const value = discriminator?.key ? data?.[discriminator.key] : fieldSchema.default || null
     const discriminatedSchema = resolveDiscriminatedSchema(discriminator?.key || null, value, fieldSchema.anyOf)
     return {
       discriminator,
@@ -19,13 +18,18 @@ export const useDiscriminator = (fieldSchema: JSONSchema, path: string[], data: 
   }, [fieldSchema.anyOf, data])
 
   useEffect(() => {
-    if (discriminator?.key && discriminator?.values.length && Object.keys(data || {}).length < 1 ) {
+    if (
+      discriminator?.key &&
+      discriminator?.values.length &&
+      Object.keys(data || {}).length < 1 &&
+      !fieldSchema.default
+    ) {
       handlePropertyChange(path, { [discriminator.key]: discriminator.values[0] })
     }
   }, [])
 
   return { discriminator, discriminatorValue: value, discriminatedSchema }
-};
+}
 
 export const resolveDiscriminator = (anyOf: ObjectSchema['anyOf']) => {
   const output = anyOf
@@ -43,7 +47,7 @@ export const resolveDiscriminator = (anyOf: ObjectSchema['anyOf']) => {
           }
           return null
         })
-        .filter((v): v is { key: string; value: string}  => !!v)
+        .filter((v): v is { key: string; value: string } => !!v)
     })
     .flat()
     .reduce(
@@ -61,7 +65,7 @@ export const resolveDiscriminator = (anyOf: ObjectSchema['anyOf']) => {
 
         return acc
       },
-      { key: null as string | null, values: [] as string[] }
+      { key: null as string | null, values: [] as string[] },
     )
 
   if (output?.key === null || !output?.values.length) {
@@ -91,4 +95,3 @@ export const resolveDiscriminatedSchema = (key: string | null, value: string | n
   }
   return null
 }
-

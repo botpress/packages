@@ -19,7 +19,7 @@ import { FormDataProvider, getDefaultItemData, useFormData } from './hooks/useFo
 import { getPathData } from './hooks/useFormData'
 import { formatTitle } from './titleutils'
 import { BoundaryFallbackComponent, ErrorBoundary } from './ErrorBoundary'
-import { useDiscriminator, resolveDiscriminator  } from './hooks/useDiscriminator'
+import { useDiscriminator, resolveDiscriminator } from './hooks/useDiscriminator'
 
 type ComponentMeta<Type extends BaseType = BaseType> = {
   type: Type
@@ -100,7 +100,7 @@ export const ZuiForm = <UI extends UIComponentDefinitions = DefaultComponentDefi
 }: ZuiFormProps<UI>): JSX.Element | null => {
   return (
     <FormDataProvider
-      formData={value}
+      formData={value || {}}
       setFormData={onChange}
       formSchema={schema}
       disableValidation={disableValidation || false}
@@ -139,7 +139,7 @@ const FormElementRenderer: FC<FormRendererProps> = ({
     useFormData(fieldSchema, path)
   const data = useMemo(() => getPathData(formData, path), [formData, path])
   const componentMeta = useMemo(() => resolveComponent(components, fieldSchema), [fieldSchema, components])
-  const { discriminator, discriminatedSchema, discriminatorValue } = useDiscriminator(fieldSchema, path, data)
+  const { discriminator, discriminatedSchema, discriminatorValue } = useDiscriminator(fieldSchema, path)
 
   if (!componentMeta) {
     return null

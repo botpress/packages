@@ -578,6 +578,49 @@ describe('UI', () => {
     fireEvent.change(textInput, { target: { value: 'Charles' } })
     expect(rendered.queryByTestId('number:value:input')).toBeFalsy()
   })
+
+  it('prepoluates the form with existing defaults on first render', () => {
+    const schema = zui.object({
+      name: zui.string().default('John'),
+      age: zui.number().default(20),
+      favoriteFoods: zui.array(zui.string()).default(['Pizza', 'Burgers']),
+      paymentMethod: zui.discriminatedUnion('type', [
+        zui.object({
+          type: zui.literal('credit'),
+          cardNumber: zui.string(),
+        }),
+        zui.object({
+          type: zui.literal('paypal'),
+          email: zui.string(),
+        }),]
+      ).default({ type: 'credit', cardNumber: '1234' }),
+    })
+
+    const jsonSchema = schema.toJsonSchema({ target: 'openApi3' }) as ObjectSchema
+
+    const rendered = render(<ZuiFormWithState schema={jsonSchema} components={testComponentImplementation} />)
+
+    const nameInput = rendered.getByTestId('string:name:input') as HTMLInputElement
+    const ageInput = rendered.getByTestId('number:age:input') as HTMLInputElement
+    const favoriteFoods = rendered.getByTestId('array:favoriteFoods:container').children
+    const creditCardInput = rendered.getByTestId('string:paymentMethod.cardNumber:input') as HTMLInputElement
+
+    expect(nameInput.value).toBe('John')
+    expect(ageInput.value).toBe('20')
+    expect(favoriteFoods).toHaveLength(2)
+    expect(creditCardInput.value).toBe('1234')
+    console.log(nameInput.value, ageInput.value)
+  })
+
+  it('Returns empty object as initial value of an empty object form', () => {
+    const schema = zui.object({})
+
+    const jsonSchema = schema.toJsonSchema({ target: 'openApi3' }) as ObjectSchema
+
+    const rendered = render(<ZuiFormWithState schema={jsonSchema} components={testComponentImplementation} />)
+    
+
+  })
 })
 
 describe('utils', () => {

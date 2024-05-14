@@ -44,6 +44,7 @@ const exampleSchema = z
     root: z
       .string()
       .title('Root')
+      .default('root')
       .placeholder('Root')
       .disabled((s) => s?.includes('9') || false),
     firstName: z.string().title('first name').placeholder('Enter your name').nullable(),
@@ -53,11 +54,11 @@ const exampleSchema = z
         z.object({
           date: z.string(),
           time: z.string(),
-          ids: z.array(z.number()).min(2),
+          ids: z.array(z.number().default(-1)).min(2),
         }),
       )
       .min(1)
-      .nonempty(),
+      .nonempty().default([{ date: '2021-01-01', time: '12:00', ids: [1, 2] }]),
     aTuple: z.tuple([z.string(), z.number(), z.object({ pointsScored: z.number() })]),
     // tests the hidden function
     aRandomField: z.string().optional().hidden(),
@@ -241,8 +242,14 @@ const componentMap: ZuiComponentMap<typeof exampleExtensions> = {
   },
   discriminatedUnion: {
     default: ({ children, discriminatorKey, discriminatorOptions, discriminatorValue, setDiscriminator }) => {
+      const [hidden, setHidden] = useState<boolean>(false)
+      if (hidden) {
+        return <button onClick={() => setHidden(false)}>Show</button>
+      }
+
       return (
         <div>
+          <button onClick={() => setHidden(true)}>Hide</button>
           <span>{discriminatorKey}</span>
           <select value={discriminatorValue || undefined} onChange={(e) => setDiscriminator(e.target.value)}>
             {discriminatorOptions?.map((option) => (
@@ -270,6 +277,7 @@ const ZuiFormExample = () => {
 
   return (
     <>
+    <pre>{JSON.stringify(formData, null, 2)}</pre>
       <ZuiForm<typeof exampleExtensions>
         schema={exampleSchema.toJsonSchema({ target: 'openApi3' })}
         value={formData}

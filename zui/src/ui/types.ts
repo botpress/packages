@@ -28,6 +28,7 @@ export type ArraySchema = {
   uniqueItems?: boolean
   minContains?: number
   maxContains?: number
+  default?: any[]
 } & BaseSchema
 
 export type ObjectSchema = {

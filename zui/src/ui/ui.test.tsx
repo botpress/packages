@@ -1,6 +1,7 @@
 import React from 'react'
 import { fireEvent, render } from '@testing-library/react'
-import { ZuiForm, ZuiFormProps, getSchemaType, resolveDiscriminatedSchema, resolveDiscriminator } from './index'
+import { ZuiForm, ZuiFormProps, getSchemaType } from './index'
+import { resolveDiscriminatedSchema, resolveDiscriminator } from './hooks/useDiscriminator'
 import { ZuiComponentMap } from '../index'
 import { ObjectSchema, JSONSchema, ZuiReactComponentBaseProps, BaseType, UIComponentDefinitions } from './types'
 import { FC, PropsWithChildren, useState } from 'react'

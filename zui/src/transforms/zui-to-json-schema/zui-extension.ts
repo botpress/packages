@@ -58,6 +58,10 @@ const mergeZuiIntoJsonSchema = (
     }
   }
 
+  if ('$ref' in jsonSchema) {
+    return jsonSchema
+  }
+
   if (jsonSchema.type === 'object' && jsonSchema.properties) {
     for (const [key, value] of Object.entries(jsonSchema.properties)) {
       const shape = getShape(zuiSchema)

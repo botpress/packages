@@ -104,9 +104,13 @@ export type BooleanSchema = {
   default?: boolean
 } & BaseSchema
 
+export type RefSchema = {
+  $ref: string
+} & BaseSchema
+
 export type PrimitiveSchema = StringSchema | NumberSchema | BooleanSchema
 
-export type JSONSchema = ArraySchema | ObjectSchema | PrimitiveSchema
+export type JSONSchema = ArraySchema | ObjectSchema | PrimitiveSchema | RefSchema
 
 export type JSONSchemaOfType<T extends BaseType> = T extends 'string'
   ? StringSchema
@@ -122,7 +126,8 @@ export type JSONSchemaOfType<T extends BaseType> = T extends 'string'
             ? ObjectSchema
             : never
 
-export type BaseType = 'number' | 'string' | 'boolean' | 'object' | 'array' | 'discriminatedUnion'
+export type BaseType = 'number' | 'string' | 'boolean' | 'object' | 'array' | 'discriminatedUnion' | 'ref'
+export type RenderableType = Exclude<BaseType, 'ref'> // refs cannot be rendered
 
 export const containerTypes = ['object', 'array', 'discriminatedUnion'] as const
 export type ContainerType = (typeof containerTypes)[number]
@@ -137,7 +142,7 @@ export type DefaultComponentDefinitions = {
 }
 
 export type UIComponentDefinitions = {
-  [T in BaseType]: {
+  [T in RenderableType]: {
     [K: string]: {
       id: string
       params: z.ZodObject<any>
@@ -189,7 +194,7 @@ export type BaseTypeToType<T extends BaseType> = T extends 'string'
 export type AsBaseType<T> = T extends BaseType ? T : never
 
 export type SchemaContext<
-  Type extends BaseType,
+  Type extends RenderableType,
   ID extends keyof UI[Type],
   UI extends UIComponentDefinitions = DefaultComponentDefinitions,
 > = {
@@ -206,7 +211,7 @@ export type FormError = {
 }
 
 export type ZuiReactComponentBaseProps<
-  Type extends BaseType,
+  Type extends RenderableType,
   ID extends keyof UI[Type],
   UI extends UIComponentDefinitions = DefaultComponentDefinitions,
 > = {
@@ -273,7 +278,7 @@ export type ZuiReactArrayComponentProps<
 }
 
 export type ZuiReactControlComponentProps<
-  Type extends BaseType,
+  Type extends RenderableType,
   ID extends keyof UI[Type],
   UI extends UIComponentDefinitions = DefaultComponentDefinitions,
 > = ZuiReactComponentBaseProps<Type, ID, UI> & {
@@ -283,7 +288,7 @@ export type ZuiReactControlComponentProps<
 }
 
 export type ZuiReactComponentProps<
-  Type extends BaseType,
+  Type extends RenderableType,
   ID extends keyof UI[Type],
   UI extends UIComponentDefinitions = DefaultComponentDefinitions,
 > = Type extends 'object'
@@ -295,13 +300,13 @@ export type ZuiReactComponentProps<
       : ZuiReactControlComponentProps<Type, ID, UI>
 
 export type ZuiReactComponent<
-  Type extends BaseType,
+  Type extends RenderableType,
   ID extends keyof UI[Type],
   UI extends UIComponentDefinitions = DefaultComponentDefinitions,
 > = FC<ZuiReactComponentProps<Type, ID, UI>>
 
 export type ZuiComponentMap<UI extends UIComponentDefinitions = DefaultComponentDefinitions> = {
-  [T in BaseType]: {
+  [T in RenderableType]: {
     [K in keyof UI[T]]: ZuiReactComponent<T, K, UI>
   } & {
     default?: ZuiReactComponent<T, 'default', UI>
@@ -318,7 +323,7 @@ export type ParseSchema<I> = I extends infer U
   : never
 
 export type MergeUIComponentDefinitions<T extends UIComponentDefinitions, U extends UIComponentDefinitions> = {
-  [Type in BaseType]: {
+  [Type in RenderableType]: {
     [K in keyof (T[Type] & U[Type])]: (T[Type] & U[Type])[K]
   }
 }

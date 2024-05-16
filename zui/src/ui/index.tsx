@@ -1,5 +1,4 @@
 import {
-  BaseType,
   UIComponentDefinitions,
   ZuiComponentMap,
   JSONSchema,
@@ -12,6 +11,7 @@ import {
   PrimitiveSchema,
   ZuiReactArrayChildProps,
   DefaultComponentDefinitions,
+  RenderableType,
 } from './types'
 import { zuiKey } from './constants'
 import React, { type FC, useMemo } from 'react'
@@ -21,14 +21,18 @@ import { formatTitle } from './titleutils'
 import { BoundaryFallbackComponent, ErrorBoundary } from './ErrorBoundary'
 import { useDiscriminator, resolveDiscriminator } from './hooks/useDiscriminator'
 
-type ComponentMeta<Type extends BaseType = BaseType> = {
+type ComponentMeta<Type extends RenderableType = RenderableType> = {
   type: Type
   Component: ZuiReactComponent<Type, 'default', any>
   id: string
   params: any
 }
 
-export const getSchemaType = (schema: JSONSchema): BaseType => {
+export const getSchemaType = (schema: JSONSchema): RenderableType | null => {
+  if ('$ref' in schema) {
+    // references cannot be rendered
+    return null
+  }
   if (schema.anyOf?.length) {
     const discriminator = resolveDiscriminator(schema.anyOf)
     return discriminator ? 'discriminatedUnion' : 'object'
@@ -40,11 +44,16 @@ export const getSchemaType = (schema: JSONSchema): BaseType => {
   return schema.type
 }
 
-const resolveComponent = <Type extends BaseType>(
+const resolveComponent = <Type extends RenderableType>(
   components: ZuiComponentMap<any> | undefined,
   fieldSchema: JSONSchema,
 ): ComponentMeta<Type> | null => {
   const type = getSchemaType(fieldSchema)
+  if (type === null) {
+    // references cannot be rendered
+    return null
+  }
+
   const uiDefinition = fieldSchema[zuiKey]?.displayAs || null
 
   if (!uiDefinition || !Array.isArray(uiDefinition) || uiDefinition.length < 2) {
@@ -141,6 +150,11 @@ const FormElementRenderer: FC<FormRendererProps> = ({
   const componentMeta = useMemo(() => resolveComponent(components, fieldSchema), [fieldSchema, components])
   const { discriminator, discriminatedSchema, discriminatorValue } = useDiscriminator(fieldSchema, path)
 
+  if ('$ref' in fieldSchema) {
+    // references cannot be rendered
+    return null
+  }
+
   if (!componentMeta) {
     return null
   }
@@ -151,7 +165,7 @@ const FormElementRenderer: FC<FormRendererProps> = ({
 
   const { Component: _component, type } = componentMeta
 
-  const baseProps: Omit<ZuiReactComponentBaseProps<BaseType, string, any>, 'data' | 'isArrayChild'> = {
+  const baseProps: Omit<ZuiReactComponentBaseProps<RenderableType, string, any>, 'data' | 'isArrayChild'> = {
     type,
     componentID: componentMeta.id,
     scope: path.join('.'),

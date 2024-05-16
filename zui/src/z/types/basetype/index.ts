@@ -1,10 +1,10 @@
 import type {
-  BaseType,
   UIComponentDefinitions,
   ZodKindToBaseType,
   JSONSchema,
   ParseSchema,
   DefaultComponentDefinitions,
+  RenderableType,
 } from '../../../ui/types'
 import { zuiKey } from '../../../ui/constants'
 import {
@@ -514,7 +514,7 @@ export abstract class ZodType<Output = any, Def extends ZodTypeDef = ZodTypeDef,
    */
   displayAs<
     UI extends UIComponentDefinitions = DefaultComponentDefinitions,
-    Type extends BaseType = ZodKindToBaseType<this['_def']>,
+    Type extends RenderableType = ZodKindToBaseType<this['_def']>,
   >(options: ParseSchema<UI[Type][keyof UI[Type]]>): this {
     this._def[zuiKey] ??= {}
     this._def[zuiKey].displayAs = [options.id, options.params]

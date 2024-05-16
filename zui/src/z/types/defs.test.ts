@@ -81,6 +81,8 @@ test('first party switch', () => {
       break
     case z.ZodFirstPartyTypeKind.ZodTemplateLiteral:
       break
+    case z.ZodFirstPartyTypeKind.ZodGeneric:
+      break
     default:
       util.assertNever(def)
   }

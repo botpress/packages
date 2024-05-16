@@ -1,3 +1,4 @@
+import { ZodGenericDef } from './generic'
 import type {
   ZodAnyDef,
   ZodArrayDef,
@@ -102,6 +103,7 @@ export enum ZodFirstPartyTypeKind {
   ZodPipeline = 'ZodPipeline',
   ZodTemplateLiteral = 'ZodTemplateLiteral',
   ZodReadonly = 'ZodReadonly',
+  ZodGeneric = 'ZodGeneric',
 }
 
 export type KindToDef<T extends ZodFirstPartyTypeKind> = T extends ZodFirstPartyTypeKind.ZodString
@@ -172,4 +174,6 @@ export type KindToDef<T extends ZodFirstPartyTypeKind> = T extends ZodFirstParty
                                                                   ? ZodTemplateLiteralDef
                                                                   : T extends ZodFirstPartyTypeKind.ZodReadonly
                                                                     ? ZodReadonlyDef
-                                                                    : never
+                                                                    : T extends ZodFirstPartyTypeKind.ZodGeneric
+                                                                      ? ZodGenericDef
+                                                                      : never

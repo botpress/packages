@@ -28,6 +28,7 @@ import { JsonSchema7TupleType, parseTupleDef } from './parsers/tuple'
 import { JsonSchema7UndefinedType, parseUndefinedDef } from './parsers/undefined'
 import { JsonSchema7UnionType, parseUnionDef } from './parsers/union'
 import { JsonSchema7UnknownType, parseUnknownDef } from './parsers/unknown'
+import { parseGenericDef } from './parsers/generic'
 import { Refs, Seen } from './Refs'
 import { parseReadonlyDef } from './parsers/readonly'
 import { zuiKey } from '../../ui/constants'
@@ -201,6 +202,8 @@ const selectParser = (def: any, typeName: ZodFirstPartyTypeKind, refs: Refs): Js
       return parseCatchDef(def, refs)
     case ZodFirstPartyTypeKind.ZodPipeline:
       return parsePipelineDef(def, refs)
+    case ZodFirstPartyTypeKind.ZodGeneric:
+      return parseGenericDef(def)
     case ZodFirstPartyTypeKind.ZodTemplateLiteral:
       throw new Error('Template literals are not supported yet')
     case ZodFirstPartyTypeKind.ZodFunction:

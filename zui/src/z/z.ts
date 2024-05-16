@@ -14,6 +14,7 @@ import {
   ZodEffects,
   ZodEnum,
   ZodFunction,
+  ZodGeneric,
   ZodIntersection,
   ZodLazy,
   ZodLiteral,
@@ -86,6 +87,7 @@ export type ZodFirstPartySchemaTypes =
   | ZodReadonly<any>
   | ZodSymbol
   | ZodTemplateLiteral<any>
+  | ZodGeneric
 
 // requires TS 4.4+
 abstract class Class {
@@ -123,6 +125,7 @@ const recordType = ZodRecord.create
 const mapType = ZodMap.create
 const setType = ZodSet.create
 const functionType = ZodFunction.create
+const genericType = ZodGeneric.create
 const lazyType = ZodLazy.create
 const literalType = ZodLiteral.create
 const enumType = ZodEnum.create
@@ -167,6 +170,7 @@ export {
   effectsType as effect,
   enumType as enum,
   functionType as function,
+  genericType as generic,
   instanceOfType as instanceof,
   intersectionType as intersection,
   lazyType as lazy,

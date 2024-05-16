@@ -3,13 +3,13 @@ import { fireEvent, render } from '@testing-library/react'
 import { ZuiForm, ZuiFormProps, getSchemaType } from './index'
 import { resolveDiscriminatedSchema, resolveDiscriminator } from './hooks/useDiscriminator'
 import { ZuiComponentMap } from '../index'
-import { ObjectSchema, JSONSchema, ZuiReactComponentBaseProps, BaseType, UIComponentDefinitions } from './types'
+import { ObjectSchema, JSONSchema, ZuiReactComponentBaseProps, UIComponentDefinitions, RenderableType } from './types'
 import { FC, PropsWithChildren, useState } from 'react'
 import { vi } from 'vitest'
 import { z as zui } from '../z/index'
 import { zuiKey } from './constants'
 
-const TestId = (type: BaseType, path: string[], subpath?: string) =>
+const TestId = (type: RenderableType | null, path: string[], subpath?: string) =>
   `${type}:${path.length > 0 ? path.join('.') : ''}${subpath ? `:${subpath}` : ''}`
 
 describe('UI', () => {
@@ -761,7 +761,7 @@ const ZuiFormWithState: FC<
   )
 }
 
-const TestWrapper: FC<PropsWithChildren<ZuiReactComponentBaseProps<BaseType, string, any>>> = ({
+const TestWrapper: FC<PropsWithChildren<ZuiReactComponentBaseProps<RenderableType, string, any>>> = ({
   children,
   type,
   scope,

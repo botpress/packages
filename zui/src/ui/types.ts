@@ -105,7 +105,9 @@ export type BooleanSchema = {
 } & BaseSchema
 
 export type RefSchema = {
+  type?: undefined // TODO: rm this key
   $ref: string
+  default?: undefined // TODO: rm this key
 } & BaseSchema
 
 export type PrimitiveSchema = StringSchema | NumberSchema | BooleanSchema

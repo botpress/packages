@@ -387,8 +387,7 @@ describe('zuiToJsonSchema', () => {
     const TJsonSchema = zuiToJsonSchema(T)
     expect(TJsonSchema).toMatchInlineSnapshot(`
       {
-        "$ref": "T",
-        "${zuiKey}": {},
+        "$ref": "@zui/generic/T",
       }
     `)
 
@@ -403,7 +402,7 @@ describe('zuiToJsonSchema', () => {
         "additionalProperties": false,
         "properties": {
           "data": {
-            "$ref": "T",
+            "$ref": "@zui/generic/T",
             "${zuiKey}": {},
           },
           "description": {

@@ -34,7 +34,7 @@ import { errorFrom } from './errors'
 ${typeHelpers}
 
 export class ApiClient {
-  private _innerClient: DefaultApi
+  protected _innerClient: DefaultApi
   public constructor(configuration?: Configuration, basePath?: string, axiosInstance?: AxiosInstance) {
     this._innerClient = new DefaultApi(configuration, basePath, axiosInstance)
   }

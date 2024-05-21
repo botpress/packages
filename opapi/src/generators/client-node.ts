@@ -96,9 +96,11 @@ export const toAxiosRequest = (req: ParsedRequest): AxiosRequestConfig => {
   // prepare query params
   const queryString = qs.stringify(query, { encode: true, arrayFormat: 'repeat', allowDots: true })
 
+  const url = queryString ? [path, queryString].join('?') : path
+
   return {
     method,
-    url: \`\${path}?\${queryString}\`,
+    url,
     headers,
     data,
   }

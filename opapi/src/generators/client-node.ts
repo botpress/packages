@@ -65,16 +65,18 @@ function getError(err: Error) {
  * { limit: 10 }                         ->  ?limit=10
  */
 
-const GET_AXIOS_REQ_FUNCTION = `// ensures axios request is properly formatted
-type Primitive = string | number | boolean
-type Value<P extends Primitive> = P | P[] | Record<string, P>
-type QueryValue = Value<string> | Value<boolean> | Value<number> | undefined
-type AnyQueryParams = Record<string, QueryValue>
-type HeaderValue = string | undefined
-type AnyHeaderParams = Record<string, HeaderValue>
-type AnyBodyParams = Record<string, any>
+const GET_AXIOS_REQ_FUNCTION = `
+import { AxiosRequestConfig } from "axios"
+import qs from "qs"
 
-type ParsedRequest = {
+export type Primitive = string | number | boolean
+export type Value<P extends Primitive> = P | P[] | Record<string, P>
+export type QueryValue = Value<string> | Value<boolean> | Value<number> | undefined
+export type AnyQueryParams = Record<string, QueryValue>
+export type HeaderValue = string | undefined
+export type AnyHeaderParams = Record<string, HeaderValue>
+export type AnyBodyParams = Record<string, any>
+export type ParsedRequest = {
   method: string
   path: string
   query: AnyQueryParams
@@ -85,7 +87,7 @@ type ParsedRequest = {
 const isDefined = <T>(pair: [string, T | undefined]): pair is [string, T] => pair[1] !== undefined
 
 export const toAxiosRequest = (req: ParsedRequest): AxiosRequestConfig => {
-  const { method, path: url, query, headers: headerParams, body: data } = req
+  const { method, path, query, headers: headerParams, body: data } = req
 
   // prepare headers
   const headerEntries: [string, string][] = Object.entries(headerParams).filter(isDefined)
@@ -93,13 +95,11 @@ export const toAxiosRequest = (req: ParsedRequest): AxiosRequestConfig => {
 
   // prepare query params
   const queryString = qs.stringify(query, { encode: true, arrayFormat: 'repeat', allowDots: true })
-  const params = new URLSearchParams(queryString)
 
   return {
     method,
-    url,
+    url: \`\${path}?\${queryString}\`,
     headers,
-    params,
     data,
   }
 }
@@ -229,14 +229,18 @@ export const generateOperations = async (state: State<string, string, string>, o
   }
 }
 
+export const generateToAxios = async (toAxiosFile: string) => {
+  await writeTs(toAxiosFile, GET_AXIOS_REQ_FUNCTION)
+}
+
 export const generateIndex = async (state: State<string, string, string>, indexFile: string) => {
   const operationsByName = _.mapKeys(state.operations, (v) => v.name)
 
   let indexCode = [
     `${HEADER}`,
-    "import qs from 'qs'",
-    "import axios, { AxiosInstance, AxiosRequestConfig } from 'axios'",
+    "import axios, { AxiosInstance } from 'axios'",
     "import { errorFrom } from './errors'",
+    "import { toAxiosRequest } from './to-axios'",
     '',
   ].join('\n')
 
@@ -251,14 +255,23 @@ export const generateIndex = async (state: State<string, string, string>, indexF
   }
   indexCode += '\n'
 
+  indexCode += [
+    'export type ClientProps = {',
+    '  toAxiosRequest: typeof toAxiosRequest', // allows to override the toAxiosRequest function
+    '}',
+  ].join('\n')
+  indexCode += '\n\n'
+
   indexCode += 'export class Client {\n\n'
-  indexCode += 'constructor(private axiosInstance: AxiosInstance) {}\n\n'
+  indexCode +=
+    '  public constructor(private axiosInstance: AxiosInstance, private props: Partial<ClientProps> = {}) {}\n\n'
   for (const [name, operation] of Object.entries(operationsByName)) {
     const { inputName, resName } = Names.of(name)
     indexCode += [
       `  public readonly ${name} = async (input: ${name}.${inputName}): Promise<${name}.${resName}> => {`,
       `    const { path, headers, query, body } = ${name}.parseReq(input)`,
-      `    const axiosReq = toAxiosRequest({`,
+      `    const mapper = this.props.toAxiosRequest ?? toAxiosRequest`,
+      `    const axiosReq = mapper({`,
       `        method: "${operation.method}",`,
       '        path,',
       '        headers: { ...headers },',
@@ -274,7 +287,6 @@ export const generateIndex = async (state: State<string, string, string>, indexF
   indexCode += '}\n\n'
 
   indexCode += `${GET_ERROR_FUNCTION}\n`
-  indexCode += `${GET_AXIOS_REQ_FUNCTION}\n`
 
   await writeTs(indexFile, indexCode)
 }

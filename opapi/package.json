@@ -1,6 +1,6 @@
 {
   "name": "@bpinternal/opapi",
-  "version": "0.10.16",
+  "version": "0.10.17",
   "description": "",
   "main": "./dist/index.js",
   "module": "./dist/index.mjs",
@@ -27,6 +27,7 @@
     "@types/json-schema": "^7.0.15",
     "@types/lodash": "^4.17.0",
     "@types/node": "18.19.31",
+    "@types/qs": "^6.9.15",
     "@types/verror": "1.10.10",
     "prettier": "3.2.5",
     "ts-node": "10.9.2",

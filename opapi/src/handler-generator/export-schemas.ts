@@ -7,15 +7,9 @@ import fs from 'fs/promises'
 
 type Module = { name: string; filename: string }
 
-const fixSchema = (schema: JSONSchema7): JSONSchema7 => {
-  schema = jsonschema.replaceNullableWithUnion(schema as jsonschema.NullableJsonSchema)
-  schema = jsonschema.setDefaultAdditionalProperties(schema, false)
-  return schema
-}
-
 const toTs = async (originalSchema: JSONSchema7, name: string): Promise<string> => {
   let { title, ...schema } = originalSchema
-  schema = fixSchema(schema)
+  schema = jsonschema.setDefaultAdditionalProperties(schema, false)
 
   type jsonSchemaToTsInput = Parameters<typeof compile>[0]
   const typeCode = await compile(schema as jsonSchemaToTsInput, name, {
@@ -34,8 +28,8 @@ export const exportSchemas = (schemas: Record<string, JSONSchema7>) => async (ou
   const jsonFiles: Module[] = []
   const typeFiles: Module[] = []
 
-  for (const schema of Object.entries(schemas)) {
-    const [name, jsonSchema] = schema
+  for (const [name, schema] of Object.entries(schemas)) {
+    const jsonSchema = jsonschema.replaceNullableWithUnion(schema)
 
     // json file
     const jsonFileName = `${name}.j`

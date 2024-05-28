@@ -28,34 +28,34 @@ const variableType = ZodEnum.create([
   'enum',
 ])
 
-export const variable = (opts?: { type?: TypeOf<typeof variableType>, params?: { horizontal?: boolean }}) =>
+export const variable = (opts?: { type?: TypeOf<typeof variableType>; params?: { horizontal?: boolean } }) =>
   ZodString.create().displayAs<any>({ id: 'variable', params: { type: opts?.type || 'any', ...opts?.params } })
 
-export const conversation = (opts?: { params?: { horizontal?: boolean }} ) =>
+export const conversation = (opts?: { params?: { horizontal?: boolean } }) =>
   ZodString.create().displayAs<any>({ id: 'conversation', params: { ...opts?.params } })
 
 export const user = (opts?: { params?: { horizontal?: boolean } }) =>
   ZodString.create().displayAs<any>({ id: 'user', params: { ...opts?.params } })
 
-export const message = (opts?: { params?: { horizontal?: boolean }}) =>
+export const message = (opts?: { params?: { horizontal?: boolean } }) =>
   ZodString.create().displayAs<any>({ id: 'message', params: { ...opts?.params } })
 
-export const agent = (opts?:{  params?: {   horizontal?: boolean } }) =>
+export const agent = (opts?: { params?: { horizontal?: boolean } }) =>
   ZodString.create().displayAs<any>({ id: 'agent', params: { ...opts?.params } })
 
-export const event = (opts?: { params?: { horizontal?: boolean }}) =>
+export const event = (opts?: { params?: { horizontal?: boolean } }) =>
   ZodString.create().displayAs<any>({ id: 'event', params: { ...opts?.params } })
 
-export const table = (opts?: { params?: { horizontal?: boolean }}) =>
+export const table = (opts?: { params?: { horizontal?: boolean } }) =>
   ZodString.create().displayAs<any>({ id: 'table', params: { ...opts?.params } })
 
-export const tablerow = (opts?: { params?: { horizontal?: boolean }}) =>
+export const tablerow = (opts?: { params?: { horizontal?: boolean } }) =>
   ZodString.create().displayAs<any>({ id: 'tablerow', params: { ...opts?.params } })
 
-export const intent = (opts?: { params?: { horizontal?: boolean }}) =>
+export const intent = (opts?: { params?: { horizontal?: boolean } }) =>
   ZodString.create().displayAs<any>({ id: 'intent', params: { ...opts?.params } })
 
-export const aimodel = () => ZodEnum.create(AI_MODELS).displayAs<any>({ id: 'dropdown', params: {}})
+export const aimodel = () => ZodEnum.create(AI_MODELS).displayAs<any>({ id: 'dropdown', params: {} })
 
 export const datasource = (opts?: { horizontal?: boolean }) =>
   ZodString.create().displayAs<any>({ id: 'datasource', params: { ...opts } })

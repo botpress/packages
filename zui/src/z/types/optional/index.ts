@@ -1,4 +1,5 @@
-import { RawCreateParams, ZodFirstPartyTypeKind, ZodType, ZodTypeAny, ZodTypeDef } from '../index'
+import { RawCreateParams, ZodType, ZodTypeAny, ZodTypeDef } from '../basetype'
+import { ZodFirstPartyTypeKind } from '../defs'
 import { processCreateParams, ZodParsedType } from '../utils'
 import { OK, ParseInput, ParseReturnType } from '../utils/parseUtil'
 

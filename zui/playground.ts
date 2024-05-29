@@ -1,5 +1,9 @@
-import { z } from './src'
+import { ZodArray, ZodDefault, ZodString, ZodUndefined, ZodFirstPartySchemaTypes, z, ZodFirstPartyTypeKind } from './src'
+console.log(z.ZodString)
+console.log(z)
+console.log(ZodFirstPartyTypeKind.ZodDefault)
 
+console.log(ZodString, ZodDefault, ZodUndefined, ZodArray, z.union, z.agent)
 const aschema = z.object({
   payment: z.discriminatedUnion('type', [
     z.object({

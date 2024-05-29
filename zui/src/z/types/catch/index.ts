@@ -1,15 +1,8 @@
+import { RawCreateParams, ZodType, ZodTypeAny, ZodTypeDef } from '../basetype'
+import { ZodFirstPartyTypeKind } from '../defs'
 import { ZodError } from '../error'
-import { RawCreateParams, ZodFirstPartyTypeKind, ZodType, ZodTypeAny, ZodTypeDef } from '../index'
 import { processCreateParams } from '../utils'
 import { isAsync, ParseContext, ParseInput, ParseReturnType } from '../utils/parseUtil'
-
-//////////////////////////////////////////
-//////////////////////////////////////////
-//////////                      //////////
-//////////       ZodCatch       //////////
-//////////                      //////////
-//////////////////////////////////////////
-//////////////////////////////////////////
 
 export interface ZodCatchDef<T extends ZodTypeAny = ZodTypeAny> extends ZodTypeDef {
   innerType: T

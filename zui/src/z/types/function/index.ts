@@ -1,5 +1,6 @@
+import { RawCreateParams, ZodType, ZodTypeAny, ZodTypeDef } from '../basetype'
+import { ZodFirstPartyTypeKind } from '../defs'
 import { defaultErrorMap, getErrorMap, ZodError, ZodErrorMap, ZodIssue, ZodIssueCode } from '../error'
-import { RawCreateParams, ZodFirstPartyTypeKind, ZodType, ZodTypeAny, ZodTypeDef } from '../index'
 import { ZodPromise } from '../promise'
 import { AnyZodTuple, ZodTuple } from '../tuple'
 import { ZodUnknown } from '../unknown'

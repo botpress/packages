@@ -1,5 +1,5 @@
+import { ProcessedCreateParams, RawCreateParams } from '../basetype'
 import type { ZodErrorMap } from '../error'
-import type { ProcessedCreateParams, RawCreateParams } from '../index'
 
 export namespace util {
   type AssertEqual<T, U> = (<V>() => V extends T ? 1 : 2) extends <V>() => V extends U ? 1 : 2 ? true : false

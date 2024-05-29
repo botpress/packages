@@ -1,32 +1,18 @@
-import {
-  ZodArray,
-  ZodEnum,
-  ZodNever,
-  ZodNullable,
-  ZodOptional,
-  ZodTuple,
-  addIssueToContext,
-  INVALID,
-  objectUtil,
-  ParseInput,
-  ParseReturnType,
-  ParseStatus,
-  util,
-  ZodIssueCode,
-  ZodParsedType,
-  ParseInputLazyPath,
-  RawCreateParams,
-  ZodFirstPartyTypeKind,
-  ZodRawShape,
-  ZodType,
-  ZodTypeAny,
-  ZodTypeDef,
-  processCreateParams,
-  enumUtil,
-  errorUtil,
-  partialUtil,
-  createZodEnum,
-} from '../index'
+import { ZodArray } from "../array"
+import { ParseInputLazyPath, RawCreateParams, ZodRawShape, ZodType, ZodTypeAny, ZodTypeDef } from "../basetype"
+import { ZodFirstPartyTypeKind } from "../defs"
+import { ZodEnum, createZodEnum } from "../enum"
+import { ZodIssueCode } from "../error"
+import { ZodNever } from "../never"
+import { ZodNullable } from "../nullable"
+import { ZodOptional } from "../optional"
+import { ZodTuple } from "../tuple"
+import { ZodParsedType, objectUtil, processCreateParams, util } from "../utils"
+import { enumUtil } from "../utils/enumUtil"
+import { errorUtil } from "../utils/errorUtil"
+import { INVALID, ParseInput, ParseReturnType, ParseStatus, addIssueToContext } from "../utils/parseUtil"
+import { partialUtil } from "../utils/partialUtil"
+
 
 export type UnknownKeysParam = 'passthrough' | 'strict' | 'strip'
 

@@ -10,7 +10,9 @@ export default defineConfig({
   platform: 'browser',
   clean: true,
   shims: true,
+  minify: true,
   external: ['react', 'react-dom'],
   bundle: true,
   plugins: [],
+  esbuildPlugins: []
 })

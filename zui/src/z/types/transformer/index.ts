@@ -4,13 +4,13 @@ import {
   output,
   RawCreateParams,
   RefinementCtx,
-  ZodFirstPartyTypeKind,
   ZodType,
   ZodTypeAny,
   ZodTypeDef,
-} from '../index'
+} from '../basetype'
 import { processCreateParams, util } from '../utils'
 import { addIssueToContext, DIRTY, INVALID, isValid, ParseInput, ParseReturnType } from '../utils/parseUtil'
+import { ZodFirstPartyTypeKind } from '../defs'
 
 export type Refinement<T> = (arg: T, ctx: RefinementCtx) => any
 export type SuperRefinement<T> = (arg: T, ctx: RefinementCtx) => void | Promise<void>

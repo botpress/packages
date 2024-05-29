@@ -1,8 +1,9 @@
-import { addIssueToContext, INVALID, ParseContext, ParseInput, ParseReturnType, ParseStatus } from '../'
 import { ZodIssueCode } from '../error'
-import { RawCreateParams, ZodFirstPartyTypeKind, ZodType, ZodTypeDef } from '../index'
+import { RawCreateParams, ZodType, ZodTypeDef } from '../basetype'
 import { processCreateParams, util, ZodParsedType } from '../utils'
 import { errorUtil } from '../utils/errorUtil'
+import { ZodFirstPartyTypeKind } from '../defs'
+import { INVALID, ParseContext, ParseInput, ParseReturnType, ParseStatus, addIssueToContext } from '../utils/parseUtil'
 
 export type ZodBigIntCheck =
   | { kind: 'min'; value: bigint; inclusive: boolean; message?: string }

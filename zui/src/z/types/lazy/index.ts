@@ -1,14 +1,7 @@
-import { input, output, RawCreateParams, ZodFirstPartyTypeKind, ZodType, ZodTypeAny, ZodTypeDef } from '../index'
+import { RawCreateParams, ZodType, ZodTypeAny, ZodTypeDef, input, output } from '../basetype'
+import { ZodFirstPartyTypeKind } from '../defs'
 import { processCreateParams } from '../utils'
 import { ParseInput, ParseReturnType } from '../utils/parseUtil'
-
-///////////////////////////////////////
-///////////////////////////////////////
-//////////                   //////////
-//////////      ZodLazy      //////////
-//////////                   //////////
-///////////////////////////////////////
-///////////////////////////////////////
 
 export interface ZodLazyDef<T extends ZodTypeAny = ZodTypeAny> extends ZodTypeDef {
   getter: () => T

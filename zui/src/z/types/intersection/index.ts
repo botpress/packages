@@ -1,5 +1,6 @@
+import { RawCreateParams, ZodType, ZodTypeAny, ZodTypeDef } from '../basetype'
+import { ZodFirstPartyTypeKind } from '../defs'
 import { ZodIssueCode } from '../error'
-import { RawCreateParams, ZodFirstPartyTypeKind, ZodType, ZodTypeAny, ZodTypeDef } from '../index'
 import { getParsedType, processCreateParams, util, ZodParsedType } from '../utils'
 import {
   addIssueToContext,

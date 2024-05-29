@@ -1,14 +1,14 @@
-import { 
-  RawCreateParams, 
-  ZodFirstPartyTypeKind, 
-  ZodType, 
-  ZodTypeDef, 
-  processCreateParams, 
-  ParseInput, 
-  ParseReturnType, 
+import {
+  RawCreateParams,
+  ZodFirstPartyTypeKind,
+  ZodType,
+  ZodTypeDef,
+  processCreateParams,
+  ParseInput,
+  ParseReturnType,
   ZodTypeAny,
   output,
-  input
+  input,
 } from '../index'
 
 export interface ZodLazyDef<T extends ZodTypeAny = ZodTypeAny> extends ZodTypeDef {

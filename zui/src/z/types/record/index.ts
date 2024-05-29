@@ -1,20 +1,20 @@
-import { 
-  BRAND, 
-  ZodIssueCode, 
-  ParseInputLazyPath, 
-  RawCreateParams, 
-  ZodFirstPartyTypeKind, 
-  ZodType, 
-  ZodTypeAny, 
-  ZodTypeDef, 
-  ZodString, 
-  processCreateParams, 
-  ZodParsedType, 
-  addIssueToContext, 
-  INVALID, 
-  ParseInput, 
-  ParseReturnType, 
-  ParseStatus 
+import {
+  BRAND,
+  ZodIssueCode,
+  ParseInputLazyPath,
+  RawCreateParams,
+  ZodFirstPartyTypeKind,
+  ZodType,
+  ZodTypeAny,
+  ZodTypeDef,
+  ZodString,
+  processCreateParams,
+  ZodParsedType,
+  addIssueToContext,
+  INVALID,
+  ParseInput,
+  ParseReturnType,
+  ParseStatus,
 } from '../index'
 
 export interface ZodRecordDef<Key extends KeySchema = ZodString, Value extends ZodTypeAny = ZodTypeAny>

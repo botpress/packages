@@ -1,4 +1,13 @@
-import { ZodFirstPartyTypeKind, ZodType, ZodTypeAny, ZodTypeDef,  DIRTY, INVALID, ParseInput, ParseReturnType  } from '../index'
+import {
+  ZodFirstPartyTypeKind,
+  ZodType,
+  ZodTypeAny,
+  ZodTypeDef,
+  DIRTY,
+  INVALID,
+  ParseInput,
+  ParseReturnType,
+} from '../index'
 
 export interface ZodPipelineDef<A extends ZodTypeAny, B extends ZodTypeAny> extends ZodTypeDef {
   in: A

@@ -1,19 +1,19 @@
-import { 
-  ZodIssueCode, 
-  ParseInputLazyPath, 
-  RawCreateParams, 
-  ZodFirstPartyTypeKind, 
-  ZodType, 
-  ZodTypeAny, 
-  ZodTypeDef, 
-  processCreateParams, 
-  ZodParsedType, 
-  addIssueToContext, 
-  INVALID, 
-  ParseInput, 
-  ParseReturnType, 
-  ParseStatus, 
-  SyncParseReturnType 
+import {
+  ZodIssueCode,
+  ParseInputLazyPath,
+  RawCreateParams,
+  ZodFirstPartyTypeKind,
+  ZodType,
+  ZodTypeAny,
+  ZodTypeDef,
+  processCreateParams,
+  ZodParsedType,
+  addIssueToContext,
+  INVALID,
+  ParseInput,
+  ParseReturnType,
+  ParseStatus,
+  SyncParseReturnType,
 } from '../index'
 
 export type ZodTupleItems = [ZodTypeAny, ...ZodTypeAny[]]

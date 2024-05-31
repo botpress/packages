@@ -48,6 +48,10 @@
       "allowedVersions": "3.22.4"
     },
     {
+      "matchPackageNames": ["pnpm"],
+      "allowedVersions": "9.1.0"
+    },
+    {
       "matchFileNames": ["**"],
       "matchPackagePatterns": ["*"],
       "groupName": "{{packageFileDir}}"

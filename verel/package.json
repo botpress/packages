@@ -1,6 +1,6 @@
 {
   "name": "@bpinternal/verel",
-  "version": "0.0.5",
+  "version": "0.0.6",
   "description": "Vector Remap Language for JavaScript",
   "main": "./dist/node/index.js",
   "module": "./dist/web/index.js",
@@ -23,7 +23,7 @@
   "devDependencies": {
     "@types/lodash": "^4.14.200",
     "@types/node": "^20.8.9",
-    "esbuild": "^0.20.0",
+    "esbuild": "^0.21.0",
     "lodash": "^4.17.21",
     "puppeteer": "^22.0.0",
     "ts-node": "^10.9.1",

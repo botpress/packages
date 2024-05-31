@@ -8,7 +8,7 @@
   "schedule": ["before 3am on monday"],
   "bumpVersion": "patch",
   "constraints": {
-    "pnpm": ">=9"
+    "pnpm": ">=9.1.0"
   },
   "packageRules": [
     {

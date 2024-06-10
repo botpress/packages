@@ -20,12 +20,16 @@ export class ZodPipeline<A extends ZodTypeAny, B extends ZodTypeAny> extends Zod
   ZodPipelineDef<A, B>,
   A['_input']
 > {
-  dereference(_defs: Record<string, ZodTypeAny>): ZodTypeAny {
+  dereference(defs: Record<string, ZodTypeAny>): ZodTypeAny {
     return new ZodPipeline({
       ...this._def,
-      in: this._def.in.dereference(_defs),
-      out: this._def.out.dereference(_defs),
+      in: this._def.in.dereference(defs),
+      out: this._def.out.dereference(defs),
     })
+  }
+
+  getReferences(): string[] {
+    return [...this._def.in.getReferences(), ...this._def.out.getReferences()]
   }
 
   _parse(input: ParseInput): ParseReturnType<any> {

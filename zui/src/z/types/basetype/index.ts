@@ -48,6 +48,7 @@ import {
 import type { ZuiSchemaOptions } from '../../../transforms/zui-to-json-schema/zui-extension'
 import type { ObjectToZuiOptions } from '../../../transforms/object-to-zui'
 import { type ToTypescriptTyingsOptions, toTypescriptTypings } from '../../../transforms/zui-to-typescript'
+import { ZodRefDef } from '../ref'
 
 export type RefinementCtx = {
   addIssue: (arg: IssueData) => void
@@ -155,6 +156,11 @@ export abstract class ZodType<Output = any, Def extends ZodTypeDef = ZodTypeDef,
   /** deeply replace all references in the schema */
   dereference(_defs: Record<string, ZodTypeAny>): ZodTypeAny {
     return this
+  }
+
+  /** deeply scans the schema to check if it contains references */
+  getReferences(): string[] {
+    return []
   }
 
   _getType(input: ParseInput): string {

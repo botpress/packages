@@ -11,7 +11,20 @@ const deref = {
   baz: z.boolean(),
 }
 
-describe('deref', () => {
+const intersect = (...schemas: z.ZodTypeAny[]) => {
+  if (schemas.length === 0) {
+    throw new Error('Intersection expects at least one schema')
+  }
+
+  let current = schemas[0]!
+  for (let i = 1; i < schemas.length; i++) {
+    current = z.intersection(current, schemas[i]!)
+  }
+
+  return current
+}
+
+describe('dereference', () => {
   test('array', () => {
     const refSchema = z.array(bar)
     const derefSchema = refSchema.dereference(deref)
@@ -29,13 +42,13 @@ describe('deref', () => {
     expect(result.success).toBe(true)
   })
   test('function', () => {
-    const refSchema = z.function(z.tuple([foo, bar], baz))
+    const refSchema = z.function(z.tuple([foo, bar]), baz)
     const derefSchema = refSchema.dereference(deref)
     const result = derefSchema.safeParse((_a: string, _b: number) => true)
     expect(result.success).toBe(true)
   })
   test('intersection', () => {
-    const refSchema = z.intersection(z.object({ foo }), z.object({ bar }), z.object({ baz }))
+    const refSchema = intersect(z.object({ foo }), z.object({ bar }), z.object({ baz }))
     const derefSchema = refSchema.dereference(deref)
     const result = derefSchema.safeParse({ foo: 'astring', bar: 1, baz: true })
     expect(result.success).toBe(true)
@@ -106,5 +119,89 @@ describe('deref', () => {
     const derefSchema = refSchema.dereference(deref)
     const result = derefSchema.safeParse('astring')
     expect(result.success).toBe(true)
+  })
+})
+
+describe('getRegerences', () => {
+  test('array', () => {
+    const refSchema = z.array(bar)
+    const refs = refSchema.getReferences()
+    expect(refs).toEqual(['bar'])
+  })
+  test('discriminatedUnion', () => {
+    const refSchema = z.discriminatedUnion('type', [
+      z.object({ type: z.literal('foo'), foo: foo }),
+      z.object({ type: z.literal('bar'), bar: bar }),
+      z.object({ type: z.literal('baz'), baz: baz }),
+    ])
+    const refs = refSchema.getReferences()
+    expect(refs).toEqual(['foo', 'bar', 'baz'])
+  })
+  test('function', () => {
+    const refSchema = z.function(z.tuple([foo, bar]), baz)
+    const refs = refSchema.getReferences()
+    expect(refs).toEqual(['foo', 'bar', 'baz'])
+  })
+  test('intersection', () => {
+    const refSchema = intersect(z.object({ foo }), z.object({ bar }), z.object({ baz }))
+    const refs = refSchema.getReferences()
+    expect(refs).toEqual(['foo', 'bar', 'baz'])
+  })
+  test('map', () => {
+    const refSchema = z.map(foo, bar)
+    const refs = refSchema.getReferences()
+    expect(refs).toEqual(['foo', 'bar'])
+  })
+  test('nullable', () => {
+    const refSchema = z.nullable(foo)
+    const refs = refSchema.getReferences()
+    expect(refs).toEqual(['foo'])
+  })
+  test('object', () => {
+    const refSchema = z.object({
+      foo,
+      bar,
+      baz,
+    })
+    const refs = refSchema.getReferences()
+    expect(refs).toEqual(['foo', 'bar', 'baz'])
+  })
+  test('optional', () => {
+    const refSchema = z.optional(foo)
+    const refs = refSchema.getReferences()
+    expect(refs).toEqual(['foo'])
+  })
+  test('promise', () => {
+    const refSchema = z.promise(foo)
+    const refs = refSchema.getReferences()
+    expect(refs).toEqual(['foo'])
+  })
+  test('record', () => {
+    const refSchema = z.record(foo, bar)
+    const refs = refSchema.getReferences()
+    expect(refs).toEqual(['foo', 'bar'])
+  })
+  test('set', () => {
+    const refSchema = z.set(foo)
+    const refs = refSchema.getReferences()
+    expect(refs).toEqual(['foo'])
+  })
+  test('transformer', () => {
+    const refSchema = z.transformer(foo, {
+      type: 'transform',
+      transform: (data) => data,
+    })
+    const refs = refSchema.getReferences()
+    expect(refs).toEqual(['foo'])
+  })
+  test('tuple', () => {
+    const refSchema = z.tuple([foo, bar])
+    const refs = refSchema.getReferences()
+    expect(refs).toEqual(['foo', 'bar'])
+  })
+  test('union', () => {
+    const refSchema = z.union([foo, bar, baz])
+    const refs = refSchema.getReferences()
+    expect(refs).toEqual(['foo', 'bar', 'baz'])
   })
 })

@@ -28,11 +28,15 @@ export class ZodPromise<T extends ZodTypeAny> extends ZodType<
     return this._def.type
   }
 
-  dereference(_defs: Record<string, ZodTypeAny>): ZodTypeAny {
+  dereference(defs: Record<string, ZodTypeAny>): ZodTypeAny {
     return new ZodPromise({
       ...this._def,
-      type: this._def.type.dereference(_defs),
+      type: this._def.type.dereference(defs),
     })
+  }
+
+  getReferences(): string[] {
+    return this._def.type.getReferences()
   }
 
   _parse(input: ParseInput): ParseReturnType<this['_output']> {

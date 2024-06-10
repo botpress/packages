@@ -23,8 +23,15 @@ export class ZodOptional<T extends ZodTypeAny> extends ZodType<
   ZodOptionalDef<T>,
   T['_input'] | undefined
 > {
-  dereference(_defs: Record<string, ZodTypeAny>): ZodTypeAny {
-    return ZodOptional.create(this._def.innerType.dereference(_defs), this._def)
+  dereference(defs: Record<string, ZodTypeAny>): ZodTypeAny {
+    return new ZodOptional({
+      ...this._def,
+      innerType: this._def.innerType.dereference(defs),
+    })
+  }
+
+  getReferences(): string[] {
+    return this._def.innerType.getReferences()
   }
 
   _parse(input: ParseInput): ParseReturnType<this['_output']> {

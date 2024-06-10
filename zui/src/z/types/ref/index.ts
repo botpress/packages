@@ -16,6 +16,10 @@ export class ZodRef extends ZodType<ZodRefOutput, ZodRefDef> {
     return def
   }
 
+  getReferences(): string[] {
+    return [this._def.uri]
+  }
+
   _parse(_input: ParseInput): ParseReturnType<never> {
     // a schema containing references should never be used to parse data
     return INVALID

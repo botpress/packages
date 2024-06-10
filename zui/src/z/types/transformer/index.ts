@@ -56,11 +56,15 @@ export class ZodEffects<T extends ZodTypeAny, Output = output<T>, Input = input<
       : (this._def.schema as T)
   }
 
-  dereference(_defs: Record<string, ZodTypeAny>): ZodTypeAny {
+  dereference(defs: Record<string, ZodTypeAny>): ZodTypeAny {
     return new ZodEffects({
       ...this._def,
-      schema: this._def.schema.dereference(_defs),
+      schema: this._def.schema.dereference(defs),
     })
+  }
+
+  getReferences(): string[] {
+    return this._def.schema.getReferences()
   }
 
   _parse(input: ParseInput): ParseReturnType<this['_output']> {

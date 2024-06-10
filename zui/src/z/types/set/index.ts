@@ -28,11 +28,15 @@ export class ZodSet<Value extends ZodTypeAny = ZodTypeAny> extends ZodType<
   ZodSetDef<Value>,
   Set<Value['_input']>
 > {
-  dereference(_defs: Record<string, ZodTypeAny>): ZodTypeAny {
+  dereference(defs: Record<string, ZodTypeAny>): ZodTypeAny {
     return new ZodSet({
       ...this._def,
-      valueType: this._def.valueType.dereference(_defs),
+      valueType: this._def.valueType.dereference(defs),
     })
+  }
+
+  getReferences(): string[] {
+    return this._def.valueType.getReferences()
   }
 
   _parse(input: ParseInput): ParseReturnType<this['_output']> {

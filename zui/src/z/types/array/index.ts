@@ -42,6 +42,10 @@ export class ZodArray<T extends ZodTypeAny, Cardinality extends ArrayCardinality
     })
   }
 
+  getReferences(): string[] {
+    return this._def.type.getReferences()
+  }
+
   _parse(input: ParseInput): ParseReturnType<this['_output']> {
     const { ctx, status } = this._processInputParams(input)
 

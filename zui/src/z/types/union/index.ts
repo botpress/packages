@@ -29,8 +29,8 @@ export class ZodUnion<T extends ZodUnionOptions> extends ZodType<
   ZodUnionDef<T>,
   T[number]['_input']
 > {
-  dereference(_defs: Record<string, ZodTypeAny>): ZodTypeAny {
-    const options = this._def.options.map((option) => option.dereference(_defs)) as [
+  dereference(defs: Record<string, ZodTypeAny>): ZodTypeAny {
+    const options = this._def.options.map((option) => option.dereference(defs)) as [
       ZodTypeAny,
       ZodTypeAny,
       ...ZodTypeAny[],
@@ -39,6 +39,12 @@ export class ZodUnion<T extends ZodUnionOptions> extends ZodType<
       ...this._def,
       options,
     })
+  }
+
+  getReferences(): string[] {
+    return this._def.options.reduce<string[]>((acc, option) => {
+      return [...acc, ...option.getReferences()]
+    }, [])
   }
 
   _parse(input: ParseInput): ParseReturnType<this['_output']> {

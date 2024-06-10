@@ -23,10 +23,10 @@ export class ZodNullable<T extends ZodTypeAny> extends ZodType<
   ZodNullableDef<T>,
   T['_input'] | null
 > {
-  unreference(_defs: Record<string, ZodTypeAny>): ZodTypeAny {
+  dereference(_defs: Record<string, ZodTypeAny>): ZodTypeAny {
     return new ZodNullable({
       ...this._def,
-      innerType: this._def.innerType.unreference(_defs),
+      innerType: this._def.innerType.dereference(_defs),
     })
   }
 

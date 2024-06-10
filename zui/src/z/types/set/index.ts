@@ -28,10 +28,10 @@ export class ZodSet<Value extends ZodTypeAny = ZodTypeAny> extends ZodType<
   ZodSetDef<Value>,
   Set<Value['_input']>
 > {
-  unreference(_defs: Record<string, ZodTypeAny>): ZodTypeAny {
+  dereference(_defs: Record<string, ZodTypeAny>): ZodTypeAny {
     return new ZodSet({
       ...this._def,
-      valueType: this._def.valueType.unreference(_defs),
+      valueType: this._def.valueType.dereference(_defs),
     })
   }
 

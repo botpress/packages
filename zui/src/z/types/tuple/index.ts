@@ -46,9 +46,9 @@ export class ZodTuple<
   T extends [ZodTypeAny, ...ZodTypeAny[]] | [] = [ZodTypeAny, ...ZodTypeAny[]],
   Rest extends ZodTypeAny | null = null,
 > extends ZodType<OutputTypeOfTupleWithRest<T, Rest>, ZodTupleDef<T, Rest>, InputTypeOfTupleWithRest<T, Rest>> {
-  unreference(_defs: Record<string, ZodTypeAny>): ZodTypeAny {
-    const items = this._def.items.map((item) => item.unreference(_defs)) as [ZodTypeAny, ...ZodTypeAny[]]
-    const rest = this._def.rest ? this._def.rest.unreference(_defs) : null
+  dereference(_defs: Record<string, ZodTypeAny>): ZodTypeAny {
+    const items = this._def.items.map((item) => item.dereference(_defs)) as [ZodTypeAny, ...ZodTypeAny[]]
+    const rest = this._def.rest ? this._def.rest.dereference(_defs) : null
     return new ZodTuple({
       ...this._def,
       items,

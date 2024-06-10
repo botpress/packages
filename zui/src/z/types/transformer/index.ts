@@ -56,10 +56,10 @@ export class ZodEffects<T extends ZodTypeAny, Output = output<T>, Input = input<
       : (this._def.schema as T)
   }
 
-  unreference(_defs: Record<string, ZodTypeAny>): ZodTypeAny {
+  dereference(_defs: Record<string, ZodTypeAny>): ZodTypeAny {
     return new ZodEffects({
       ...this._def,
-      schema: this._def.schema.unreference(_defs),
+      schema: this._def.schema.dereference(_defs),
     })
   }
 

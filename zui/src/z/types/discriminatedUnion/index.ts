@@ -88,8 +88,8 @@ export class ZodDiscriminatedUnion<
   Discriminator extends string,
   Options extends ZodDiscriminatedUnionOption<Discriminator>[],
 > extends ZodType<output<Options[number]>, ZodDiscriminatedUnionDef<Discriminator, Options>, input<Options[number]>> {
-  unreference(_defs: Record<string, ZodTypeAny>): ZodTypeAny {
-    const options = this.options.map((option) => option.unreference(_defs)) as [
+  dereference(_defs: Record<string, ZodTypeAny>): ZodTypeAny {
+    const options = this.options.map((option) => option.dereference(_defs)) as [
       ZodDiscriminatedUnionOption<Discriminator>,
       ...ZodDiscriminatedUnionOption<Discriminator>[],
     ]

@@ -28,10 +28,10 @@ export class ZodPromise<T extends ZodTypeAny> extends ZodType<
     return this._def.type
   }
 
-  unreference(_defs: Record<string, ZodTypeAny>): ZodTypeAny {
+  dereference(_defs: Record<string, ZodTypeAny>): ZodTypeAny {
     return new ZodPromise({
       ...this._def,
-      type: this._def.type.unreference(_defs),
+      type: this._def.type.dereference(_defs),
     })
   }
 

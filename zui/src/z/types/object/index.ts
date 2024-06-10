@@ -124,11 +124,11 @@ export class ZodObject<
     return (this._cached = { shape, keys })
   }
 
-  unreference(_defs: Record<string, ZodTypeAny>): ZodTypeAny {
+  dereference(_defs: Record<string, ZodTypeAny>): ZodTypeAny {
     const currentShape = this._def.shape()
     const shape: Record<string, ZodTypeAny> = {}
     for (const key in currentShape) {
-      shape[key] = currentShape[key]!.unreference(_defs)
+      shape[key] = currentShape[key]!.dereference(_defs)
     }
     return new ZodObject({
       ...this._def,

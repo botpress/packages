@@ -34,9 +34,9 @@ export class ZodMap<Key extends ZodTypeAny = ZodTypeAny, Value extends ZodTypeAn
     return this._def.valueType
   }
 
-  unreference(_defs: Record<string, ZodTypeAny>): ZodTypeAny {
-    const keyType = this._def.keyType.unreference(_defs)
-    const valueType = this._def.valueType.unreference(_defs)
+  dereference(_defs: Record<string, ZodTypeAny>): ZodTypeAny {
+    const keyType = this._def.keyType.dereference(_defs)
+    const valueType = this._def.valueType.dereference(_defs)
     return new ZodMap({
       ...this._def,
       keyType,

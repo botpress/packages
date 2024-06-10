@@ -8,7 +8,7 @@ export interface ZodRefDef extends ZodTypeDef {
 type ZodRefOutput = NonNullable<unknown>
 
 export class ZodRef extends ZodType<ZodRefOutput, ZodRefDef> {
-  unreference(defs: Record<string, ZodTypeAny>): ZodTypeAny {
+  dereference(defs: Record<string, ZodTypeAny>): ZodTypeAny {
     const def = defs[this._def.uri]
     if (!def) {
       return this

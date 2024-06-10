@@ -153,7 +153,7 @@ export abstract class ZodType<Output = any, Def extends ZodTypeDef = ZodTypeDef,
   abstract _parse(input: ParseInput): ParseReturnType<Output>
 
   /** deeply replace all references in the schema */
-  unreference(_defs: Record<string, ZodTypeAny>): ZodTypeAny {
+  dereference(_defs: Record<string, ZodTypeAny>): ZodTypeAny {
     return this
   }
 

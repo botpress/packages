@@ -42,10 +42,10 @@ export class ZodReadonly<T extends ZodTypeAny> extends ZodType<
   ZodReadonlyDef<T>,
   MakeReadonly<T['_input']>
 > {
-  unreference(_defs: Record<string, ZodTypeAny>): ZodTypeAny {
+  dereference(_defs: Record<string, ZodTypeAny>): ZodTypeAny {
     return new ZodReadonly({
       ...this._def,
-      innerType: this._def.innerType.unreference(_defs),
+      innerType: this._def.innerType.dereference(_defs),
     })
   }
 

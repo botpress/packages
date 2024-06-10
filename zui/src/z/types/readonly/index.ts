@@ -42,6 +42,13 @@ export class ZodReadonly<T extends ZodTypeAny> extends ZodType<
   ZodReadonlyDef<T>,
   MakeReadonly<T['_input']>
 > {
+  unreference(_defs: Record<string, ZodTypeAny>): ZodTypeAny {
+    return new ZodReadonly({
+      ...this._def,
+      innerType: this._def.innerType.unreference(_defs),
+    })
+  }
+
   _parse(input: ParseInput): ParseReturnType<this['_output']> {
     const result = this._def.innerType._parse(input)
     if (isValid(result)) {

@@ -20,6 +20,14 @@ export class ZodPipeline<A extends ZodTypeAny, B extends ZodTypeAny> extends Zod
   ZodPipelineDef<A, B>,
   A['_input']
 > {
+  unreference(_defs: Record<string, ZodTypeAny>): ZodTypeAny {
+    return new ZodPipeline({
+      ...this._def,
+      in: this._def.in.unreference(_defs),
+      out: this._def.out.unreference(_defs),
+    })
+  }
+
   _parse(input: ParseInput): ParseReturnType<any> {
     const { status, ctx } = this._processInputParams(input)
     if (ctx.common.async) {

@@ -28,6 +28,13 @@ export class ZodPromise<T extends ZodTypeAny> extends ZodType<
     return this._def.type
   }
 
+  unreference(_defs: Record<string, ZodTypeAny>): ZodTypeAny {
+    return new ZodPromise({
+      ...this._def,
+      type: this._def.type.unreference(_defs),
+    })
+  }
+
   _parse(input: ParseInput): ParseReturnType<this['_output']> {
     const { ctx } = this._processInputParams(input)
     if (ctx.parsedType !== ZodParsedType.promise && ctx.common.async === false) {

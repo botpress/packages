@@ -28,6 +28,13 @@ export class ZodSet<Value extends ZodTypeAny = ZodTypeAny> extends ZodType<
   ZodSetDef<Value>,
   Set<Value['_input']>
 > {
+  unreference(_defs: Record<string, ZodTypeAny>): ZodTypeAny {
+    return new ZodSet({
+      ...this._def,
+      valueType: this._def.valueType.unreference(_defs),
+    })
+  }
+
   _parse(input: ParseInput): ParseReturnType<this['_output']> {
     const { status, ctx } = this._processInputParams(input)
     if (ctx.parsedType !== ZodParsedType.set) {

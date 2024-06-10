@@ -44,6 +44,16 @@ export class ZodFunction<Args extends ZodTuple<any, any>, Returns extends ZodTyp
   ZodFunctionDef<Args, Returns>,
   InnerTypeOfFunction<Args, Returns>
 > {
+  unreference(_defs: Record<string, ZodTypeAny>): ZodTypeAny {
+    const args = this._def.args.unreference(_defs) as ZodTuple<[], ZodUnknown>
+    const returns = this._def.returns.unreference(_defs)
+    return new ZodFunction({
+      ...this._def,
+      args,
+      returns,
+    })
+  }
+
   _parse(input: ParseInput): ParseReturnType<any> {
     const { ctx } = this._processInputParams(input)
     if (ctx.parsedType !== ZodParsedType.function) {

@@ -124,6 +124,18 @@ export class ZodObject<
     return (this._cached = { shape, keys })
   }
 
+  unreference(_defs: Record<string, ZodTypeAny>): ZodTypeAny {
+    const currentShape = this._def.shape()
+    const shape: Record<string, ZodTypeAny> = {}
+    for (const key in currentShape) {
+      shape[key] = currentShape[key]!.unreference(_defs)
+    }
+    return new ZodObject({
+      ...this._def,
+      shape: () => shape,
+    })
+  }
+
   _parse(input: ParseInput): ParseReturnType<this['_output']> {
     const parsedType = this._getType(input)
     if (parsedType !== ZodParsedType.object) {

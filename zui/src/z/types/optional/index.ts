@@ -23,6 +23,10 @@ export class ZodOptional<T extends ZodTypeAny> extends ZodType<
   ZodOptionalDef<T>,
   T['_input'] | undefined
 > {
+  unreference(_defs: Record<string, ZodTypeAny>): ZodTypeAny {
+    return ZodOptional.create(this._def.innerType.unreference(_defs), this._def)
+  }
+
   _parse(input: ParseInput): ParseReturnType<this['_output']> {
     const parsedType = this._getType(input)
     if (parsedType === ZodParsedType.undefined) {

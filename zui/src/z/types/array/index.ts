@@ -35,6 +35,13 @@ export class ZodArray<T extends ZodTypeAny, Cardinality extends ArrayCardinality
   ZodArrayDef<T>,
   Cardinality extends 'atleastone' ? [T['_input'], ...T['_input'][]] : T['_input'][]
 > {
+  unreference(defs: Record<string, ZodTypeAny>): ZodTypeAny {
+    return new ZodArray({
+      ...this._def,
+      type: this._def.type.unreference(defs),
+    })
+  }
+
   _parse(input: ParseInput): ParseReturnType<this['_output']> {
     const { ctx, status } = this._processInputParams(input)
 

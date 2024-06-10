@@ -56,6 +56,13 @@ export class ZodEffects<T extends ZodTypeAny, Output = output<T>, Input = input<
       : (this._def.schema as T)
   }
 
+  unreference(_defs: Record<string, ZodTypeAny>): ZodTypeAny {
+    return new ZodEffects({
+      ...this._def,
+      schema: this._def.schema.unreference(_defs),
+    })
+  }
+
   _parse(input: ParseInput): ParseReturnType<this['_output']> {
     const { status, ctx } = this._processInputParams(input)
 

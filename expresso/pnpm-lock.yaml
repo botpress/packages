@@ -27,8 +27,8 @@ importers:
         specifier: 2.0.2
         version: 2.0.2
       swagger-ui-express:
-        specifier: 5.0.0
-        version: 5.0.0(express@4.19.2)
+        specifier: 5.0.1
+        version: 5.0.1(express@4.19.2)
       zod:
         specifier: 3.22.4
         version: 3.22.4
@@ -43,11 +43,11 @@ importers:
         specifier: 2.0.4
         version: 2.0.4
       '@types/lodash':
-        specifier: 4.17.4
-        version: 4.17.4
+        specifier: 4.17.5
+        version: 4.17.5
       '@types/node':
-        specifier: 18.19.33
-        version: 18.19.33
+        specifier: 18.19.34
+        version: 18.19.34
       '@types/supertest':
         specifier: 6.0.2
         version: 6.0.2
@@ -59,7 +59,7 @@ importers:
         version: 5.4.5
       vitest:
         specifier: 1.6.0
-        version: 1.6.0(@types/node@18.19.33)
+        version: 1.6.0(@types/node@18.19.34)
 
 packages:
 
@@ -303,8 +303,8 @@ packages:
   '@types/http-errors@2.0.4':
     resolution: {integrity: sha512-D0CFMMtydbJAegzOyHjtiKPLlvnm3iTZyZRSZoLq2mRhDdmLfIWOCYPfQJ4cu2erKghU++QvjcUjp/5h7hESpA==}
 
-  '@types/lodash@4.17.4':
-    resolution: {integrity: sha512-wYCP26ZLxaT3R39kiN2+HcJ4kTd3U1waI/cY7ivWYqFP6pW3ZNpvi6Wd6PHZx7T/t8z0vlkXMg3QYLa7DZ/IJQ==}
+  '@types/lodash@4.17.5':
+    resolution: {integrity: sha512-MBIOHVZqVqgfro1euRDWX7OO0fBVUUMrN6Pwm8LQsz8cWhEpihlvR70ENj3f40j58TNxZaWv2ndSkInykNBBJw==}
 
   '@types/methods@1.1.4':
     resolution: {integrity: sha512-ymXWVrDiCxTBE3+RIrrP533E70eA+9qu7zdWoHuOmGujkYtzf4HQF96b8nwHLqhuf4ykX61IGRIB38CC6/sImQ==}
@@ -315,8 +315,8 @@ packages:
   '@types/mime@3.0.4':
     resolution: {integrity: sha512-iJt33IQnVRkqeqC7PzBHPTC6fDlRNRW8vjrgqtScAhrmMwe8c4Eo7+fUGTa+XdWrpEgpyKWMYmi2dIwMAYRzPw==}
 
-  '@types/node@18.19.33':
-    resolution: {integrity: sha512-NR9+KrpSajr2qBVp/Yt5TU/rp+b5Mayi3+OlMlcg2cVCfRmcG5PWZ7S4+MG9PZ5gWBoc9Pd0BKSRViuBCRPu0A==}
+  '@types/node@18.19.34':
+    resolution: {integrity: sha512-eXF4pfBNV5DAMKGbI02NnDtWrQ40hAN558/2vvS4gMpMIxaf6JmD7YjnZbq0Q9TDSSkKBamime8ewRoomHdt4g==}
 
   '@types/qs@6.9.12':
     resolution: {integrity: sha512-bZcOkJ6uWrL0Qb2NAWKa7TBU+mJHPzhx9jjLL1KHF+XpzEcR7EXHvjbHlGtR/IsP1vyPrehuS6XqkmaePy//mg==}
@@ -850,8 +850,8 @@ packages:
   swagger-ui-dist@5.11.8:
     resolution: {integrity: sha512-IfPtCPdf6opT5HXrzHO4kjL1eco0/8xJCtcs7ilhKuzatrpF2j9s+3QbOag6G3mVFKf+g+Ca5UG9DquVUs2obA==}
 
-  swagger-ui-express@5.0.0:
-    resolution: {integrity: sha512-tsU9tODVvhyfkNSvf03E6FAk+z+5cU3lXAzMy6Pv4av2Gt2xA0++fogwC4qo19XuFf6hdxevPuVCSKFuMHJhFA==}
+  swagger-ui-express@5.0.1:
+    resolution: {integrity: sha512-SrNU3RiBGTLLmFU8GIJdOdanJTl4TOmT27tt3bWWHppqYmAZ6IDuEuBvMU6nZq0zLEe6b/1rACXCgLZqO6ZfrA==}
     engines: {node: '>= v0.10.32'}
     peerDependencies:
       express: '>=4.0.0 || >=5.0.0-beta'
@@ -1118,11 +1118,11 @@ snapshots:
   '@types/body-parser@1.19.5':
     dependencies:
       '@types/connect': 3.4.38
-      '@types/node': 18.19.33
+      '@types/node': 18.19.34
 
   '@types/connect@3.4.38':
     dependencies:
-      '@types/node': 18.19.33
+      '@types/node': 18.19.34
 
   '@types/cookiejar@2.1.5': {}
 
@@ -1130,7 +1130,7 @@ snapshots:
 
   '@types/express-serve-static-core@4.17.43':
     dependencies:
-      '@types/node': 18.19.33
+      '@types/node': 18.19.34
       '@types/qs': 6.9.12
       '@types/range-parser': 1.2.7
       '@types/send': 0.17.4
@@ -1144,7 +1144,7 @@ snapshots:
 
   '@types/http-errors@2.0.4': {}
 
-  '@types/lodash@4.17.4': {}
+  '@types/lodash@4.17.5': {}
 
   '@types/methods@1.1.4': {}
 
@@ -1152,7 +1152,7 @@ snapshots:
 
   '@types/mime@3.0.4': {}
 
-  '@types/node@18.19.33':
+  '@types/node@18.19.34':
     dependencies:
       undici-types: 5.26.5
 
@@ -1163,19 +1163,19 @@ snapshots:
   '@types/send@0.17.4':
     dependencies:
       '@types/mime': 1.3.5
-      '@types/node': 18.19.33
+      '@types/node': 18.19.34
 
   '@types/serve-static@1.15.5':
     dependencies:
       '@types/http-errors': 2.0.4
       '@types/mime': 3.0.4
-      '@types/node': 18.19.33
+      '@types/node': 18.19.34
 
   '@types/superagent@8.1.4':
     dependencies:
       '@types/cookiejar': 2.1.5
       '@types/methods': 1.1.4
-      '@types/node': 18.19.33
+      '@types/node': 18.19.34
 
   '@types/supertest@6.0.2':
     dependencies:
@@ -1770,7 +1770,7 @@ snapshots:
 
   swagger-ui-dist@5.11.8: {}
 
-  swagger-ui-express@5.0.0(express@4.19.2):
+  swagger-ui-express@5.0.1(express@4.19.2):
     dependencies:
       express: 4.19.2
       swagger-ui-dist: 5.11.8
@@ -1804,13 +1804,13 @@ snapshots:
 
   vary@1.1.2: {}
 
-  vite-node@1.6.0(@types/node@18.19.33):
+  vite-node@1.6.0(@types/node@18.19.34):
     dependencies:
       cac: 6.7.14
       debug: 4.3.4
       pathe: 1.1.2
       picocolors: 1.0.0
-      vite: 5.1.4(@types/node@18.19.33)
+      vite: 5.1.4(@types/node@18.19.34)
     transitivePeerDependencies:
       - '@types/node'
       - less
@@ -1821,16 +1821,16 @@ snapshots:
       - supports-color
       - terser
 
-  vite@5.1.4(@types/node@18.19.33):
+  vite@5.1.4(@types/node@18.19.34):
     dependencies:
       esbuild: 0.19.12
       postcss: 8.4.35
       rollup: 4.12.0
     optionalDependencies:
-      '@types/node': 18.19.33
+      '@types/node': 18.19.34
       fsevents: 2.3.3
 
-  vitest@1.6.0(@types/node@18.19.33):
+  vitest@1.6.0(@types/node@18.19.34):
     dependencies:
       '@vitest/expect': 1.6.0
       '@vitest/runner': 1.6.0
@@ -1849,11 +1849,11 @@ snapshots:
       strip-literal: 2.0.0
       tinybench: 2.6.0
       tinypool: 0.8.4
-      vite: 5.1.4(@types/node@18.19.33)
-      vite-node: 1.6.0(@types/node@18.19.33)
+      vite: 5.1.4(@types/node@18.19.34)
+      vite-node: 1.6.0(@types/node@18.19.34)
       why-is-node-running: 2.2.2
     optionalDependencies:
-      '@types/node': 18.19.33
+      '@types/node': 18.19.34
     transitivePeerDependencies:
       - less
       - lightningcss

@@ -82,7 +82,11 @@ export const limitConfigs = {
     unit: 'count'
   },
   files_api_query_bytes: {
-    value: 1024, // 1 KB  
+    value: 1024, // 1 KB
     unit: 'bytes'
-  }
+  },
+  code_payload_bytes: {
+    value: 52428800, // 50 MB
+    unit: 'bytes'
+  },
 } as const satisfies Record<string, Limit>

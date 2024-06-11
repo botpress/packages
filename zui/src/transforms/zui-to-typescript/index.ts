@@ -86,7 +86,7 @@ export const DEFAULT_OPTIONS: Options = {
   unknownAny: true,
 }
 
-export async function compile(schema: JSONSchema4, name = 'Root', options: Partial<Options> = {}): Promise<string> {
+export function compile(schema: JSONSchema4, name = 'Root', options: Partial<Options> = {}): string {
   validateOptions(options)
   const _options = merge({}, DEFAULT_OPTIONS, options)
 
@@ -103,7 +103,7 @@ export async function compile(schema: JSONSchema4, name = 'Root', options: Parti
   // Initial clone to avoid mutating the input
   const _schema = cloneDeep(schema)
 
-  const { dereferencedPaths, dereferencedSchema } = await dereference(_schema, _options)
+  const { dereferencedPaths, dereferencedSchema } = dereference(_schema, _options)
   if (process.env.VERBOSE) {
     if (isEqual(_schema, dereferencedSchema)) {
       log('green', 'dereferencer', time(), '✅ No change')
@@ -146,8 +146,8 @@ type ToTypescriptTyingsOptions = { schemaName: string } & Partial<Options>
 
 export type { ToTypescriptTyingsOptions }
 
-export const toTypescriptTypings = async (jsonSchema: any, options?: ToTypescriptTyingsOptions) => {
-  const generatedType = await compile(jsonSchema, options?.schemaName ?? 'Schema', {
+export const toTypescriptTypings = (jsonSchema: any, options?: ToTypescriptTyingsOptions) => {
+  const generatedType = compile(jsonSchema, options?.schemaName ?? 'Schema', {
     bannerComment: '',
     ...options,
   })

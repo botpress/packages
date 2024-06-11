@@ -11,6 +11,9 @@ importers:
       '@apidevtools/json-schema-ref-parser':
         specifier: ^11.5.5
         version: 11.5.5
+      call-me-maybe:
+        specifier: ^1.0.2
+        version: 1.0.2
       lodash:
         specifier: ^4.17.21
         version: 4.17.21
@@ -2048,6 +2051,9 @@ packages:
   call-bind@1.0.7:
     resolution: {integrity: sha512-GHTSNSYICQ7scH7sZ+M2rFopRoLh8t2bLSW6BbgrtLsahOIB5iyAVJf9GjWK3cYTDaMj4XdBpM1cA6pIS0Kv2w==}
     engines: {node: '>= 0.4'}
+
+  call-me-maybe@1.0.2:
+    resolution: {integrity: sha512-HpX65o1Hnr9HH25ojC1YGs7HCQLq0GCOibSaWER0eNpgJ/Z1MZv2mTc7+xh6WOPxbRVcmgbv4hGU+uSQ/2xFZQ==}
 
   caniuse-lite@1.0.30001608:
     resolution: {integrity: sha512-cjUJTQkk9fQlJR2s4HMuPMvTiRggl0rAVMtthQuyOlDWuqHXqN8azLq+pi8B2TjwKJ32diHjUqRIKeFX4z1FoA==}
@@ -6637,6 +6643,8 @@ snapshots:
       function-bind: 1.1.2
       get-intrinsic: 1.2.4
       set-function-length: 1.2.1
+
+  call-me-maybe@1.0.2: {}
 
   caniuse-lite@1.0.30001608: {}
 

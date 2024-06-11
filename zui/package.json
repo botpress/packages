@@ -49,17 +49,18 @@
     "jsdom": "^24.0.0",
     "local-ref-resolver": "^0.2.0",
     "prettier": "^3.0.0",
+    "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "storybook": "^8.0.9",
     "tsup": "^8.0.1",
     "tsx": "^4.7.2",
     "typescript": "5.4.5",
     "vite": "^5.2.6",
-    "vitest": "1.5.2",
-    "react": "^18.2.0"
+    "vitest": "1.5.2"
   },
   "dependencies": {
     "@apidevtools/json-schema-ref-parser": "^11.5.5",
+    "call-me-maybe": "^1.0.2",
     "lodash": "^4.17.21"
   },
   "peerDependencies": {

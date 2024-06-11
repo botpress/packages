@@ -1,5 +1,7 @@
 import { z } from './src'
 
+
+
 const aschema = z.object({
   payment: z.discriminatedUnion('type', [
     z.object({
@@ -38,3 +40,6 @@ const aschema = z.object({
       }),
   ]),
 })
+
+
+console.log(z.object({ name: z.string().nullable(), age: z.number()}).toTypescriptTypings())

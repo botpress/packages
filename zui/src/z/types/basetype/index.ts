@@ -48,7 +48,6 @@ import {
 import type { ZuiSchemaOptions } from '../../../transforms/zui-to-json-schema/zui-extension'
 import type { ObjectToZuiOptions } from '../../../transforms/object-to-zui'
 import { type ToTypescriptTyingsOptions, toTypescriptTypings } from '../../../transforms/zui-to-typescript'
-import { ZodRefDef } from '../ref'
 
 export type RefinementCtx = {
   addIssue: (arg: IssueData) => void

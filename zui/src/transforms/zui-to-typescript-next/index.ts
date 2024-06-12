@@ -1,4 +1,4 @@
-import z, { ZodDef, util } from '../../z'
+import z, { util } from '../../z'
 import { escapeString, getMultilineComment, toPropertyKey } from './utils'
 
 const Primitives = [
@@ -279,7 +279,7 @@ ${escapeString((schema as z.ZodLiteral<any>).value)}`.trim()
       return sUnwrapZod(def.values, newConfig)
 
     case z.ZodFirstPartyTypeKind.ZodOptional:
-      if (config?.declaration || config?.parent instanceof z.ZodRecord) {
+      if (config?.declaration || config?.parent instanceof z.ZodRecord || config?.parent instanceof z.ZodObject) {
         return `${sUnwrapZod(def.innerType, newConfig)} | undefined`
       }
 
@@ -315,5 +315,4 @@ ${escapeString((schema as z.ZodLiteral<any>).value)}`.trim()
     default:
       util.assertNever(def)
   }
-  throw new Error('unreachable')
 }

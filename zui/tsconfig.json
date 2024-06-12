@@ -30,6 +30,7 @@
     "**/benchmark/**/*.ts",
   ],
   "include": [
-    "src/**/*"
+    "src/**/*",
+    "src/vitest.d.ts"
   ]
 }

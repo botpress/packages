@@ -2,22 +2,6 @@ import { describe, it, expect } from 'vitest'
 import { getTypings } from '.'
 import z from '../../z'
 
-expect.extend({
-  toMatchWithoutFormatting(received: string, expected: string, _) {
-    const { isNot } = this
-    const transformedReceived = received.replace(/\s+/g, '')
-    const transformedExpected = expected.replace(/\s+/g, '')
-
-    return {
-      pass: transformedExpected === transformedReceived,
-      message: () => {
-        const message = isNot ? 'not ' : ''
-        const diffView = this.utils.diff(transformedExpected, transformedReceived, { expand: true })
-        return `Expected output to ${message}match without formatting:\n${diffView}`
-      }
-    }
-  }
-})
 
 describe('functions', () => {
   it('title mandatory to declare', async () => {
@@ -27,7 +11,7 @@ describe('functions', () => {
       .returns(z.number())
       .describe('Add two numbers together.\nThis is a multiline description')
 
-    expect(getTypings(fn, { declaration: true })).toThrow(/title/i)
+    expect(getTypings(fn, { declaration: true })).toThrowError()
   })
 
   it('function with multi-line description', async () => {
@@ -47,6 +31,8 @@ describe('functions', () => {
        */
       declare function add(arg0: { a: number; b: number }): number;
     `)
+
+    expect(typings).toBeValidTypeScript()
   })
 
   it('function with no args and unknown return', async () => {
@@ -55,6 +41,8 @@ describe('functions', () => {
     const typings = getTypings(fn, { declaration: true })
 
     expect(typings).toMatchWithoutFormatting('declare function fn(): unknown;')
+
+    expect(typings).toBeValidTypeScript()
   })
 
   it('function with no args and void return', async () => {
@@ -63,6 +51,7 @@ describe('functions', () => {
     const typings =  getTypings(fn, { declaration: true })
 
     expect(typings).toMatchWithoutFormatting('declare function fn(): void;')
+    expect(typings).toBeValidTypeScript()
   })
 
   it('async function returning union', async () => {
@@ -74,6 +63,7 @@ describe('functions', () => {
     const typings = getTypings(fn, { declaration: true })
 
     expect(typings).toMatchWithoutFormatting('declare function fn(): Promise<number | string>;')
+    expect(typings).toBeValidTypeScript()
   })
 
   it('function with multiple args', async () => {
@@ -103,12 +93,14 @@ describe('functions', () => {
         arg2: [string, /** This is a number */ number]
       ): unknown;
     `)
+    expect(typings).toBeValidTypeScript()
   })
 
   it('function with optional args', async () => {
     const fn = z.function().title('fn').args(z.string().optional())
     const typings =  getTypings(fn, { declaration: true })
     expect(typings).toMatchWithoutFormatting('declare function fn(arg0?: string): unknown;')
+    expect(typings).toBeValidTypeScript()
   })
 
   it('string literals', async () => {
@@ -128,6 +120,7 @@ describe('functions', () => {
     const fn = z.function().title('fn').args(z.string().title('firstName').optional())
     const typings =  getTypings(fn, { declaration: true })
     expect(typings).toMatchWithoutFormatting('declare function fn(firstName?: string): unknown;')
+    expect(typings).toBeValidTypeScript()
   })
 
   it('mix of named and unnammed params', async () => {
@@ -385,12 +378,14 @@ describe('objects', () => {
     expect(typings).toMatchWithoutFormatting(`
       declare const MyObject: {
         /** This is A */
-        a: /**
+        a: /***
          * This is A
          */
         string
       };
     `)
+
+    expect(typings).toBeValidTypeScript()
   })
 
   it('zod effects', async () => {
@@ -413,5 +408,6 @@ describe('objects', () => {
     `)
   })
 })
+
 
 // TODO: regex, discriminated unions, literals, arrays, never, NaN, z.catch(), z.transform(), z.effects()

@@ -566,12 +566,23 @@ export abstract class ZodType<Output = any, Def extends ZodTypeDef = ZodTypeDef,
     return zuiToJsonSchema(this, opts)
   }
 
+  /**
+ * @deprecated use toTypescript instead
+ */
   async toTypescriptTypings(opts?: ToTypescriptTyingsOptions): Promise<string> {
     return toTypescriptTypings(this.toJsonSchema(), opts)
   }
 
-  toTypescript(opts?: TypescriptGenerationOptions) {
+  toTypescript(opts?: TypescriptGenerationOptions): string {
     return getTypings(this, opts)
+  }
+
+  async toTypescriptAsync(opts?: Omit<TypescriptGenerationOptions, 'formatters'> & { formatters: ((typing: string) => Promise<string> | string)[]}): Promise<string> {
+    let result = getTypings(this, { ...opts, formatters: []})
+    for (const formatter of opts?.formatters || []) {
+      result = await formatter(result)
+    }
+    return result
   }
   
   static fromObject(obj: any, opts?: ObjectToZuiOptions) {

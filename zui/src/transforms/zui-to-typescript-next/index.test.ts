@@ -2,7 +2,6 @@ import { describe, it, expect } from 'vitest'
 import { getTypings } from '.'
 import z from '../../z'
 
-
 describe('functions', () => {
   it('title mandatory to declare', async () => {
     const fn = z
@@ -10,8 +9,7 @@ describe('functions', () => {
       .args(z.object({ a: z.number(), b: z.number() }))
       .returns(z.number())
       .describe('Add two numbers together.\nThis is a multiline description')
-
-    expect(getTypings(fn, { declaration: true })).toThrowError()
+    expect(() => getTypings(fn, { declaration: true })).toThrowError(/title/i)
   })
 
   it('function with multi-line description', async () => {
@@ -22,7 +20,7 @@ describe('functions', () => {
       .title('add')
       .describe('Add two numbers together.\nThis is a multiline description')
 
-    const typings =  getTypings(fn, { declaration: true })
+    const typings = getTypings(fn, { declaration: true })
 
     expect(typings).toMatchWithoutFormatting(`
       /**
@@ -48,7 +46,7 @@ describe('functions', () => {
   it('function with no args and void return', async () => {
     const fn = z.function().title('fn').returns(z.void())
 
-    const typings =  getTypings(fn, { declaration: true })
+    const typings = getTypings(fn, { declaration: true })
 
     expect(typings).toMatchWithoutFormatting('declare function fn(): void;')
     expect(typings).toBeValidTypeScript()
@@ -76,10 +74,10 @@ describe('functions', () => {
         // Arg 2
         z.number().describe('This is a number'),
         // Arg 3
-        z.tuple([z.string(), z.number().describe('This is a number')])
+        z.tuple([z.string(), z.number().describe('This is a number')]),
       )
 
-    const typings =  getTypings(fn, { declaration: true })
+    const typings = getTypings(fn, { declaration: true })
 
     expect(typings).toMatchWithoutFormatting(`
       declare function fn(
@@ -98,14 +96,14 @@ describe('functions', () => {
 
   it('function with optional args', async () => {
     const fn = z.function().title('fn').args(z.string().optional())
-    const typings =  getTypings(fn, { declaration: true })
+    const typings = getTypings(fn, { declaration: true })
     expect(typings).toMatchWithoutFormatting('declare function fn(arg0?: string): unknown;')
     expect(typings).toBeValidTypeScript()
   })
 
   it('string literals', async () => {
-    const typings =  getTypings(
-      z.union([z.literal('Hello, world!'), z.literal('Yoyoyoyo')]).describe('yoyoyo\nmultiline')
+    const typings = getTypings(
+      z.union([z.literal('Hello, world!'), z.literal('Yoyoyoyo')]).describe('yoyoyo\nmultiline'),
     )
     expect(typings).toMatchWithoutFormatting(`
       /**
@@ -118,7 +116,7 @@ describe('functions', () => {
 
   it('function with named args', async () => {
     const fn = z.function().title('fn').args(z.string().title('firstName').optional())
-    const typings =  getTypings(fn, { declaration: true })
+    const typings = getTypings(fn, { declaration: true })
     expect(typings).toMatchWithoutFormatting('declare function fn(firstName?: string): unknown;')
     expect(typings).toBeValidTypeScript()
   })
@@ -128,7 +126,7 @@ describe('functions', () => {
       .function()
       .title('fn')
       .args(z.string().title('firstName').optional(), z.number(), z.object({ a: z.string() }).title('obj'))
-    const typings =  getTypings(fn, { declaration: true })
+    const typings = getTypings(fn, { declaration: true })
     expect(typings).toMatchWithoutFormatting(`
       declare function fn(
         firstName?: string,
@@ -145,7 +143,7 @@ describe('functions', () => {
       .args(z.string().nullable().optional(), z.number().optional())
       .returns(z.string().nullable().optional())
 
-    const typings =  getTypings(fn, { declaration: true })
+    const typings = getTypings(fn, { declaration: true })
     expect(typings).toMatchWithoutFormatting(`
       declare function fn(
         arg0?: string | null,
@@ -158,13 +156,13 @@ describe('functions', () => {
 describe('objects', () => {
   it('title mandatory to declare', async () => {
     const obj = z.object({ a: z.number(), b: z.string() })
-    expect(getTypings(obj, { declaration: true })).rejects.toThrow(/title/i)
+    expect(() => getTypings(obj, { declaration: true })).toThrowError()
   })
 
   it('normal object', async () => {
     const obj = z.object({ a: z.number(), b: z.string() }).title('MyObject')
 
-    const typings =  getTypings(obj, { declaration: true })
+    const typings = getTypings(obj, { declaration: true })
 
     expect(typings).toMatchWithoutFormatting('declare const MyObject: { a: number; b: string };')
   })
@@ -175,7 +173,7 @@ describe('objects', () => {
       .title('MyObject')
       .describe('This is my object.\nThis is a multiline description.\n\n\n')
 
-    const typings =  getTypings(obj, { declaration: true })
+    const typings = getTypings(obj, { declaration: true })
 
     expect(typings).toMatchWithoutFormatting(`
       /**
@@ -189,7 +187,7 @@ describe('objects', () => {
   it('nullable', async () => {
     const obj = z.object({ a: z.number(), b: z.string() }).title('MyObject').nullable()
 
-    const typings =  getTypings(obj, { declaration: true })
+    const typings = getTypings(obj, { declaration: true })
 
     expect(typings).toMatchWithoutFormatting('declare const MyObject: { a: number; b: string } | null;')
   })
@@ -197,31 +195,33 @@ describe('objects', () => {
   it('optionals with default values', async () => {
     const obj = z.object({ a: z.number(), b: z.string() }).title('MyObject').optional().default({ a: 1, b: 'hello' })
 
-    const typings =  getTypings(obj, { declaration: true })
+    const typings = getTypings(obj, { declaration: true })
 
     expect(typings).toMatchWithoutFormatting('declare const MyObject: { a: number; b: string } | undefined;')
+    expect(typings).toBeValidTypeScript()
   })
 
   it('enum', async () => {
     const obj = z.object({ a: z.enum(['hello', 'world']) }).title('MyObject')
 
-    const typings =  getTypings(obj)
+    const typings = getTypings(obj, { declaration: true })
 
     expect(typings).toMatchWithoutFormatting(`
-      {
+      declare const MyObject: {
         a: 'hello' | 'world'
-      }
+      };
     `)
+    expect(typings).toBeValidTypeScript()
   })
 
   it('object with a description & optional', async () => {
     const obj = z
       .object({
-        someStr: z.string().describe('Description').optional()
+        someStr: z.string().describe('Description').optional(),
       })
       .title('MyObject')
 
-    const typings =  getTypings(obj, { declaration: true })
+    const typings = getTypings(obj, { declaration: true })
 
     expect(typings).toMatchWithoutFormatting(`
       declare const MyObject: {
@@ -229,16 +229,18 @@ describe('objects', () => {
         someStr?: string
       };
     `)
+
+    expect(typings).toBeValidTypeScript()
   })
 
   it('object with optional and a description (opposite of previous test)', async () => {
     const obj = z
       .object({
-        someStr: z.string().optional().describe('Description')
+        someStr: z.string().optional().describe('Description'),
       })
       .title('MyObject')
 
-    const typings =  getTypings(obj, { declaration: true })
+    const typings = getTypings(obj, { declaration: true })
 
     expect(typings).toMatchWithoutFormatting(`
       declare const MyObject: {
@@ -246,18 +248,20 @@ describe('objects', () => {
         someStr?: string
       };
     `)
+    expect(typings).toBeValidTypeScript()
   })
 
   it('object with nullable object and no properties', async () => {
     const obj = z
       .object({
-        address: z.object({}).nullable()
+        address: z.object({}).nullable(),
       })
       .title('MyObject')
 
-    const typings =  getTypings(obj, { declaration: true })
+    const typings = getTypings(obj, { declaration: true })
 
     expect(typings).toMatchWithoutFormatting('declare const MyObject: { address: {} | null };')
+    expect(typings).toBeValidTypeScript()
   })
 
   it('zod record', async () => {
@@ -268,14 +272,14 @@ describe('objects', () => {
             z.number(),
             z.object({
               street: z.string(),
-              number: z.number()
-            })
+              number: z.number(),
+            }),
           )
-          .describe('This is a record')
+          .describe('This is a record'),
       })
       .title('MyObject')
 
-    const typings =  getTypings(obj, { declaration: true })
+    const typings = getTypings(obj, { declaration: true })
 
     expect(typings).toMatchWithoutFormatting(`
       declare const MyObject: {
@@ -283,6 +287,8 @@ describe('objects', () => {
         address: { [key: number]: { street: string; number: number } }
       };
     `)
+
+    expect(typings).toBeValidTypeScript()
   })
 
   it('zod record with an optional object', async () => {
@@ -293,25 +299,95 @@ describe('objects', () => {
           z
             .object({
               status: z.string(),
-              error: z.string().optional()
+              error: z.string().optional(),
             })
-            .optional()
-        )
+            .optional(),
+        ),
       })
       .title('MyObject')
 
     const typings = getTypings(obj, { declaration: true })
 
-    //'?' at the end of a type is not valid TypeScript syntax. Did you mean to write '{ status: string; error?: string | undefined; } | undefined'?
     expect(typings).toMatchWithoutFormatting(
       `
       declare const MyObject: {
         computed: { [key: string]: { status: string; error?: string } | undefined }
       };
-    `
+    `,
     )
+    expect(typings).toBeValidTypeScript()
   })
 
+  it('Can handle a complex discriminated union with descriptions', () => {
+    const obj = z
+      .discriminatedUnion('type', [
+        z.object({
+          type: z.literal('Credit Card'),
+          cardNumber: z
+            .string()
+            .title('Credit Card Number')
+            .placeholder('1234 5678 9012 3456')
+            .describe('This is the card number'),
+          expirationDate: z
+            .string()
+            .title('Expiration Date')
+            .placeholder('10/29')
+            .describe('This is the expiration date'),
+          brand: z
+            .enum(['Visa', 'Mastercard', 'American Express'])
+            .nullable()
+            .optional()
+            .default('Visa')
+            .describe('This is the brand of the card'),
+        }),
+        z.object({
+          type: z.literal('PayPal'),
+          email: z
+            .string()
+            .email()
+            .title('Paypal Email')
+            .placeholder('john@doe.com')
+            .describe("This is the paypal account's email address"),
+        }),
+        z.object({
+          type: z.literal('Bitcoin'),
+          address: z
+            .string()
+            .title('Bitcoin Address')
+            .placeholder('1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa')
+            .describe('This is the bitcoin address'),
+        }),
+        z.object({
+          type: z.literal('Bank Transfer'),
+          accountNumber: z
+            .string()
+            .title('Account Number')
+            .placeholder('1234567890')
+            .describe('This is the bank account number'),
+        }),
+        z
+          .object({
+            type: z.literal('Cash'),
+            amount: z
+              .number()
+              .title('Amount')
+              .disabled((value) => (value || 0) > 100)
+              .describe('This is the amount of cash'),
+          })
+          .disabled((obj) => {
+            return {
+              type: !!obj && obj.amount > 100,
+            }
+          })
+          .disabled(() => {
+            return false
+          }),
+      ])
+      .title('payment')
+    const typings = obj.toTypescript({ declaration: true })
+
+    expect(typings).toBeValidTypeScript()
+  })
   it('zod lazy', async () => {
     const obj = z
       .object({
@@ -321,11 +397,11 @@ describe('objects', () => {
               z.number(),
               z.object({
                 street: z.string(),
-                number: z.number()
-              })
+                number: z.number(),
+              }),
             )
-            .describe('This is a record')
-        )
+            .describe('This is a record'),
+        ),
       })
       .title('MyObject')
 
@@ -338,6 +414,8 @@ describe('objects', () => {
         }
       };
     `)
+
+    expect(typings).toBeValidTypeScript()
   })
 
   it('array of complex object as input params', async () => {
@@ -345,14 +423,17 @@ describe('objects', () => {
       .function()
       .args(z.array(z.object({ a: z.number(), b: z.string() })))
       .title('MyObject')
-    const typings =  getTypings(fn, { declaration: true })
+    const typings = getTypings(fn, { declaration: true })
 
-    expect(typings).toMatchWithoutFormatting('declare function MyObject(arg0: Array<{ a: number; b: string }>): unknown;')
+    expect(typings).toMatchWithoutFormatting(
+      'declare function MyObject(arg0: Array<{ a: number; b: string }>): unknown;',
+    )
+    expect(typings).toBeValidTypeScript()
   })
 
   it('array of primitives as input params', async () => {
     const fn = z.function().args(z.array(z.number()).describe('This is an array of numbers')).title('MyObject')
-    const typings =  getTypings(fn, { declaration: true })
+    const typings = getTypings(fn, { declaration: true })
 
     expect(typings).toMatchWithoutFormatting(`
       declare function MyObject(
@@ -360,6 +441,7 @@ describe('objects', () => {
         arg0: number[]
       ): unknown;
     `)
+    expect(typings).toBeValidTypeScript()
   })
 
   it('zod effects', async () => {
@@ -369,16 +451,16 @@ describe('objects', () => {
           .string()
           .title('A')
           .describe('This is A')
-          .transform((val) => val.toUpperCase())
+          .transform((val) => val.toUpperCase()),
       })
       .title('MyObject')
 
-    const typings =  getTypings(obj, { declaration: true })
+    const typings = getTypings(obj, { declaration: true })
 
     expect(typings).toMatchWithoutFormatting(`
       declare const MyObject: {
         /** This is A */
-        a: /***
+        a: /*
          * This is A
          */
         string
@@ -393,11 +475,11 @@ describe('objects', () => {
       .object({
         'Hello World!': z.string(),
         'Hey?': z.string().optional(),
-        'Hey!': z.string().optional()
+        'Hey!': z.string().optional(),
       })
       .title('MyObject')
 
-    const typings =  getTypings(obj, { declaration: true })
+    const typings = getTypings(obj, { declaration: true })
 
     expect(typings).toMatchWithoutFormatting(`
       declare const MyObject: {
@@ -406,8 +488,116 @@ describe('objects', () => {
         'Hey!'?: string
       };
     `)
+
+    expect(typings).toBeValidTypeScript()
   })
 })
 
+function getTypingVariations(
+  type: z.ZodType,
+  opts?: { declaration?: boolean; maxDepth?: number },
+  n: number = 1,
+): string[] {
+  if (n > (opts?.maxDepth ?? 5)) {
+    return []
+  }
 
-// TODO: regex, discriminated unions, literals, arrays, never, NaN, z.catch(), z.transform(), z.effects()
+  const baseTypings = getTypings(type, opts)
+
+  const typingsNullable = getTypings(type.nullable(), opts)
+
+  const typingsOptional = getTypings(type.optional(), opts)
+
+  const typingsNullableOptional = getTypings(type.nullable().optional(), opts)
+
+  const typingsOptionalNullable = getTypings(type.optional().nullable(), opts)
+
+  const output = [baseTypings, typingsNullable, typingsOptional, typingsNullableOptional, typingsOptionalNullable]
+
+  return output
+}
+
+describe('primitives', () => {
+  it.concurrent.each(getTypingVariations(z.string().title('MyString'), { declaration: true }))(
+    'string',
+    (typings) => {
+      console.log(typings)
+      expect(typings).toBeValidTypeScript()
+    },
+    5000,
+  )
+  it.concurrent.each(getTypingVariations(z.number().title('MyNumber'), { declaration: true }))(
+    'number',
+    (typings) => {
+      expect(typings).toBeValidTypeScript()
+    },
+    5000,
+  )
+  it.concurrent.each(getTypingVariations(z.bigint().title('MyBigInt'), { declaration: true }))(
+    'int',
+    (typings) => {
+      expect(typings).toBeValidTypeScript()
+    },
+    5000,
+  )
+  it.concurrent.each(getTypingVariations(z.boolean().title('MyBoolean'), { declaration: true }))(
+    'boolean',
+    (typings) => {
+      expect(typings).toBeValidTypeScript()
+    },
+    5000,
+  )
+  it.concurrent.each(getTypingVariations(z.date().title('MyDate'), { declaration: true }))(
+    'date',
+    (typings) => {
+      console.log(typings)
+      expect(typings).toBeValidTypeScript()
+    },
+    5000,
+  )
+  it.concurrent.each(getTypingVariations(z.undefined().title('MyUndefined'), { declaration: true }))(
+    'undefined',
+    (typings) => {
+      expect(typings).toBeValidTypeScript()
+    },
+    5000,
+  )
+  it.concurrent.each(getTypingVariations(z.null().title('MyNull'), { declaration: true }))('null', (typings) => {
+    expect(typings).toBeValidTypeScript()
+  })
+  it.concurrent.each(getTypingVariations(z.unknown().title('MyUnknown'), { declaration: true }))(
+    'unknown',
+    (typings) => {
+      expect(typings).toBeValidTypeScript()
+    },
+    5000,
+  )
+  it.concurrent.each(getTypingVariations(z.never().title('MyNever'), { declaration: true }))(
+    'never',
+    (typings) => {
+      expect(typings).toBeValidTypeScript()
+    },
+    5000,
+  )
+  it.concurrent.each(getTypingVariations(z.nan().title('MyNaNBreadMiam'), { declaration: true }))(
+    'nan',
+    (typings) => {
+      expect(typings).toBeValidTypeScript()
+    },
+    5000,
+  )
+  it.concurrent.each(getTypingVariations(z.symbol().title('MySymbol'), { declaration: true }))(
+    'symbol',
+    (typings) => {
+      expect(typings).toBeValidTypeScript()
+    },
+    5000,
+  )
+  it.concurrent.each(getTypingVariations(z.literal('bob').title('MYLiteral'), { declaration: true }))(
+    'function',
+    (typings) => {
+      expect(typings).toBeValidTypeScript()
+    },
+    5000,
+  )
+})

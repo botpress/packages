@@ -1,16 +1,4 @@
 import _ from 'lodash'
-import z from '../../z'
-
-export const Identifier = z
-  .string()
-  .min(1)
-  .max(100)
-  // must start with a letter and can only contain letters, numbers and underscores
-  .regex(
-    /^([a-zA-Z][a-zA-Z0-9_]+)$/,
-    'Identifiers must start with a letter and can only contain letters, numbers and underscores'
-  )
-
 export function escapeString(str: string) {
   if (typeof str !== 'string') {
     return ''

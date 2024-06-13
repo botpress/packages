@@ -43,18 +43,18 @@ class Declaration {
   ) {}
 }
 
-export type Options = {
+export type TypescriptGenerationOptions = {
   declaration?: boolean
   formatters?: ((typing: string) => string)[]
 }
 
 type SchemaTypes = z.Schema | KeyValue | FnParameters | Declaration | null
 
-type InternalOptions = Options & {
+type InternalOptions = TypescriptGenerationOptions & {
   parent?: SchemaTypes
 }
 
-export function getTypings(schema: z.Schema, options?: Options): string {
+export function getTypings(schema: z.Schema, options?: TypescriptGenerationOptions): string {
   options ??= {}
   options.declaration ??= false
 
@@ -241,7 +241,7 @@ ${opts.join(' | ')}`
     case z.ZodFirstPartyTypeKind.ZodRecord:
       const keyType = sUnwrapZod(def.keyType, newConfig)
       const valueType = sUnwrapZod(def.valueType, newConfig)
-      return `${getMultilineComment(def.description)} { [key: (${keyType})]: (${valueType}) }`
+      return `${getMultilineComment(def.description)} { [key: ${keyType}]: ${valueType} }`
 
     case z.ZodFirstPartyTypeKind.ZodMap:
       return `Map<${sUnwrapZod(def.keyType, newConfig)}, ${sUnwrapZod(def.valueType, newConfig)}>`
@@ -283,6 +283,10 @@ ${escapeString((schema as z.ZodLiteral<any>).value)}`.trim()
         return `${sUnwrapZod(def.innerType, newConfig)} | undefined`
       }
 
+      if (config?.parent instanceof z.ZodDefault || config?.parent instanceof z.ZodNullable || config?.parent instanceof z.ZodOptional) {
+        return `${sUnwrapZod(def.innerType, newConfig)} | undefined`
+      }
+
       return `${sUnwrapZod(def.innerType, newConfig)}?`
 
     case z.ZodFirstPartyTypeKind.ZodNullable:
@@ -310,9 +314,59 @@ ${escapeString((schema as z.ZodLiteral<any>).value)}`.trim()
       return `readonly ${sUnwrapZod(def.innerType, newConfig)}`
 
     case z.ZodFirstPartyTypeKind.ZodTemplateLiteral:
-      return `${def.regexString}`
+      const inner = def.parts.map(p => {
+        if (typeof p === 'undefined' || p === null) {
+          return ''
+        } 
+        if (typeof p === 'string') {
+          return p
+        }
+        if (typeof p === 'boolean' || typeof p === 'number') {
+          return `${p}`
+        }
+        return '${' + sUnwrapZod(p, { ...newConfig, declaration: false }) + '}'
+      }).join('')
+
+      return `\`${inner}\``
 
     default:
       util.assertNever(def)
   }
 }
+
+
+// const getInnerType = (def: z.ZodDef): z.ZodTypeAny | null => {
+//   if (def.typeName === z.ZodFirstPartyTypeKind.ZodOptional) {
+//     return def.innerType
+//   }
+
+//   if (def.typeName === z.ZodFirstPartyTypeKind.ZodNullable) {
+//     return def.innerType
+//   }
+
+//   if (def.typeName === z.ZodFirstPartyTypeKind.ZodDefault) {
+//     return def.innerType
+//   }
+
+//   if (def.typeName === z.ZodFirstPartyTypeKind.ZodCatch) {
+//     return def.innerType
+//   }
+
+//   if (def.typeName === z.ZodFirstPartyTypeKind.ZodPromise) {
+//     return def.type
+//   }
+
+//   if (def.typeName === z.ZodFirstPartyTypeKind.ZodBranded) {
+//     return def.type
+//   }
+
+//   if (def.typeName === z.ZodFirstPartyTypeKind.ZodPipeline) {
+//     return def.in
+//   }
+
+//   if (def.typeName === z.ZodFirstPartyTypeKind.ZodEffects) {
+//     return def.schema
+//   }
+
+//   return null
+// }

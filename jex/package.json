@@ -9,11 +9,11 @@
     "build:types": "tsc --emitDeclarationOnly",
     "build": "pnpm build:node && pnpm build:types",
     "test": "vitest --run",
-    "type:check": "tsc --noEmit",
-    "format:check": "prettier --check .",
-    "format:fix": "prettier --write .",
-    "check": "pnpm format:check && pnpm type:check",
-    "fix": "pnpm format:fix"
+    "check:type": "tsc --noEmit",
+    "check:format": "prettier --check .",
+    "fix:format": "prettier --write .",
+    "check": "pnpm check:format && pnpm check:type",
+    "fix": "pnpm fix:format"
   },
   "keywords": [],
   "author": "",

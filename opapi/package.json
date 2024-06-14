@@ -15,9 +15,9 @@
   "scripts": {
     "test": "vitest run",
     "build": "tsup src/index.ts --dts --format cjs,esm --clean",
-    "type:check": "tsc --noEmit",
-    "format:check": "prettier --check .",
-    "format:fix": "prettier --write ."
+    "check:type": "tsc --noEmit",
+    "check:format": "prettier --check .",
+    "fix:format": "prettier --write ."
   },
   "devDependencies": {
     "@swc/core": "1.5.27",

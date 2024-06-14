@@ -26,8 +26,8 @@ jobs:
           version: 9.1.0
       - run: pnpm install --frozen-lockfile
       - run: pnpm build
-      - run: pnpm type:check
-      - run: pnpm format:check
+      - run: pnpm check:type
+      - run: pnpm check:format
       - run: pnpm test
       - name: Publish
         if: github.ref == 'refs/heads/master' || github.event_name == 'workflow_dispatch'

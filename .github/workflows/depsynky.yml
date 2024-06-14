@@ -26,7 +26,7 @@ jobs:
           version: 9.1.0
       - run: pnpm install --frozen-lockfile
       - run: pnpm build
-      - run: pnpm type:check
+      - run: pnpm check:type
       - name: Publish
         if: github.ref == 'refs/heads/master' || github.event_name == 'workflow_dispatch'
         uses: botpress/gh-actions/publish-if-not-exists@master

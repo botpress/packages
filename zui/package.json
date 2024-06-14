@@ -1,77 +1,40 @@
 {
-  "name": "@bpinternal/zui",
-  "version": "0.8.4",
-  "description": "An extension of Zod for working nicely with UIs and JSON Schemas",
-  "type": "module",
-  "source": "./src/index.ts",
-  "main": "./dist/index.js",
-  "types": "./dist/index.d.ts",
-  "exports": {
-    ".": {
-      "import": "./dist/index.js",
-      "require": "./dist/index.cjs"
-    }
-  },
+  "name": "@bpinternal/jex",
+  "version": "0.0.8",
+  "description": "JSON-Extends; JSON Schema type checking library",
+  "main": "dist/index.cjs",
+  "types": "dist/src/index.d.ts",
   "scripts": {
-    "build": "tsup",
-    "watch": "tsup --watch",
-    "test": "vitest run",
-    "dev": "tsx playground.ts",
-    "test:watch": "vitest",
-    "type:check": "tsc --noEmit",
-    "format:check": "prettier --check src/",
-    "format:fix": "prettier --write src/",
-    "storybook": "storybook dev -p 6006",
-    "build-storybook": "storybook build"
-  },
-  "devDependencies": {
-    "@storybook/addon-essentials": "^8.0.9",
-    "@storybook/addon-interactions": "^8.0.9",
-    "@storybook/addon-links": "^8.0.9",
-    "@storybook/addon-onboarding": "^8.0.9",
-    "@storybook/blocks": "^8.0.9",
-    "@storybook/react": "^8.0.9",
-    "@storybook/react-vite": "^8.0.9",
-    "@storybook/test": "^8.0.9",
-    "@testing-library/jest-dom": "^6.4.2",
-    "@testing-library/react": "^14.2.2",
-    "@testing-library/user-event": "^14.5.2",
-    "@types/benchmark": "^2.1.5",
-    "@types/jest": "^29.5.12",
-    "@types/json-schema": "^7.0.15",
-    "@types/lodash": "^4.17.0",
-    "@types/node": "^20.12.6",
-    "@types/react": "^18.2.48",
-    "@vitejs/plugin-react-swc": "^3.6.0",
-    "ajv": "^8.12.0",
-    "ajv-formats": "^3.0.1",
-    "benchmark": "^2.1.4",
-    "jsdom": "^24.0.0",
-    "local-ref-resolver": "^0.2.0",
-    "prettier": "^3.0.0",
-    "react-dom": "^18.2.0",
-    "storybook": "^8.0.9",
-    "tsup": "^8.0.1",
-    "tsx": "^4.7.2",
-    "typescript": "5.4.5",
-    "vite": "^5.2.6",
-    "vitest": "1.5.2",
-    "react": "^18.2.0"
-  },
-  "dependencies": {
-    "@apidevtools/json-schema-ref-parser": "^11.5.5",
-    "lodash": "^4.17.21"
-  },
-  "peerDependencies": {
-    "react": "^18.2.0"
-  },
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/botpress/packages"
+    "build:node": "esbuild src/index.ts --bundle --platform=node --format=cjs --outfile=dist/index.cjs",
+    "build:types": "tsc --emitDeclarationOnly",
+    "build": "pnpm build:node && pnpm build:types",
+    "test": "vitest --run",
+    "check:type": "tsc --noEmit",
+    "check:format": "prettier --check .",
+    "fix:format": "prettier --write .",
+    "check": "pnpm check:format && pnpm check:type",
+    "fix": "pnpm fix:format"
   },
   "keywords": [],
-  "author": "Botpress, Inc.",
-  "license": "MIT",
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/lodash": "^4.14.202",
+    "ajv": "^8.12.0",
+    "esbuild": "^0.21.0",
+    "prettier": "^3.2.4",
+    "ts-node": "^10.9.2",
+    "typescript": "5.3.3",
+    "vitest": "1.6.0",
+    "zod": "^3.22.4",
+    "zod-to-json-schema": "^3.22.4"
+  },
+  "dependencies": {
+    "@apidevtools/json-schema-ref-parser": "^11.1.0",
+    "@types/json-schema": "^7.0.15",
+    "lodash": "^4.17.21",
+    "node-fetch": "^3.3.2"
+  },
   "engines": {
     "node": ">=16.0.0",
     "pnpm": "9.1.0"

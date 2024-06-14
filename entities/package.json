@@ -6,15 +6,15 @@
   "module": "./dist/web/index.js",
   "types": "./dist/types/index.d.ts",
   "scripts": {
-    "type:check": "tsc --noEmit",
+    "check:type": "tsc --noEmit",
     "build": "pnpm run build:node && pnpm run build:web && pnpm run build:type",
     "build:type": "tsc -p tsconfig.build.json",
     "build:node": "ts-node -T ./build.ts nodejs",
     "build:web": "ts-node -T ./build.ts web",
-    "test": "pnpm run unit:test && pnpm run e2e:test && pnpm run rust:test",
-    "unit:test": "pnpm vitest --run",
-    "e2e:test": "ts-node -T ./e2e/node.ts && ts-node -T ./e2e/browser/index.ts",
-    "rust:test": "cargo test"
+    "test": "pnpm run test:unit && pnpm run test:e2e && pnpm run test:rust",
+    "test:unit": "pnpm vitest --run",
+    "test:e2e": "ts-node -T ./e2e/node.ts && ts-node -T ./e2e/browser/index.ts",
+    "test:rust": "cargo test"
   },
   "dependencies": {
     "browser-or-node": "^2.1.1",

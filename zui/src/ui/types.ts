@@ -3,13 +3,13 @@ import type { FC } from 'react'
 import { zuiKey } from './constants'
 
 export type ZuiExtensionObject = {
-    tooltip?: boolean
-    displayAs?: [string, any]
-    title?: string
-    disabled?: boolean | SerializedFunction
-    hidden?: boolean | SerializedFunction
-    placeholder?: string
-    secret?: boolean
+  tooltip?: boolean
+  displayAs?: [string, any]
+  title?: string
+  disabled?: boolean | SerializedFunction
+  hidden?: boolean | SerializedFunction
+  placeholder?: string
+  secret?: boolean
 }
 
 export type SerializedFunction = string

@@ -1,4 +1,4 @@
-import { zuiKey } from '../../../ui/constants';
+import { zuiKey } from '../../../ui/constants'
 import {
   StringValidation,
   ZodIssueCode,

@@ -47,3 +47,7 @@ expect.extend({
     }
   },
 })
+
+describe('vitest', () => {
+  expect(true).toBeTruthy()
+})

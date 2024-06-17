@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { toTypescript } from '.'
+import { UntitledDeclarationError, toTypescript } from '.'
 import z from '../../z'
 
 describe('functions', () => {
@@ -9,7 +9,7 @@ describe('functions', () => {
       .args(z.object({ a: z.number(), b: z.number() }))
       .returns(z.number())
       .describe('Add two numbers together.\nThis is a multiline description')
-    expect(() => toTypescript(fn, { declaration: true })).toThrowError(/title/i)
+    expect(() => toTypescript(fn, { declaration: true })).toThrowError(UntitledDeclarationError)
   })
 
   it('function with multi-line description', async () => {

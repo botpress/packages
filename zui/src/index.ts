@@ -2,7 +2,11 @@ import { jsonSchemaToZui } from './transforms/json-schema-to-zui'
 import { zuiToJsonSchema } from './transforms/zui-to-json-schema'
 import { objectToZui } from './transforms/object-to-zui'
 import { toTypescriptTypings } from './transforms/zui-to-typescript'
-import { toTypescript } from './transforms/zui-to-typescript-next'
+import {
+  toTypescript,
+  UntitledDeclarationError,
+  TypescriptGenerationOptions,
+} from './transforms/zui-to-typescript-next'
 
 export type {
   BaseType,
@@ -30,3 +34,5 @@ export const transforms = {
    */
   zuiToTypescriptTypings: toTypescriptTypings,
 }
+
+export { UntitledDeclarationError, type TypescriptGenerationOptions }

@@ -16,6 +16,17 @@ const Primitives = [
   'object',
 ]
 
+export class UntitledDeclarationError extends Error {
+  constructor(message: string) {
+    super(message)
+    this.name = 'UntitledDeclarationError'
+  }
+
+  static isUntitledDeclarationError(err: Error): err is UntitledDeclarationError {
+    return err.name === 'UntitledDeclarationError'
+  }
+}
+
 const isPrimitive = (type: string) => Primitives.includes(type)
 const isArrayOfPrimitives = (type: string) => Primitives.map((p) => `${p}[]`).includes(type)
 
@@ -64,7 +75,7 @@ export function toTypescript(schema: z.Schema, options?: TypescriptGenerationOpt
     if (schema instanceof z.Schema) {
       const title = 'title' in schema.ui ? (schema.ui.title as string) : null
       if (!title) {
-        throw new Error('Only schemas with "title" Zui property can be declared.')
+        throw new UntitledDeclarationError('Only schemas with "title" Zui property can be declared.')
       }
 
       wrappedSchema = new Declaration(schema, title)

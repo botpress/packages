@@ -5,7 +5,7 @@ import { escapeString } from './utils'
 describe('Typescript Checker', () => {
   it('passes successfully on valid string definition', () => {
     const data = isValidTypescript(`const a: string = 'hello'`)
-    
+
     expect(data.isValid).toBe(true)
   })
 

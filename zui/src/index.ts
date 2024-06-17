@@ -26,7 +26,7 @@ export const transforms = {
   objectToZui,
   toTypescript: getTypings,
   /**
- * @deprecated use getTypings instead
- */
+   * @deprecated use getTypings instead
+   */
   zuiToTypescriptTypings: toTypescriptTypings,
 }

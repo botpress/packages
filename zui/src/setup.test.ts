@@ -26,9 +26,9 @@ expect.extend({
       pass: validation.isValid,
       message: () => {
         return `Expected code to ${isNot ? 'not ' : ''}be valid TypeScript:\n${received}\n\n${validation.isValid ? '' : validation.errorMessage}`
-      }
+      },
     }
-  }
+  },
 })
 
 expect.extend({
@@ -43,7 +43,7 @@ expect.extend({
         const message = isNot ? 'not ' : ''
         const diffView = this.utils.diff(transformedExpected, transformedReceived, { expand: true })
         return `Expected output to ${message}match without formatting:\n${diffView}`
-      }
+      },
     }
-  }
+  },
 })

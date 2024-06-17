@@ -1,12 +1,11 @@
-import { isValidTypescript } from "../../setup.test"
-import { escapeString } from "./utils"
+import { isValidTypescript } from '../../setup.test'
+import { expect } from 'vitest'
+import { escapeString } from './utils'
 
 describe('Typescript Checker', () => {
   it('passes successfully on valid string definition', () => {
     const data = isValidTypescript(`const a: string = 'hello'`)
-    if (!data.isValid) {
-      console.error(data.errorMessage)
-    }
+    
     expect(data.isValid).toBe(true)
   })
 
@@ -28,7 +27,7 @@ describe('Typescript Checker', () => {
 
 describe('test utility to validate typescript', () => {
   it('passes on valid code', () => {
-  const exampleTS = `
+    const exampleTS = `
 const a: string = 'hello'
 const b: number = 1
 const c: string[] = ['hello']

@@ -175,25 +175,25 @@ declare const ${schema.identifier}: ${typings};`)
       return `${getMultilineComment(schema._def.description)} boolean`.trim()
 
     case z.ZodFirstPartyTypeKind.ZodDate:
-      return 'Date'
+      return `${getMultilineComment(def.description)} Date`.trim()
 
     case z.ZodFirstPartyTypeKind.ZodUndefined:
-      return 'undefined'
+      return `${getMultilineComment(def.description)} undefined`.trim()
 
     case z.ZodFirstPartyTypeKind.ZodNull:
-      return 'null'
+      return `${getMultilineComment(def.description)} null`.trim()
 
     case z.ZodFirstPartyTypeKind.ZodAny:
-      return 'any'
+      return `${getMultilineComment(def.description)} any`.trim()
 
     case z.ZodFirstPartyTypeKind.ZodUnknown:
-      return 'unknown'
+      return `${getMultilineComment(def.description)} unknown`.trim()
 
     case z.ZodFirstPartyTypeKind.ZodNever:
-      return 'never'
+      return `${getMultilineComment(def.description)} never`.trim()
 
     case z.ZodFirstPartyTypeKind.ZodVoid:
-      return 'void'
+      return `${getMultilineComment(def.description)} void`.trim()
 
     case z.ZodFirstPartyTypeKind.ZodArray:
       const item = sUnwrapZod(def.type, newConfig)
@@ -283,7 +283,11 @@ ${escapeString((schema as z.ZodLiteral<any>).value)}`.trim()
         return `${sUnwrapZod(def.innerType, newConfig)} | undefined`
       }
 
-      if (config?.parent instanceof z.ZodDefault || config?.parent instanceof z.ZodNullable || config?.parent instanceof z.ZodOptional) {
+      if (
+        config?.parent instanceof z.ZodDefault ||
+        config?.parent instanceof z.ZodNullable ||
+        config?.parent instanceof z.ZodOptional
+      ) {
         return `${sUnwrapZod(def.innerType, newConfig)} | undefined`
       }
 
@@ -308,24 +312,26 @@ ${escapeString((schema as z.ZodLiteral<any>).value)}`.trim()
       return sUnwrapZod(def.in, newConfig)
 
     case z.ZodFirstPartyTypeKind.ZodSymbol:
-      return 'symbol'
+      return `${getMultilineComment(def.description)} symbol`.trim()
 
     case z.ZodFirstPartyTypeKind.ZodReadonly:
       return `readonly ${sUnwrapZod(def.innerType, newConfig)}`
 
     case z.ZodFirstPartyTypeKind.ZodTemplateLiteral:
-      const inner = def.parts.map(p => {
-        if (typeof p === 'undefined' || p === null) {
-          return ''
-        } 
-        if (typeof p === 'string') {
-          return p
-        }
-        if (typeof p === 'boolean' || typeof p === 'number') {
-          return `${p}`
-        }
-        return '${' + sUnwrapZod(p, { ...newConfig, declaration: false }) + '}'
-      }).join('')
+      const inner = def.parts
+        .map((p) => {
+          if (typeof p === 'undefined' || p === null) {
+            return ''
+          }
+          if (typeof p === 'string') {
+            return p
+          }
+          if (typeof p === 'boolean' || typeof p === 'number') {
+            return `${p}`
+          }
+          return '${' + sUnwrapZod(p, { ...newConfig, declaration: false }) + '}'
+        })
+        .join('')
 
       return `\`${inner}\``
 
@@ -333,40 +339,3 @@ ${escapeString((schema as z.ZodLiteral<any>).value)}`.trim()
       util.assertNever(def)
   }
 }
-
-
-// const getInnerType = (def: z.ZodDef): z.ZodTypeAny | null => {
-//   if (def.typeName === z.ZodFirstPartyTypeKind.ZodOptional) {
-//     return def.innerType
-//   }
-
-//   if (def.typeName === z.ZodFirstPartyTypeKind.ZodNullable) {
-//     return def.innerType
-//   }
-
-//   if (def.typeName === z.ZodFirstPartyTypeKind.ZodDefault) {
-//     return def.innerType
-//   }
-
-//   if (def.typeName === z.ZodFirstPartyTypeKind.ZodCatch) {
-//     return def.innerType
-//   }
-
-//   if (def.typeName === z.ZodFirstPartyTypeKind.ZodPromise) {
-//     return def.type
-//   }
-
-//   if (def.typeName === z.ZodFirstPartyTypeKind.ZodBranded) {
-//     return def.type
-//   }
-
-//   if (def.typeName === z.ZodFirstPartyTypeKind.ZodPipeline) {
-//     return def.in
-//   }
-
-//   if (def.typeName === z.ZodFirstPartyTypeKind.ZodEffects) {
-//     return def.schema
-//   }
-
-//   return null
-// }

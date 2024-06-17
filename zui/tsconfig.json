@@ -31,6 +31,6 @@
   ],
   "include": [
     "src/**/*",
-    "src/vitest.d.ts"
+    "vitest.d.ts"
   ]
 }

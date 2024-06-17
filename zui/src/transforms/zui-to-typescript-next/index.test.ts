@@ -493,15 +493,7 @@ describe('objects', () => {
   })
 })
 
-function getTypingVariations(
-  type: z.ZodType,
-  opts?: { declaration?: boolean; maxDepth?: number },
-  n: number = 1,
-): string[] {
-  if (n > (opts?.maxDepth ?? 5)) {
-    return []
-  }
-
+function getTypingVariations(type: z.ZodType, opts?: { declaration?: boolean; maxDepth?: number }): string[] {
   const baseTypings = getTypings(type, opts)
 
   const typingsNullable = getTypings(type.nullable(), opts)
@@ -521,7 +513,6 @@ describe('primitives', () => {
   it.concurrent.each(getTypingVariations(z.string().title('MyString'), { declaration: true }))(
     'string',
     (typings) => {
-      console.log(typings)
       expect(typings).toBeValidTypeScript()
     },
     5000,

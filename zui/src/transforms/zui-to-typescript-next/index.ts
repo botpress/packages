@@ -54,7 +54,7 @@ type InternalOptions = TypescriptGenerationOptions & {
   parent?: SchemaTypes
 }
 
-export function getTypings(schema: z.Schema, options?: TypescriptGenerationOptions): string {
+export function toTypescript(schema: z.Schema, options?: TypescriptGenerationOptions): string {
   options ??= {}
   options.declaration ??= false
 

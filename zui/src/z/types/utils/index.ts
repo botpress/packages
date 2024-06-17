@@ -9,7 +9,7 @@ export namespace util {
   export const assertEqual = <A, B>(val: AssertEqual<A, B>) => val
   export function assertIs<T>(_arg: T): void {}
   export function assertNever(_x: never): never {
-    throw new Error()
+    throw new Error('assertNever called')
   }
 
   export type Omit<T, K extends keyof T> = Pick<T, Exclude<keyof T, K>>

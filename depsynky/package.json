@@ -4,7 +4,7 @@
   "description": "CLI to synchronize dependencies accross a pnpm mono-repo",
   "main": "dist/index.js",
   "scripts": {
-    "type:check": "tsc --noEmit",
+    "check:type": "tsc --noEmit",
     "build": "esbuild --bundle --platform=node --target=node18 --outdir=dist src/index.ts",
     "dev": "ts-node -T src/index.ts",
     "start": "node dist/index.js"

@@ -5,6 +5,7 @@ import type {
   JSONSchema,
   ParseSchema,
   DefaultComponentDefinitions,
+  ZuiExtensionObject,
 } from '../../../ui/types'
 import { zuiKey } from '../../../ui/constants'
 import {
@@ -48,6 +49,7 @@ import {
 import type { ZuiSchemaOptions } from '../../../transforms/zui-to-json-schema/zui-extension'
 import type { ObjectToZuiOptions } from '../../../transforms/object-to-zui'
 import { type ToTypescriptTyingsOptions, toTypescriptTypings } from '../../../transforms/zui-to-typescript'
+import { TypescriptGenerationOptions, toTypescript } from '../../../transforms/zui-to-typescript-next'
 
 export type RefinementCtx = {
   addIssue: (arg: IssueData) => void
@@ -65,7 +67,7 @@ export interface ZodTypeDef {
   typeName: ZodFirstPartyTypeKind
   errorMap?: ZodErrorMap
   description?: string
-  [zuiKey]?: any
+  [zuiKey]?: ZuiExtensionObject
 }
 
 export class ParseInputLazyPath implements ParseInput {
@@ -121,11 +123,13 @@ export type RawCreateParams =
       invalid_type_error?: string
       required_error?: string
       description?: string
+      [zuiKey]?: any
     }
   | undefined
 export type ProcessedCreateParams = {
   errorMap?: ZodErrorMap
   description?: string
+  [zuiKey]?: any
 }
 export type SafeParseSuccess<Output> = {
   success: true
@@ -573,8 +577,27 @@ export abstract class ZodType<Output = any, Def extends ZodTypeDef = ZodTypeDef,
     return zuiToJsonSchema(this, opts)
   }
 
+  /**
+   * @deprecated use toTypescript instead
+   */
   async toTypescriptTypings(opts?: ToTypescriptTyingsOptions): Promise<string> {
     return toTypescriptTypings(this.toJsonSchema(), opts)
+  }
+
+  toTypescript(opts?: TypescriptGenerationOptions): string {
+    return toTypescript(this, opts)
+  }
+
+  async toTypescriptAsync(
+    opts?: Omit<TypescriptGenerationOptions, 'formatters'> & {
+      formatters: ((typing: string) => Promise<string> | string)[]
+    },
+  ): Promise<string> {
+    let result = toTypescript(this, { ...opts, formatters: [] })
+    for (const formatter of opts?.formatters || []) {
+      result = await formatter(result)
+    }
+    return result
   }
 
   static fromObject(obj: any, opts?: ObjectToZuiOptions) {

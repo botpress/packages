@@ -7,7 +7,7 @@
   "scripts": {
     "build": "tsc --build",
     "test": "vitest",
-    "type:check": "tsc --noEmit",
+    "check:type": "tsc --noEmit",
     "clean": "rimraf ./dist && rimraf ./node_modules"
   },
   "types": "./dist/index.d.ts",

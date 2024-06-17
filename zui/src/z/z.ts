@@ -30,6 +30,7 @@ import {
   ZodPromise,
   ZodReadonly,
   ZodRecord,
+  ZodRef,
   ZodSet,
   ZodString,
   ZodSymbol,
@@ -41,7 +42,6 @@ import {
   ZodUnknown,
   ZodVoid,
 } from './types'
-import { ZodRef } from './types/ref'
 
 export { ZodType as Schema, ZodType as ZodSchema }
 

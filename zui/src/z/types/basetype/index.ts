@@ -5,6 +5,7 @@ import type {
   JSONSchema,
   ParseSchema,
   DefaultComponentDefinitions,
+  ZuiExtensionObject,
 } from '../../../ui/types'
 import { zuiKey } from '../../../ui/constants'
 import {
@@ -65,7 +66,7 @@ export interface ZodTypeDef {
   typeName: ZodFirstPartyTypeKind
   errorMap?: ZodErrorMap
   description?: string
-  [zuiKey]?: any
+  [zuiKey]?: ZuiExtensionObject
 }
 
 export class ParseInputLazyPath implements ParseInput {

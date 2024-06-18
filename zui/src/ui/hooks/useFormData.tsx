@@ -121,7 +121,13 @@ export const useFormData = (fieldSchema: JSONSchema, path: string[]) => {
   const addArrayItem = useCallback(
     (path: string[], data: any) => {
       const currentData = getPathData(context.formData, path) || []
-      context.setFormData(setObjectPath(context.formData, path, Array.isArray(currentData) ? [...currentData, data] : [...currentData, data]))
+      context.setFormData(
+        setObjectPath(
+          context.formData,
+          path,
+          Array.isArray(currentData) ? [...currentData, data] : [...currentData, data],
+        ),
+      )
     },
     [context.formData],
   )

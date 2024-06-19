@@ -44,11 +44,11 @@ export type JsonSchema7StringType = {
   pattern?: string
   allOf?: {
     pattern: string
-    errorMessage?: ErrorMessages<{ type: 'string', pattern: string }>
+    errorMessage?: ErrorMessages<{ type: 'string'; pattern: string }>
   }[]
   anyOf?: {
     format: string
-    errorMessage?: ErrorMessages<{ type: 'string', format: string }>
+    errorMessage?: ErrorMessages<{ type: 'string'; format: string }>
   }[]
   errorMessage?: ErrorMessages<JsonSchema7StringType>
   [zuiKey]?: ZuiExtensionObject

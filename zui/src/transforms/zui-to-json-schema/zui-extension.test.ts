@@ -36,7 +36,6 @@ describe('zuiToJsonSchema', () => {
           },
         },
         "type": "object",
-        "${zuiKey}": {},
       }
     `)
   })
@@ -53,13 +52,11 @@ describe('zuiToJsonSchema', () => {
       properties: {
         fruit: {
           enum: ['Apple', 'Banana', 'Orange'],
-          type: 'string',
-          [zuiKey]: {},
+          type: 'string'
         },
       },
       required: ['fruit'],
       type: 'object',
-      [zuiKey]: {},
     })
   })
 
@@ -91,7 +88,6 @@ describe('zuiToJsonSchema', () => {
           "testExample",
         ],
         "type": "object",
-        "${zuiKey}": {},
       }
     `)
   })
@@ -194,12 +190,10 @@ describe('zuiToJsonSchema', () => {
           "properties": {
             "id": {
               "type": "number",
-              "${zuiKey}": {},
             },
             "title": {
               "minLength": 5,
               "type": "string",
-              "${zuiKey}": {},
             },
           },
           "required": [
@@ -207,11 +201,9 @@ describe('zuiToJsonSchema', () => {
             "title",
           ],
           "type": "object",
-          "${zuiKey}": {},
         },
         "minItems": 1,
         "type": "array",
-        "${zuiKey}": {},
       }
     `)
   })
@@ -265,7 +257,6 @@ describe('zuiToJsonSchema', () => {
             "type": "object",
           },
         ],
-        "${zuiKey}": {},
       }
     `)
   })
@@ -322,7 +313,6 @@ describe('zuiToJsonSchema', () => {
             "type": "object",
           },
         ],
-        "${zuiKey}": {},
       }
     `)
   })
@@ -357,13 +347,12 @@ describe('zuiToJsonSchema', () => {
         "value",
       ],
       "type": "object",
-      "x-zui": {},
     }
   `)
   })
 
   test('array of array', () => {
-    const schema = z.array(z.array(z.string()))
+    const schema = z.array(z.array(z.string().disabled()))
 
     const jsonSchema = zuiToJsonSchema(schema)
     expect(jsonSchema).toMatchInlineSnapshot(`
@@ -371,24 +360,26 @@ describe('zuiToJsonSchema', () => {
         "items": {
           "items": {
             "type": "string",
-            "${zuiKey}": {},
+            "${zuiKey}": {
+              "disabled": true,
+            },
           },
           "type": "array",
-          "${zuiKey}": {},
         },
         "type": "array",
-        "${zuiKey}": {},
       }
     `)
   })
 
   test('generic is transformed to a ref', () => {
-    const T = z.ref('T')
+    const T = z.ref('T').disabled()
     const TJsonSchema = zuiToJsonSchema(T)
     expect(TJsonSchema).toMatchInlineSnapshot(`
       {
         "$ref": "T",
-        "${zuiKey}": {},
+        "${zuiKey}": {
+          "disabled": true,
+        },
       }
     `)
 
@@ -404,11 +395,12 @@ describe('zuiToJsonSchema', () => {
         "properties": {
           "data": {
             "$ref": "T",
-            "${zuiKey}": {},
+            "${zuiKey}": {
+              "disabled": true,
+            },
           },
           "description": {
             "type": "string",
-            "${zuiKey}": {},
           },
         },
         "required": [
@@ -416,7 +408,6 @@ describe('zuiToJsonSchema', () => {
           "data",
         ],
         "type": "object",
-        "${zuiKey}": {},
       }
     `)
   })

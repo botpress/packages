@@ -21,9 +21,13 @@ export function parseDateDef(def: ZodDateDef, refs: Refs): JsonSchema7DateType {
     return {
       type: 'string',
       format: 'date-time',
-      [zuiKey]: {
-        coerce: def.coerce
-      },
+      ...(def.coerce
+        ? {
+            [zuiKey]: {
+              coerce: def.coerce || undefined,
+            },
+          }
+        : {}),
     }
   }
 }
@@ -32,9 +36,13 @@ const integerDateParser = (def: ZodDateDef, refs: Refs) => {
   const res: JsonSchema7DateType = {
     type: 'integer',
     format: 'unix-time',
-    [zuiKey]: {
-      coerce: def.coerce
-    },
+    ...(def.coerce
+      ? {
+          [zuiKey]: {
+            coerce: def.coerce || undefined,
+          },
+        }
+      : {}),
   }
 
   for (const check of def.checks) {

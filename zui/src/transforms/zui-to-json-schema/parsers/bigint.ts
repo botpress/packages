@@ -20,6 +20,13 @@ export function parseBigintDef(def: ZodBigIntDef, refs: Refs): JsonSchema7Bigint
   const res: JsonSchema7BigintType = {
     type: 'integer',
     format: 'int64',
+    ...(def.coerce
+      ? {
+          [zuiKey]: {
+            coerce: def.coerce || undefined,
+          },
+        }
+      : {}),
   }
 
   if (!def.checks) return res

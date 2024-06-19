@@ -146,7 +146,7 @@ const selectParser = (def: any, typeName: ZodFirstPartyTypeKind, refs: Refs): Js
     case ZodFirstPartyTypeKind.ZodBigInt:
       return parseBigintDef(def, refs)
     case ZodFirstPartyTypeKind.ZodBoolean:
-      return parseBooleanDef()
+      return parseBooleanDef(def)
     case ZodFirstPartyTypeKind.ZodDate:
       return parseDateDef(def, refs)
     case ZodFirstPartyTypeKind.ZodUndefined:

@@ -57,6 +57,13 @@ export type JsonSchema7StringType = {
 export function parseStringDef(def: ZodStringDef, refs: Refs): JsonSchema7StringType {
   const res: JsonSchema7StringType = {
     type: 'string',
+    ...(def.coerce
+      ? {
+          [zuiKey]: {
+            coerce: def.coerce || undefined,
+          },
+        }
+      : {}),
   }
 
   function processPattern(value: string): string {

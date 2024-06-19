@@ -18,6 +18,13 @@ export type JsonSchema7NumberType = {
 export function parseNumberDef(def: ZodNumberDef, refs: Refs): JsonSchema7NumberType {
   const res: JsonSchema7NumberType = {
     type: 'number',
+    ...(def.coerce
+      ? {
+          [zuiKey]: {
+            coerce: def.coerce || undefined,
+          },
+        }
+      : {}),
   }
 
   if (!def.checks) return res

@@ -86,7 +86,7 @@ export function parseDef(
 
   refs.seen.set(def, newItem)
 
-  const jsonSchema = selectParser(def, (def as any).typeName, refs)
+  const jsonSchema = selectParser(def, def.typeName, refs)
 
   if (jsonSchema) {
     addMeta(def, refs, jsonSchema)
@@ -222,8 +222,9 @@ const addMeta = (def: ZodTypeDef, refs: Refs, jsonSchema: JsonSchema7Type): Json
       jsonSchema.markdownDescription = def.description
     }
   }
-  if ((def as any)[zuiKey]) {
-    ;(jsonSchema as any)[zuiKey] = (def as any)[zuiKey]
+  if (def[zuiKey]) {
+    Object.assign(jsonSchema, { [zuiKey]: { ... def[zuiKey], ...(jsonSchema as any)[zuiKey] }})
   }
+
   return jsonSchema
 }

@@ -24,14 +24,13 @@ export type ZuiSchemaOptions = {
 
 export const zuiToJsonSchema = (zuiType: z.ZodTypeAny, opts: ZuiSchemaOptions = { target: 'openApi3' }): JSONSchema => {
   const jsonSchema = zodToJsonSchema(zuiType as z.ZodType, opts)
-
   if (opts.$schemaUrl === false) {
     delete jsonSchema.$schema
   } else if (typeof opts.$schemaUrl === 'string') {
     jsonSchema.$schema = opts.$schemaUrl
   }
 
-  return mergeZuiIntoJsonSchema(jsonSchema as JSONSchema, zuiType, opts)
+  return jsonSchema as JSONSchema
 }
 
 const getShape = (zuiSchema?: z.ZodTypeAny) => {

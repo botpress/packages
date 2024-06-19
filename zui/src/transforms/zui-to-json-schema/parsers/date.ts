@@ -21,6 +21,9 @@ export function parseDateDef(def: ZodDateDef, refs: Refs): JsonSchema7DateType {
     return {
       type: 'string',
       format: 'date-time',
+      [zuiKey]: {
+        coerce: def.coerce
+      },
     }
   }
 }

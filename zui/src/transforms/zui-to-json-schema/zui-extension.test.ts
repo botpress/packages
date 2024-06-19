@@ -97,7 +97,7 @@ describe('zuiToJsonSchema', () => {
   test('examples are available on json schema', () => {
     const schema = z.string()
 
-    const jsonSchema = zuiToJsonSchema(schema, { stripZuiProps: true, $schemaUrl: false })
+    const jsonSchema = zuiToJsonSchema(schema, { $schemaUrl: false })
     expect(jsonSchema).toMatchInlineSnapshot(`
       {
         "type": "string",
@@ -108,7 +108,7 @@ describe('zuiToJsonSchema', () => {
   test('record with a value works', () => {
     const schema = z.record(z.string().max(30)).describe('hello')
 
-    const jsonSchema = zuiToJsonSchema(schema, { stripZuiProps: true, $schemaUrl: false })
+    const jsonSchema = zuiToJsonSchema(schema, { $schemaUrl: false })
     expect(jsonSchema).toEqual({
       additionalProperties: {
         maxLength: 30,
@@ -122,7 +122,7 @@ describe('zuiToJsonSchema', () => {
   test('record with second parameter', () => {
     const schema = z.record(z.string(), z.number().max(30), {}).describe('hello')
 
-    const jsonSchema = zuiToJsonSchema(schema, { stripZuiProps: true, $schemaUrl: false })
+    const jsonSchema = zuiToJsonSchema(schema, { $schemaUrl: false })
     expect(jsonSchema).toMatchInlineSnapshot(`
       {
         "additionalProperties": {
@@ -138,7 +138,7 @@ describe('zuiToJsonSchema', () => {
   test('record with second parameter', () => {
     const schema = z.object({})
 
-    const jsonSchema = zuiToJsonSchema(schema, { stripZuiProps: true, $schemaUrl: 'http://schema.com' })
+    const jsonSchema = zuiToJsonSchema(schema, { $schemaUrl: 'http://schema.com' })
     expect(jsonSchema).toMatchInlineSnapshot(`
       {
         "$schema": "http://schema.com",
@@ -152,7 +152,7 @@ describe('zuiToJsonSchema', () => {
   test('record with second parameter', () => {
     const schema = z.object({ multipleTypes: z.union([z.string(), z.number()]) })
 
-    const jsonSchema = zuiToJsonSchema(schema, { stripZuiProps: true, $schemaUrl: false })
+    const jsonSchema = zuiToJsonSchema(schema, { $schemaUrl: false })
     expect(jsonSchema).toMatchInlineSnapshot(`
       {
         "additionalProperties": false,

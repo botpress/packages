@@ -19,6 +19,8 @@ export type BaseSchema = {
   anyOf?: JSONSchema[]
   oneOf?: JSONSchema[]
   allOf?: JSONSchema[]
+  not?: JSONSchema
+  nullable?: boolean
   [zuiKey]?: ZuiExtensionObject
 }
 

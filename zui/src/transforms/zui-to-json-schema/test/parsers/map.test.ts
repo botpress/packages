@@ -20,11 +20,11 @@ describe('map', () => {
         items: [
           {
             type: 'string',
-                      [zuiKey]: {},
+            [zuiKey]: {},
           },
           {
             type: 'number',
-                      [zuiKey]: {},
+            [zuiKey]: {},
           },
         ],
         minItems: 2,

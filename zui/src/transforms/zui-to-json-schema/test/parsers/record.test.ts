@@ -30,14 +30,14 @@ describe('records', () => {
         properties: {
           foo: {
             type: 'number',
-                      [zuiKey]: {},
+            [zuiKey]: {},
             minimum: 2,
           },
         },
         required: ['foo'],
         additionalProperties: {
           type: 'string',
-                    [zuiKey]: {},
+          [zuiKey]: {},
           pattern: '^[cC][^\\s-]{8,}$',
         },
         [zuiKey]: {},

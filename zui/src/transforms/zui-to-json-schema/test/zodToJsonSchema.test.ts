@@ -44,12 +44,7 @@ describe('Root schema result after parsing', () => {
       zodToJsonSchema(z.union([z.any(), z.instanceof(String), z.string(), z.number()]), { strictUnions: true }),
     ).toEqual({
       $schema: 'http://json-schema.org/draft-07/schema#',
-      anyOf: [
-        {[zuiKey]: {}, },
-        { [zuiKey]: {}, },
-        { type: 'string', [zuiKey]: {} },
-        { type: 'number', [zuiKey]: {} },
-      ],
+      anyOf: [{ [zuiKey]: {} }, { [zuiKey]: {} }, { type: 'string', [zuiKey]: {} }, { type: 'number', [zuiKey]: {} }],
       [zuiKey]: {},
     })
   })
@@ -68,8 +63,8 @@ describe('Root schema result after parsing', () => {
       properties: {
         field: {
           anyOf: [
-            {           [zuiKey]: {},},
-            {           [zuiKey]: {},},
+            { [zuiKey]: {} },
+            { [zuiKey]: {} },
             { type: 'string', [zuiKey]: {} },
             { type: 'number', [zuiKey]: {} },
           ],

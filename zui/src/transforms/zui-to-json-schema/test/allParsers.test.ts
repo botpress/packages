@@ -501,473 +501,442 @@ describe('All Parsers tests', () => {
     const jsonSchema = zodToJsonSchema(allParsersSchema, {
       target: 'openApi3',
     })
-    const expectedOutput =  {
-      "additionalProperties": false,
-      "default":  {
-        "string": "hello",
+    const expectedOutput = {
+      additionalProperties: false,
+      default: {
+        string: 'hello',
       },
-      "description": "watup",
-      "properties":  {
-        "any":  {
-          "x-zui":  {},
+      description: 'watup',
+      properties: {
+        any: {
+          'x-zui': {},
         },
-        "array":  {
-          "type": "array",
-          "x-zui":  {},
+        array: {
+          type: 'array',
+          'x-zui': {},
         },
-        "arrayMax":  {
-          "maxItems": 1,
-          "type": "array",
-          "x-zui":  {},
+        arrayMax: {
+          maxItems: 1,
+          type: 'array',
+          'x-zui': {},
         },
-        "arrayMin":  {
-          "minItems": 1,
-          "type": "array",
-          "x-zui":  {},
+        arrayMin: {
+          minItems: 1,
+          type: 'array',
+          'x-zui': {},
         },
-        "arrayMinMax":  {
-          "maxItems": 1,
-          "minItems": 1,
-          "type": "array",
-          "x-zui":  {},
+        arrayMinMax: {
+          maxItems: 1,
+          minItems: 1,
+          type: 'array',
+          'x-zui': {},
         },
-        "bigInt":  {
-          "format": "int64",
-          "type": "integer",
-          "x-zui":  {},
+        bigInt: {
+          format: 'int64',
+          type: 'integer',
+          'x-zui': {},
         },
-        "boolean":  {
-          "type": "boolean",
-          "x-zui":  {},
+        boolean: {
+          type: 'boolean',
+          'x-zui': {},
         },
-        "date":  {
-          "format": "date-time",
-          "type": "string",
-          "x-zui":  {},
+        date: {
+          format: 'date-time',
+          type: 'string',
+          'x-zui': {},
         },
-        "default":  {
-          "default": 42,
-          "x-zui":  {},
+        default: {
+          default: 42,
+          'x-zui': {},
         },
-        "effectPreprocess":  {
-          "type": "string",
-          "x-zui":  {},
+        effectPreprocess: {
+          type: 'string',
+          'x-zui': {},
         },
-        "effectRefine":  {
-          "type": "string",
-          "x-zui":  {},
+        effectRefine: {
+          type: 'string',
+          'x-zui': {},
         },
-        "effectTransform":  {
-          "type": "string",
-          "x-zui":  {},
+        effectTransform: {
+          type: 'string',
+          'x-zui': {},
         },
-        "enum":  {
-          "enum":  [
-            "hej",
-            "svejs",
-          ],
-          "type": "string",
-          "x-zui":  {},
+        enum: {
+          enum: ['hej', 'svejs'],
+          type: 'string',
+          'x-zui': {},
         },
-        "intersection":  {
-          "allOf":  [
-             {
-              "minLength": 1,
-              "type": "string",
-              "x-zui":  {},
+        intersection: {
+          allOf: [
+            {
+              minLength: 1,
+              type: 'string',
+              'x-zui': {},
             },
-             {
-              "maxLength": 4,
-              "type": "string",
-              "x-zui":  {},
+            {
+              maxLength: 4,
+              type: 'string',
+              'x-zui': {},
             },
           ],
-          "x-zui":  {},
+          'x-zui': {},
         },
-        "literal":  {
-          "enum":  [
-            "hej",
-          ],
-          "type": "string",
-          "x-zui":  {},
+        literal: {
+          enum: ['hej'],
+          type: 'string',
+          'x-zui': {},
         },
-        "map":  {
-          "items":  {
-            "items":  [
-               {
-                "format": "uuid",
-                "type": "string",
-                "x-zui":  {},
+        map: {
+          items: {
+            items: [
+              {
+                format: 'uuid',
+                type: 'string',
+                'x-zui': {},
               },
-               {
-                "type": "boolean",
-                "x-zui":  {},
+              {
+                type: 'boolean',
+                'x-zui': {},
               },
             ],
-            "maxItems": 2,
-            "minItems": 2,
-            "type": "array",
+            maxItems: 2,
+            minItems: 2,
+            type: 'array',
           },
-          "maxItems": 125,
-          "type": "array",
-          "x-zui":  {},
+          maxItems: 125,
+          type: 'array',
+          'x-zui': {},
         },
-        "nativeEnum":  {
-          "enum":  [
-            0,
-            1,
-            2,
-          ],
-          "type": "number",
-          "x-zui":  {},
+        nativeEnum: {
+          enum: [0, 1, 2],
+          type: 'number',
+          'x-zui': {},
         },
-        "never":  {
-          "not":  {},
-          "x-zui":  {},
+        never: {
+          not: {},
+          'x-zui': {},
         },
-        "null":  {
-          "enum":  [
-            "null",
-          ],
-          "nullable": true,
-          "x-zui":  {},
+        null: {
+          enum: ['null'],
+          nullable: true,
+          'x-zui': {},
         },
-        "nullable":  {
-          "additionalProperties": false,
-          "nullable": true,
-          "properties":  {
-            "hello":  {
-              "type": "string",
-              "x-zui":  {},
+        nullable: {
+          additionalProperties: false,
+          nullable: true,
+          properties: {
+            hello: {
+              type: 'string',
+              'x-zui': {},
             },
           },
-          "required":  [
-            "hello",
-          ],
-          "type": "object",
-          "x-zui":  {},
+          required: ['hello'],
+          type: 'object',
+          'x-zui': {},
         },
-        "nullablePrimitive":  {
-          "nullable": true,
-          "type": "string",
-          "x-zui":  {},
+        nullablePrimitive: {
+          nullable: true,
+          type: 'string',
+          'x-zui': {},
         },
-        "number":  {
-          "type": "number",
-          "x-zui":  {},
+        number: {
+          type: 'number',
+          'x-zui': {},
         },
-        "numberGt":  {
-          "exclusiveMinimum": true,
-          "minimum": 1,
-          "type": "number",
-          "x-zui":  {},
+        numberGt: {
+          exclusiveMinimum: true,
+          minimum: 1,
+          type: 'number',
+          'x-zui': {},
         },
-        "numberGtLt":  {
-          "exclusiveMaximum": true,
-          "exclusiveMinimum": true,
-          "maximum": 1,
-          "minimum": 1,
-          "type": "number",
-          "x-zui":  {},
+        numberGtLt: {
+          exclusiveMaximum: true,
+          exclusiveMinimum: true,
+          maximum: 1,
+          minimum: 1,
+          type: 'number',
+          'x-zui': {},
         },
-        "numberGte":  {
-          "minimum": 1,
-          "type": "number",
-          "x-zui":  {},
+        numberGte: {
+          minimum: 1,
+          type: 'number',
+          'x-zui': {},
         },
-        "numberGteLte":  {
-          "maximum": 1,
-          "minimum": 1,
-          "type": "number",
-          "x-zui":  {},
+        numberGteLte: {
+          maximum: 1,
+          minimum: 1,
+          type: 'number',
+          'x-zui': {},
         },
-        "numberInt":  {
-          "type": "integer",
-          "x-zui":  {},
+        numberInt: {
+          type: 'integer',
+          'x-zui': {},
         },
-        "numberLt":  {
-          "exclusiveMaximum": true,
-          "maximum": 1,
-          "type": "number",
-          "x-zui":  {},
+        numberLt: {
+          exclusiveMaximum: true,
+          maximum: 1,
+          type: 'number',
+          'x-zui': {},
         },
-        "numberLte":  {
-          "maximum": 1,
-          "type": "number",
-          "x-zui":  {},
+        numberLte: {
+          maximum: 1,
+          type: 'number',
+          'x-zui': {},
         },
-        "numberMultipleOf":  {
-          "multipleOf": 2,
-          "type": "number",
-          "x-zui":  {},
+        numberMultipleOf: {
+          multipleOf: 2,
+          type: 'number',
+          'x-zui': {},
         },
-        "objectCatchall":  {
-          "additionalProperties":  {
-            "type": "boolean",
-            "x-zui":  {},
+        objectCatchall: {
+          additionalProperties: {
+            type: 'boolean',
+            'x-zui': {},
           },
-          "properties":  {
-            "bar":  {
-              "type": "number",
-              "x-zui":  {},
+          properties: {
+            bar: {
+              type: 'number',
+              'x-zui': {},
             },
-            "foo":  {
-              "type": "string",
-              "x-zui":  {},
+            foo: {
+              type: 'string',
+              'x-zui': {},
             },
           },
-          "required":  [
-            "foo",
-          ],
-          "type": "object",
-          "x-zui":  {},
+          required: ['foo'],
+          type: 'object',
+          'x-zui': {},
         },
-        "objectPasstrough":  {
-          "additionalProperties": true,
-          "properties":  {
-            "bar":  {
-              "type": "number",
-              "x-zui":  {},
+        objectPasstrough: {
+          additionalProperties: true,
+          properties: {
+            bar: {
+              type: 'number',
+              'x-zui': {},
             },
-            "foo":  {
-              "type": "string",
-              "x-zui":  {},
+            foo: {
+              type: 'string',
+              'x-zui': {},
             },
           },
-          "required":  [
-            "foo",
-          ],
-          "type": "object",
-          "x-zui":  {},
+          required: ['foo'],
+          type: 'object',
+          'x-zui': {},
         },
-        "objectStrict":  {
-          "additionalProperties": false,
-          "properties":  {
-            "bar":  {
-              "type": "number",
-              "x-zui":  {},
+        objectStrict: {
+          additionalProperties: false,
+          properties: {
+            bar: {
+              type: 'number',
+              'x-zui': {},
             },
-            "foo":  {
-              "type": "string",
-              "x-zui":  {},
+            foo: {
+              type: 'string',
+              'x-zui': {},
             },
           },
-          "required":  [
-            "foo",
-          ],
-          "type": "object",
-          "x-zui":  {},
+          required: ['foo'],
+          type: 'object',
+          'x-zui': {},
         },
-        "objectStrip":  {
-          "additionalProperties": false,
-          "properties":  {
-            "bar":  {
-              "type": "number",
-              "x-zui":  {},
+        objectStrip: {
+          additionalProperties: false,
+          properties: {
+            bar: {
+              type: 'number',
+              'x-zui': {},
             },
-            "foo":  {
-              "type": "string",
-              "x-zui":  {},
+            foo: {
+              type: 'string',
+              'x-zui': {},
             },
           },
-          "required":  [
-            "foo",
-          ],
-          "type": "object",
-          "x-zui":  {},
+          required: ['foo'],
+          type: 'object',
+          'x-zui': {},
         },
-        "promise":  {
-          "type": "string",
-          "x-zui":  {},
+        promise: {
+          type: 'string',
+          'x-zui': {},
         },
-        "recordBooleanBoolean":  {
-          "additionalProperties":  {
-            "type": "boolean",
-            "x-zui":  {},
+        recordBooleanBoolean: {
+          additionalProperties: {
+            type: 'boolean',
+            'x-zui': {},
           },
-          "type": "object",
-          "x-zui":  {},
+          type: 'object',
+          'x-zui': {},
         },
-        "recordStringBoolean":  {
-          "additionalProperties":  {
-            "type": "boolean",
-            "x-zui":  {},
+        recordStringBoolean: {
+          additionalProperties: {
+            type: 'boolean',
+            'x-zui': {},
           },
-          "type": "object",
-          "x-zui":  {},
+          type: 'object',
+          'x-zui': {},
         },
-        "recordUuidBoolean":  {
-          "additionalProperties":  {
-            "type": "boolean",
-            "x-zui":  {},
+        recordUuidBoolean: {
+          additionalProperties: {
+            type: 'boolean',
+            'x-zui': {},
           },
-          "type": "object",
-          "x-zui":  {},
+          type: 'object',
+          'x-zui': {},
         },
-        "set":  {
-          "items":  {
-            "type": "string",
-            "x-zui":  {},
+        set: {
+          items: {
+            type: 'string',
+            'x-zui': {},
           },
-          "type": "array",
-          "uniqueItems": true,
-          "x-zui":  {},
+          type: 'array',
+          uniqueItems: true,
+          'x-zui': {},
         },
-        "string":  {
-          "type": "string",
-          "x-zui":  {},
+        string: {
+          type: 'string',
+          'x-zui': {},
         },
-        "stringCuid":  {
-          "pattern": "^[cC][^\\\s-]{8,}$",
-          "type": "string",
-          "x-zui":  {},
+        stringCuid: {
+          pattern: '^[cC][^\\s-]{8,}$',
+          type: 'string',
+          'x-zui': {},
         },
-        "stringEmail":  {
-          "format": "email",
-          "type": "string",
-          "x-zui":  {},
+        stringEmail: {
+          format: 'email',
+          type: 'string',
+          'x-zui': {},
         },
-        "stringMax":  {
-          "maxLength": 1,
-          "type": "string",
-          "x-zui":  {},
+        stringMax: {
+          maxLength: 1,
+          type: 'string',
+          'x-zui': {},
         },
-        "stringMin":  {
-          "minLength": 1,
-          "type": "string",
-          "x-zui":  {},
+        stringMin: {
+          minLength: 1,
+          type: 'string',
+          'x-zui': {},
         },
-        "stringRegEx":  {
-          "pattern": "abc",
-          "type": "string",
-          "x-zui":  {},
+        stringRegEx: {
+          pattern: 'abc',
+          type: 'string',
+          'x-zui': {},
         },
-        "stringUrl":  {
-          "format": "uri",
-          "type": "string",
-          "x-zui":  {},
+        stringUrl: {
+          format: 'uri',
+          type: 'string',
+          'x-zui': {},
         },
-        "stringUuid":  {
-          "format": "uuid",
-          "type": "string",
-          "x-zui":  {},
+        stringUuid: {
+          format: 'uuid',
+          type: 'string',
+          'x-zui': {},
         },
-        "tuple":  {
-          "items":  [
-             {
-              "type": "string",
-              "x-zui":  {},
+        tuple: {
+          items: [
+            {
+              type: 'string',
+              'x-zui': {},
             },
-             {
-              "type": "number",
-              "x-zui":  {},
+            {
+              type: 'number',
+              'x-zui': {},
             },
-             {
-              "type": "boolean",
-              "x-zui":  {},
+            {
+              type: 'boolean',
+              'x-zui': {},
             },
           ],
-          "maxItems": 3,
-          "minItems": 3,
-          "type": "array",
-          "x-zui":  {},
+          maxItems: 3,
+          minItems: 3,
+          type: 'array',
+          'x-zui': {},
         },
-        "undefined":  {
-          "not":  {},
-          "x-zui":  {},
+        undefined: {
+          not: {},
+          'x-zui': {},
         },
-        "unionNonPrimitives":  {
-          "anyOf":  [
-             {
-              "type": "string",
-              "x-zui":  {},
+        unionNonPrimitives: {
+          anyOf: [
+            {
+              type: 'string',
+              'x-zui': {},
             },
-             {
-              "additionalProperties": false,
-              "properties":  {
-                "bar":  {
-                  "type": "number",
-                  "x-zui":  {},
+            {
+              additionalProperties: false,
+              properties: {
+                bar: {
+                  type: 'number',
+                  'x-zui': {},
                 },
-                "foo":  {
-                  "type": "string",
-                  "x-zui":  {},
+                foo: {
+                  type: 'string',
+                  'x-zui': {},
                 },
               },
-              "required":  [
-                "foo",
-              ],
-              "type": "object",
-              "x-zui":  {},
+              required: ['foo'],
+              type: 'object',
+              'x-zui': {},
             },
           ],
-          "x-zui":  {},
+          'x-zui': {},
         },
-        "unionPrimitiveLiterals":  {
-          "anyOf":  [
-             {
-              "enum":  [
-                123,
-              ],
-              "type": "number",
-              "x-zui":  {},
+        unionPrimitiveLiterals: {
+          anyOf: [
+            {
+              enum: [123],
+              type: 'number',
+              'x-zui': {},
             },
-             {
-              "enum":  [
-                "abc",
-              ],
-              "type": "string",
-              "x-zui":  {},
+            {
+              enum: ['abc'],
+              type: 'string',
+              'x-zui': {},
             },
-             {
-              "type": "object",
-              "x-zui":  {},
+            {
+              type: 'object',
+              'x-zui': {},
             },
-             {
-              "enum":  [
-                true,
-              ],
-              "type": "boolean",
-              "x-zui":  {},
+            {
+              enum: [true],
+              type: 'boolean',
+              'x-zui': {},
             },
           ],
-          "x-zui":  {},
+          'x-zui': {},
         },
-        "unionPrimitives":  {
-          "anyOf":  [
-             {
-              "type": "string",
-              "x-zui":  {},
+        unionPrimitives: {
+          anyOf: [
+            {
+              type: 'string',
+              'x-zui': {},
             },
-             {
-              "type": "number",
-              "x-zui":  {},
+            {
+              type: 'number',
+              'x-zui': {},
             },
-             {
-              "type": "boolean",
-              "x-zui":  {},
+            {
+              type: 'boolean',
+              'x-zui': {},
             },
-             {
-              "format": "int64",
-              "type": "integer",
-              "x-zui":  {},
+            {
+              format: 'int64',
+              type: 'integer',
+              'x-zui': {},
             },
-             {
-              "enum":  [
-                "null",
-              ],
-              "nullable": true,
-              "x-zui":  {},
+            {
+              enum: ['null'],
+              nullable: true,
+              'x-zui': {},
             },
           ],
-          "x-zui":  {},
+          'x-zui': {},
         },
-        "unknown":  {
-          "x-zui":  {},
+        unknown: {
+          'x-zui': {},
         },
       },
-      "type": "object",
-      "x-zui":  {},
+      type: 'object',
+      'x-zui': {},
     }
 
     expect(jsonSchema).toEqual(expectedOutput)

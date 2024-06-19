@@ -10,7 +10,10 @@ describe('objects', () => {
     const parsedSchema = parseTupleDef(schema._def, getRefs())
     const expectedSchema = {
       type: 'array',
-      items: [{ type: 'string',           [zuiKey]: {}, }, { type: 'number',           [zuiKey]: {}, }],
+      items: [
+        { type: 'string', [zuiKey]: {} },
+        { type: 'number', [zuiKey]: {} },
+      ],
       minItems: 2,
       maxItems: 2,
     }
@@ -23,7 +26,10 @@ describe('objects', () => {
     const parsedSchema = parseTupleDef(schema._def, getRefs())
     const expectedSchema = {
       type: 'array',
-      items: [{ type: 'string',           [zuiKey]: {}, }, { type: 'number',           [zuiKey]: {}, }],
+      items: [
+        { type: 'string', [zuiKey]: {} },
+        { type: 'number', [zuiKey]: {} },
+      ],
       minItems: 2,
       additionalItems: {
         type: 'boolean',

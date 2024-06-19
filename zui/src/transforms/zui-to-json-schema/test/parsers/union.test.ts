@@ -40,11 +40,11 @@ describe('Unions', () => {
           properties: {
             herp: {
               type: 'string',
-                        [zuiKey]: {},
+              [zuiKey]: {},
             },
             derp: {
               type: 'boolean',
-                        [zuiKey]: {},
+              [zuiKey]: {},
             },
           },
           required: ['herp', 'derp'],
@@ -55,18 +55,18 @@ describe('Unions', () => {
           type: 'array',
           items: {
             type: 'number',
-                      [zuiKey]: {},
+            [zuiKey]: {},
           },
           [zuiKey]: {},
         },
         {
           type: 'string',
-                    [zuiKey]: {},
+          [zuiKey]: {},
           minLength: 3,
         },
         {
           type: 'number',
-                    [zuiKey]: {},
+          [zuiKey]: {},
         },
       ],
     }

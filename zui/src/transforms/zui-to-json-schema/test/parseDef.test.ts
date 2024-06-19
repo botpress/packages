@@ -186,7 +186,7 @@ describe('Basic parsing', () => {
     const shorthand = z.string().nullable()
     const union = z.union([z.string(), z.null()])
 
-    const expected = { type: ['string', 'null'],           [zuiKey]: {}, }
+    const expected = { type: ['string', 'null'], [zuiKey]: {} }
 
     expect(parseDef(shorthand._def, getRefs())).toEqual(expected)
     expect(parseDef(union._def, getRefs())).toEqual(expected)

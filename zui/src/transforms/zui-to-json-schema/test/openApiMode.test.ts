@@ -41,7 +41,7 @@ describe('Open API target', () => {
       type: 'object',
       required: ['a', 'b', 'c'],
       properties: {
-        a: { type: 'boolean', [zuiKey]: {},},
+        a: { type: 'boolean', [zuiKey]: {} },
         b: { $ref: '#/properties/a' },
         c: { $ref: '#/properties/a' },
       },

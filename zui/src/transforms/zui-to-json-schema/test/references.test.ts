@@ -24,15 +24,9 @@ describe('Pathing', () => {
         address1: {
           type: 'object',
           properties: {
-            street: { type: 'string',
-              [zuiKey]: {},
-             },
-            number: { type: 'number',
-              [zuiKey]: {},
-             },
-            city: { type: 'string',
-              [zuiKey]: {},
-             },
+            street: { type: 'string', [zuiKey]: {} },
+            number: { type: 'number', [zuiKey]: {} },
+            city: { type: 'string', [zuiKey]: {} },
           },
           additionalProperties: false,
           required: ['street', 'number', 'city'],

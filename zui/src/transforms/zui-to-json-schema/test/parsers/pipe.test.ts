@@ -8,7 +8,10 @@ describe('pipe', () => {
     const schema = z.number().pipe(z.number().int())
 
     expect(parsePipelineDef(schema._def, getRefs())).toEqual({
-      allOf: [{ type: 'number', [zuiKey]: {} }, { type: 'integer', [zuiKey]: {} }],
+      allOf: [
+        { type: 'number', [zuiKey]: {} },
+        { type: 'integer', [zuiKey]: {} },
+      ],
     })
   })
 

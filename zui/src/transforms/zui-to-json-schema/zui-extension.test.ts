@@ -64,6 +64,7 @@ describe('zuiToJsonSchema', () => {
     const schema = z.object({
       testExample: z
         .string()
+        .nullable()
         .displayAs<typeof testComponentDefinitions>({ id: 'customstringcomponent', params: { multiline: true } }),
     })
 
@@ -73,6 +74,7 @@ describe('zuiToJsonSchema', () => {
         "additionalProperties": false,
         "properties": {
           "testExample": {
+            "nullable": true,
             "type": "string",
             "${zuiKey}": {
               "displayAs": [

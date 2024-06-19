@@ -1,3 +1,5 @@
+import { zuiKey } from '../../../ui/constants'
+import { ZuiExtensionObject } from '../../../ui/types'
 import { ZodNumberDef } from '../../../z/index'
 import { addErrorMessage, ErrorMessages, setResponseValueAndErrors } from '../errorMessages'
 import { Refs } from '../Refs'
@@ -10,6 +12,7 @@ export type JsonSchema7NumberType = {
   exclusiveMaximum?: number
   multipleOf?: number
   errorMessage?: ErrorMessages<JsonSchema7NumberType>
+  [zuiKey]?: ZuiExtensionObject
 }
 
 export function parseNumberDef(def: ZodNumberDef, refs: Refs): JsonSchema7NumberType {

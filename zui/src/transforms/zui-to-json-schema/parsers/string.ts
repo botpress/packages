@@ -1,3 +1,5 @@
+import { zuiKey } from '../../../ui/constants'
+import { ZuiExtensionObject } from '../../../ui/types'
 import { ZodStringDef } from '../../../z/index'
 import { ErrorMessages, setResponseValueAndErrors } from '../errorMessages'
 import { Refs } from '../Refs'
@@ -49,6 +51,7 @@ export type JsonSchema7StringType = {
     errorMessage?: ErrorMessages<{ format: string }>
   }[]
   errorMessage?: ErrorMessages<JsonSchema7StringType>
+  [zuiKey]?: ZuiExtensionObject
 }
 
 export function parseStringDef(def: ZodStringDef, refs: Refs): JsonSchema7StringType {

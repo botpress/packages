@@ -1,6 +1,6 @@
-import { zuiKey } from "../../../ui/constants"
-import { ZuiExtensionObject } from "../../../ui/types"
-import { ZodBooleanDef } from "../../../z"
+import { zuiKey } from '../../../ui/constants'
+import { ZuiExtensionObject } from '../../../ui/types'
+import { ZodBooleanDef } from '../../../z'
 
 export type JsonSchema7BooleanType = {
   type: 'boolean'

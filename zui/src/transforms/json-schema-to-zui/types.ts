@@ -1,5 +1,5 @@
-import { zuiKey } from "../../ui/constants"
-import { ZuiExtensionObject } from "../../ui/types"
+import { zuiKey } from '../../ui/constants'
+import { ZuiExtensionObject } from '../../ui/types'
 
 export type Serializable = { [key: string]: Serializable } | Serializable[] | string | number | boolean | null
 

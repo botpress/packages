@@ -52,7 +52,7 @@ describe('zuiToJsonSchema', () => {
       properties: {
         fruit: {
           enum: ['Apple', 'Banana', 'Orange'],
-          type: 'string'
+          type: 'string',
         },
       },
       required: ['fruit'],

@@ -44,31 +44,40 @@ describe('object-to-zui', () => {
             "properties": {
               "city": {
                 "type": "string",
+                "x-zui": {},
               },
               "state": {
                 "type": "string",
+                "x-zui": {},
               },
               "street": {
                 "type": "string",
+                "x-zui": {},
               },
             },
             "type": "object",
+            "x-zui": {},
           },
           "age": {
             "type": "number",
+            "x-zui": {},
           },
           "birthDate": {
             "format": "date-time",
             "type": "string",
+            "x-zui": {},
           },
           "isAdmin": {
             "type": "boolean",
+            "x-zui": {},
           },
           "name": {
             "type": "string",
+            "x-zui": {},
           },
         },
         "type": "object",
+        "x-zui": {},
       }
     `)
   })

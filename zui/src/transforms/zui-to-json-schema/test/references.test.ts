@@ -1,9 +1,9 @@
 import Ajv from 'ajv'
-import { JSONSchema7 } from 'json-schema'
 import { z } from '../../../z/index'
 import { zodToJsonSchema } from '../zodToJsonSchema'
 const ajv = new Ajv()
 import deref from 'local-ref-resolver'
+import { zuiKey } from '../../../ui/constants'
 
 describe('Pathing', () => {
   test('should handle recurring properties with paths', () => {
@@ -24,21 +24,30 @@ describe('Pathing', () => {
         address1: {
           type: 'object',
           properties: {
-            street: { type: 'string' },
-            number: { type: 'number' },
-            city: { type: 'string' },
+            street: { type: 'string',
+              [zuiKey]: {},
+             },
+            number: { type: 'number',
+              [zuiKey]: {},
+             },
+            city: { type: 'string',
+              [zuiKey]: {},
+             },
           },
           additionalProperties: false,
           required: ['street', 'number', 'city'],
+          [zuiKey]: {},
         },
         address2: { $ref: '#/properties/address1' },
         lotsOfAddresses: {
           type: 'array',
           items: { $ref: '#/properties/address1' },
+          [zuiKey]: {},
         },
       },
       additionalProperties: false,
       required: ['address1', 'address2', 'lotsOfAddresses'],
+      [zuiKey]: {},
     }
 
     const parsedSchema = zodToJsonSchema(someAddresses)
@@ -62,9 +71,11 @@ describe('Pathing', () => {
           anyOf: [
             {
               type: 'object',
+              [zuiKey]: {},
               properties: {
                 str: {
                   type: 'string',
+                  [zuiKey]: {},
                 },
               },
               additionalProperties: false,
@@ -72,8 +83,10 @@ describe('Pathing', () => {
             },
             {
               type: 'string',
+              [zuiKey]: {},
             },
           ],
+          [zuiKey]: {},
         },
         part: {
           $ref: '#/properties/union/anyOf/0',
@@ -81,6 +94,7 @@ describe('Pathing', () => {
       },
       additionalProperties: false,
       required: ['union', 'part'],
+      [zuiKey]: {},
     }
 
     const parsedSchema = zodToJsonSchema(schema)
@@ -115,16 +129,19 @@ describe('Pathing', () => {
       properties: {
         name: {
           type: 'string',
+          [zuiKey]: {},
         },
         subcategories: {
           type: 'array',
           items: {
             $ref: '#',
           },
+          [zuiKey]: {},
         },
       },
       required: ['name', 'subcategories'],
       additionalProperties: false,
+      [zuiKey]: {},
     }
 
     expect(parsedSchema).toEqual(expectedJsonSchema)
@@ -170,6 +187,7 @@ describe('Pathing', () => {
           properties: {
             name: {
               type: 'string',
+              [zuiKey]: {},
             },
             inner: {
               type: 'object',
@@ -182,19 +200,24 @@ describe('Pathing', () => {
                       additionalProperties: {
                         $ref: '#/properties/category',
                       },
+                      [zuiKey]: {},
                     },
                     {
                       type: 'null',
                     },
                   ],
+                  [zuiKey]: {},
                 },
               },
+              [zuiKey]: {},
             },
           },
+          [zuiKey]: {},
           required: ['name', 'inner'],
           additionalProperties: false,
         },
       },
+      [zuiKey]: {},
     }
 
     expect(parsedSchema).toEqual(expectedJsonSchema)
@@ -212,12 +235,13 @@ describe('Pathing', () => {
       $refStrategy: 'relative',
     })
 
-    const expectedResult: JSONSchema7 = {
+    const expectedResult = {
       $schema: 'http://json-schema.org/draft-07/schema#',
       type: 'object',
       properties: {
         foo: {
           type: 'string',
+          [zuiKey]: {},
         },
         bar: {
           $ref: '1/foo',
@@ -225,6 +249,7 @@ describe('Pathing', () => {
       },
       required: ['foo', 'bar'],
       additionalProperties: false,
+      [zuiKey]: {},
     }
 
     expect(jsonSchema).toEqual(expectedResult)
@@ -241,12 +266,13 @@ describe('Pathing', () => {
       basePath: ['#', 'lol', 'xD'],
     })
 
-    const expectedResult: JSONSchema7 = {
+    const expectedResult = {
       $schema: 'http://json-schema.org/draft-07/schema#',
       type: 'object',
       properties: {
         foo: {
           type: 'string',
+          [zuiKey]: {},
         },
         bar: {
           $ref: '#/lol/xD/properties/foo',
@@ -254,6 +280,7 @@ describe('Pathing', () => {
       },
       required: ['foo', 'bar'],
       additionalProperties: false,
+      [zuiKey]: {},
     }
 
     expect(jsonSchema).toEqual(expectedResult)
@@ -271,7 +298,7 @@ describe('Pathing', () => {
       name: 'kex',
     })
 
-    const expectedResult: JSONSchema7 = {
+    const expectedResult = {
       $schema: 'http://json-schema.org/draft-07/schema#',
       $ref: '#/lol/xD/definitions/kex',
       definitions: {
@@ -280,6 +307,7 @@ describe('Pathing', () => {
           properties: {
             foo: {
               type: 'string',
+              [zuiKey]: {},
             },
             bar: {
               $ref: '#/lol/xD/definitions/kex/properties/foo',
@@ -287,6 +315,7 @@ describe('Pathing', () => {
           },
           required: ['foo', 'bar'],
           additionalProperties: false,
+          [zuiKey]: {},
         },
       },
     }
@@ -305,19 +334,22 @@ describe('Pathing', () => {
       $refStrategy: 'none',
     })
 
-    const expectedResult: JSONSchema7 = {
+    const expectedResult = {
       $schema: 'http://json-schema.org/draft-07/schema#',
       type: 'object',
       properties: {
         foo: {
           type: 'string',
+          [zuiKey]: {},
         },
         bar: {
           type: 'string',
+          [zuiKey]: {},
         },
       },
       required: ['foo', 'bar'],
       additionalProperties: false,
+      [zuiKey]: {},
     }
 
     expect(jsonSchema).toEqual(expectedResult)
@@ -352,14 +384,17 @@ describe('Pathing', () => {
       properties: {
         name: {
           type: 'string',
+          [zuiKey]: {},
         },
         subcategories: {
           type: 'array',
           items: {},
+          [zuiKey]: {},
         },
       },
       required: ['name', 'subcategories'],
       additionalProperties: false,
+      [zuiKey]: {},
     }
 
     expect(parsedSchema).toEqual(expectedJsonSchema)
@@ -389,6 +424,7 @@ describe('Pathing', () => {
           properties: {
             foo: {
               type: 'string',
+              [zuiKey]: {},
             },
             bar: {
               $ref: '#/$defs/hello/properties/foo',
@@ -396,6 +432,7 @@ describe('Pathing', () => {
           },
           required: ['foo', 'bar'],
           additionalProperties: false,
+          [zuiKey]: {},
         },
       },
     }
@@ -424,6 +461,7 @@ describe('Pathing', () => {
           properties: {
             foo: {
               type: 'string',
+              [zuiKey]: {},
             },
             bar: {
               $ref: '#/definitions/hello/properties/foo',
@@ -431,6 +469,7 @@ describe('Pathing', () => {
           },
           required: ['foo', 'bar'],
           additionalProperties: false,
+          [zuiKey]: {},
         },
       },
     }
@@ -456,6 +495,7 @@ describe('Pathing', () => {
           properties: {
             foo: {
               type: 'string',
+              [zuiKey]: {},
             },
             bar: {
               $ref: '#/definitions/hello/properties/foo',
@@ -463,6 +503,7 @@ describe('Pathing', () => {
           },
           required: ['foo', 'bar'],
           additionalProperties: false,
+          [zuiKey]: {},
         },
       },
     }
@@ -488,6 +529,7 @@ describe('Pathing', () => {
           properties: {
             foo: {
               type: 'string',
+              [zuiKey]: {},
             },
             bar: {
               $ref: '#/definitions/hello/properties/foo',
@@ -495,6 +537,7 @@ describe('Pathing', () => {
           },
           required: ['foo', 'bar'],
           additionalProperties: false,
+          [zuiKey]: {},
         },
       },
     }
@@ -529,8 +572,10 @@ describe('Pathing', () => {
       definitions: {
         myRecurringSchema: {
           type: 'string',
+          [zuiKey]: {},
         },
       },
+      [zuiKey]: {},
     })
   })
 
@@ -568,6 +613,7 @@ describe('Pathing', () => {
       definitions: {
         myRecurringSchema: {
           type: 'string',
+          [zuiKey]: {},
         },
         mySecondRecurringSchema: {
           type: 'object',
@@ -578,8 +624,10 @@ describe('Pathing', () => {
             },
           },
           additionalProperties: false,
+          [zuiKey]: {},
         },
       },
+      [zuiKey]: {},
     })
   })
 
@@ -618,9 +666,11 @@ describe('Pathing', () => {
             },
           },
           additionalProperties: false,
+          [zuiKey]: {},
         },
         myRecurringSchema: {
           type: 'string',
+          [zuiKey]: {},
         },
         mySecondRecurringSchema: {
           type: 'object',
@@ -631,6 +681,7 @@ describe('Pathing', () => {
             },
           },
           additionalProperties: false,
+          [zuiKey]: {},
         },
       },
     })
@@ -672,9 +723,11 @@ describe('Pathing', () => {
             },
           },
           additionalProperties: false,
+          [zuiKey]: {},
         },
         myRecurringSchema: {
           type: 'string',
+          [zuiKey]: {},
         },
         mySecondRecurringSchema: {
           type: 'object',
@@ -685,6 +738,7 @@ describe('Pathing', () => {
             },
           },
           additionalProperties: false,
+          [zuiKey]: {},
         },
       },
     })
@@ -718,8 +772,10 @@ describe('Pathing', () => {
       definitions: {
         myRecurringSchema: {
           type: 'string',
+          [zuiKey]: {},
         },
       },
+      [zuiKey]: {},
     })
   })
 
@@ -752,9 +808,11 @@ describe('Pathing', () => {
             },
           },
           additionalProperties: false,
+          [zuiKey]: {},
         },
         myRecurringSchema: {
           type: 'string',
+          [zuiKey]: {},
         },
       },
     })
@@ -792,6 +850,7 @@ describe('Pathing', () => {
             },
           },
           additionalProperties: false,
+          [zuiKey]: {},
         },
         myRecurringSchema: {
           type: 'object',
@@ -799,9 +858,11 @@ describe('Pathing', () => {
           properties: {
             circular: {
               $ref: 'hello/definitions/myRecurringSchema',
+              [zuiKey]: {},
             },
           },
           additionalProperties: false,
+          [zuiKey]: {},
         },
       },
     })
@@ -842,15 +903,19 @@ describe('Pathing', () => {
           properties: {
             id: {
               type: 'string',
+              [zuiKey]: {},
             },
             headUser: {
               $ref: '#/definitions/userSchema',
+              [zuiKey]: {},
             },
           },
           required: ['id'],
           additionalProperties: false,
+          [zuiKey]: {},
         },
       },
+      [zuiKey]: {},
     })
   })
 
@@ -888,10 +953,12 @@ describe('Pathing', () => {
           properties: {
             prop: {
               type: 'string',
+              [zuiKey]: {},
             },
           },
           required: ['prop'],
           additionalProperties: false,
+          [zuiKey]: {},
         },
         Node: {
           type: 'object',
@@ -901,10 +968,12 @@ describe('Pathing', () => {
               items: {
                 $ref: '#/definitions/NodeChild',
               },
+              [zuiKey]: {},
             },
           },
           required: ['children'],
           additionalProperties: false,
+          [zuiKey]: {},
         },
         NodeChild: {
           anyOf: [
@@ -915,6 +984,7 @@ describe('Pathing', () => {
               $ref: '#/definitions/Node',
             },
           ],
+          [zuiKey]: {},
         },
         Tree: {
           type: 'object',
@@ -925,6 +995,7 @@ describe('Pathing', () => {
           },
           required: ['nodes'],
           additionalProperties: false,
+          [zuiKey]: {},
         },
       },
       $schema: 'http://json-schema.org/draft-07/schema#',
@@ -945,8 +1016,9 @@ describe('Pathing', () => {
       properties: { lazyProp: { $ref: '#/definitions/lazyString' } },
       required: ['lazyProp'],
       additionalProperties: false,
-      definitions: { lazyString: { type: 'string' } },
+      definitions: { lazyString: { type: 'string', [zuiKey]: {} } },
       $schema: 'http://json-schema.org/draft-07/schema#',
+      [zuiKey]: {},
     }
 
     expect(jsonSchema).toEqual(expected)

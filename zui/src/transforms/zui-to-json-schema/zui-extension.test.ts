@@ -36,6 +36,7 @@ describe('zuiToJsonSchema', () => {
           },
         },
         "type": "object",
+        "x-zui": {},
       }
     `)
   })
@@ -53,10 +54,12 @@ describe('zuiToJsonSchema', () => {
         fruit: {
           enum: ['Apple', 'Banana', 'Orange'],
           type: 'string',
+          [zuiKey]: {},
         },
       },
       required: ['fruit'],
       type: 'object',
+      [zuiKey]: {},
     })
   })
 
@@ -90,6 +93,7 @@ describe('zuiToJsonSchema', () => {
           "testExample",
         ],
         "type": "object",
+        "x-zui": {},
       }
     `)
   })
@@ -101,6 +105,7 @@ describe('zuiToJsonSchema', () => {
     expect(jsonSchema).toMatchInlineSnapshot(`
       {
         "type": "string",
+        "x-zui": {},
       }
     `)
   })
@@ -113,9 +118,11 @@ describe('zuiToJsonSchema', () => {
       additionalProperties: {
         maxLength: 30,
         type: 'string',
+        [zuiKey]: {},
       },
       description: 'hello',
       type: 'object',
+      [zuiKey]: {},
     })
   })
 
@@ -128,9 +135,11 @@ describe('zuiToJsonSchema', () => {
         "additionalProperties": {
           "maximum": 30,
           "type": "number",
+          "x-zui": {},
         },
         "description": "hello",
         "type": "object",
+        "x-zui": {},
       }
     `)
   })
@@ -145,6 +154,7 @@ describe('zuiToJsonSchema', () => {
         "additionalProperties": false,
         "properties": {},
         "type": "object",
+        "x-zui": {},
       }
     `)
   })
@@ -162,12 +172,14 @@ describe('zuiToJsonSchema', () => {
               "string",
               "number",
             ],
+            "x-zui": {},
           },
         },
         "required": [
           "multipleTypes",
         ],
         "type": "object",
+        "x-zui": {},
       }
     `)
   })
@@ -192,10 +204,12 @@ describe('zuiToJsonSchema', () => {
           "properties": {
             "id": {
               "type": "number",
+              "x-zui": {},
             },
             "title": {
               "minLength": 5,
               "type": "string",
+              "x-zui": {},
             },
           },
           "required": [
@@ -203,9 +217,11 @@ describe('zuiToJsonSchema', () => {
             "title",
           ],
           "type": "object",
+          "x-zui": {},
         },
         "minItems": 1,
         "type": "array",
+        "x-zui": {},
       }
     `)
   })
@@ -228,9 +244,11 @@ describe('zuiToJsonSchema', () => {
                   "A",
                 ],
                 "type": "string",
+                "x-zui": {},
               },
               "lel": {
                 "type": "boolean",
+                "x-zui": {},
               },
             },
             "required": [
@@ -238,6 +256,7 @@ describe('zuiToJsonSchema', () => {
               "lel",
             ],
             "type": "object",
+            "x-zui": {},
           },
           {
             "additionalProperties": false,
@@ -247,9 +266,11 @@ describe('zuiToJsonSchema', () => {
                   "B",
                 ],
                 "type": "string",
+                "x-zui": {},
               },
               "lel": {
                 "type": "number",
+                "x-zui": {},
               },
             },
             "required": [
@@ -257,8 +278,10 @@ describe('zuiToJsonSchema', () => {
               "lel",
             ],
             "type": "object",
+            "x-zui": {},
           },
         ],
+        "x-zui": {},
       }
     `)
   })
@@ -284,9 +307,11 @@ describe('zuiToJsonSchema', () => {
                   "A",
                 ],
                 "type": "string",
+                "x-zui": {},
               },
               "lel": {
                 "type": "boolean",
+                "x-zui": {},
               },
             },
             "required": [
@@ -294,6 +319,7 @@ describe('zuiToJsonSchema', () => {
               "lel",
             ],
             "type": "object",
+            "x-zui": {},
           },
           {
             "additionalProperties": false,
@@ -303,9 +329,11 @@ describe('zuiToJsonSchema', () => {
                   "B",
                 ],
                 "type": "string",
+                "x-zui": {},
               },
               "lel": {
                 "type": "number",
+                "x-zui": {},
               },
             },
             "required": [
@@ -313,8 +341,10 @@ describe('zuiToJsonSchema', () => {
               "lel",
             ],
             "type": "object",
+            "x-zui": {},
           },
         ],
+        "x-zui": {},
       }
     `)
   })
@@ -349,6 +379,7 @@ describe('zuiToJsonSchema', () => {
         "value",
       ],
       "type": "object",
+      "x-zui": {},
     }
   `)
   })
@@ -367,8 +398,10 @@ describe('zuiToJsonSchema', () => {
             },
           },
           "type": "array",
+          "x-zui": {},
         },
         "type": "array",
+        "x-zui": {},
       }
     `)
   })
@@ -403,6 +436,7 @@ describe('zuiToJsonSchema', () => {
           },
           "description": {
             "type": "string",
+            "x-zui": {},
           },
         },
         "required": [
@@ -410,6 +444,7 @@ describe('zuiToJsonSchema', () => {
           "data",
         ],
         "type": "object",
+        "x-zui": {},
       }
     `)
   })

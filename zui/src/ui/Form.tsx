@@ -4,7 +4,6 @@ import { FormDataProvider, deepMerge, getDefaultValues } from './hooks/useFormDa
 import { DefaultComponentDefinitions, JSONSchema, UIComponentDefinitions, ZuiComponentMap } from './types'
 import { FormElementRenderer } from './ElementRenderer'
 
-
 export type ZuiFormProps<UI extends UIComponentDefinitions = DefaultComponentDefinitions> = {
   schema: JSONSchema
   components: ZuiComponentMap<UI>

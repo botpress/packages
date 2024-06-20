@@ -4,6 +4,7 @@ import { ArraySchema, JSONSchema } from '../types'
 import { jsonSchemaToZui } from '../../transforms/json-schema-to-zui'
 import { zuiKey } from '../constants'
 import { Maskable } from '../../z'
+import { ZuiFormOptions } from '../Form'
 
 export type FormDataContextProps = {
   formData: any
@@ -14,7 +15,9 @@ export type FormDataContextProps = {
   hiddenState: object
   disabledState: object
   disableValidation: boolean
+  options?: ZuiFormOptions
 }
+
 export type FormDataProviderProps = Omit<
   FormDataContextProps,
   'setHiddenState' | 'setDisabledState' | 'hiddenState' | 'disabledState'
@@ -82,8 +85,8 @@ export const useFormData = (fieldSchema: JSONSchema, path: string[]) => {
     if (!formContext.formSchema) {
       return { formValid: null, formErrors: null }
     }
-
-    const validation = jsonSchemaToZui(formContext.formSchema).safeParse(formContext.formData)
+    const currentFormData = formContext.options?.dataTransform ? formContext.options.dataTransform(data) : data
+    const validation = jsonSchemaToZui(formContext.formSchema).safeParse(currentFormData)
 
     if (!validation.success) {
       return {
@@ -97,8 +100,15 @@ export const useFormData = (fieldSchema: JSONSchema, path: string[]) => {
     }
   }, [formContext.formData])
 
-  const hiddenMask = useMemo(() => parseMaskableField('hidden', fieldSchema, data), [fieldSchema, data])
-  const disabledMask = useMemo(() => parseMaskableField('disabled', fieldSchema, data), [fieldSchema, data])
+  const transformedData = formContext.options?.dataTransform ? formContext.options.dataTransform(data) : data
+  const hiddenMask = useMemo(
+    () => parseMaskableField('hidden', fieldSchema, transformedData),
+    [fieldSchema, transformedData],
+  )
+  const disabledMask = useMemo(
+    () => parseMaskableField('disabled', fieldSchema, transformedData),
+    [fieldSchema, transformedData],
+  )
 
   useEffect(() => {
     formContext.setHiddenState((hiddenState) => setObjectPath(hiddenState, path, hiddenMask || {}))
@@ -240,6 +250,7 @@ export const FormDataProvider: React.FC<PropsWithChildren<FormDataProviderProps>
   formData,
   formSchema,
   disableValidation,
+  options,
 }) => {
   const [hiddenState, setHiddenState] = useState({})
   const [disabledState, setDisabledState] = useState({})
@@ -255,6 +266,7 @@ export const FormDataProvider: React.FC<PropsWithChildren<FormDataProviderProps>
         setHiddenState,
         disabledState,
         setDisabledState,
+        options,
       }}
     >
       {children}

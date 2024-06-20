@@ -4,6 +4,7 @@ import { FormDataProvider, deepMerge, getDefaultValues } from './hooks/useFormDa
 import { DefaultComponentDefinitions, JSONSchema, UIComponentDefinitions, ZuiComponentMap } from './types'
 import { FormElementRenderer } from './ElementRenderer'
 
+
 export type ZuiFormProps<UI extends UIComponentDefinitions = DefaultComponentDefinitions> = {
   schema: JSONSchema
   components: ZuiComponentMap<UI>
@@ -11,6 +12,11 @@ export type ZuiFormProps<UI extends UIComponentDefinitions = DefaultComponentDef
   onChange: (value: any) => void
   disableValidation?: boolean
   fallback?: BoundaryFallbackComponent
+  options?: ZuiFormOptions
+}
+
+export type ZuiFormOptions = {
+  dataTransform?: (data: any) => any
 }
 
 export const ZuiForm = <UI extends UIComponentDefinitions = DefaultComponentDefinitions>({
@@ -20,6 +26,7 @@ export const ZuiForm = <UI extends UIComponentDefinitions = DefaultComponentDefi
   value,
   disableValidation,
   fallback,
+  options,
 }: ZuiFormProps<UI>): JSX.Element | null => {
   useEffect(() => {
     const defaults = getDefaultValues(schema)
@@ -32,6 +39,7 @@ export const ZuiForm = <UI extends UIComponentDefinitions = DefaultComponentDefi
       setFormData={onChange}
       formSchema={schema}
       disableValidation={disableValidation || false}
+      options={options}
     >
       <ErrorBoundary fallback={fallback} fieldSchema={schema} path={[]}>
         <FormElementRenderer

@@ -106,9 +106,7 @@ export const ZuiForm = <UI extends UIComponentDefinitions = DefaultComponentDefi
   return (
     <FormDataProvider
       formData={value}
-      setFormData={(callback) => {
-        onChange(callback(value))
-      }}
+      setFormData={onChange}
       formSchema={schema}
       disableValidation={disableValidation || false}
     >

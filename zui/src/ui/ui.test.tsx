@@ -339,7 +339,10 @@ describe('UI', () => {
     fireEvent.change(input, { target: { value: 'Jane' } })
 
     expect(onChangeMock).toHaveBeenCalledTimes(2)
-    expect(onChangeMock).toHaveBeenCalledWith({ students: [{ name: 'Jane', age: 20 }] })
+
+
+    // check initial value
+    expect(onChangeMock).toHaveBeenCalledWith({ students: [{ name: 'John', age: 20 }] })
   })
 
   it('it renders custom zui components with correct params as input', () => {

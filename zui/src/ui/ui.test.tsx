@@ -340,7 +340,6 @@ describe('UI', () => {
 
     expect(onChangeMock).toHaveBeenCalledTimes(2)
 
-
     // check initial value
     expect(onChangeMock).toHaveBeenCalledWith({ students: [{ name: 'John', age: 20 }] })
   })

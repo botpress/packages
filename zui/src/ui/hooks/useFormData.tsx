@@ -99,7 +99,7 @@ export const useFormData = (fieldSchema: JSONSchema, path: string[]) => {
     }
   }, [formContext.formData])
 
-  const transformedData = formContext.dataTransform ? formContext.dataTransform(formContext.formData) : formContext.formData
+  const transformedData = formContext.dataTransform ? formContext.dataTransform(data) : data
 
   const hiddenMask = useMemo(
     () => parseMaskableField('hidden', fieldSchema, transformedData),

@@ -84,7 +84,7 @@ export const useFormData = (fieldSchema: JSONSchema, path: string[]) => {
     if (!formContext.formSchema) {
       return { formValid: null, formErrors: null }
     }
-    const currentFormData = formContext.dataTransform ? formContext.dataTransform(data) : data
+    const currentFormData = formContext.dataTransform ? formContext.dataTransform(formContext.formData) : formContext.formData
     const validation = jsonSchemaToZui(formContext.formSchema).safeParse(currentFormData)
 
     if (!validation.success) {
@@ -99,7 +99,8 @@ export const useFormData = (fieldSchema: JSONSchema, path: string[]) => {
     }
   }, [formContext.formData])
 
-  const transformedData = formContext.dataTransform ? formContext.dataTransform(data) : data
+  const transformedData = formContext.dataTransform ? formContext.dataTransform(formContext.formData) : formContext.formData
+
   const hiddenMask = useMemo(
     () => parseMaskableField('hidden', fieldSchema, transformedData),
     [fieldSchema, transformedData],

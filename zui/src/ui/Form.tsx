@@ -11,10 +11,6 @@ export type ZuiFormProps<UI extends UIComponentDefinitions = DefaultComponentDef
   onChange: (value: any) => void
   disableValidation?: boolean
   fallback?: BoundaryFallbackComponent
-  options?: ZuiFormOptions
-}
-
-export type ZuiFormOptions = {
   dataTransform?: (data: any) => any
 }
 
@@ -25,7 +21,7 @@ export const ZuiForm = <UI extends UIComponentDefinitions = DefaultComponentDefi
   value,
   disableValidation,
   fallback,
-  options,
+  dataTransform,
 }: ZuiFormProps<UI>): JSX.Element | null => {
   useEffect(() => {
     const defaults = getDefaultValues(schema)
@@ -38,7 +34,7 @@ export const ZuiForm = <UI extends UIComponentDefinitions = DefaultComponentDefi
       setFormData={onChange}
       formSchema={schema}
       disableValidation={disableValidation || false}
-      options={options}
+      dataTransform={dataTransform}
     >
       <ErrorBoundary fallback={fallback} fieldSchema={schema} path={[]}>
         <FormElementRenderer

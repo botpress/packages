@@ -4,7 +4,6 @@ import { ArraySchema, JSONSchema } from '../types'
 import { jsonSchemaToZui } from '../../transforms/json-schema-to-zui'
 import { zuiKey } from '../constants'
 import { Maskable } from '../../z'
-import { ZuiFormOptions } from '../Form'
 
 export type FormDataContextProps = {
   formData: any
@@ -15,7 +14,7 @@ export type FormDataContextProps = {
   hiddenState: object
   disabledState: object
   disableValidation: boolean
-  options?: ZuiFormOptions
+  dataTransform?: (data: any) => any
 }
 
 export type FormDataProviderProps = Omit<
@@ -85,7 +84,7 @@ export const useFormData = (fieldSchema: JSONSchema, path: string[]) => {
     if (!formContext.formSchema) {
       return { formValid: null, formErrors: null }
     }
-    const currentFormData = formContext.options?.dataTransform ? formContext.options.dataTransform(data) : data
+    const currentFormData = formContext.dataTransform ? formContext.dataTransform(data) : data
     const validation = jsonSchemaToZui(formContext.formSchema).safeParse(currentFormData)
 
     if (!validation.success) {
@@ -100,7 +99,7 @@ export const useFormData = (fieldSchema: JSONSchema, path: string[]) => {
     }
   }, [formContext.formData])
 
-  const transformedData = formContext.options?.dataTransform ? formContext.options.dataTransform(data) : data
+  const transformedData = formContext.dataTransform ? formContext.dataTransform(data) : data
   const hiddenMask = useMemo(
     () => parseMaskableField('hidden', fieldSchema, transformedData),
     [fieldSchema, transformedData],
@@ -250,7 +249,7 @@ export const FormDataProvider: React.FC<PropsWithChildren<FormDataProviderProps>
   formData,
   formSchema,
   disableValidation,
-  options,
+  dataTransform,
 }) => {
   const [hiddenState, setHiddenState] = useState({})
   const [disabledState, setDisabledState] = useState({})
@@ -266,7 +265,7 @@ export const FormDataProvider: React.FC<PropsWithChildren<FormDataProviderProps>
         setHiddenState,
         disabledState,
         setDisabledState,
-        options,
+        dataTransform,
       }}
     >
       {children}

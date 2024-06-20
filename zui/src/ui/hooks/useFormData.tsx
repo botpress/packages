@@ -1,6 +1,6 @@
 import { PropsWithChildren, createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react'
 import React from 'react'
-import { JSONSchema } from '../types'
+import { ArraySchema, JSONSchema } from '../types'
 import { jsonSchemaToZui } from '../../transforms/json-schema-to-zui'
 import { zuiKey } from '../constants'
 import { Maskable } from '../../z'
@@ -9,7 +9,7 @@ export type FormDataContextProps = {
   formData: any
   formSchema: JSONSchema | any
   setFormData: (callback: (formData: any) => void) => void
-  setHiddenState: (callback: (hiddenState: any) => void) => void 
+  setHiddenState: (callback: (hiddenState: any) => void) => void
   setDisabledState: (callback: (disabledState: any) => void) => void
   hiddenState: object
   disabledState: object
@@ -101,9 +101,9 @@ export const useFormData = (fieldSchema: JSONSchema, path: string[]) => {
   const disabledMask = useMemo(() => parseMaskableField('disabled', fieldSchema, data), [fieldSchema, data])
 
   useEffect(() => {
-    formContext.setHiddenState(hiddenState => setObjectPath(hiddenState, path, hiddenMask || {}))
-    formContext.setDisabledState(disabledState => setObjectPath(disabledState, path, disabledMask || {}))
-  }, [fieldSchema, data])
+    formContext.setHiddenState((hiddenState) => setObjectPath(hiddenState, path, hiddenMask || {}))
+    formContext.setDisabledState((disabledState) => setObjectPath(disabledState, path, disabledMask || {}))
+  }, [JSON.stringify({ fieldSchema, data })])
 
   const { disabled, hidden } = useMemo(() => {
     const hidden = hiddenMask === true || getPathData(formContext.hiddenState, path)
@@ -117,26 +117,33 @@ export const useFormData = (fieldSchema: JSONSchema, path: string[]) => {
     },
     [formContext.setFormData],
   )
-
   const addArrayItem = useCallback(
-    (path: string[], data: any) => {
-      const currentData = getPathData(formContext.formData, path) || []
-      formContext.setFormData((formData) => 
-        setObjectPath(
-          formData,
-          path,
-          Array.isArray(currentData) ? [...currentData, data] : [...currentData, data],
-        ),
-      )
+    (path: string[], data: any = undefined) => {
+      const defaultData = getDefaultValues((fieldSchema as ArraySchema).items)
+
+      formContext.setFormData((formData) => {
+        const currentData = getPathData(formData, path) || []
+        if (data === undefined) {
+          data = defaultData
+        }
+        return setObjectPath(formData, path, Array.isArray(currentData) ? [...currentData, data] : [data])
+      })
     },
     [formContext.setFormData],
   )
 
   const removeArrayItem = useCallback(
     (path: string[], index: number) => {
-      const currentData = getPathData(formContext.formData, path)
-      currentData.splice(index, 1)
-      formContext.setFormData(formData => setObjectPath(formData, path, currentData))
+      formContext.setFormData((formData) => {
+        const currentData = getPathData(formData, path) || []
+
+        if (!Array.isArray(currentData)) {
+          return formData
+        }
+
+        currentData.splice(index, 1)
+        return setObjectPath(formData, path, currentData)
+      })
     },
     [formContext.setFormData],
   )

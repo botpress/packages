@@ -14,7 +14,7 @@ import {
   DefaultComponentDefinitions,
 } from './types'
 import { zuiKey } from './constants'
-import React, { type FC, useMemo } from 'react'
+import React, { type FC, useMemo, useEffect } from 'react'
 import { FormDataProvider, deepMerge, getDefaultValues, useFormData } from './hooks/useFormData'
 import { getPathData } from './hooks/useFormData'
 import { formatTitle } from './titleutils'
@@ -98,14 +98,17 @@ export const ZuiForm = <UI extends UIComponentDefinitions = DefaultComponentDefi
   disableValidation,
   fallback,
 }: ZuiFormProps<UI>): JSX.Element | null => {
-  const actualData = useMemo(() => {
-    return deepMerge(getDefaultValues(schema), value)
-  }, [value, schema])
+  useEffect(() => {
+    const defaults = getDefaultValues(schema)
+    onChange(deepMerge(defaults, value))
+  }, [JSON.stringify(schema)])
 
   return (
     <FormDataProvider
-      formData={actualData}
-      setFormData={onChange}
+      formData={value}
+      setFormData={(callback) => {
+        onChange(callback(value))
+      }}
       formSchema={schema}
       disableValidation={disableValidation || false}
     >
@@ -185,8 +188,7 @@ const FormElementRenderer: FC<FormRendererProps> = ({
       type,
       schema,
       data: dataArray,
-      addItem: (data = undefined) =>
-        addArrayItem(path, typeof data === 'undefined' ? getDefaultValues(schema.items) : data),
+      addItem: (data) => addArrayItem(path, data),
       removeItem: (index) => removeArrayItem(path, index),
       ...childProps,
     }

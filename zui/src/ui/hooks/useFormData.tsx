@@ -84,6 +84,7 @@ export const useFormData = (fieldSchema: JSONSchema, path: string[]) => {
     if (!formContext.formSchema) {
       return { formValid: null, formErrors: null }
     }
+    
     const currentFormData = formContext.dataTransform
       ? formContext.dataTransform(formContext.formData)
       : formContext.formData

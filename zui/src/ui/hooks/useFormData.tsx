@@ -6,15 +6,42 @@ import { zuiKey } from '../constants'
 import { Maskable } from '../../z'
 
 export type FormDataContextProps = {
+  /**
+   * The current form data
+   * */
   formData: any
   formSchema: JSONSchema | any
+  /**
+   * Function to update the form data, takes a callback that receives the form data with the new values
+   * */
   setFormData: (callback: (formData: any) => void) => void
-  setHiddenState: (callback: (hiddenState: any) => void) => void
-  setDisabledState: (callback: (disabledState: any) => void) => void
+
+  /**
+   * hiddenState is an object that contains the hidden state of the form fields
+   */
   hiddenState: object
+  /**
+   * Function to update the hidden state, takes a callback that receives the hidden state with the new values
+   * */
+  setHiddenState: (callback: (hiddenState: any) => void) => void
+  /**
+   * disabledState is an object that contains the disabled state of the form fields
+   */
   disabledState: object
+  /**
+   * Function to update the disabled state, takes a callback that receives the disabled state with the new values
+   * */
+  setDisabledState: (callback: (disabledState: any) => void) => void
+
+  /**
+   * Whether to disable validation
+   * */
   disableValidation: boolean
-  dataTransform?: (data: any) => any
+  /**
+   * Function to transform the form data before validation and computation of hidden/disabled states
+   * useful for cases where the form data does not match the schema
+   */
+  dataTransform?: (formData: any) => any
 }
 
 export type FormDataProviderProps = Omit<
@@ -84,7 +111,7 @@ export const useFormData = (fieldSchema: JSONSchema, path: string[]) => {
     if (!formContext.formSchema) {
       return { formValid: null, formErrors: null }
     }
-    
+
     const currentFormData = formContext.dataTransform
       ? formContext.dataTransform(formContext.formData)
       : formContext.formData

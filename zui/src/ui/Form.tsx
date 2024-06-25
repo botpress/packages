@@ -1,3 +1,4 @@
+import React from 'react'
 import { useEffect } from 'react'
 import { BoundaryFallbackComponent, ErrorBoundary } from './ErrorBoundary'
 import { FormDataProvider, deepMerge, getDefaultValues } from './hooks/useFormData'

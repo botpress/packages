@@ -295,7 +295,7 @@ export const FormDataProvider: React.FC<PropsWithChildren<FormDataProviderProps>
     if (!formSchema) {
       return { formValid: null, formErrors: null }
     }
-    console.log(transformedData)
+
     const validation = jsonSchemaToZui(formSchema).safeParse(transformedData)
 
     if (!validation.success) {

@@ -32,7 +32,7 @@ export const ZuiForm = <UI extends UIComponentDefinitions = DefaultComponentDefi
 
   useEffect(() => {
     const defaults = getDefaultValues(schema)
-    setFormData(prev => (deepMerge(defaults, prev)))
+    setFormData((prev) => deepMerge(defaults, prev))
   }, [JSON.stringify(schema), setFormData])
 
   return (

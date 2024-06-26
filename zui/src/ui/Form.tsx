@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { useEffect } from 'react'
 import { BoundaryFallbackComponent, ErrorBoundary } from './ErrorBoundary'
 import { FormDataProvider, deepMerge, getDefaultValues } from './hooks/useFormData'
@@ -24,15 +24,21 @@ export const ZuiForm = <UI extends UIComponentDefinitions = DefaultComponentDefi
   fallback,
   dataTransform,
 }: ZuiFormProps<UI>): JSX.Element | null => {
+  const [formData, setFormData] = useState<object>(value)
+
+  useEffect(() => {
+    onChange(formData)
+  }, [formData])
+
   useEffect(() => {
     const defaults = getDefaultValues(schema)
-    onChange(deepMerge(defaults, value))
-  }, [JSON.stringify(schema)])
+    setFormData(prev => (deepMerge(defaults, prev)))
+  }, [JSON.stringify(schema), setFormData])
 
   return (
     <FormDataProvider
-      formData={value}
-      setFormData={onChange}
+      formData={formData}
+      setFormData={setFormData}
       formSchema={schema}
       disableValidation={disableValidation || false}
       dataTransform={dataTransform}

@@ -2,7 +2,7 @@ import React, { PropsWithChildren, createContext, useCallback, useContext, useEf
 import { ArraySchema, JSONSchema } from '../types'
 import { jsonSchemaToZui } from '../../transforms/json-schema-to-zui'
 import { zuiKey } from '../constants'
-import { Maskable } from '../../z'
+import { Maskable, ZodIssue } from '../../z'
 
 export type FormDataContextProps = {
   /**
@@ -33,19 +33,25 @@ export type FormDataContextProps = {
   setDisabledState: (callback: (disabledState: any) => void) => void
 
   /**
-   * Whether to disable validation
-   * */
-  disableValidation: boolean
+   * Validation state of the form
+   */
+  validation: {
+    formValid: boolean | null
+    formErrors: ZodIssue[] | null
+  }
+
+  disableValidation?: boolean
+
   /**
    * Function to transform the form data before validation and computation of hidden/disabled states
-   * useful for cases where the form data does not match the schema
+   * useful for cases where the underlying form data does not match the schema
    */
   dataTransform?: (formData: any) => any
 }
 
 export type FormDataProviderProps = Omit<
   FormDataContextProps,
-  'setHiddenState' | 'setDisabledState' | 'hiddenState' | 'disabledState'
+  'setHiddenState' | 'setDisabledState' | 'hiddenState' | 'disabledState' | 'validation'
 >
 
 export const FormDataContext = createContext<FormDataContextProps>({
@@ -62,7 +68,7 @@ export const FormDataContext = createContext<FormDataContextProps>({
   },
   hiddenState: {},
   disabledState: {},
-  disableValidation: false,
+  validation: { formValid: null, formErrors: null },
 })
 
 const parseMaskableField = (key: 'hidden' | 'disabled', fieldSchema: JSONSchema, data: any): Maskable => {
@@ -103,30 +109,17 @@ export const useFormData = (fieldSchema: JSONSchema, path: string[]) => {
   const data = useMemo(() => getPathData(formContext.formData, path), [formContext.formData, path])
 
   const validation = useMemo(() => {
-    if (formContext.disableValidation) {
+    if (formContext.validation.formValid === null) {
       return { formValid: null, formErrors: null }
     }
-
-    if (!formContext.formSchema) {
-      return { formValid: null, formErrors: null }
-    }
-
-    const currentFormData = formContext.dataTransform
-      ? formContext.dataTransform(formContext.formData)
-      : formContext.formData
-    const validation = jsonSchemaToZui(formContext.formSchema).safeParse(currentFormData)
-
-    if (!validation.success) {
+    if (formContext.validation.formValid === false) {
       return {
         formValid: false,
-        formErrors: validation.error.issues,
+        formErrors: formContext.validation.formErrors?.filter((issue) => issue.path === path) || null,
       }
     }
-    return {
-      formValid: true,
-      formErrors: [],
-    }
-  }, [formContext.formData])
+    return { formValid: true, formErrors: [] }
+  }, [formContext.validation.formValid, formContext.validation.formErrors, path])
 
   const transformedData = formContext.dataTransform ? formContext.dataTransform(data) : data
 
@@ -284,13 +277,38 @@ export const FormDataProvider: React.FC<PropsWithChildren<FormDataProviderProps>
   const [hiddenState, setHiddenState] = useState({})
   const [disabledState, setDisabledState] = useState({})
 
+  const transformedData = dataTransform ? dataTransform(formData) : formData
+
+  const validation = useMemo(() => {
+    if (disableValidation) {
+      return { formValid: null, formErrors: null }
+    }
+
+    if (!formSchema) {
+      return { formValid: null, formErrors: null }
+    }
+
+    const validation = jsonSchemaToZui(formSchema).safeParse(transformedData)
+
+    if (!validation.success) {
+      return {
+        formValid: false,
+        formErrors: validation.error.issues,
+      }
+    }
+    return {
+      formValid: true,
+      formErrors: [],
+    }
+  }, [JSON.stringify({ transformedData })])
+
   return (
     <FormDataContext.Provider
       value={{
         formData,
         setFormData,
         formSchema,
-        disableValidation,
+        validation,
         hiddenState,
         setHiddenState,
         disabledState,

@@ -3,13 +3,7 @@ import { fireEvent, render } from '@testing-library/react'
 import { ZuiForm, ZuiFormProps, getSchemaType } from './index'
 import { resolveDiscriminatedSchema, resolveDiscriminator } from './hooks/useDiscriminator'
 import { ZuiComponentMap } from '../index'
-import {
-  ObjectSchema,
-  JSONSchema,
-  ZuiReactComponentBaseProps,
-  BaseType,
-  UIComponentDefinitions,
-} from './types'
+import { ObjectSchema, JSONSchema, ZuiReactComponentBaseProps, BaseType, UIComponentDefinitions } from './types'
 import { FC, PropsWithChildren, useState } from 'react'
 import { vi } from 'vitest'
 import { z as zui } from '../z/index'

@@ -9,7 +9,7 @@ importers:
   .:
     dependencies:
       '@types/yargs':
-        specifier: ^17.0.24
+        specifier: ^17.0.32
         version: 17.0.32
       decamelize:
         specifier: 5.0.1

@@ -87,10 +87,15 @@ export const exportSchemas =
     // index file
     const indexCode = [
       ...jsonFiles.map(({ name, filename }) => `import json_${name} from './${filename}'`),
+      ...zodFiles.map(({ name, filename }) => `import zod_${name} from './${filename}'`),
       ...typeFiles.map(({ name, filename }) => `import type { ${utils.pascalCase(name)} } from './${filename}'`),
       '',
       `export const json = {`,
       ...jsonFiles.map(({ name }) => `  ${name}: json_${name},`),
+      `}`,
+      '',
+      `export const zod = {`,
+      ...zodFiles.map(({ name }) => `  ${name}: zod_${name},`),
       `}`,
       '',
       `export type Types = {`,

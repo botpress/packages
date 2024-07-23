@@ -1,6 +1,12 @@
 import { JSONSchema7 } from 'json-schema'
 import { test, expect } from 'vitest'
-import { JsonSchema, NullableJsonSchema, replaceNullableWithUnion, setDefaultAdditionalProperties } from './jsonschema'
+import {
+  JsonSchema,
+  NullableJsonSchema,
+  replaceNullableWithUnion,
+  replaceOneOfWithAnyOf,
+  setDefaultAdditionalProperties,
+} from './jsonschema'
 import { jsonSchemaBuilder, JsonSchemaBuilder } from './handler-generator/utils'
 import _ from 'lodash'
 
@@ -174,5 +180,47 @@ test('setDefaultAdditionalProperties with real example', () => {
   }
 
   const actual = setDefaultAdditionalProperties(input, false)
+  expect(actual).toEqual(expected)
+})
+
+test('replaceOneOfWithAnyOf', () => {
+  const input: JsonSchema = {
+    type: 'object',
+    properties: {
+      id: {
+        oneOf: [
+          {
+            type: 'string',
+          },
+          {
+            type: 'number',
+          },
+        ],
+      },
+    },
+    required: ['id'],
+    additionalProperties: false,
+  }
+
+  const actual = replaceOneOfWithAnyOf(input)
+
+  const expected: JsonSchema = {
+    type: 'object',
+    properties: {
+      id: {
+        anyOf: [
+          {
+            type: 'string',
+          },
+          {
+            type: 'number',
+          },
+        ],
+      },
+    },
+    required: ['id'],
+    additionalProperties: false,
+  }
+
   expect(actual).toEqual(expected)
 })

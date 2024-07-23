@@ -108,12 +108,20 @@ export const exportJsonSchemas =
     await fs.writeFile(indexPath, indexCode)
   }
 
+/**
+ * export any record of zod schema to:
+ * - json schemas
+ * - zod schemas
+ * - typescript types
+ *
+ * allows fully separating build time schemas from the ones used at runtime
+ */
 export const exportZodSchemas = (schemas: Record<string, OpenApiZodAny>) => {
   const jsonSchemas = Object.entries(schemas).reduce(
     (acc, [name, zodSchema]) => {
       return {
         ...acc,
-        [name]: jsonschema.generateSchemaFromZod(zodSchema) as JSONSchema7,
+        [name]: jsonschema.generateSchemaFromZod(zodSchema, { allowUnions: true }) as JSONSchema7,
       }
     },
     {} as Record<string, JSONSchema7>,

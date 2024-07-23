@@ -5,6 +5,7 @@ import * as utils from './utils'
 import pathlib from 'path'
 import fs from 'fs/promises'
 import jsonSchemaToZod from 'json-schema-to-zod'
+import { OpenApiZodAny } from '@anatine/zod-openapi'
 
 type jsonSchemaToZodInput = Parameters<typeof jsonSchemaToZod>[0]
 type jsonSchemaToTsInput = Parameters<typeof compile>[0]
@@ -43,7 +44,7 @@ const DEFAULT_OPTIONS: ExportSchemasOptions = {
  *
  * allows fully separating build time schemas from the ones used at runtime
  */
-export const exportSchemas =
+export const exportJsonSchemas =
   (schemas: Record<string, JSONSchema7>) =>
   async (outDir: string, opts: Partial<ExportSchemasOptions> = {}) => {
     const options = { ...DEFAULT_OPTIONS, ...opts }
@@ -106,3 +107,16 @@ export const exportSchemas =
     const indexPath = pathlib.join(outDir, 'index.ts')
     await fs.writeFile(indexPath, indexCode)
   }
+
+export const exportZodSchemas = (schemas: Record<string, OpenApiZodAny>) => {
+  const jsonSchemas = Object.entries(schemas).reduce(
+    (acc, [name, zodSchema]) => {
+      return {
+        ...acc,
+        [name]: jsonschema.generateSchemaFromZod(zodSchema) as JSONSchema7,
+      }
+    },
+    {} as Record<string, JSONSchema7>,
+  )
+  return exportJsonSchemas(jsonSchemas)
+}

@@ -129,3 +129,5 @@ export type ParameterOf<O extends OpenApi<any, any, any>> =
 
 export type SectionOf<O extends OpenApi<any, any, any>> =
   O extends OpenApi<infer _Skema, infer _Param, infer Sexion> ? Sexion : never
+
+export { exportSchemas } from './handler-generator/export-schemas'

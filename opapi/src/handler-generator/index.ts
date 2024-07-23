@@ -15,7 +15,7 @@ type JsonSchemaMap = Record<string, JSONSchema7>
 type ExportableSchema = { exportSchemas: (outDir: string) => Promise<void> }
 
 const toExportableSchema = (schemas: JsonSchemaMap): ExportableSchema => ({
-  exportSchemas: (outDir: string) => exportSchemas(schemas)(outDir),
+  exportSchemas: (outDir: string) => exportSchemas(schemas)(outDir, { includeZodSchemas: false }),
 })
 
 export const generateHandler = async <Schema extends string, Param extends string, Section extends string>(

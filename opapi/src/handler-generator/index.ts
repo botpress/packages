@@ -6,7 +6,7 @@ import { toRequestSchema, toResponseSchema } from './map-operation'
 import { exportErrors } from './export-errors'
 import { exportTypings } from './export-typings'
 import { exportRouteTree } from './export-tree'
-import { exportSchemas } from './export-schemas'
+import { exportJsonSchemas } from './export-schemas'
 import { JSONSchema7 } from 'json-schema'
 import { exportHandler } from './export-handler'
 import { generateOpenapi } from '../generator'
@@ -15,7 +15,7 @@ type JsonSchemaMap = Record<string, JSONSchema7>
 type ExportableSchema = { exportSchemas: (outDir: string) => Promise<void> }
 
 const toExportableSchema = (schemas: JsonSchemaMap): ExportableSchema => ({
-  exportSchemas: (outDir: string) => exportSchemas(schemas)(outDir),
+  exportSchemas: (outDir: string) => exportJsonSchemas(schemas)(outDir, { includeZodSchemas: false }),
 })
 
 export const generateHandler = async <Schema extends string, Param extends string, Section extends string>(

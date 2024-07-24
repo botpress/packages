@@ -1,6 +1,6 @@
 {
   "name": "@bpinternal/opapi",
-  "version": "0.10.19",
+  "version": "0.10.20",
   "description": "",
   "main": "./dist/index.js",
   "module": "./dist/index.mjs",
@@ -45,6 +45,7 @@
     "decompress": "4.2.1",
     "execa": "8.0.1",
     "json-schema-to-typescript": "13.1.2",
+    "json-schema-to-zod": "1.1.1",
     "lodash": "^4.17.21",
     "openapi-typescript": "6.7.6",
     "openapi3-ts": "2.0.2",

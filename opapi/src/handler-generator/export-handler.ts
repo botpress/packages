@@ -107,10 +107,10 @@ const getErrorBody = (thrown: unknown) => {
     const statusCode = thrown.response?.status
 
     if (!data) {
-      return \`\${err.message} (no response data) (Status Code: \${statusCode})\`
+      return \`\${thrown.message} (no response data) (Status Code: \${statusCode})\`
     }
 
-    return \`\${data.message || data.error?.message || data.error || data.body || err.message} (Status Code: \${statusCode})\`
+    return \`\${data.message || data.error?.message || data.error || data.body || thrown.message} (Status Code: \${statusCode})\`
   } else if (thrown instanceof Error) {
     return thrown.message
   }

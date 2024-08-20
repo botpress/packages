@@ -1,6 +1,7 @@
 import fs from 'fs/promises'
 
 const CONTENT = `import qs from 'qs'
+import { isAxiosError } from 'axios'
 import { isApiError } from './errors'
 import * as types from './typings'
 
@@ -101,7 +102,16 @@ export class Router {
 }
 
 const getErrorBody = (thrown: unknown) => {
-  if (thrown instanceof Error) {
+  if (isAxiosError(thrown)) {
+    const data = thrown.response?.data
+    const statusCode = thrown.response?.status
+
+    if (!data) {
+      return \`\${err.message} (no response data) (Status Code: \${statusCode})\`
+    }
+
+    return \`\${data.message || data.error?.message || data.error || data.body || err.message} (Status Code: \${statusCode})\`
+  } else if (thrown instanceof Error) {
     return thrown.message
   }
   try {

@@ -2,11 +2,16 @@ import z from '../z'
 import { UIComponentDefinitions } from './types'
 
 const commonInputParams = z.object({
+  /**
+   * TODO: remove this field (allowDynamicVariable);
+   * - the schema developer should not be responsible for allowing dynamic variables or not
+   * - the dev who renders the schema should be the one with enough context to decide if dynamic variables are allowed
+   */
   allowDynamicVariable: z.boolean().optional(),
   horizontal: z.boolean().optional(),
 })
 
-export const defaultComponentDefinitions = {
+const defaultComponentDefinitions = {
   string: {
     text: {
       id: 'text',

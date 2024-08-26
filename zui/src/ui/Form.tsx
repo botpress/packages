@@ -47,7 +47,7 @@ export const ZuiForm = <UI extends UIComponentDefinitions = EmptyComponentDefini
     >
       <ErrorBoundary fallback={fallback} fieldSchema={schema} path={[]}>
         <FormElementRenderer
-          components={components as any}
+          components={components}
           fieldSchema={schema}
           path={[]}
           fallback={fallback}

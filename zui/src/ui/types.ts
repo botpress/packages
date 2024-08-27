@@ -325,10 +325,9 @@ export type ParseSchema<I> = I extends infer U
     : object
   : never
 
+export type Merge<A, B> = Omit<A, keyof B> & B
 export type MergeUIComponentDefinitions<T extends UIComponentDefinitions, U extends UIComponentDefinitions> = {
-  [Type in BaseType]: {
-    [K in keyof (T[Type] & U[Type])]: (T[Type] & U[Type])[K]
-  }
+  [Type in BaseType]: Merge<T[Type], U[Type]>
 }
 
 export type DeepPartial<T> = T extends object ? { [K in keyof T]?: DeepPartial<T[K]> } : T

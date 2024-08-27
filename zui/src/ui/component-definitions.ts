@@ -1,154 +1,22 @@
 import z from '../z'
 import { UIComponentDefinitions } from './types'
 
-const commonInputParams = z.object({
-  /**
-   * TODO: remove this field (allowDynamicVariable);
-   * - the schema developer should not be responsible for allowing dynamic variables or not
-   * - the dev who renders the schema should be the one with enough context to decide if dynamic variables are allowed
-   */
-  allowDynamicVariable: z.boolean().optional(),
-  horizontal: z.boolean().optional(),
-})
-
-const defaultComponentDefinitions = {
-  string: {
-    text: {
-      id: 'text',
-      params: commonInputParams.extend({
-        multiLine: z.boolean().optional(),
-        growVertically: z.boolean().optional(),
-        suggestions: z.array(z.string()).optional(),
-      }),
-    },
-    dropdown: {
-      id: 'dropdown',
-      params: commonInputParams.extend({
-        filterable: z.boolean().optional(),
-      }),
-    },
-    radiogroup: {
-      id: 'radiogroup',
-      params: commonInputParams.extend({}),
-    },
-    date: {
-      id: 'date',
-      params: commonInputParams.extend({
-        dateFormat: z.string().optional(),
-        minDate: z.string().optional(),
-        maxDate: z.string().optional(),
-        defaultTimezone: z.string().optional(),
-        disableTimezoneSelection: z.boolean().optional(),
-        highlightCurrentDay: z.boolean().optional(),
-        showShortcutButtons: z.boolean().optional(),
-        showOutsideDaysOfMonth: z.boolean().optional(),
-        firstDayOfWeek: z.number().optional(),
-        canChangeMonth: z.boolean().optional(),
-        showWeekNumbers: z.boolean().optional(),
-      }),
-    },
-    time: {
-      id: 'time',
-      params: commonInputParams.extend({
-        useAMPM: z.boolean().optional(),
-        timeFormat: z.string().optional(),
-        minTime: z.string().optional(),
-        maxTime: z.string().optional(),
-        showArrowButtons: z.boolean().optional(),
-        precision: z.enum(['minute', 'second', 'millisecond']).optional(),
-      }),
-    },
-    richtext: {
-      id: 'richtext',
-      params: z.object({
-        allowDynamicVariable: z.boolean().optional(),
-        resizable: z.boolean().optional(),
-      }),
-    },
-    json: {
-      id: 'json',
-      params: commonInputParams.extend({
-        showPreview: z.boolean().optional(),
-        showValidationError: z.boolean().optional(),
-      }),
-    },
-    file: {
-      id: 'file',
-      params: commonInputParams.extend({
-        fileTypes: z.array(z.enum(['image', 'audio', 'video'])).optional(),
-        showUploadedFiles: z.boolean().optional(),
-      }),
-    },
-  },
+export const defaultComponentDefinitions = {
+  string: {},
   number: {
-    number: {
-      id: 'number',
-      params: commonInputParams.extend({
-        allowNumericCharactersOnly: z.boolean().optional(),
-        stepSize: z.number().optional(),
-      }),
-    },
     slider: {
       id: 'slider',
-      params: z.object({
-        horizontal: z.boolean().optional(),
-        stepSize: z.number().optional(),
-      }),
+      params: z.object({}),
     },
   },
   boolean: {
     switch: {
       id: 'switch',
-      params: commonInputParams,
+      params: z.object({}),
     },
   },
-  array: {
-    options: {
-      id: 'options',
-      params: commonInputParams,
-    },
-    strings: {
-      id: 'strings',
-      params: commonInputParams,
-    },
-    daterange: {
-      id: 'daterange',
-      params: z.object({
-        dateFormat: z.string().optional(),
-        minDate: z.string().optional(),
-        maxDate: z.string().optional(),
-        defaultTimezone: z.string().optional(),
-        allowSingleDayRange: z.boolean().optional(),
-        highlightCurrentDay: z.boolean().optional(),
-        showOutsideDaysOfMonth: z.boolean().optional(),
-        firstDayOfWeek: z.number().optional(),
-        canChangeMonth: z.boolean().optional(),
-        showWeekNumbers: z.boolean().optional(),
-      }),
-    },
-  },
-  object: {
-    collapsible: {
-      id: 'collapsible',
-      params: z.object({
-        defaultOpen: z.boolean().optional(),
-      }),
-    },
-    modal: {
-      id: 'modal',
-      params: z.object({
-        title: z.string().optional(),
-        buttonLabel: z.string().optional(),
-        closeButtonLabel: z.string().optional(),
-      }),
-    },
-    popover: {
-      id: 'popover',
-      params: z.object({
-        buttonLabel: z.string().optional(),
-      }),
-    },
-  },
+  array: {},
+  object: {},
   discriminatedUnion: {},
 } as const satisfies UIComponentDefinitions
 

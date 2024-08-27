@@ -1,7 +1,7 @@
 export { ZuiForm, type ZuiFormProps } from './Form'
 
-export type { DefaultComponentDefinitions } from './component-definitions'
-export type { BoundaryFallbackComponent } from './ErrorBoundary'
+export * from './component-definitions'
+export * from './ErrorBoundary'
 
 export type {
   BaseType,

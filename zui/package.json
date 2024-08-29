@@ -16,7 +16,6 @@
     "build": "tsup",
     "watch": "tsup --watch",
     "test": "vitest run",
-    "dev": "tsx playground.ts",
     "test:watch": "vitest",
     "check:type": "tsc --noEmit",
     "check:format": "prettier --check src/",

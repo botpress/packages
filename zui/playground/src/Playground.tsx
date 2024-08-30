@@ -1,4 +1,4 @@
-import { z, ZodType } from '../../src'
+import { JSONSchema, z, ZodType } from '../../src'
 import { Flex } from '@radix-ui/themes'
 import { debounce } from 'lodash'
 import * as prettier from 'prettier'
@@ -7,6 +7,7 @@ import * as typescriptPlugin from 'prettier/plugins/typescript'
 import { useEffect, useState } from 'react'
 import { MonacoEditor } from './MonacoEditor'
 import { useLocalStorage } from './hooks'
+import { ZuiForm } from './ZuiForm'
 
 const initialSchemaCode = `z
   .object({
@@ -71,9 +72,9 @@ const evaluateCode = (code: string): ZodType => {
 
 export const ZuiPlayground = () => {
   const [code, setCode] = useLocalStorage('zui-playground-code', initialSchemaCode)
-
-  const [schemaStr, setSchemaStr] = useState('{}')
+  const [jsonSchema, setSchema] = useState<JSONSchema>({})
   const [typeStr, setTypeStr] = useState('')
+  const [data, setData] = useState<any>({})
 
   const [zuiError, setZuiError] = useState<string | null>(null)
   const [schemaError, _setSchemaError] = useState<string | null>(null)
@@ -85,7 +86,7 @@ export const ZuiPlayground = () => {
     try {
       const zuiSchema = evaluateCode(newCode)
       const jsonSchema = zuiSchema.toJsonSchema()
-      setSchemaStr(JSON.stringify(jsonSchema, undefined, 2))
+      setSchema(jsonSchema)
       void updateTsTypes(zuiSchema)
     } catch (error) {
       setZuiError(getErrorMessage(error))
@@ -122,7 +123,7 @@ export const ZuiPlayground = () => {
 
         <div style={{ flex: 1, width: '33%' }}>
           <CollapsiblePanel label={`JSON Schema ${schemaError ? `(Error: ${schemaError})` : ''}`} defaultOpened>
-            <MonacoEditor value={schemaStr} language="json" readOnly={true} />
+            <MonacoEditor value={JSON.stringify(jsonSchema, null, 2)} language="json" readOnly={true} />
           </CollapsiblePanel>
         </div>
 
@@ -132,6 +133,10 @@ export const ZuiPlayground = () => {
           </CollapsiblePanel>
         </div>
       </Flex>
+      <CollapsiblePanel label="Data" defaultOpened>
+        <MonacoEditor value={JSON.stringify(data, null, 2)} language="json" readOnly={true} />
+      </CollapsiblePanel>
+      <ZuiForm schema={jsonSchema} onChange={setData} />
     </div>
   )
 }

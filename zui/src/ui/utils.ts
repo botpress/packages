@@ -10,10 +10,15 @@ type ComponentMeta<Type extends BaseType = BaseType> = {
 }
 
 export const getSchemaType = (schema: JSONSchema): BaseType => {
+  // if (!schema.type || schema.type === 'null') {
+  //   throw new Error('Any and null schemas cannot be rendered yet') // TODO: handle these
+  // }
+
   if (schema.anyOf?.length) {
     const discriminator = resolveDiscriminator(schema.anyOf)
     return discriminator ? 'discriminatedUnion' : 'object'
   }
+
   if (schema.type === 'integer') {
     return 'number'
   }

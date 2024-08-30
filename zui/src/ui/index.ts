@@ -10,7 +10,7 @@ export type {
   AsBaseType,
   ZuiReactComponent,
   ZuiReactComponentProps,
-  JSONSchema,
+  JSONSchema as JSONSchema,
   JSONSchemaOfType,
   MergeUIComponentDefinitions,
   FormValidation,

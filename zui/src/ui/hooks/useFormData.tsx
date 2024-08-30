@@ -239,9 +239,13 @@ export const getDefaultValues = (schema: JSONSchema | JSONSchema[], optional?: b
       })
       return data
     }
+
+    if (schema.additionalProperties) {
+      return {} // record
+    }
   }
 
-  if (schema.type === 'array') {
+  if (schema.type === 'array' && !Array.isArray(schema.items)) {
     if (schema.minItems && schema.minItems > 0) {
       return [getDefaultValues(schema.items)]
     }
@@ -269,6 +273,17 @@ export const getDefaultValues = (schema: JSONSchema | JSONSchema[], optional?: b
     }
     return false
   }
+
+  // if (schema.type === 'null') {
+  //   return null
+  // }
+
+  // if (schema.type === undefined) {
+  //   if (schema.default) {
+  //     return schema.default
+  //   }
+  //   return {} // any
+  // }
 
   return undefined
 }

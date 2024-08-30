@@ -65,6 +65,7 @@ export type JsonSchema7TypeUnion =
   | JsonSchema7UnknownType
   | JsonSchema7SetType
 
+// TODO: replace this type by our own (see '../json-schema.ts')
 export type JsonSchema7Type = JsonSchema7TypeUnion & JsonSchema7Meta
 
 export function parseDef(

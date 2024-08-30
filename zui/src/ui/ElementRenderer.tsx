@@ -4,7 +4,6 @@ import {
   BaseType,
   JSONSchema,
   ObjectSchema,
-  PrimitiveSchema,
   ZuiComponentMap,
   ZuiReactArrayChildProps,
   ZuiReactComponent,
@@ -192,18 +191,25 @@ export const FormElementRenderer: FC<FormRendererProps> = ({
       </Component>
     )
   }
-  const Component = _component as any as ZuiReactComponent<any, any>
+  const Component = _component as ZuiReactComponent<any, any>
 
-  const props: ZuiReactControlComponentProps<'boolean' | 'number' | 'string', string, any> = {
-    ...baseProps,
-    type: type as any as 'boolean' | 'number' | 'string',
-    schema: baseProps.schema as any as PrimitiveSchema,
-    config: {},
-    required,
-    data,
-    description: fieldSchema.description,
-    ...childProps,
+  if (
+    (type === 'boolean' && baseProps.schema.type === 'boolean') ||
+    (type === 'number' && baseProps.schema.type === 'number') ||
+    (type === 'string' && baseProps.schema.type === 'string')
+  ) {
+    const props: ZuiReactControlComponentProps<'boolean' | 'number' | 'string', string, any> = {
+      ...baseProps,
+      type: type as 'boolean' | 'number' | 'string',
+      schema: baseProps.schema,
+      config: {},
+      required,
+      data,
+      description: fieldSchema.description,
+      ...childProps,
+    }
+    return <Component {...props} />
   }
 
-  return <Component {...props} />
+  return
 }

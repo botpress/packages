@@ -1,4 +1,4 @@
-import { ArraySchema, JSONSchema, TupleSchema } from '../json-schema'
+import { ArraySchema, JSONSchema, TupleSchema, TypeOf } from '../json-schema'
 
 /**
  * Type guards do not propagate type narrowings to parent objects, see:
@@ -8,28 +8,14 @@ const isTuple = (schema: ArraySchema | TupleSchema): schema is TupleSchema => Ar
 const isOptional = (schema: JSONSchema): boolean =>
   schema.anyOf?.some((s) => s.not && Object.keys(s.not).length === 0) || false
 
-export const getDefaultValues = (schema: JSONSchema, optional?: boolean): any => {
-  if (schema.type === 'null') {
-    return null
-  }
-
-  if (schema.type === undefined) {
-    if (schema.default) {
-      return schema.default
-    }
-    return {} // any
-  }
-
-  if (schema.type === 'object' && schema.additionalProperties) {
-    return {} // record
-  }
-
-  if (schema.type === 'array' && isTuple(schema)) {
-    return schema.items.map((item) => getDefaultValues(item))
-  }
-
-  if (Array.isArray(schema)) {
-    return getDefaultValues(schema[0]!)
+// @ts-ignore (ts complains about a potential infinitly deep recursion)
+export function getDefaultData<S extends JSONSchema>(schema: S): TypeOf<S>
+export function getDefaultData<S extends JSONSchema>(schema: S, optiona: undefined | false): TypeOf<S>
+export function getDefaultData<S extends JSONSchema>(schema: S, optional: true): undefined
+export function getDefaultData<S extends JSONSchema>(schema: S, optional?: boolean): TypeOf<S> | undefined
+export function getDefaultData<S extends JSONSchema>(schema: S, optional?: boolean): TypeOf<S> | undefined {
+  if (optional) {
+    return undefined
   }
 
   if (schema.default) {
@@ -37,55 +23,73 @@ export const getDefaultValues = (schema: JSONSchema, optional?: boolean): any =>
   }
 
   if (schema.nullable) {
-    return null
+    return null as TypeOf<S>
   }
 
-  if (optional) {
-    return undefined
+  if (schema.type === 'null') {
+    return null as TypeOf<S>
+  }
+
+  if (schema.type === undefined) {
+    // any
+    if (schema.default) {
+      return schema.default
+    }
+    return {} as any
+  }
+
+  if (schema.type === 'object' && schema.additionalProperties) {
+    // record
+    return {} as TypeOf<S>
+  }
+
+  if (schema.type === 'array' && isTuple(schema)) {
+    // tuple
+    return schema.items.map((item) => getDefaultData(item)) as TypeOf<S>
   }
 
   if (schema.anyOf?.length) {
-    return getDefaultValues(schema.anyOf[0]!)
+    return getDefaultData(schema.anyOf[0]!) as TypeOf<S>
   }
 
   if (schema.type === 'object') {
     if (schema.properties) {
       const data: Record<string, any> = {}
       Object.entries(schema.properties).map(([key, fieldSchema]) => {
-        data[key] = getDefaultValues(fieldSchema, !schema.required?.includes(key) || isOptional(fieldSchema) || false)
+        data[key] = getDefaultData(fieldSchema, !schema.required?.includes(key) || isOptional(fieldSchema) || false)
       })
-      return data
+      return data as TypeOf<S>
     }
   }
 
   if (schema.type === 'array' && !Array.isArray(schema.items)) {
     if (schema.minItems && schema.minItems > 0) {
-      return [getDefaultValues(schema.items)]
+      return [getDefaultData(schema.items)] as TypeOf<S>
     }
 
-    return []
+    return [] as TypeOf<S>
   }
 
   if (schema.type === 'string') {
     if (schema.enum?.length) {
-      return schema.enum[0]
+      return schema.enum[0] as TypeOf<S>
     }
-    return ''
+    return '' as TypeOf<S>
   }
 
   if (schema.type === 'number') {
     if (schema.enum?.length) {
-      return schema.enum[0]
+      return schema.enum[0] as TypeOf<S>
     }
-    return 0
+    return 0 as TypeOf<S>
   }
 
   if (schema.type === 'boolean') {
     if (schema.enum?.length) {
-      return schema.enum[0]
+      return schema.enum[0] as TypeOf<S>
     }
-    return false
+    return false as TypeOf<S>
   }
 
-  return undefined
+  return undefined as TypeOf<S>
 }

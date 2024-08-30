@@ -9,6 +9,7 @@ import { useEffect, useState } from 'react'
 import { MonacoEditor } from './MonacoEditor'
 import { useLocalStorage } from './hooks'
 import { ZuiForm } from './ZuiForm'
+import { getDefaultData } from './ZuiForm/default-values'
 
 const initialSchemaCode = `z
   .object({
@@ -35,7 +36,7 @@ const formatCode = (code: string) => {
     parser: 'typescript',
     plugins: [typescriptPlugin, estreePlugin],
     singleQuote: true,
-    printWidth: 120,
+    printWidth: 60,
     trailingComma: 'none',
     semi: false,
     bracketSpacing: true,
@@ -75,7 +76,7 @@ export const ZuiPlayground = () => {
   const [code, setCode] = useLocalStorage('zui-playground-code', initialSchemaCode)
   const [jsonSchema, setSchema] = useState<JSONSchema>({})
   const [typeStr, setTypeStr] = useState('')
-  const [data, setData] = useState<any>({})
+  const [data, setData] = useState<any>(getDefaultData(jsonSchema))
 
   const [zuiError, setZuiError] = useState<string | null>(null)
   const [schemaError, _setSchemaError] = useState<string | null>(null)

@@ -1,16 +1,16 @@
 import { FC, useEffect, useState } from 'react'
 import MonacoEditor from '../MonacoEditor'
-import { JSONSchema, StringSchema, NumberSchema, BooleanSchema, ObjectSchema, NullSchema } from '../json-schema'
-import { getDefaultValues } from './default-values'
+import { JSONSchema, StringSchema, NumberSchema, BooleanSchema, ObjectSchema, NullSchema, TypeOf } from '../json-schema'
+import { getDefaultData } from './default-values'
 
 type FormComponent<S extends JSONSchema> = FC<{
   schema: S
   onChange: (value: any) => void
 }>
 
-type Debug = (...args: any[]) => void
+// type Debug = (...args: any[]) => void
 // const debug: Debug = (...args) => console.log(...args)
-const debug: Debug = () => {}
+// const debug: Debug = () => {}
 
 const validate = (
   _schema: JSONSchema,
@@ -36,151 +36,144 @@ const safeJsonParse = (x: string): { success: true; data: any } | { success: fal
 }
 
 const StringForm: FormComponent<StringSchema> = (props) => {
-  const [value, setValue] = useState(getDefaultValues(props.schema))
+  const defaultValue = getDefaultData(props.schema)
 
-  const onChange = (x: any) => {
-    debug('### StringForm Change', x)
-    setValue(x)
-    const result = validate(props.schema, x)
-    if (result.success) {
-      props.onChange(result.data)
+  const [value, setValue] = useState(defaultValue)
+
+  const onChange = (newValue: string) => {
+    setValue(newValue)
+
+    const newData = newValue
+    const validateResult = validate(props.schema, newData)
+    if (validateResult.success) {
+      props.onChange(validateResult.data)
     }
   }
 
   useEffect(() => {
-    onChange(getDefaultValues(props.schema))
+    setValue(defaultValue)
   }, [props.schema])
 
-  return (
-    <input
-      type="text"
-      onChange={(e) => {
-        setValue(e.target.value)
-        const result = validate(props.schema, e.target.value)
-        if (result.success) {
-          props.onChange(result.data)
-        }
-      }}
-      value={value}
-    />
-  )
+  return <input type="text" onChange={(e) => onChange(e.target.value)} value={value} />
 }
 
 const NumberForm: FormComponent<NumberSchema> = (props) => {
-  const [value, setValue] = useState(getDefaultValues(props.schema))
+  const defaultData = getDefaultData(props.schema)
 
-  const onChange = (x: any) => {
-    debug('### NumberForm Change', x)
-    setValue(x)
-    const result = validate(props.schema, x)
-    if (result.success) {
-      props.onChange(result.data)
+  const toValue = (x: number) => `${x}`
+  const fromValue = (x: string) => Number(x)
+
+  const defaultValue = toValue(defaultData)
+  const [value, setValue] = useState(defaultValue)
+
+  const onChange = (newValue: string) => {
+    setValue(newValue)
+
+    const numberCasted = fromValue(newValue)
+    const newData = isNaN(numberCasted) ? defaultData : numberCasted
+    const validateResult = validate(props.schema, newData)
+    if (validateResult.success) {
+      props.onChange(validateResult.data)
     }
   }
 
   useEffect(() => {
-    onChange(getDefaultValues(props.schema))
+    setValue(defaultValue)
   }, [props.schema])
 
-  return (
-    <input
-      type="number"
-      onChange={(e) => {
-        const value = Number(e.target.value)
-        if (isNaN(value)) {
-          return
-        }
-        setValue(value)
-        const result = validate(props.schema, e.target.value)
-        if (result.success) {
-          props.onChange(result.data)
-        }
-      }}
-      value={value}
-    />
-  )
+  return <input type="number" onChange={(e) => onChange(e.target.value)} value={value} />
 }
 
 const BooleanForm: FormComponent<BooleanSchema> = (props) => {
-  const [value, setValue] = useState(getDefaultValues(props.schema))
+  const defaultValue = getDefaultData(props.schema)
 
-  const onChange = (x: any) => {
-    debug('### BooleanForm Change', x)
-    setValue(x)
-    const result = validate(props.schema, x)
-    if (result.success) {
-      props.onChange(result.data)
+  const [value, setValue] = useState(defaultValue)
+
+  const onChange = (newValue: boolean) => {
+    setValue(newValue)
+
+    const newData = newValue
+    const validateResult = validate(props.schema, newData)
+    if (validateResult.success) {
+      props.onChange(validateResult.data)
     }
   }
 
   useEffect(() => {
-    onChange(getDefaultValues(props.schema))
+    setValue(defaultValue)
   }, [props.schema])
 
-  return (
-    <input
-      type="checkbox"
-      onChange={(e) => {
-        setValue(e.target.checked)
-        const result = validate(props.schema, e.target.checked)
-        if (result.success) {
-          props.onChange(result.data)
-        }
-      }}
-      checked={value}
-    />
-  )
+  return <input type="checkbox" onChange={(e) => onChange(e.target.checked)} checked={value} />
 }
 
 const NullForm: FormComponent<NullSchema> = () => {
-  return null
+  return <div>null</div>
 }
 
-// json editor
 const AnyForm: FormComponent<JSONSchema> = (props) => {
-  const [value, setValue] = useState(getDefaultValues(props.schema))
+  // @ts-ignore (ts complains about a potential infinitly deep recursion)
+  const defaultData: any = getDefaultData(props.schema)
+  const defaultValue: string = JSON.stringify(defaultData, null, 2)
 
-  const onChange = (x: any) => {
-    debug('### AnyForm Change', x)
-    setValue(x)
-    const result = validate(props.schema, x)
-    if (result.success) {
-      props.onChange(result.data)
+  const [value, setValue] = useState(defaultValue)
+
+  const onChange = (newValue: string) => {
+    setValue(newValue)
+
+    const parseResult = safeJsonParse(newValue)
+    if (!parseResult.success) {
+      return
+    }
+
+    const newData = parseResult.data
+    const validateResult = validate(props.schema, newData)
+    if (validateResult.success) {
+      props.onChange(validateResult.data)
     }
   }
 
   useEffect(() => {
-    onChange(getDefaultValues(props.schema))
+    onChange(defaultValue)
   }, [props.schema])
 
+  return <MonacoEditor value={value} language="json" readOnly={true} onChange={(x) => onChange(x)} />
+}
+
+const OptionalForm: FormComponent<JSONSchema> = (props) => {
+  const [isUndefined, setUndefined] = useState(true)
+
+  // @ts-ignore (ts complains about a potential infinitly deep recursion)
+  const defaultChildData = getDefaultData(props.schema)
+  const [childFormData, setChildFormData] = useState<any>(defaultChildData)
+
+  const onUndefinedChange = (newValue: boolean) => {
+    setUndefined(newValue)
+    if (newValue) {
+      props.onChange(undefined)
+    } else {
+      props.onChange(childFormData)
+    }
+  }
+
+  const onChildChange = (newValue: any) => {
+    setChildFormData(newValue)
+    props.onChange(newValue)
+  }
+
   return (
-    <MonacoEditor
-      value={value}
-      language="json"
-      readOnly={true}
-      onChange={(x) => {
-        setValue(x)
-        const parseResult = safeJsonParse(x)
-        if (!parseResult.success) {
-          return
-        }
-
-        const result = validate(props.schema, parseResult.data)
-        if (!result.success) {
-          return
-        }
-
-        props.onChange(parseResult.data)
-      }}
-    />
+    <div>
+      <input type="checkbox" onChange={(e) => onUndefinedChange(!e.target.checked)} checked={!isUndefined} />
+      {isUndefined ? 'undefined' : <ZuiForm schema={props.schema} onChange={onChildChange} />}
+    </div>
   )
 }
 
 const ObjectForm: FormComponent<ObjectSchema> = (props) => {
-  const [value, setValue] = useState(getDefaultValues(props.schema))
+  const defaultData = getDefaultData(props.schema)
+  const defaultValue = defaultData
+  const [value, setValue] = useState(defaultValue)
 
   const onChange = (x: any) => {
-    debug('### ObjectForm Change', x)
     setValue(x)
     const result = validate(props.schema, x)
     if (result.success) {
@@ -189,24 +182,37 @@ const ObjectForm: FormComponent<ObjectSchema> = (props) => {
   }
 
   useEffect(() => {
-    onChange(getDefaultValues(props.schema))
+    onChange(defaultValue)
   }, [props.schema])
 
   return (
     <div>
       {Object.entries(props.schema.properties).map(([key, schema]) => {
+        const isOptional = !props.schema.required?.includes(key)
         return (
           <div key={key} style={{ display: 'flex' }}>
             <div>{key}</div>
-            <ZuiForm
-              schema={schema}
-              onChange={(x) => {
-                onChange({
-                  ...value,
-                  [key]: x,
-                })
-              }}
-            />
+            {isOptional ? (
+              <OptionalForm
+                schema={schema}
+                onChange={(x) => {
+                  onChange({
+                    ...value,
+                    [key]: x,
+                  })
+                }}
+              />
+            ) : (
+              <ZuiForm
+                schema={schema}
+                onChange={(x) => {
+                  onChange({
+                    ...value,
+                    [key]: x,
+                  })
+                }}
+              />
+            )}
           </div>
         )
       })}

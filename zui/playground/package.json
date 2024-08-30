@@ -7,9 +7,11 @@
     "dev": "vite",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "check:type": "tsc --noEmit"
   },
   "dependencies": {
+    "@esbuild-plugins/node-modules-polyfill": "^0.2.2",
     "@monaco-editor/loader": "^1.3.3",
     "@radix-ui/colors": "^3.0.0",
     "@radix-ui/react-collapsible": "^1.0.3",

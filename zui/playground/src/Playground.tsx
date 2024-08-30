@@ -1,4 +1,5 @@
-import { JSONSchema, z, ZodType } from '../../src'
+import { JSONSchema } from './json-schema'
+import { z, ZodType } from '../../src'
 import { Flex } from '@radix-ui/themes'
 import { debounce } from 'lodash'
 import * as prettier from 'prettier'

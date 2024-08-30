@@ -239,10 +239,6 @@ export const getDefaultValues = (schema: JSONSchema | JSONSchema[], optional?: b
       })
       return data
     }
-
-    if (schema.additionalProperties) {
-      return {} // record
-    }
   }
 
   if (schema.type === 'array' && !Array.isArray(schema.items)) {

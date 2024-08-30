@@ -1,33 +1,12 @@
 import { JSONSchema7 } from 'json-schema'
-import { zuiKey } from './ui/constants'
-import { util } from './z'
+import { BaseSchema as _BaseSchema } from '../../src/json-schema'
+import { util } from '../../src/z/types/utils'
 
-/**
- * This file contains a subset of json-schema;
- * i.e. if a data conforms to this type, it is a valid json-schema **but**,
- *   there are valid json-schemas that do not conform to this type.
- */
-
-export type SerializedFunction = string
-export type ZuiExtensionObject = {
-  tooltip?: boolean
-  displayAs?: [string, any]
-  title?: string
-  disabled?: boolean | SerializedFunction
-  hidden?: boolean | SerializedFunction
-  placeholder?: string
-  secret?: boolean
-  coerce?: boolean
-}
-
-export type BaseSchema = {
-  description?: string
+export type BaseSchema = _BaseSchema & {
   anyOf?: JSONSchema[]
   oneOf?: JSONSchema[]
   allOf?: JSONSchema[]
   not?: JSONSchema
-  nullable?: boolean
-  [zuiKey]?: ZuiExtensionObject
 }
 
 export type JSONSchemaPrimitiveType = 'string' | 'number' | 'integer' | 'boolean' | 'null'
@@ -130,8 +109,8 @@ export type AnySchema = {
   default?: any
 } & BaseSchema
 
-export type PrimitiveSchema = StringSchema | NumberSchema | BooleanSchema // | NullSchema | AnySchema
-
-export type JSONSchema = ArraySchema | ObjectSchema | PrimitiveSchema // | RecordSchema | TupleSchema
+// more complete type for JSONSchema
+export type PrimitiveSchema = StringSchema | NumberSchema | BooleanSchema | NullSchema | AnySchema
+export type JSONSchema = PrimitiveSchema | ArraySchema | ObjectSchema | RecordSchema | TupleSchema
 
 util.assertExtends<JSONSchema, JSONSchema7>(true) // ensure that JSONSchema is a subset of JSONSchema7

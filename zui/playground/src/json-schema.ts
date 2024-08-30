@@ -137,23 +137,25 @@ export type StringTypeOf<T extends StringSchema> = T['enum'] extends string[] ? 
 export type NumberTypeOf<T extends NumberSchema> = T['enum'] extends number[] ? T['enum'][number] : number
 export type BooleanTypeOf<T extends BooleanSchema> = T['enum'] extends boolean[] ? T['enum'][number] : boolean
 export type TupleTypeOf<T extends TupleSchema> = ParseTupleTree<BuildTupleTree<T>>
-export type TypeOf<T extends JSONSchema> = T extends StringSchema
-  ? StringTypeOf<T>
-  : T extends NumberSchema
-    ? NumberTypeOf<T>
-    : T extends BooleanSchema
-      ? BooleanTypeOf<T>
-      : T extends NullSchema
-        ? null
-        : T extends ArraySchema
-          ? TypeOf<T['items']>[]
-          : T extends TupleSchema
-            ? TupleTypeOf<T>
-            : T extends ObjectSchema
-              ? { [K in keyof T['properties']]: TypeOf<T['properties'][K]> }
-              : T extends RecordSchema
-                ? Record<string, TypeOf<T['additionalProperties']>>
-                : any
+export type TypeOf<T extends JSONSchema> = JSONSchema extends T
+  ? any
+  : T extends StringSchema
+    ? StringTypeOf<T>
+    : T extends NumberSchema
+      ? NumberTypeOf<T>
+      : T extends BooleanSchema
+        ? BooleanTypeOf<T>
+        : T extends NullSchema
+          ? null
+          : T extends ArraySchema
+            ? TypeOf<T['items']>[]
+            : T extends TupleSchema
+              ? TupleTypeOf<T>
+              : T extends ObjectSchema
+                ? { [K in keyof T['properties']]: TypeOf<T['properties'][K]> }
+                : T extends RecordSchema
+                  ? Record<string, TypeOf<T['additionalProperties']>>
+                  : any
 
 type TupleActual = TypeOf<{
   type: 'array'

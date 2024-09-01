@@ -111,6 +111,10 @@ export const ZuiPlayground = () => {
     handleCodeChange(code)
   }, [code])
 
+  useEffect(() => {
+    setData(getDefaultData(jsonSchema))
+  }, [jsonSchema])
+
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 10, padding: 5 }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>

@@ -2,6 +2,7 @@ import { FC, useState } from 'react'
 import MonacoEditor from '../MonacoEditor'
 import { JSONSchema, StringSchema, NumberSchema, BooleanSchema, ObjectSchema, NullSchema, TypeOf } from '../json-schema'
 import { getDefaultData } from './default-values'
+import { validate } from './validate'
 
 type FormComponent<S extends JSONSchema> = FC<{
   schema: S
@@ -12,14 +13,6 @@ type FormComponent<S extends JSONSchema> = FC<{
 // type Debug = (...args: any[]) => void
 // const debug: Debug = (...args) => console.log(...args)
 // const debug: Debug = () => {}
-
-const validate = (
-  _schema: JSONSchema,
-  data: any,
-): { success: true; data: any } | { success: false; error: string } => ({
-  success: true,
-  data: data,
-})
 
 const safeJsonParse = (x: string): { success: true; data: any } | { success: false; error: string } => {
   try {
@@ -38,19 +31,27 @@ const safeJsonParse = (x: string): { success: true; data: any } | { success: fal
 
 const StringForm: FormComponent<StringSchema> = (props) => {
   const [value, setValue] = useState(props.data)
+  const [error, setError] = useState<string | null>(null)
+
+  const errorMessage = error ?? ''
   return (
-    <input
-      type="text"
-      onChange={({ target: { value: newValue } }) => {
-        setValue(newValue)
-        const validateResult = validate(props.schema, newValue)
-        if (!validateResult.success) {
-          return
-        }
-        props.onChange(validateResult.data)
-      }}
-      value={value}
-    />
+    <div>
+      <input
+        type="text"
+        onChange={({ target: { value: newValue } }) => {
+          setValue(newValue)
+          const validateResult = validate(props.schema, newValue)
+          if (!validateResult.success) {
+            setError(validateResult.error)
+            return
+          }
+          setError(null)
+          props.onChange(validateResult.data)
+        }}
+        value={value}
+      />
+      <div style={{ color: 'red' }}>{errorMessage}</div>
+    </div>
   )
 }
 

@@ -6,7 +6,7 @@ import { Refs } from '../Refs'
 export type JsonSchema7LiteralType =
   | {
       type: 'string' | 'number' | 'integer' | 'boolean'
-      const: string | number | boolean
+      enum: string[] | number[] | boolean[]
       [zuiKey]?: ZuiExtensionObject
     }
   | {
@@ -22,15 +22,8 @@ export function parseLiteralDef(def: ZodLiteralDef, refs: Refs): JsonSchema7Lite
     }
   }
 
-  if (refs.target === 'openApi3') {
-    return {
-      type: parsedType === 'bigint' ? 'integer' : parsedType,
-      enum: [def.value],
-    } as any
-  }
-
   return {
     type: parsedType === 'bigint' ? 'integer' : parsedType,
-    const: def.value,
+    enum: [def.value],
   }
 }

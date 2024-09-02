@@ -114,6 +114,11 @@ describe('functions', () => {
     `)
   })
 
+  it('number literals', async () => {
+    const typings = toTypescript(z.union([z.literal(1), z.literal(2)]))
+    expect(typings).toMatchWithoutFormatting('1 | 2')
+  })
+
   it('function with named args', async () => {
     const fn = z.function().title('fn').args(z.string().title('firstName').optional())
     const typings = toTypescript(fn, { declaration: true })

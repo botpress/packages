@@ -42,7 +42,7 @@ export const prefixToObjectMap = {
   user: 'user',
   webhook: 'webhook',
   wkspace: 'workspace',
-  workflow: 'workflow',
+  wrkflow: 'workflow',
 } as const
 
 export const objectToPrefixMap: Reverser<typeof prefixToObjectMap> = {
@@ -88,7 +88,7 @@ export const objectToPrefixMap: Reverser<typeof prefixToObjectMap> = {
   usage: 'usage',
   user: 'user',
   webhook: 'webhook',
-  workflow: 'workflow',
+  workflow: 'wrkflow',
   workspace: 'wkspace',
 } as const
 

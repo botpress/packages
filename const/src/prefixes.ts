@@ -41,7 +41,8 @@ export const prefixToObjectMap = {
   usage: 'usage',
   user: 'user',
   webhook: 'webhook',
-  wkspace: 'workspace'
+  wkspace: 'workspace',
+  wrkflow: 'workflow',
 } as const
 
 export const objectToPrefixMap: Reverser<typeof prefixToObjectMap> = {
@@ -87,7 +88,8 @@ export const objectToPrefixMap: Reverser<typeof prefixToObjectMap> = {
   usage: 'usage',
   user: 'user',
   webhook: 'webhook',
-  workspace: 'wkspace'
+  workflow: 'wrkflow',
+  workspace: 'wkspace',
 } as const
 
 export type Prefixes = (typeof objectToPrefixMap)[keyof typeof objectToPrefixMap]
@@ -130,11 +132,12 @@ export type ScriptId = Ids['ScriptId']
 export type StateId = Ids['StateId']
 export type TableId = Ids['TableId']
 export type TagId = Ids['TagId']
+export type TaskId = Ids['TaskId']
 export type UsageId = Ids['UsageId']
 export type UserId = Ids['UserId']
 export type WebhookId = Ids['WebhookId']
+export type WorkflowId = Ids['WorkflowId']
 export type WorkspaceId = Ids['WorkspaceId']
-export type TaskId = Ids['TaskId']
 
 type Reverser<T extends Record<PropertyKey, PropertyKey>> = {
   [P in keyof T as T[P]]: P

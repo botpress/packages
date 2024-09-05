@@ -257,6 +257,8 @@ export const generateIndex = async (state: State<string, string, string>, indexF
   }
   indexCode += '\n'
 
+  indexCode += `export const apiVersion = '${state.metadata.version}'\n\n`
+
   indexCode += [
     'export type ClientProps = {',
     '  toAxiosRequest: typeof toAxiosRequest', // allows to override the toAxiosRequest function

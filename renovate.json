@@ -8,7 +8,7 @@
   "schedule": ["before 3am on monday"],
   "bumpVersion": "patch",
   "constraints": {
-    "pnpm": "9.1.0"
+    "pnpm": "8.15.8"
   },
   "packageRules": [
     {
@@ -49,7 +49,7 @@
     },
     {
       "matchPackageNames": ["pnpm"],
-      "allowedVersions": "9.1.0"
+      "allowedVersions": "8.15.8"
     },
     {
       "matchFileNames": ["**"],

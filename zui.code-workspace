@@ -1,4 +1,6 @@
 {
   "folders": [{ "path": "./zui" }],
-  "settings": {}
+  "settings": {
+    "typescript.tsdk": "node_modules/typescript/lib"
+  }
 }

@@ -1,4 +1,4 @@
-import { InstrumentationOption, registerInstrumentations } from '@opentelemetry/instrumentation'
+import { Instrumentation, registerInstrumentations } from '@opentelemetry/instrumentation'
 import { BatchSpanProcessor } from '@opentelemetry/sdk-trace-base'
 import { NodeTracerProvider } from '@opentelemetry/sdk-trace-node'
 import { getNodeAutoInstrumentations } from '@opentelemetry/auto-instrumentations-node'
@@ -10,8 +10,7 @@ import { JaegerExporter } from '@opentelemetry/exporter-jaeger'
 
 export const isEnabled = () => process.env.TRACING_ENABLED === 'true'
 
-const isDebugEnabled = (enabled?: boolean) =>
-  enabled !== undefined ? enabled : process.env.TRACING_DEBUG === 'true'
+const isDebugEnabled = (enabled?: boolean) => (enabled !== undefined ? enabled : process.env.TRACING_DEBUG === 'true')
 
 const removeUndefinedValues = <T>(obj: Record<string, T | undefined>): Record<string, T> => {
   const result: Record<string, T> = {}
@@ -39,7 +38,7 @@ type InitProps = {
   /**
    * @default [getNodeAutoInstrumentations()]
    */
-  instrumentations?: InstrumentationOption[]
+  instrumentations?: Instrumentation[]
 }
 
 /**

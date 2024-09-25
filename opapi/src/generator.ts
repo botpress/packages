@@ -231,7 +231,9 @@ function mapOperationPropsToHandlerProps(
     params: [],
     body: isOperationWithBodyProps(operation) ? true : false,
     isEmptyBody: isOperationWithBodyProps(operation) ? schemaIsEmptyObject(operation.requestBody.schema) : true,
-    contentType: isOperationWithBodyProps(operation) ? operation.contentType ?? 'application/json' : 'application/json',
+    contentType: isOperationWithBodyProps(operation)
+      ? (operation.contentType ?? 'application/json')
+      : 'application/json',
   }
 
   if (operation.parameters) {

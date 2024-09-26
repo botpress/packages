@@ -1,7 +1,7 @@
 {
   "name": "@bpinternal/promex",
   "description": "Prometheus express initialization package for nodejs.",
-  "version": "0.5.10",
+  "version": "0.5.11",
   "author": "Botpress, Inc.",
   "repository": {
     "type": "git",
@@ -45,7 +45,7 @@
   },
   "engines": {
     "node": ">=16.0.0",
-    "pnpm": "9.1.0"
+    "pnpm": "8.6.2"
   },
-  "packageManager": "pnpm@9.1.0"
+  "packageManager": "pnpm@8.6.2"
 }

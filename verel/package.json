@@ -1,6 +1,6 @@
 {
   "name": "@bpinternal/verel",
-  "version": "0.0.8",
+  "version": "0.0.9",
   "description": "Vector Remap Language for JavaScript",
   "main": "./dist/node/index.js",
   "module": "./dist/web/index.js",

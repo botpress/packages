@@ -1,6 +1,6 @@
 {
   "name": "@bpinternal/opapi",
-  "version": "0.10.24",
+  "version": "0.10.25",
   "description": "",
   "main": "./dist/index.js",
   "module": "./dist/index.mjs",

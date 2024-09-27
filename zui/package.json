@@ -15,7 +15,7 @@
   "scripts": {
     "build": "tsup",
     "watch": "tsup --watch",
-    "test": "vitest run --no-isolate",
+    "test": "vitest run",
     "dev": "tsx playground.ts",
     "test:watch": "vitest",
     "check:type": "tsc --noEmit",

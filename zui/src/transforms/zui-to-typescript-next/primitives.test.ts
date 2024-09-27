@@ -3,7 +3,7 @@ import { toTypescript } from '.'
 import z from '../../z'
 
 /**
- * This test file is excessively due to the `toBeValidTypeScript` custom matcher.
+ * This test file is excessively slow due to the `toBeValidTypeScript` custom matcher.
  */
 
 function getTypingVariations(type: z.ZodType, opts?: { declaration?: boolean; maxDepth?: number }): string[] {

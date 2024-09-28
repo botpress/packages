@@ -50,6 +50,7 @@ import {
 import type { ZuiSchemaOptions } from '../../../transforms/zui-to-json-schema/zui-extension'
 import type { ObjectToZuiOptions } from '../../../transforms/object-to-zui'
 import { TypescriptGenerationOptions, toTypescript } from '../../../transforms/zui-to-typescript-next'
+import { toTypescriptExpression } from '../../../transforms/zui-to-typescript-expression'
 
 export type RefinementCtx = {
   addIssue: (arg: IssueData) => void
@@ -606,6 +607,10 @@ export abstract class ZodType<Output = any, Def extends ZodTypeDef = ZodTypeDef,
 
   toTypescript(opts?: TypescriptGenerationOptions): string {
     return toTypescript(this, opts)
+  }
+
+  toTypescriptExpression(): string {
+    return toTypescriptExpression(this)
   }
 
   async toTypescriptAsync(

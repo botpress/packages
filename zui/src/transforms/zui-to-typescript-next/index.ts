@@ -95,6 +95,12 @@ type InternalOptions = {
   parent?: SchemaTypes
 }
 
+/**
+ *
+ * @param schema zui schema
+ * @param options generation options
+ * @returns a string of the TypeScript **type** representing the schema
+ */
 export function toTypescript(schema: z.Schema, options: TypescriptGenerationOptions = {}): string {
   const wrappedSchema: Declaration = getDeclarationProps(schema, options)
 

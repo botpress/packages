@@ -123,6 +123,7 @@ const intersectionType = ZodIntersection.create
 const tupleType = ZodTuple.create
 const recordType = ZodRecord.create
 const refType = ZodRef.create
+const readonlyType = ZodReadonly.create
 const mapType = ZodMap.create
 const setType = ZodSet.create
 const functionType = ZodFunction.create
@@ -191,6 +192,7 @@ export {
   promiseType as promise,
   recordType as record,
   refType as ref,
+  readonlyType as readonly,
   setType as set,
   strictObjectType as strictObject,
   stringType as string,

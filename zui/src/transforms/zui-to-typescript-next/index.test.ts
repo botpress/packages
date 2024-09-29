@@ -581,7 +581,7 @@ describe.concurrent('generics', () => {
     const schema = z.object({ a: z.string(), b: z.ref('T') }).title('MyObject')
     expect(() => toTs(schema, { declaration: true })).toThrowError(UnrepresentableGenericError)
     expect(() => toTs(schema, { declaration: false })).toThrowError(UnrepresentableGenericError)
-    expect(() => toTs(schema, { declaration: 'reference' })).toThrowError(UnrepresentableGenericError)
+    expect(() => toTs(schema, { declaration: 'variable' })).toThrowError(UnrepresentableGenericError)
     expect(() => toTs(schema, { declaration: 'none' })).toThrowError(UnrepresentableGenericError)
   })
 

@@ -67,7 +67,7 @@ class Declaration {
 
 type DeclarationProps =
   | {
-      type: 'reference'
+      type: 'variable'
       schema: z.Schema
       identifier: string
     }
@@ -357,7 +357,7 @@ const unwrapDeclaration = (declaration: Declaration, options: InternalOptions): 
   const withoutDesc = declaration.props.schema.describe('')
   const typings = sUnwrapZod(withoutDesc, options)
 
-  if (declaration.props.type === 'reference') {
+  if (declaration.props.type === 'variable') {
     return stripSpaces(`${description}declare const ${declaration.props.identifier}: ${typings};`)
   }
 
@@ -371,7 +371,7 @@ const getDeclarationType = (options: TypescriptGenerationOptions): TypescriptDec
     return 'none'
   }
   if (options.declaration === true) {
-    return 'reference'
+    return 'variable'
   }
   return options.declaration
 }
@@ -395,14 +395,14 @@ const getDeclarationProps = (schema: z.Schema, options: TypescriptGenerationOpti
     throw new UntitledDeclarationError('Only schemas with "title" Zui property can be declared.')
   }
 
-  if (declarationType === 'reference') {
+  if (declarationType === 'variable') {
     if (args.length > 0) {
       throw new UnrepresentableGenericError(
         'ZodRefs are only supported when generating "type" declaration. Please set "declaration" option to "type".',
       )
     }
 
-    return new Declaration({ type: 'reference', identifier: title, schema })
+    return new Declaration({ type: 'variable', identifier: title, schema })
   }
 
   return new Declaration({ type: 'type', identifier: title, schema, args })

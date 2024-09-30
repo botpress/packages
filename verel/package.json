@@ -12,6 +12,7 @@
     "build:type": "tsc -p tsconfig.build.json",
     "build:node": "ts-node -T ./build.ts nodejs",
     "build:web": "ts-node -T ./build.ts web",
+    "test": "pnpm run test:node && pnpm run test:browser",
     "test:node": "vitest --browser.enabled false --run",
     "test:browser": "vitest --browser.enabled true --run"
   },

@@ -8,9 +8,6 @@ dependencies:
   browser-or-node:
     specifier: ^2.1.1
     version: 2.1.1
-  playwright:
-    specifier: ^1.47.2
-    version: 1.47.2
 
 devDependencies:
   '@types/lodash':
@@ -28,6 +25,9 @@ devDependencies:
   lodash:
     specifier: ^4.17.21
     version: 4.17.21
+  playwright:
+    specifier: ^1.47.2
+    version: 1.47.2
   ts-node:
     specifier: ^10.9.1
     version: 10.9.1(@types/node@20.8.9)(typescript@5.5.4)
@@ -1265,6 +1265,7 @@ packages:
     engines: {node: ^8.16.0 || ^10.6.0 || >=11.0.0}
     os: [darwin]
     requiresBuild: true
+    dev: true
     optional: true
 
   /fsevents@2.3.3:
@@ -1484,6 +1485,7 @@ packages:
     resolution: {integrity: sha512-3JvMfF+9LJfe16l7AbSmU555PaTl2tPyQsVInqm3id16pdDfvZ8TTZ/pyzmkbDrZTQefyzU7AIHlZqQnxpqHVQ==}
     engines: {node: '>=18'}
     hasBin: true
+    dev: true
 
   /playwright@1.47.2:
     resolution: {integrity: sha512-nx1cLMmQWqmA3UsnjaaokyoUpdVaaDhJhMoxX2qj3McpjnsqFHs516QAKYhqHAgOP+oCFTEOCOAaD1RgD/RQfA==}
@@ -1493,6 +1495,7 @@ packages:
       playwright-core: 1.47.2
     optionalDependencies:
       fsevents: 2.3.2
+    dev: true
 
   /postcss@8.4.47:
     resolution: {integrity: sha512-56rxCq7G/XfB4EkXq9Egn5GCqugWvDFjafDOThIdMBsI15iqPqR5r15TfSr1YPYeEI19YeaXMCbY6u88Y76GLQ==}

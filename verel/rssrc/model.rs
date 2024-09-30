@@ -83,6 +83,10 @@ impl From<&vrl::diagnostic::Note> for CompilationDiagnosticNote {
                 note_type: "UserErrorMessage".to_owned(),
                 message: message.clone(),
             },
+            vrl::diagnostic::Note::SeeFunctionCharacteristicsDocs => CompilationDiagnosticNote {
+                note_type: "SeeFunctionCharacteristicsDocs".to_owned(),
+                message: "".to_owned(),
+            },
         }
     }
 }
@@ -259,6 +263,15 @@ impl From<&vrl::compiler::runtime::Terminate> for ExecutionTermination {
             },
             vrl::prelude::ExpressionError::Error { message, .. } => ExecutionTermination {
                 message: message.clone(),
+            },
+            vrl::prelude::ExpressionError::Return { span, value } => ExecutionTermination {
+                message: "return".to_owned(), // TODO: implement this correctly
+            },
+            vrl::prelude::ExpressionError::Fallible { span } => ExecutionTermination {
+                message: "fallible".to_owned(), // TODO: implement this correctly
+            },
+            vrl::prelude::ExpressionError::Missing { span, feature } => ExecutionTermination {
+                message: "missing".to_owned(), // TODO: implement this correctly
             },
         }
     }

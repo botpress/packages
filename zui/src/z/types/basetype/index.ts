@@ -482,8 +482,8 @@ export abstract class ZodType<Output = any, Def extends ZodTypeDef = ZodTypeDef,
   // BOTPRESS EXTENSIONS
 
   /** append metadata to object */
-  metadata(metadata: Record<string, ZuiMetadata>): this {
-    for (const [key, value] of Object.entries(metadata)) {
+  metadata(data: Record<string, ZuiMetadata>): this {
+    for (const [key, value] of Object.entries(data)) {
       this._def[zuiKey] = {
         ...this._def[zuiKey],
         [key]: value,
@@ -495,6 +495,11 @@ export abstract class ZodType<Output = any, Def extends ZodTypeDef = ZodTypeDef,
   /** get metadata of object */
   getMetadata(): Record<string, ZuiMetadata> {
     return { ...this._def[zuiKey] }
+  }
+
+  /** set metadata of object */
+  setMetadata(data: Record<string, ZuiMetadata>): void {
+    this._def[zuiKey] = { ...data }
   }
 
   /**

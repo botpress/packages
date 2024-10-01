@@ -1,18 +1,20 @@
 {
   "name": "@bpinternal/verel",
-  "version": "0.0.9",
+  "version": "0.1.0",
   "description": "Vector Remap Language for JavaScript",
   "main": "./dist/node/index.js",
   "module": "./dist/web/index.js",
   "types": "./dist/types/index.d.ts",
   "scripts": {
+    "postinstall": "pnpm exec playwright install",
     "check:type": "tsc --noEmit",
     "build": "pnpm run build:node && pnpm run build:web && pnpm run build:type",
     "build:type": "tsc -p tsconfig.build.json",
     "build:node": "ts-node -T ./build.ts nodejs",
     "build:web": "ts-node -T ./build.ts web",
-    "test": "pnpm run test:e2e",
-    "test:e2e": "ts-node -T ./e2e/node.ts && ts-node -T ./e2e/browser"
+    "test": "pnpm run test:node && pnpm run test:browser",
+    "test:node": "vitest --browser.enabled false --run",
+    "test:browser": "vitest --browser.enabled true --run"
   },
   "keywords": [],
   "author": "",
@@ -23,11 +25,13 @@
   "devDependencies": {
     "@types/lodash": "^4.14.200",
     "@types/node": "^20.8.9",
+    "@vitest/browser": "^2.1.1",
     "esbuild": "^0.23.0",
     "lodash": "^4.17.21",
-    "puppeteer": "^22.0.0",
+    "playwright": "^1.47.2",
     "ts-node": "^10.9.1",
     "typescript": "5.5.4",
+    "vitest": "^2.1.1",
     "wasm-pack": "^0.13.0"
   },
   "engines": {

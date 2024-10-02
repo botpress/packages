@@ -1,5 +1,5 @@
 import { describe, expect } from 'vitest'
-import { toTypescriptZuiString as toTypescript } from '.'
+import { toTypescriptSchema as toTypescript } from '.'
 import z from '../../z'
 import { evalZuiString } from '../common/eval-zui-string'
 

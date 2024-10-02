@@ -7,9 +7,9 @@ export type TypescriptExpressionGenerationOptions = {}
  *
  * @param schema zui schema
  * @param options generation options
- * @returns a string of the TypeScript code that would construct the given schema if executed
+ * @returns a typescript program that would construct the given schema if executed
  */
-export function toTypescriptZuiString(schema: z.Schema, _options?: TypescriptExpressionGenerationOptions): string {
+export function toTypescriptSchema(schema: z.Schema, _options?: TypescriptExpressionGenerationOptions): string {
   let wrappedSchema: z.Schema = schema
   let dts = sUnwrapZod(wrappedSchema)
   return dts

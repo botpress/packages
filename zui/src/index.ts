@@ -6,7 +6,7 @@ import {
   UntitledDeclarationError,
   TypescriptGenerationOptions,
 } from './transforms/zui-to-typescript-next'
-import { toTypescriptExpression } from './transforms/zui-to-typescript-expression'
+import { toTypescriptZuiString } from './transforms/zui-to-zui-string'
 
 export * from './ui'
 export * from './z'
@@ -16,7 +16,7 @@ export const transforms = {
   zuiToJsonSchema,
   objectToZui,
   toTypescript,
-  toTypescriptExpression,
+  toTypescriptExpression: toTypescriptZuiString,
 }
 
 export { UntitledDeclarationError, type TypescriptGenerationOptions }

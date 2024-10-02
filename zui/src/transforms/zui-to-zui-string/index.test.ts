@@ -1,84 +1,84 @@
 import { describe, expect } from 'vitest'
-import { toTypescriptExpression as toTypescript } from '.'
-import { evalZod } from '../../setup.test'
+import { toTypescriptZuiString as toTypescript } from '.'
 import z from '../../z'
+import { evalZuiString } from '../common/eval-zui-string'
 
-describe('toTypescriptExpression', () => {
+describe('toTypescriptZuiString', () => {
   test('string', async () => {
     const expected = `z.string()`
-    const schema = evalZod(expected)
+    const schema = evalZuiString(expected)
     const actual = toTypescript(schema)
     await expect(actual).toMatchWithoutFormatting(expected)
   })
   test('number', async () => {
     const expected = `z.number()`
-    const schema = evalZod(expected)
+    const schema = evalZuiString(expected)
     const actual = toTypescript(schema)
     await expect(actual).toMatchWithoutFormatting(expected)
   })
   test('nan', async () => {
     const expected = `z.nan()`
-    const schema = evalZod(expected)
+    const schema = evalZuiString(expected)
     const actual = toTypescript(schema)
     await expect(actual).toMatchWithoutFormatting(expected)
   })
   test('bigint', async () => {
     const expected = `z.bigint()`
-    const schema = evalZod(expected)
+    const schema = evalZuiString(expected)
     const actual = toTypescript(schema)
     await expect(actual).toMatchWithoutFormatting(expected)
   })
   test('boolean', async () => {
     const expected = `z.boolean()`
-    const schema = evalZod(expected)
+    const schema = evalZuiString(expected)
     const actual = toTypescript(schema)
     await expect(actual).toMatchWithoutFormatting(expected)
   })
   test('date', async () => {
     const expected = `z.date()`
-    const schema = evalZod(expected)
+    const schema = evalZuiString(expected)
     const actual = toTypescript(schema)
     await expect(actual).toMatchWithoutFormatting(expected)
   })
   test('undefined', async () => {
     const expected = `z.undefined()`
-    const schema = evalZod(expected)
+    const schema = evalZuiString(expected)
     const actual = toTypescript(schema)
     await expect(actual).toMatchWithoutFormatting(expected)
   })
   test('null', async () => {
     const expected = `z.null()`
-    const schema = evalZod(expected)
+    const schema = evalZuiString(expected)
     const actual = toTypescript(schema)
     await expect(actual).toMatchWithoutFormatting(expected)
   })
   test('any', async () => {
     const expected = `z.any()`
-    const schema = evalZod(expected)
+    const schema = evalZuiString(expected)
     const actual = toTypescript(schema)
     await expect(actual).toMatchWithoutFormatting(expected)
   })
   test('unknown', async () => {
     const expected = `z.unknown()`
-    const schema = evalZod(expected)
+    const schema = evalZuiString(expected)
     const actual = toTypescript(schema)
     await expect(actual).toMatchWithoutFormatting(expected)
   })
   test('never', async () => {
     const expected = `z.never()`
-    const schema = evalZod(expected)
+    const schema = evalZuiString(expected)
     const actual = toTypescript(schema)
     await expect(actual).toMatchWithoutFormatting(expected)
   })
   test('void', async () => {
     const expected = `z.void()`
-    const schema = evalZod(expected)
+    const schema = evalZuiString(expected)
     const actual = toTypescript(schema)
     await expect(actual).toMatchWithoutFormatting(expected)
   })
   test('array', async () => {
     const expected = `z.array(z.string())`
-    const schema = evalZod(expected)
+    const schema = evalZuiString(expected)
     const actual = toTypescript(schema)
     await expect(actual).toMatchWithoutFormatting(expected)
   })
@@ -87,13 +87,13 @@ describe('toTypescriptExpression', () => {
       a: z.string(),
       b: z.number(),
     })`
-    const schema = evalZod(expected)
+    const schema = evalZuiString(expected)
     const actual = toTypescript(schema)
     await expect(actual).toMatchWithoutFormatting(expected)
   })
   test('union', async () => {
     const expected = `z.union([z.string(), z.number(), z.boolean()])`
-    const schema = evalZod(expected)
+    const schema = evalZuiString(expected)
     const actual = toTypescript(schema)
     await expect(actual).toMatchWithoutFormatting(expected)
   })
@@ -102,37 +102,37 @@ describe('toTypescriptExpression', () => {
       z.object({ type: z.literal("A"), a: z.string() }),
       z.object({ type: z.literal("B"), b: z.number() }),
     ])`
-    const schema = evalZod(expected)
+    const schema = evalZuiString(expected)
     const actual = toTypescript(schema)
     await expect(actual).toMatchWithoutFormatting(expected)
   })
   test('intersection', async () => {
     const expected = `z.intersection(z.object({ a: z.string() }), z.object({ b: z.number() }))`
-    const schema = evalZod(expected)
+    const schema = evalZuiString(expected)
     const actual = toTypescript(schema)
     await expect(actual).toMatchWithoutFormatting(expected)
   })
   test('tuple', async () => {
     const expected = `z.tuple([z.string(), z.number()])`
-    const schema = evalZod(expected)
+    const schema = evalZuiString(expected)
     const actual = toTypescript(schema)
     await expect(actual).toMatchWithoutFormatting(expected)
   })
   test('record', async () => {
     const expected = `z.record(z.string(), z.number())`
-    const schema = evalZod(expected)
+    const schema = evalZuiString(expected)
     const actual = toTypescript(schema)
     await expect(actual).toMatchWithoutFormatting(expected)
   })
   test('map', async () => {
     const expected = `z.map(z.string(), z.number())`
-    const schema = evalZod(expected)
+    const schema = evalZuiString(expected)
     const actual = toTypescript(schema)
     await expect(actual).toMatchWithoutFormatting(expected)
   })
   test('set', async () => {
     const expected = `z.set(z.string())`
-    const schema = evalZod(expected)
+    const schema = evalZuiString(expected)
     const actual = toTypescript(schema)
     await expect(actual).toMatchWithoutFormatting(expected)
   })
@@ -148,25 +148,25 @@ describe('toTypescriptExpression', () => {
   })
   test('literal string', async () => {
     const expected = `z.literal("banana")`
-    const schema = evalZod(expected)
+    const schema = evalZuiString(expected)
     const actual = toTypescript(schema)
     await expect(actual).toMatchWithoutFormatting(expected)
   })
   test('literal number', async () => {
     const expected = `z.literal(42)`
-    const schema = evalZod(expected)
+    const schema = evalZuiString(expected)
     const actual = toTypescript(schema)
     await expect(actual).toMatchWithoutFormatting(expected)
   })
   test('literal boolean', async () => {
     const expected = `z.literal(true)`
-    const schema = evalZod(expected)
+    const schema = evalZuiString(expected)
     const actual = toTypescript(schema)
     await expect(actual).toMatchWithoutFormatting(expected)
   })
   test('enum', async () => {
     const expected = `z.enum(["banana", "apple", "orange"])`
-    const schema = evalZod(expected)
+    const schema = evalZuiString(expected)
     const actual = toTypescript(schema)
     await expect(actual).toMatchWithoutFormatting(expected)
   })
@@ -185,13 +185,13 @@ describe('toTypescriptExpression', () => {
   })
   test('optional', async () => {
     const expected = `z.optional(z.string())`
-    const schema = evalZod(expected)
+    const schema = evalZuiString(expected)
     const actual = toTypescript(schema)
     await expect(actual).toMatchWithoutFormatting(expected)
   })
   test('nullable', async () => {
     const expected = `z.nullable(z.string())`
-    const schema = evalZod(expected)
+    const schema = evalZuiString(expected)
     const actual = toTypescript(schema)
     await expect(actual).toMatchWithoutFormatting(expected)
   })
@@ -203,7 +203,7 @@ describe('toTypescriptExpression', () => {
   })
   test('promise', async () => {
     const expected = `z.promise(z.string())`
-    const schema = evalZod(expected)
+    const schema = evalZuiString(expected)
     const actual = toTypescript(schema)
     await expect(actual).toMatchWithoutFormatting(expected)
   })
@@ -222,13 +222,13 @@ describe('toTypescriptExpression', () => {
   })
   test('readonly', async () => {
     const expected = `z.readonly(z.string())`
-    const schema = evalZod(expected)
+    const schema = evalZuiString(expected)
     const actual = toTypescript(schema)
     await expect(actual).toMatchWithoutFormatting(expected)
   })
   test('ref', async () => {
     const expected = `z.ref("#item")`
-    const schema = evalZod(expected)
+    const schema = evalZuiString(expected)
     const actual = toTypescript(schema)
     await expect(actual).toMatchWithoutFormatting(expected)
   })

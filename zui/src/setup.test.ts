@@ -1,7 +1,6 @@
 import { expect } from 'vitest'
 import { Project, Diagnostic } from 'ts-morph'
 import { format } from 'prettier'
-import z from './z'
 
 export function isValidTypescript(
   code: string,
@@ -17,14 +16,6 @@ export function isValidTypescript(
   } catch (e: any) {
     return { isValid: false, diagnostics: [], errorMessage: e?.message || '' }
   }
-}
-
-export function evalZod(script: string): z.ZodType {
-  const output = Function('const { z } = this; return (' + script + ')').bind({ z })()
-  if (output instanceof z.ZodType) {
-    return output
-  }
-  throw new Error('Expected output to be a Zod schema')
 }
 
 expect.extend({

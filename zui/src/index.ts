@@ -5,7 +5,7 @@ import {
   toTypescript,
   UntitledDeclarationError,
   TypescriptGenerationOptions,
-} from './transforms/zui-to-typescript-next'
+} from './transforms/zui-to-typescript-type'
 import { toTypescriptSchema } from './transforms/zui-to-typescript-schema'
 
 export * from './ui'

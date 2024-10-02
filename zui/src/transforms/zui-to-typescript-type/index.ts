@@ -95,6 +95,8 @@ type InternalOptions = {
   parent?: SchemaTypes
 }
 
+// TODO: rename this transform to `toTypescriptType`
+
 /**
  *
  * @param schema zui schema

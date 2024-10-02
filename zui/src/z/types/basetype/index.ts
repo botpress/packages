@@ -49,7 +49,7 @@ import {
 } from '../index'
 import type { ZuiSchemaOptions } from '../../../transforms/zui-to-json-schema/zui-extension'
 import type { ObjectToZuiOptions } from '../../../transforms/object-to-zui'
-import { TypescriptGenerationOptions, toTypescript } from '../../../transforms/zui-to-typescript-next'
+import { TypescriptGenerationOptions, toTypescript } from '../../../transforms/zui-to-typescript-type'
 import { toTypescriptSchema } from '../../../transforms/zui-to-typescript-schema'
 
 export type RefinementCtx = {

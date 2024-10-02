@@ -1,5 +1,5 @@
 import z, { util } from '../../z'
-import { escapeString, getMultilineComment, mapValues, toTypesriptPrimitive } from '../zui-to-typescript-next/utils'
+import { escapeString, getMultilineComment, mapValues, toTypesriptPrimitive } from '../zui-to-typescript-type/utils'
 
 export type TypescriptExpressionGenerationOptions = {}
 

@@ -48,14 +48,13 @@ export class ZodDefault<T extends ZodTypeAny = ZodTypeAny> extends ZodType<
 
   static create = <T extends ZodTypeAny>(
     type: T,
-    params: RawCreateParams & {
-      default: T['_input'] | (() => util.noUndefined<T['_input']>)
-    },
+    value: T['_input'] | (() => util.noUndefined<T['_input']>),
+    params?: RawCreateParams,
   ): ZodDefault<T> => {
     return new ZodDefault({
       innerType: type,
       typeName: ZodFirstPartyTypeKind.ZodDefault,
-      defaultValue: typeof params.default === 'function' ? params.default : () => params.default as any,
+      defaultValue: typeof value === 'function' ? value : () => value as any,
       ...processCreateParams(params),
     }) as any
   }

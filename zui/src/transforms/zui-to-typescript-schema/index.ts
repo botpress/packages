@@ -121,7 +121,7 @@ function sUnwrapZod(schema: z.Schema): string {
       return `${getMultilineComment(def.description)}z.literal(${value})`.trim()
 
     case z.ZodFirstPartyTypeKind.ZodEnum:
-      const values = def.values.map((v: any) => toTypesriptPrimitive(v))
+      const values = def.values.map(toTypesriptPrimitive)
       return `${getMultilineComment(def.description)}z.enum([${values.join(', ')}])`.trim()
 
     case z.ZodFirstPartyTypeKind.ZodEffects:
@@ -137,7 +137,8 @@ function sUnwrapZod(schema: z.Schema): string {
       return `${getMultilineComment(def.description)}z.nullable(${sUnwrapZod(def.innerType)})`.trim()
 
     case z.ZodFirstPartyTypeKind.ZodDefault:
-      throw new Error('ZodDefault cannot be transformed to TypeScript expression yet')
+      const defaultValue = toTypesriptPrimitive(def.defaultValue())
+      return `${getMultilineComment(def.description)}${sUnwrapZod(def.innerType)}.default(${defaultValue})`.trim()
 
     case z.ZodFirstPartyTypeKind.ZodCatch:
       throw new Error('ZodCatch cannot be transformed to TypeScript expression yet')

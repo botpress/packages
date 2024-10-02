@@ -135,6 +135,7 @@ const promiseType = ZodPromise.create
 const effectsType = ZodEffects.create
 const optionalType = ZodOptional.create
 const nullableType = ZodNullable.create
+const defaultType = ZodDefault.create
 const preprocessType = ZodEffects.createWithPreprocess
 const pipelineType = ZodPipeline.create
 const templateLiteralType = ZodTemplateLiteral.create
@@ -167,6 +168,7 @@ export {
   bigIntType as bigint,
   booleanType as boolean,
   dateType as date,
+  defaultType as default,
   discriminatedUnionType as discriminatedUnion,
   effectsType as effect,
   enumType as enum,

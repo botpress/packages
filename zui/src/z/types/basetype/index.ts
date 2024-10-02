@@ -431,7 +431,7 @@ export abstract class ZodType<Output = any, Def extends ZodTypeDef = ZodTypeDef,
       innerType: this,
       defaultValue: defaultValueFunc,
       typeName: ZodFirstPartyTypeKind.ZodDefault,
-    }) as any
+    })
   }
 
   brand<B extends string | number | symbol>(brand?: B): ZodBranded<this, B>

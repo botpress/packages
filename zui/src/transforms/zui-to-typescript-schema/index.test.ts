@@ -136,10 +136,17 @@ describe('toTypescriptZuiString', () => {
     const actual = toTypescript(schema)
     await expect(actual).toMatchWithoutFormatting(expected)
   })
-  test('function', async () => {
-    const schema = z.function()
-    const fn = () => toTypescript(schema)
-    expect(fn).toThrowError() // not supported
+  test('function with no argument', async () => {
+    const expected = `z.function().returns(z.void())`
+    const schema = evalZuiString(expected)
+    const actual = toTypescript(schema)
+    await expect(actual).toMatchWithoutFormatting(expected)
+  })
+  test('function with multiple arguments', async () => {
+    const expected = `z.function().args(z.number(), z.string()).returns(z.boolean())`
+    const schema = evalZuiString(expected)
+    const actual = toTypescript(schema)
+    await expect(actual).toMatchWithoutFormatting(expected)
   })
   test('lazy', async () => {
     const schema = z.lazy(() => z.string())

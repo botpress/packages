@@ -17,7 +17,7 @@ export interface ZodDefaultDef<T extends ZodTypeAny = ZodTypeAny> extends ZodTyp
   typeName: ZodFirstPartyTypeKind.ZodDefault
 }
 
-export class ZodDefault<T extends ZodTypeAny> extends ZodType<
+export class ZodDefault<T extends ZodTypeAny = ZodTypeAny> extends ZodType<
   util.noUndefined<T['_output']>,
   ZodDefaultDef<T>,
   T['_input'] | undefined

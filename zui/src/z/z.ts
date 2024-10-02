@@ -62,31 +62,31 @@ export type ZodFirstPartySchemaTypes =
   | ZodUnknown
   | ZodNever
   | ZodVoid
-  | ZodArray<any, any>
-  | ZodObject<any, any, any>
-  | ZodUnion<any>
-  | ZodDiscriminatedUnion<any, any>
-  | ZodIntersection<any, any>
-  | ZodTuple<any, any>
-  | ZodRecord<any, any>
-  | ZodMap<any>
-  | ZodSet<any>
-  | ZodFunction<any, any>
-  | ZodLazy<any>
-  | ZodLiteral<any>
-  | ZodEnum<any>
-  | ZodEffects<any, any, any>
-  | ZodNativeEnum<any>
-  | ZodOptional<any>
-  | ZodNullable<any>
-  | ZodDefault<any>
-  | ZodCatch<any>
-  | ZodPromise<any>
-  | ZodBranded<any, any>
-  | ZodPipeline<any, any>
-  | ZodReadonly<any>
+  | ZodArray
+  | ZodObject
+  | ZodUnion
+  | ZodDiscriminatedUnion
+  | ZodIntersection
+  | ZodTuple
+  | ZodRecord
+  | ZodMap
+  | ZodSet
+  | ZodFunction
+  | ZodLazy
+  | ZodLiteral
+  | ZodEnum
+  | ZodEffects
+  | ZodNativeEnum
+  | ZodOptional
+  | ZodNullable
+  | ZodDefault
+  | ZodCatch
+  | ZodPromise
+  | ZodBranded
+  | ZodPipeline
+  | ZodReadonly
   | ZodSymbol
-  | ZodTemplateLiteral<any>
+  | ZodTemplateLiteral
   | ZodRef
 
 // requires TS 4.4+

@@ -58,32 +58,30 @@ function sUnwrapZod(schema: z.Schema): string {
       return `${getMultilineComment(def.description)}z.void()`.trim()
 
     case z.ZodFirstPartyTypeKind.ZodArray:
-      const item = sUnwrapZod(def.type)
-      return `z.array(${item})`
+      return `z.array(${sUnwrapZod(def.type)})`
 
     case z.ZodFirstPartyTypeKind.ZodObject:
-      const props = mapValues((schema as z.ZodObject<any>).shape, (value) => {
+      const props = mapValues(def.shape(), (value) => {
         if (value instanceof z.Schema) {
           return sUnwrapZod(value)
         }
         return `z.any()`
       })
+      return [
+        //
+        `${getMultilineComment(def.description)}z.object({`,
+        ...Object.entries(props).map(([key, value]) => `  ${key}: ${value},`),
+        `})`,
+      ]
+        .join('\n')
+        .trim()
 
-      return `${getMultilineComment(def.description)}z.object({
-${Object.entries(props)
-  .map(([key, value]) => `  ${key}: ${value}`)
-  .join(',\n')}
-})`.trim()
     case z.ZodFirstPartyTypeKind.ZodUnion:
-      const options = ((schema as z.ZodUnion<any>).options as z.ZodSchema[]).map((option) => {
-        return sUnwrapZod(option)
-      })
+      const options = def.options.map(sUnwrapZod)
       return `${getMultilineComment(def.description)}z.union([${options.join(', ')}])`.trim()
 
     case z.ZodFirstPartyTypeKind.ZodDiscriminatedUnion:
-      const opts = ((schema as z.ZodDiscriminatedUnion<any, any>).options as z.ZodSchema[]).map((option) => {
-        return sUnwrapZod(option)
-      })
+      const opts = (def.options as z.ZodSchema[]).map(sUnwrapZod)
       const discriminator = escapeString(def.discriminator)
       return `${getMultilineComment(def.description)}z.discriminatedUnion(${discriminator}, [${opts.join(', ')}])`.trim()
 
@@ -93,7 +91,7 @@ ${Object.entries(props)
       return `${getMultilineComment(def.description)}z.intersection(${left}, ${right})`.trim()
 
     case z.ZodFirstPartyTypeKind.ZodTuple:
-      const items = def.items.map((i: any) => sUnwrapZod(i))
+      const items = def.items.map(sUnwrapZod)
       return `${getMultilineComment(def.description)}z.tuple([${items.join(', ')}])`.trim()
 
     case z.ZodFirstPartyTypeKind.ZodRecord:
@@ -110,7 +108,10 @@ ${Object.entries(props)
       return `${getMultilineComment(def.description)}z.set(${sUnwrapZod(def.valueType)})`.trim()
 
     case z.ZodFirstPartyTypeKind.ZodFunction:
-      throw new Error('ZodFunction cannot be transformed to TypeScript expression yet')
+      const args = def.args.items.map(sUnwrapZod)
+      const argsString = args.length ? `.args(${args.join(', ')})` : ''
+      const returns = sUnwrapZod(def.returns)
+      return `${getMultilineComment(def.description)}z.function()${argsString}.returns(${returns})`.trim()
 
     case z.ZodFirstPartyTypeKind.ZodLazy:
       throw new Error('ZodLazy cannot be transformed to TypeScript expression yet')

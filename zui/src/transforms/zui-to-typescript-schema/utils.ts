@@ -1,10 +1,12 @@
 import { escapeString } from '../zui-to-typescript-type/utils'
 
-export const toTypesriptPrimitive = (primitive: string | number | boolean | null): string => {
+export const toTypesriptPrimitive = (
+  primitive: string | number | boolean | null | symbol | undefined | bigint,
+): string => {
   if (typeof primitive === 'string') {
     return escapeString(primitive)
   }
-  return `${primitive}`
+  return String(primitive)
 }
 
 export const mapValues = <K extends string, V1, V2>(

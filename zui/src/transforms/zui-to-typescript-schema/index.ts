@@ -114,7 +114,7 @@ function sUnwrapZod(schema: z.Schema): string {
       return `${getMultilineComment(def.description)}z.function()${argsString}.returns(${returns})`.trim()
 
     case z.ZodFirstPartyTypeKind.ZodLazy:
-      throw new Error('ZodLazy cannot be transformed to TypeScript expression yet')
+      return `${getMultilineComment(def.description)}z.lazy(() => ${sUnwrapZod(def.getter())})`.trim()
 
     case z.ZodFirstPartyTypeKind.ZodLiteral:
       const value = toTypesriptPrimitive(def.value)

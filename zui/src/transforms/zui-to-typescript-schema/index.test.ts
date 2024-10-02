@@ -149,9 +149,10 @@ describe('toTypescriptZuiString', () => {
     await expect(actual).toMatchWithoutFormatting(expected)
   })
   test('lazy', async () => {
-    const schema = z.lazy(() => z.string())
-    const fn = () => toTypescript(schema)
-    expect(fn).toThrowError() // not supported
+    const expected = `z.lazy(() => z.string())`
+    const schema = evalZuiString(expected)
+    const actual = toTypescript(schema)
+    await expect(actual).toMatchWithoutFormatting(expected)
   })
   test('literal string', async () => {
     const expected = `z.literal("banana")`

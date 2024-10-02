@@ -204,7 +204,7 @@ describe('toTypescriptZuiString', () => {
     await expect(actual).toMatchWithoutFormatting(expected)
   })
   test('default', async () => {
-    const expected = `z.string().default('banana')` // should use `z.default(z.string(), 'banana')` for uniformity
+    const expected = `z.string().default('banana')` // TODO: should use `z.default(z.string(), 'banana')` for uniformity
     const schema = evalZuiString(expected)
     const actual = toTypescript(schema)
     await expect(actual).toMatchWithoutFormatting(expected)

@@ -168,7 +168,7 @@ describe('toTypescriptZuiString', () => {
     await assert(schema).toGenerateItself()
   })
   test('branded', async () => {
-    const schema = `z.string().brand('MyString')`
+    const schema = `z.string().brand('MyString')` // TODO: should use `z.brand(z.string(), 'MyString')` for uniformity
     await assert(schema).toThrowErrorWhenGenerating()
   })
   test('pipeline', async () => {

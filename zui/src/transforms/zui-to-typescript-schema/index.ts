@@ -141,16 +141,15 @@ function sUnwrapZod(schema: z.Schema): string {
       return `${getMultilineComment(def.description)}${sUnwrapZod(def.innerType)}.default(${defaultValue})`.trim()
 
     case z.ZodFirstPartyTypeKind.ZodCatch:
-      const emptyZodError = new ZodError([])
-      const zodInput = null // TODO: use the default value of the inner type
-      const catchValue = toTypesriptPrimitive(def.catchValue({ error: emptyZodError, input: zodInput }))
+      // TODO: should write a function if a function was passed at the constructor; otherwise, should write a value
+      const catchValue = toTypesriptPrimitive(def.catchValue({ error: new ZodError([]), input: null }))
       return `${getMultilineComment(def.description)}${sUnwrapZod(def.innerType)}.catch(${catchValue})`.trim()
 
     case z.ZodFirstPartyTypeKind.ZodPromise:
       return `${getMultilineComment(def.description)}z.promise(${sUnwrapZod(def.type)})`.trim()
 
     case z.ZodFirstPartyTypeKind.ZodBranded:
-      return `${getMultilineComment(def.description)}z.brand(${sUnwrapZod(def.type)})`.trim()
+      throw new Error('ZodBranded cannot be transformed to TypeScript expression yet')
 
     case z.ZodFirstPartyTypeKind.ZodPipeline:
       throw new Error('ZodPipeline cannot be transformed to TypeScript expression yet')

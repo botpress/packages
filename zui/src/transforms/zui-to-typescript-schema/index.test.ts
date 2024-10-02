@@ -178,8 +178,10 @@ describe('toTypescriptZuiString', () => {
     const actual = toTypescript(schema)
     await expect(actual).toMatchWithoutFormatting(expected)
   })
-  test.skip('effects', () => {
-    // TODO: test effects
+  test('effects', () => {
+    const schema = z.string().transform((s) => s.toUpperCase())
+    const fn = () => toTypescript(schema)
+    expect(fn).toThrowError() // not supported
   })
   test('nativeEnum', async () => {
     enum Fruit {
@@ -221,8 +223,10 @@ describe('toTypescriptZuiString', () => {
     const actual = toTypescript(schema)
     await expect(actual).toMatchWithoutFormatting(expected)
   })
-  test.skip('branded', () => {
-    // TODO: test branded
+  test('branded', () => {
+    const schema = z.string().brand('MyString')
+    const fn = () => toTypescript(schema)
+    expect(fn).toThrowError() // not supported
   })
   test('pipeline', async () => {
     const schema = z.pipeline(z.string(), z.number())

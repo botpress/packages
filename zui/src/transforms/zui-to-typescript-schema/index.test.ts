@@ -209,8 +209,11 @@ describe('toTypescriptZuiString', () => {
     const actual = toTypescript(schema)
     await expect(actual).toMatchWithoutFormatting(expected)
   })
-  test.skip('catch', () => {
-    // TODO: test catch
+  test('catch', () => {
+    const expected = `z.string().catch('banana')` // TODO: should use `z.catch(z.string(), 'banana')` for uniformity
+    const schema = evalZuiString(expected)
+    const actual = toTypescript(schema)
+    expect(actual).toMatch(expected)
   })
   test('promise', async () => {
     const expected = `z.promise(z.string())`

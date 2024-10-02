@@ -1,4 +1,4 @@
-import z, { util } from '../../z'
+import z, { util, ZodError } from '../../z'
 import { escapeString, getMultilineComment } from '../zui-to-typescript-type/utils'
 import { mapValues, toTypesriptPrimitive } from './utils'
 
@@ -141,7 +141,10 @@ function sUnwrapZod(schema: z.Schema): string {
       return `${getMultilineComment(def.description)}${sUnwrapZod(def.innerType)}.default(${defaultValue})`.trim()
 
     case z.ZodFirstPartyTypeKind.ZodCatch:
-      throw new Error('ZodCatch cannot be transformed to TypeScript expression yet')
+      const emptyZodError = new ZodError([])
+      const zodInput = null // TODO: use the default value of the inner type
+      const catchValue = toTypesriptPrimitive(def.catchValue({ error: emptyZodError, input: zodInput }))
+      return `${getMultilineComment(def.description)}${sUnwrapZod(def.innerType)}.catch(${catchValue})`.trim()
 
     case z.ZodFirstPartyTypeKind.ZodPromise:
       return `${getMultilineComment(def.description)}z.promise(${sUnwrapZod(def.type)})`.trim()

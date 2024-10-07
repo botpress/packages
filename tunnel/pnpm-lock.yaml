@@ -23,8 +23,8 @@ dependencies:
 
 devDependencies:
   '@bpinternal/log4bot':
-    specifier: 0.0.18
-    version: 0.0.18
+    specifier: 0.0.19
+    version: 0.0.19
   '@bpinternal/yargs-extra':
     specifier: 0.0.13
     version: 0.0.13
@@ -33,13 +33,13 @@ devDependencies:
     version: 1.0.0
   '@types/lodash':
     specifier: ^4.14.195
-    version: 4.17.9
+    version: 4.17.10
   '@types/node':
     specifier: ^18.11.17
     version: 18.19.54
   '@types/web':
-    specifier: ^0.0.167
-    version: 0.0.167
+    specifier: ^0.0.169
+    version: 0.0.169
   esbuild:
     specifier: ^0.24.0
     version: 0.24.0
@@ -78,8 +78,8 @@ packages:
       picocolors: 1.1.0
     dev: true
 
-  /@bpinternal/log4bot@0.0.18:
-    resolution: {integrity: sha512-yKJ/cKO0ld+/cYw45IcuKjqPpAZnw6yWYxzavoDHTPv4JOX1vmEY5kHRwmFQMloZqn57uwK2b2+Y9fIHOz2lag==}
+  /@bpinternal/log4bot@0.0.19:
+    resolution: {integrity: sha512-KvLez25gjW9uXxj4TC6qPP2x+4gq7O2cKORC2Jb5AWodgkHCqLmtvY9Ur/F94ceYpjP31I11oBwTXl6bBsIyjw==}
     engines: {node: '>=16.0.0', pnpm: 8.6.2}
     dependencies:
       chalk: 4.1.2
@@ -380,8 +380,8 @@ packages:
     deprecated: TypeScript 5.0 supports combining TSConfigs using array syntax in extends
     dev: true
 
-  /@types/lodash@4.17.9:
-    resolution: {integrity: sha512-w9iWudx1XWOHW5lQRS9iKpK/XuRhnN+0T7HvdCCd802FYkT1AMTnxndJHGrNJwRoRHkslGr4S29tjm1cT7x/7w==}
+  /@types/lodash@4.17.10:
+    resolution: {integrity: sha512-YpS0zzoduEhuOWjAotS6A5AVCva7X4lVlYLF0FYHAY9sdraBfnatttHItlWeZdGhuEkf+OzMNg2ZYAx8t+52uQ==}
     dev: true
 
   /@types/node@18.19.54:
@@ -389,8 +389,8 @@ packages:
     dependencies:
       undici-types: 5.26.5
 
-  /@types/web@0.0.167:
-    resolution: {integrity: sha512-IhdCUXL+vwofU/IzuOD+/T8Xteuk8fS9TvVJi7y7HTuURs7pWf3Kysxz4+lU0NSkj2LjDQ8AbKaaFFoAgeqYPg==}
+  /@types/web@0.0.169:
+    resolution: {integrity: sha512-oRSjHjC3f3/e/8b6jpPfjDnQxJR9s6ajeHJTaN6fnjg466wDO/inKStV52uplNraDg5MJ3sFTYLoBJIdR0w2sg==}
     dev: true
 
   /@types/ws@8.5.12:

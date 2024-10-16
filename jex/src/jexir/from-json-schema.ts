@@ -6,15 +6,15 @@ import { flattenUnions } from './flatten-unions'
 import { dereference, JSONParserError } from '@apidevtools/json-schema-ref-parser'
 
 type _Primitives = {
-  string: types.JexString
-  number: types.JexNumber
-  boolean: types.JexBoolean
+  string: types.JexIRString
+  number: types.JexIRNumber
+  boolean: types.JexIRBoolean
 }
 
 type _Literals = {
-  string: types.JexStringLiteral
-  number: types.JexNumberLiteral
-  boolean: types.JexBooleanLiteral
+  string: types.JexIRStringLiteral
+  number: types.JexIRNumberLiteral
+  boolean: types.JexIRBooleanLiteral
 }
 
 const _dereference = async (schema: JSONSchema7): Promise<JSONSchema7> => {
@@ -40,10 +40,7 @@ const _dereference = async (schema: JSONSchema7): Promise<JSONSchema7> => {
   }
 }
 
-const _toInternalPrimitive = <T extends 'string' | 'number' | 'boolean'>(
-  type: T,
-  schema: JSONSchema7
-): types.JexType => {
+const _toInternalPrimitive = <T extends 'string' | 'number' | 'boolean'>(type: T, schema: JSONSchema7): types.JexIR => {
   if (schema.enum === undefined && schema.const === undefined) {
     return { type } as _Primitives[T]
   }
@@ -67,10 +64,10 @@ const _toInternalPrimitive = <T extends 'string' | 'number' | 'boolean'>(
   return {
     type: 'union',
     anyOf: values.map((value) => ({ type, value }))
-  } as types.JexUnion
+  } as types.JexIRUnion
 }
 
-const _toInternalRep = (schema: JSONSchema7): types.JexType => {
+const _toInternalRep = (schema: JSONSchema7): types.JexIR => {
   if (schema.not !== undefined) {
     if (schema.not === true) {
       return {
@@ -106,7 +103,7 @@ const _toInternalRep = (schema: JSONSchema7): types.JexType => {
     return _toInternalPrimitive('string', schema)
   }
 
-  if (schema.type === 'number') {
+  if (schema.type === 'number' || schema.type === 'integer') {
     return _toInternalPrimitive('number', schema)
   }
 
@@ -177,7 +174,7 @@ const _toInternalRep = (schema: JSONSchema7): types.JexType => {
       }
     }
 
-    const properties: Record<string, types.JexType> = {}
+    const properties: Record<string, types.JexIR> = {}
     for (const [key, value] of Object.entries(schema.properties)) {
       const isRequired = schema.required?.includes(key)
       const mapped = _toInternalRep(value as JSONSchema7)
@@ -214,7 +211,7 @@ const _toInternalRep = (schema: JSONSchema7): types.JexType => {
   return { type: 'any' }
 }
 
-export const fromJsonSchema = async (schema: JSONSchema7): Promise<types.JexType> => {
+export const fromJsonSchema = async (schema: JSONSchema7): Promise<types.JexIR> => {
   const unref = await _dereference(schema)
   const jex = _toInternalRep(unref)
   return flattenUnions(jex)

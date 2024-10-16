@@ -1,10 +1,10 @@
 import { JSONSchema7 } from 'json-schema'
 import * as types from './typings'
 
-const isOptional = (jexir: types.JexType): boolean =>
+const isOptional = (jexir: types.JexIR): boolean =>
   jexir.type === 'union' && jexir.anyOf.some((jex) => jex.type === 'undefined')
 
-export const toJsonSchema = (jex: types.JexType): JSONSchema7 => {
+export const toJsonSchema = (jex: types.JexIR): JSONSchema7 => {
   if (jex.type === 'null') {
     return { type: 'null' }
   }

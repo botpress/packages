@@ -1,84 +1,89 @@
-export type JexStringContent = string
-export type JexString = {
+export type JexIRStringContent = string
+export type JexIRString = {
   type: 'string'
 }
 
-export type JexNumberContent = number
-export type JexNumber = {
+export type JexIRNumberContent = number
+export type JexIRNumber = {
   type: 'number' // includes integer
 }
 
-export type JexBooleanContent = boolean
-export type JexBoolean = {
+export type JexIRBooleanContent = boolean
+export type JexIRBoolean = {
   type: 'boolean'
 }
 
-export type JexPrimitive = JexString | JexNumber | JexBoolean
+export type JexIRPrimitive = JexIRString | JexIRNumber | JexIRBoolean
 
-export type JexStringLiteral<V extends string = string> = {
+export type JexIRStringLiteral<V extends string = string> = {
   type: 'string'
   value: V
 }
 
-export type JexNumberLiteral<V extends number = number> = {
+export type JexIRNumberLiteral<V extends number = number> = {
   type: 'number'
   value: V
 }
 
-export type JexBooleanLiteral<V extends boolean = boolean> = {
+export type JexIRBooleanLiteral<V extends boolean = boolean> = {
   type: 'boolean'
   value: V
 }
 
-export type JexLiteral = JexStringLiteral | JexNumberLiteral | JexBooleanLiteral
+export type JexIRLiteral = JexIRStringLiteral | JexIRNumberLiteral | JexIRBooleanLiteral
 
-export type JexNull = {
+export type JexIRNull = {
   type: 'null'
 }
 
-export type JexUndefined = {
+export type JexIRUndefined = {
   type: 'undefined'
 }
 
-export type JexUnion = {
+export type JexIRUnion = {
   type: 'union'
-  anyOf: JexType[]
+  anyOf: JexIR[]
 }
 
-export type JexObject = {
+export type JexIRObject = {
   type: 'object'
-  properties: Record<string, JexType> // properties are required
+  properties: Record<string, JexIR> // properties are required
 }
 
-export type JexArray = {
+export type JexIRArray = {
   type: 'array'
-  items: JexType
+  items: JexIR
 }
 
-export type JexMap = {
+export type JexIRMap = {
   type: 'map'
-  items: JexType
+  items: JexIR
 }
 
-export type JexAny = {
+export type JexIRAny = {
   type: 'any'
 }
 
-export type JexTuple = {
+export type JexIRTuple = {
   type: 'tuple'
-  items: JexType[]
+  items: JexIR[]
 }
 
-export type JexType =
-  | JexPrimitive
-  | JexNull
-  | JexUndefined
-  | JexStringLiteral
-  | JexNumberLiteral
-  | JexBooleanLiteral
-  | JexUnion
-  | JexObject
-  | JexArray
-  | JexMap
-  | JexAny
-  | JexTuple
+/**
+ * Jex Intermediate Representation;
+ * This datastructure is simpler than a JSON Schema and easier to work with.
+ * It has no requirement to be backward compatible since it is only used internally.
+ */
+export type JexIR =
+  | JexIRPrimitive
+  | JexIRNull
+  | JexIRUndefined
+  | JexIRStringLiteral
+  | JexIRNumberLiteral
+  | JexIRBooleanLiteral
+  | JexIRUnion
+  | JexIRObject
+  | JexIRArray
+  | JexIRMap
+  | JexIRAny
+  | JexIRTuple

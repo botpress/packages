@@ -216,3 +216,14 @@ test('jex-extends should be false if child and parents are maps and child items 
   type _childNotExtendsParent = utils.types.ExpectNot<utils.types.Extends<_child, _parent>>
   expectJex(child).not.toExtend(parent)
 })
+
+test('jex-extends should be true if child is a map and parent is object with no required properties', () => {
+  const child = $.map($.string())
+  expectJex(child).toExtend($.object({}))
+  expectJex(child).toExtend($.object({ a: $.union([$.string(), $.undefined()]) }))
+})
+
+test('jex-extends should be false if child is a map and parent has required properties', () => {
+  const child = $.map($.string())
+  expectJex(child).not.toExtend($.object({ a: $.string() }))
+})

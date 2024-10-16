@@ -43,6 +43,7 @@ export const jsonSchemaBuilder = {
   union: <T extends JSONSchema7[]>(schemas: T) => ({ anyOf: schemas }),
   enum: <P extends string | number | boolean>(...values: P[]) => ({ enum: values }),
   ref: ($ref: string) => ({ $ref }),
+  date: () => ({ type: 'string', format: 'date-time' }),
   literal: (value: string | number | boolean) => ({ type: typeOf(value), enum: [value] }),
   nullable: (schema: JSONSchema7) => ({ anyOf: [schema, NULL] }),
   optional: (schema: JSONSchema7) => ({ anyOf: [schema, UNDEFINED] }),

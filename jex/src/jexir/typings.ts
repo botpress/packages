@@ -60,7 +60,7 @@ export type JexIRMap = {
   items: JexIR
 }
 
-export type JexIRUnkown = {
+export type JexIRUnknown = {
   type: 'unknown'
 }
 
@@ -85,5 +85,5 @@ export type JexIR =
   | JexIRObject
   | JexIRArray
   | JexIRMap
-  | JexIRUnkown
+  | JexIRUnknown
   | JexIRTuple

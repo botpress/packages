@@ -4,6 +4,8 @@ on:
   push:
     branches:
       - master
+    paths:
+      - 'yargs-extra/**'
 
   pull_request:
     paths:

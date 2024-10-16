@@ -4,6 +4,8 @@ on:
   push:
     branches:
       - master
+    paths:
+      - 'entities/**'
 
   pull_request:
     paths:

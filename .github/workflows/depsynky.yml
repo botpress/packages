@@ -4,6 +4,8 @@ on:
   push:
     branches:
       - master
+    paths:
+      - 'depsynky/**'
 
   pull_request:
     paths:

@@ -4,6 +4,8 @@ on:
   push:
     branches:
       - master
+    paths:
+      - 'const/**'
 
   pull_request:
     paths:

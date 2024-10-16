@@ -4,6 +4,8 @@ on:
   push:
     branches:
       - master
+    paths:
+      - 'promex/**'
 
   pull_request:
     paths:

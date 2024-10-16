@@ -4,6 +4,8 @@ on:
   push:
     branches:
       - master
+    paths:
+      - 'readiness/**'
 
   pull_request:
     paths:

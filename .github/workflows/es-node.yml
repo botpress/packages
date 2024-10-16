@@ -4,6 +4,8 @@ on:
   push:
     branches:
       - master
+    paths:
+      - 'es-node/**'
 
   pull_request:
     paths:

@@ -4,6 +4,8 @@ on:
   push:
     branches:
       - master
+    paths:
+      - 'zui/**'
 
   pull_request:
     paths:

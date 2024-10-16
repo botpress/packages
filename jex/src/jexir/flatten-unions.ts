@@ -1,6 +1,6 @@
 import * as types from './typings'
 
-export const flattenUnions = (schema: types.JexType): types.JexType => {
+export const flattenUnions = (schema: types.JexIR): types.JexIR => {
   if (schema.type === 'array') {
     return {
       type: 'array',
@@ -9,7 +9,7 @@ export const flattenUnions = (schema: types.JexType): types.JexType => {
   }
 
   if (schema.type === 'object') {
-    const properties: Record<string, types.JexType> = {}
+    const properties: Record<string, types.JexIR> = {}
     for (const [key, value] of Object.entries(schema.properties)) {
       properties[key] = flattenUnions(value)
     }
@@ -20,7 +20,7 @@ export const flattenUnions = (schema: types.JexType): types.JexType => {
   }
 
   if (schema.type === 'union') {
-    const anyOf: types.JexType[] = []
+    const anyOf: types.JexIR[] = []
     for (const item of schema.anyOf) {
       const flattened = flattenUnions(item)
       if (flattened.type === 'union') {

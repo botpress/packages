@@ -1,25 +1,25 @@
 import * as jexir from './jexir'
 import { JexExtensionResult, jexExtends } from './jex-extends'
 import { expect, test } from 'vitest'
-import { $ } from './jex-builder'
+import { jexirBuilder as $ } from './builders'
 
 const failureMessage = (res: JexExtensionResult): string => {
   if (res.extends) return ''
   return '\n' + res.reasons.map((r) => ` - ${r}\n`).join('')
 }
 
-const successMessage = (typeA: jexir.JexType, typeB: jexir.JexType): string => {
+const successMessage = (typeA: jexir.JexIR, typeB: jexir.JexIR): string => {
   return `${jexir.toString(typeA)} ⊆ ${jexir.toString(typeB)}`
 }
 
-const expectJex = (typeA: jexir.JexType) => ({
+const expectJex = (typeA: jexir.JexIR) => ({
   not: {
-    toExtend: (typeB: jexir.JexType) => {
+    toExtend: (typeB: jexir.JexIR) => {
       const actual = jexExtends(typeA, typeB)
       expect(actual.extends).to.eq(false, successMessage(typeA, typeB))
     }
   },
-  toExtend: (typeB: jexir.JexType) => {
+  toExtend: (typeB: jexir.JexIR) => {
     const actual = jexExtends(typeA, typeB)
     expect(actual.extends).to.eq(true, failureMessage(actual))
   }

@@ -1,7 +1,7 @@
 import { JSONSchema7 } from 'json-schema'
 import { test, expect } from 'vitest'
 import z from 'zod'
-import { JexType } from './typings'
+import { JexIR } from './typings'
 
 import zodToJsonSchema from 'zod-to-json-schema'
 import { fromJsonSchema as j2x } from './from-json-schema'
@@ -11,7 +11,7 @@ import { jexEquals as jexEquals } from '../jex-equals'
 const z2j = (s: z.ZodType): JSONSchema7 => zodToJsonSchema(s) as JSONSchema7
 
 const expectZod = (zodSchema: z.ZodType) => ({
-  toEqualJex: async (expectedJexSchema: JexType): Promise<void> => {
+  toEqualJex: async (expectedJexSchema: JexIR): Promise<void> => {
     const jsonSchema = z2j(zodSchema)
     const actualJexSchema = await j2x(jsonSchema)
     expect(jexEquals(actualJexSchema, expectedJexSchema)).toBe(true)

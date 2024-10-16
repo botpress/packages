@@ -50,7 +50,7 @@ export const zodBotCreateSchema = z.object({
  * ##################
  */
 
-const jexEventV1: types.JexType = {
+const jexEventV1: types.JexIR = {
   type: 'object',
   properties: {
     schemaVersion: { type: 'string', value: 'v1' },
@@ -61,7 +61,7 @@ const jexEventV1: types.JexType = {
   }
 }
 
-const jexMessageReceivedEvent: types.JexType = {
+const jexMessageReceivedEvent: types.JexIR = {
   type: 'object',
   properties: {
     eventVersion: { type: 'string', value: 'v2' },
@@ -75,7 +75,7 @@ const jexMessageReceivedEvent: types.JexType = {
   }
 }
 
-const jexEmojiReceivedEvent: types.JexType = {
+const jexEmojiReceivedEvent: types.JexIR = {
   type: 'object',
   properties: {
     eventVersion: { type: 'string', value: 'v2' },
@@ -85,12 +85,12 @@ const jexEmojiReceivedEvent: types.JexType = {
   }
 }
 
-const jexEventV2: types.JexType = {
+const jexEventV2: types.JexIR = {
   type: 'union',
   anyOf: [jexMessageReceivedEvent, jexEmojiReceivedEvent]
 }
 
-export const jexBotCreateSchema: types.JexType = {
+export const jexBotCreateSchema: types.JexIR = {
   type: 'object',
   properties: {
     name: { type: 'string' },

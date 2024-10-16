@@ -1,16 +1,16 @@
 import { test, expect } from 'vitest'
 import { toString } from './to-string'
-import { $ } from '../jex-builder'
-import { JexType } from './typings'
+import { jexirBuilder as $ } from '../builders/jexir-builder'
+import { JexIR } from './typings'
 
-const expectJex = (jex: JexType) => ({
+const expectJex = (jex: JexIR) => ({
   toStringifyAs: (expected: string) => {
     const actual = toString(jex)
     expect(actual).to.eq(expected)
   }
 })
 
-test('should correctly convert jex schema to string representation', () => {
+test('jexir toString should correctly convert jexir schema to string representation', () => {
   expectJex($.any()).toStringifyAs('any')
   expectJex($.undefined()).toStringifyAs('undefined')
   expectJex($.null()).toStringifyAs('null')

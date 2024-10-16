@@ -1,6 +1,6 @@
 import * as types from './typings'
 
-const _primitiveToString = (jexPrimitive: types.JexPrimitive): string => {
+const _primitiveToString = (jexPrimitive: types.JexIRPrimitive): string => {
   if ('value' in jexPrimitive) {
     return JSON.stringify(jexPrimitive.value)
   }
@@ -9,37 +9,37 @@ const _primitiveToString = (jexPrimitive: types.JexPrimitive): string => {
 
 /**
  *
- * @param jexSchema the schema to convert
+ * @param jexirSchema the schema to convert
  * @returns A string representation of the schema for easier debugging. This string is used when returning an extension failure reason.
  */
-export const toString = (jexSchema: types.JexType): string => {
-  if (jexSchema.type === 'undefined') return 'undefined'
-  if (jexSchema.type === 'null') return 'null'
-  if (jexSchema.type === 'string' || jexSchema.type === 'number' || jexSchema.type === 'boolean')
-    return _primitiveToString(jexSchema)
+export const toString = (jexirSchema: types.JexIR): string => {
+  if (jexirSchema.type === 'undefined') return 'undefined'
+  if (jexirSchema.type === 'null') return 'null'
+  if (jexirSchema.type === 'string' || jexirSchema.type === 'number' || jexirSchema.type === 'boolean')
+    return _primitiveToString(jexirSchema)
 
-  if (jexSchema.type === 'array') {
-    const itemIsUnion = jexSchema.items.type === 'union'
+  if (jexirSchema.type === 'array') {
+    const itemIsUnion = jexirSchema.items.type === 'union'
     if (itemIsUnion) {
-      return `(${toString(jexSchema.items)})[]`
+      return `(${toString(jexirSchema.items)})[]`
     }
-    return `${toString(jexSchema.items)}[]`
+    return `${toString(jexirSchema.items)}[]`
   }
 
-  if (jexSchema.type === 'tuple') {
-    return `[${jexSchema.items.map(toString).join(', ')}]`
+  if (jexirSchema.type === 'tuple') {
+    return `[${jexirSchema.items.map(toString).join(', ')}]`
   }
 
-  if (jexSchema.type === 'map') {
-    return `{ [key: string]: ${toString(jexSchema.items)} }`
+  if (jexirSchema.type === 'map') {
+    return `{ [key: string]: ${toString(jexirSchema.items)} }`
   }
 
-  if (jexSchema.type === 'union') {
-    return jexSchema.anyOf.map(toString).join(' | ')
+  if (jexirSchema.type === 'union') {
+    return jexirSchema.anyOf.map(toString).join(' | ')
   }
 
-  if (jexSchema.type === 'object') {
-    return `{ ${Object.entries(jexSchema.properties)
+  if (jexirSchema.type === 'object') {
+    return `{ ${Object.entries(jexirSchema.properties)
       .map(([key, value]) => `${key}: ${toString(value)}`)
       .join(', ')} }`
   }

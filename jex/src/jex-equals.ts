@@ -2,13 +2,13 @@ import * as jexir from './jexir'
 import * as utils from './utils'
 import _ from 'lodash'
 
-export class JexSet extends utils.collection.CustomSet<jexir.JexType> {
-  public constructor(items: jexir.JexType[] = []) {
+export class JexSet extends utils.collection.CustomSet<jexir.JexIR> {
+  public constructor(items: jexir.JexIR[] = []) {
     super(items, { compare: jexEquals })
   }
 }
 
-export const jexEquals = (a: jexir.JexType, b: jexir.JexType): boolean => {
+export const jexEquals = (a: jexir.JexIR, b: jexir.JexIR): boolean => {
   if (a.type === 'array' && b.type === 'array') {
     return jexEquals(a.items, b.items)
   }

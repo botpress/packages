@@ -38,6 +38,10 @@ export const toString = (jexirSchema: types.JexIR): string => {
     return jexirSchema.anyOf.map(toString).join(' | ')
   }
 
+  if (jexirSchema.type === 'intersection') {
+    return jexirSchema.allOf.map(toString).join(' & ')
+  }
+
   if (jexirSchema.type === 'object') {
     return `{ ${Object.entries(jexirSchema.properties)
       .map(([key, value]) => `${key}: ${toString(value)}`)

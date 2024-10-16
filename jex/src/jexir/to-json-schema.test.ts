@@ -28,6 +28,20 @@ test('JexIR of literal types should map to json-schema', () => {
   expectJex($.literal(true)).toEqualJsonSchema({ type: 'boolean', const: true })
 })
 
+// JexIR of intersection of primitives should map to json-schema
+
+test('JexIR of intersection of primitives should map to json-schema', () => {
+  expectJex($.intersection([$.string(), $.number()])).toEqualJsonSchema({
+    allOf: [{ type: 'string' }, { type: 'number' }]
+  })
+  expectJex($.intersection([$.boolean(), $.null()])).toEqualJsonSchema({
+    allOf: [{ type: 'boolean' }, { type: 'null' }]
+  })
+  expectJex($.intersection([$.string(), $.null(), $.undefined()])).toEqualJsonSchema({
+    allOf: [{ type: 'string' }, { type: 'null' }, { not: {} }]
+  })
+})
+
 // JexIR of union of primitives should map to json-schema
 
 test('JexIR of union of primitives should map to json-schema', () => {

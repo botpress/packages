@@ -45,6 +45,11 @@ export type JexIRUnion = {
   anyOf: JexIR[]
 }
 
+export type JexIRIntersection = {
+  type: 'intersection'
+  allOf: JexIR[]
+}
+
 export type JexIRObject = {
   type: 'object'
   properties: Record<string, JexIR> // properties are required
@@ -82,6 +87,7 @@ export type JexIR =
   | JexIRNumberLiteral
   | JexIRBooleanLiteral
   | JexIRUnion
+  | JexIRIntersection
   | JexIRObject
   | JexIRArray
   | JexIRMap

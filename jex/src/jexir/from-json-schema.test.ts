@@ -6,7 +6,7 @@ import { jexEquals as jexEquals } from '../jex-equals'
 import { jsonSchemaBuilder as $ } from '../builders'
 import { toString } from './to-string'
 
-const expectZod = (jsonSchema: JSONSchema7) => ({
+const expectJsonSchema = (jsonSchema: JSONSchema7) => ({
   toEqualJex: async (expectedJexSchema: JexIR): Promise<void> => {
     const actualJexSchema = await j2x(jsonSchema)
 
@@ -18,51 +18,51 @@ const expectZod = (jsonSchema: JSONSchema7) => ({
 })
 
 test('JexIR should model primitive types', async () => {
-  await expectZod($.string()).toEqualJex({ type: 'string' })
-  await expectZod($.number()).toEqualJex({ type: 'number' })
-  await expectZod($.integer()).toEqualJex({ type: 'number' })
-  await expectZod($.boolean()).toEqualJex({ type: 'boolean' })
-  await expectZod($.null()).toEqualJex({ type: 'null' })
-  await expectZod($.undefined()).toEqualJex({ type: 'undefined' })
+  await expectJsonSchema($.string()).toEqualJex({ type: 'string' })
+  await expectJsonSchema($.number()).toEqualJex({ type: 'number' })
+  await expectJsonSchema($.integer()).toEqualJex({ type: 'number' })
+  await expectJsonSchema($.boolean()).toEqualJex({ type: 'boolean' })
+  await expectJsonSchema($.null()).toEqualJex({ type: 'null' })
+  await expectJsonSchema($.undefined()).toEqualJex({ type: 'undefined' })
 })
 
 test('JexIR should model literal types', async () => {
-  await expectZod($.literal('a')).toEqualJex({ type: 'string', value: 'a' })
-  await expectZod($.literal(1)).toEqualJex({ type: 'number', value: 1 })
-  await expectZod($.literal(true)).toEqualJex({ type: 'boolean', value: true })
+  await expectJsonSchema($.literal('a')).toEqualJex({ type: 'string', value: 'a' })
+  await expectJsonSchema($.literal(1)).toEqualJex({ type: 'number', value: 1 })
+  await expectJsonSchema($.literal(true)).toEqualJex({ type: 'boolean', value: true })
 })
 
 test('JexIR should model union of primitives', async () => {
-  await expectZod($.union([$.string(), $.number()])).toEqualJex({
+  await expectJsonSchema($.union([$.string(), $.number()])).toEqualJex({
     type: 'union',
     anyOf: [{ type: 'string' }, { type: 'number' }]
   })
-  await expectZod($.union([$.boolean(), $.null()])).toEqualJex({
+  await expectJsonSchema($.union([$.boolean(), $.null()])).toEqualJex({
     type: 'union',
     anyOf: [{ type: 'boolean' }, { type: 'null' }]
   })
-  await expectZod($.union([$.string(), $.null(), $.undefined()])).toEqualJex({
+  await expectJsonSchema($.union([$.string(), $.null(), $.undefined()])).toEqualJex({
     type: 'union',
     anyOf: [{ type: 'string' }, { type: 'null' }, { type: 'undefined' }]
   })
 })
 
 test('JexIR should model union of literals of a single primitive', async () => {
-  await expectZod($.union([$.literal('a'), $.literal('b')])).toEqualJex({
+  await expectJsonSchema($.union([$.literal('a'), $.literal('b')])).toEqualJex({
     type: 'union',
     anyOf: [
       { type: 'string', value: 'a' },
       { type: 'string', value: 'b' }
     ]
   })
-  await expectZod($.union([$.literal(1), $.literal(2)])).toEqualJex({
+  await expectJsonSchema($.union([$.literal(1), $.literal(2)])).toEqualJex({
     type: 'union',
     anyOf: [
       { type: 'number', value: 1 },
       { type: 'number', value: 2 }
     ]
   })
-  await expectZod($.union([$.literal(true), $.literal(false)])).toEqualJex({
+  await expectJsonSchema($.union([$.literal(true), $.literal(false)])).toEqualJex({
     type: 'union',
     anyOf: [
       { type: 'boolean', value: true },
@@ -72,26 +72,31 @@ test('JexIR should model union of literals of a single primitive', async () => {
 })
 
 test('JexIR should model optional and nullable fields', async () => {
-  await expectZod($.optional($.string())).toEqualJex({
+  await expectJsonSchema($.optional($.string())).toEqualJex({
     type: 'union',
     anyOf: [{ type: 'undefined' }, { type: 'string' }]
   })
-  await expectZod($.nullable($.string())).toEqualJex({ type: 'union', anyOf: [{ type: 'string' }, { type: 'null' }] })
-  await expectZod($.nullable($.optional($.string()))).toEqualJex({
+  await expectJsonSchema($.nullable($.string())).toEqualJex({
+    type: 'union',
+    anyOf: [{ type: 'string' }, { type: 'null' }]
+  })
+  await expectJsonSchema($.nullable($.optional($.string()))).toEqualJex({
     type: 'union',
     anyOf: [{ type: 'undefined' }, { type: 'string' }, { type: 'null' }]
   })
 })
 
 test('JexIR should model union of literals of multiple primitives', async () => {
-  await expectZod($.union([$.literal('a'), $.literal(1)])).toEqualJex({
+  await expectJsonSchema($.union([$.literal('a'), $.literal(1)])).toEqualJex({
     type: 'union',
     anyOf: [
       { type: 'string', value: 'a' },
       { type: 'number', value: 1 }
     ]
   })
-  await expectZod($.union([$.literal('yes'), $.literal('no'), $.literal(1), $.literal(0), $.boolean()])).toEqualJex({
+  await expectJsonSchema(
+    $.union([$.literal('yes'), $.literal('no'), $.literal(1), $.literal(0), $.boolean()])
+  ).toEqualJex({
     type: 'union',
     anyOf: [
       { type: 'string', value: 'yes' },
@@ -104,7 +109,7 @@ test('JexIR should model union of literals of multiple primitives', async () => 
 })
 
 test('JexIR should model object types', async () => {
-  await expectZod(
+  await expectJsonSchema(
     $.object({
       name: $.string(),
       age: $.number()
@@ -119,26 +124,59 @@ test('JexIR should model object types', async () => {
 })
 
 test('JexIR should model array types', async () => {
-  await expectZod($.array($.string())).toEqualJex({
+  await expectJsonSchema($.array($.string())).toEqualJex({
     type: 'array',
     items: { type: 'string' }
   })
 })
 
 test('JexIR should model map types', async () => {
-  await expectZod($.record($.string())).toEqualJex({
+  await expectJsonSchema($.record($.string())).toEqualJex({
     type: 'map',
     items: { type: 'string' }
   })
 })
 
+test('JexIR should model a complex object type', async () => {
+  await expectJsonSchema({
+    type: 'object',
+    properties: {
+      name: $.string(),
+      age: $.number(),
+      email: $.string()
+    },
+    required: ['name', 'age'],
+    additionalProperties: $.string()
+  }).toEqualJex({
+    type: 'intersection',
+    allOf: [
+      {
+        type: 'object',
+        properties: {
+          name: { type: 'string' },
+          age: { type: 'number' },
+          email: { type: 'union', anyOf: [{ type: 'string' }, { type: 'undefined' }] }
+        }
+      },
+      { type: 'map', items: { type: 'string' } }
+    ]
+  })
+})
+
 test('JexIR should model unknown type', async () => {
-  await expectZod($.unknown()).toEqualJex({ type: 'unknown' })
+  await expectJsonSchema($.unknown()).toEqualJex({ type: 'unknown' })
 })
 
 test('JexIR should model tuple types', async () => {
-  await expectZod($.tuple([$.string(), $.number()])).toEqualJex({
+  await expectJsonSchema($.tuple([$.string(), $.number()])).toEqualJex({
     type: 'tuple',
     items: [{ type: 'string' }, { type: 'number' }]
+  })
+})
+
+test('JexIR should model intersection types', async () => {
+  await expectJsonSchema($.intersection([$.string(), $.number()])).toEqualJex({
+    type: 'intersection',
+    allOf: [{ type: 'string' }, { type: 'number' }]
   })
 })

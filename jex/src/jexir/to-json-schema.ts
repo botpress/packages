@@ -24,6 +24,10 @@ export const toJsonSchema = (jex: types.JexIR): JSONSchema7 => {
     return { anyOf: jex.anyOf.map(toJsonSchema) }
   }
 
+  if (jex.type === 'intersection') {
+    return { allOf: jex.allOf.map(toJsonSchema) }
+  }
+
   if (jex.type === 'array') {
     return { type: 'array', items: toJsonSchema(jex.items) }
   }

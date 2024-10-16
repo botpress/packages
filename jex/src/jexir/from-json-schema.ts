@@ -143,9 +143,17 @@ const _toInternalRep = (schema: JSONSchema7): types.JexIR => {
   }
 
   if (schema.type === 'object') {
-    // TODO: if both additionalProperties and properties are defined, the resulting type should be an intersection
+    if (schema.additionalProperties !== undefined && schema.properties !== undefined) {
+      return {
+        type: 'intersection',
+        allOf: [
+          _toInternalRep({ ...schema, additionalProperties: undefined }),
+          _toInternalRep({ ...schema, properties: undefined })
+        ]
+      }
+    }
 
-    if (schema.additionalProperties !== undefined && schema.properties === undefined) {
+    if (schema.additionalProperties !== undefined) {
       if (schema.additionalProperties === true) {
         return {
           type: 'map',
@@ -158,38 +166,35 @@ const _toInternalRep = (schema: JSONSchema7): types.JexIR => {
           properties: {}
         }
       }
-      if (typeof schema.additionalProperties !== 'object') {
-        throw new err.JexError('Object schema additionalProperties must be an object')
-      }
       return {
         type: 'map',
         items: _toInternalRep(schema.additionalProperties)
       }
     }
 
-    if (schema.properties === undefined) {
+    if (schema.properties !== undefined) {
+      const properties: Record<string, types.JexIR> = {}
+      for (const [key, value] of Object.entries(schema.properties)) {
+        const isRequired = schema.required?.includes(key)
+        const mapped = _toInternalRep(value as JSONSchema7)
+        if (isRequired) {
+          properties[key] = mapped
+        } else {
+          properties[key] = {
+            type: 'union',
+            anyOf: [mapped, { type: 'undefined' }]
+          }
+        }
+      }
       return {
         type: 'object',
-        properties: {}
+        properties
       }
     }
 
-    const properties: Record<string, types.JexIR> = {}
-    for (const [key, value] of Object.entries(schema.properties)) {
-      const isRequired = schema.required?.includes(key)
-      const mapped = _toInternalRep(value as JSONSchema7)
-      if (isRequired) {
-        properties[key] = mapped
-      } else {
-        properties[key] = {
-          type: 'union',
-          anyOf: [mapped, { type: 'undefined' }]
-        }
-      }
-    }
     return {
       type: 'object',
-      properties
+      properties: {}
     }
   }
 
@@ -205,6 +210,20 @@ const _toInternalRep = (schema: JSONSchema7): types.JexIR => {
     return {
       type: 'union',
       anyOf: enums.map(_toInternalRep)
+    }
+  }
+
+  if (schema.allOf !== undefined) {
+    const enums: JSONSchema7[] = []
+    for (const item of schema.allOf) {
+      if (item === true || item === false) {
+        throw new err.JexError('Boolean schema is not supported')
+      }
+      enums.push(item)
+    }
+    return {
+      type: 'intersection',
+      allOf: enums.map(_toInternalRep)
     }
   }
 

@@ -1,6 +1,6 @@
 import { test, expect } from 'vitest'
 import { toString } from './to-string'
-import { $ } from './jex-builder'
+import { $ } from '../jex-builder'
 import { JexType } from './typings'
 
 const expectJex = (jex: JexType) => ({

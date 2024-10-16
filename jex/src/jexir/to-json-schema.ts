@@ -4,7 +4,7 @@ import * as types from './typings'
 const isOptional = (jexir: types.JexType): boolean =>
   jexir.type === 'union' && jexir.anyOf.some((jex) => jex.type === 'undefined')
 
-export const fromJex = (jex: types.JexType): JSONSchema7 => {
+export const toJsonSchema = (jex: types.JexType): JSONSchema7 => {
   if (jex.type === 'null') {
     return { type: 'null' }
   }
@@ -21,15 +21,15 @@ export const fromJex = (jex: types.JexType): JSONSchema7 => {
   }
 
   if (jex.type === 'union') {
-    return { anyOf: jex.anyOf.map(fromJex) }
+    return { anyOf: jex.anyOf.map(toJsonSchema) }
   }
 
   if (jex.type === 'array') {
-    return { type: 'array', items: fromJex(jex.items) }
+    return { type: 'array', items: toJsonSchema(jex.items) }
   }
 
   if (jex.type === 'map') {
-    return { type: 'object', additionalProperties: fromJex(jex.items) }
+    return { type: 'object', additionalProperties: toJsonSchema(jex.items) }
   }
 
   if (jex.type === 'object') {
@@ -37,13 +37,13 @@ export const fromJex = (jex: types.JexType): JSONSchema7 => {
     const requiredEntries = entries.filter(([_, jex]) => !isOptional(jex)).map(([k]) => k)
     return {
       type: 'object',
-      properties: Object.fromEntries(entries.map(([k, v]) => [k, fromJex(v)])),
+      properties: Object.fromEntries(entries.map(([k, v]) => [k, toJsonSchema(v)])),
       required: requiredEntries
     }
   }
 
   if (jex.type === 'tuple') {
-    return { type: 'array', items: jex.items.map(fromJex) }
+    return { type: 'array', items: jex.items.map(toJsonSchema) }
   }
 
   return {}

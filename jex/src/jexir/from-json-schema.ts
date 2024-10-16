@@ -214,7 +214,7 @@ const _toInternalRep = (schema: JSONSchema7): types.JexType => {
   return { type: 'any' }
 }
 
-export const toJex = async (schema: JSONSchema7): Promise<types.JexType> => {
+export const fromJsonSchema = async (schema: JSONSchema7): Promise<types.JexType> => {
   const unref = await _dereference(schema)
   const jex = _toInternalRep(unref)
   return flattenUnions(jex)

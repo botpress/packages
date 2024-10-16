@@ -1,5 +1,3 @@
-import * as utils from '../utils'
-
 export type JexStringContent = string
 export type JexString = {
   type: 'string'

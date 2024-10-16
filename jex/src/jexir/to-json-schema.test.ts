@@ -1,12 +1,12 @@
-import { fromJex } from './from-jex'
+import { toJsonSchema } from './to-json-schema'
 import { expect, test } from 'vitest'
-import { $ } from './jex-builder'
+import { $ } from '../jex-builder'
 import { JexType } from './typings'
 import { JSONSchema7 } from 'json-schema'
 
 const expectJex = (jex: JexType) => ({
   toEqualJsonSchema: (expectedJsonSchema: JSONSchema7) => {
-    expect(fromJex(jex)).toEqual(expectedJsonSchema)
+    expect(toJsonSchema(jex)).toEqual(expectedJsonSchema)
   }
 })
 

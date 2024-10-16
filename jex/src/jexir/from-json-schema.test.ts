@@ -4,9 +4,9 @@ import z from 'zod'
 import { JexType } from './typings'
 
 import zodToJsonSchema from 'zod-to-json-schema'
-import { toJex as j2x } from './to-jex'
+import { fromJsonSchema as j2x } from './from-json-schema'
 import { jexBotCreateSchema, zodBotCreateSchema } from './create-bot.utils.test'
-import { jexEquals as jexEquals } from './jex-equals'
+import { jexEquals as jexEquals } from '../jex-equals'
 
 const z2j = (s: z.ZodType): JSONSchema7 => zodToJsonSchema(s) as JSONSchema7
 

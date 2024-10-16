@@ -1,11 +1,10 @@
-import * as types from './typings'
+import * as jexir from './jexir'
 import { PropertyPath, pathToString } from './property-path'
-import { toString } from './to-string'
 
 type _JexFailureReason = {
   path: PropertyPath
-  typeA: types.JexType
-  typeB: types.JexType
+  typeA: jexir.JexType
+  typeB: jexir.JexType
 }
 type _JexExtensionSuccess = { result: true }
 type _JexExtensionFailure = { result: false; reasons: _JexFailureReason[] }
@@ -21,13 +20,13 @@ const _splitSuccessFailure = (results: _JexExtensionResult[]): [_JexExtensionSuc
   return [success, failure]
 }
 
-type _LiteralOf<T extends types.JexPrimitive> = Extract<types.JexLiteral, { type: T['type'] }>
-const _primitiveExtends = <T extends types.JexPrimitive>(
+type _LiteralOf<T extends jexir.JexPrimitive> = Extract<jexir.JexLiteral, { type: T['type'] }>
+const _primitiveExtends = <T extends jexir.JexPrimitive>(
   path: PropertyPath,
   typeA: T | _LiteralOf<T>,
-  typeB: types.JexType
+  typeB: jexir.JexType
 ): _JexExtensionResult => {
-  const isT = (x: types.JexType): x is T | _LiteralOf<T> => x.type === typeA.type
+  const isT = (x: jexir.JexType): x is T | _LiteralOf<T> => x.type === typeA.type
   if (!isT(typeB)) {
     return {
       result: false,
@@ -57,7 +56,7 @@ const _primitiveExtends = <T extends types.JexPrimitive>(
   return { result: true }
 }
 
-const _jexExtends = (path: PropertyPath, typeA: types.JexType, typeB: types.JexType): _JexExtensionResult => {
+const _jexExtends = (path: PropertyPath, typeA: jexir.JexType, typeB: jexir.JexType): _JexExtensionResult => {
   if (typeB.type === 'any' || typeA.type === 'any') {
     return { result: true }
   }
@@ -104,7 +103,7 @@ const _jexExtends = (path: PropertyPath, typeA: types.JexType, typeB: types.JexT
 
   if (typeA.type === 'map') {
     if (typeB.type === 'object') {
-      const valueA: types.JexUnion = { type: 'union', anyOf: [typeA.items, { type: 'undefined' }] } // could be undefined
+      const valueA: jexir.JexUnion = { type: 'union', anyOf: [typeA.items, { type: 'undefined' }] } // could be undefined
       const extensions = Object.entries(typeB.properties).map(([key, valueB]) => {
         const newPath: PropertyPath = [...path, { type: 'key', value: key }]
         return _jexExtends(newPath, valueA, valueB)
@@ -133,7 +132,7 @@ const _jexExtends = (path: PropertyPath, typeA: types.JexType, typeB: types.JexT
       return { result: false, reasons: failures.flatMap((f) => f.reasons) }
     }
     if (typeB.type === 'tuple') {
-      const zipped = typeA.items.map((c, i) => [c, typeB.items[i]] satisfies [types.JexType, types.JexType | undefined])
+      const zipped = typeA.items.map((c, i) => [c, typeB.items[i]] satisfies [jexir.JexType, jexir.JexType | undefined])
       const extensions = zipped.map(([c, p], i): _JexExtensionResult => {
         if (p === undefined) {
           return { result: true } // A tuple is longer than B
@@ -169,10 +168,10 @@ const _jexExtends = (path: PropertyPath, typeA: types.JexType, typeB: types.JexT
 }
 
 const _reasonToString = (reason: _JexFailureReason): string =>
-  `${pathToString(reason.path)}: ${toString(reason.typeA)} ⊈ ${toString(reason.typeB)}`
+  `${pathToString(reason.path)}: ${jexir.toString(reason.typeA)} ⊈ ${jexir.toString(reason.typeB)}`
 
 export type JexExtensionResult = { extends: true } | { extends: false; reasons: string[] }
-export const jexExtends = (typeA: types.JexType, typeB: types.JexType): JexExtensionResult => {
+export const jexExtends = (typeA: jexir.JexType, typeB: jexir.JexType): JexExtensionResult => {
   const extension = _jexExtends([], typeA, typeB)
   if (extension.result) return { extends: true }
   return { extends: false, reasons: extension.reasons.map(_reasonToString) }

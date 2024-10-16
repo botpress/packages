@@ -23,11 +23,11 @@ dependencies:
 
 devDependencies:
   '@bpinternal/log4bot':
-    specifier: 0.0.19
-    version: 0.0.19
+    specifier: 0.0.21
+    version: 0.0.21
   '@bpinternal/yargs-extra':
-    specifier: 0.0.13
-    version: 0.0.13
+    specifier: 0.0.15
+    version: 0.0.15
   '@tsconfig/node18-strictest':
     specifier: ^1.0.0
     version: 1.0.0
@@ -36,22 +36,22 @@ devDependencies:
     version: 4.17.10
   '@types/node':
     specifier: ^18.11.17
-    version: 18.19.54
+    version: 18.19.55
   '@types/web':
-    specifier: ^0.0.169
-    version: 0.0.169
+    specifier: ^0.0.172
+    version: 0.0.172
   esbuild:
     specifier: ^0.24.0
     version: 0.24.0
   puppeteer:
     specifier: ^22.0.0
-    version: 22.0.0(typescript@5.6.2)
+    version: 22.0.0(typescript@5.6.3)
   ts-node:
     specifier: ^10.9.1
-    version: 10.9.2(@types/node@18.19.54)(typescript@5.6.2)
+    version: 10.9.2(@types/node@18.19.55)(typescript@5.6.3)
   typescript:
-    specifier: 5.6.2
-    version: 5.6.2
+    specifier: 5.6.3
+    version: 5.6.3
 
 packages:
 
@@ -78,8 +78,8 @@ packages:
       picocolors: 1.1.0
     dev: true
 
-  /@bpinternal/log4bot@0.0.19:
-    resolution: {integrity: sha512-KvLez25gjW9uXxj4TC6qPP2x+4gq7O2cKORC2Jb5AWodgkHCqLmtvY9Ur/F94ceYpjP31I11oBwTXl6bBsIyjw==}
+  /@bpinternal/log4bot@0.0.21:
+    resolution: {integrity: sha512-vGe9fmJYn6a6mUAq8FRokqCOga9UM/dXKDTg+cgismaTKkehxFJuxWPsP0/WTJWWegOZcss4Gk2qy1ZuWyTTOA==}
     engines: {node: '>=16.0.0', pnpm: 8.6.2}
     dependencies:
       chalk: 4.1.2
@@ -88,8 +88,8 @@ packages:
       regex-parser: 2.3.0
     dev: true
 
-  /@bpinternal/yargs-extra@0.0.13:
-    resolution: {integrity: sha512-564rYqGkccAg8dSg83YCPKMvHQNPyZe+WCdyOEVn+3N2oJoIrHAHTNVPQC0lJfmHPZl48hPC775sLxPNv+rMWQ==}
+  /@bpinternal/yargs-extra@0.0.15:
+    resolution: {integrity: sha512-juFu/mzittuZQW8o/+DE2z5uw10Ka6wfKw6U0tH5wrFwQbM104KDZ2hkshn4gjxo1wBMw0snpXlhwGpSyWTiZQ==}
     engines: {node: '>=16.0.0', pnpm: 8.6.2}
     dependencies:
       '@types/yargs': 17.0.33
@@ -384,19 +384,19 @@ packages:
     resolution: {integrity: sha512-YpS0zzoduEhuOWjAotS6A5AVCva7X4lVlYLF0FYHAY9sdraBfnatttHItlWeZdGhuEkf+OzMNg2ZYAx8t+52uQ==}
     dev: true
 
-  /@types/node@18.19.54:
-    resolution: {integrity: sha512-+BRgt0G5gYjTvdLac9sIeE0iZcJxi4Jc4PV5EUzqi+88jmQLr+fRZdv2tCTV7IHKSGxM6SaLoOXQWWUiLUItMw==}
+  /@types/node@18.19.55:
+    resolution: {integrity: sha512-zzw5Vw52205Zr/nmErSEkN5FLqXPuKX/k5d1D7RKHATGqU7y6YfX9QxZraUzUrFGqH6XzOzG196BC35ltJC4Cw==}
     dependencies:
       undici-types: 5.26.5
 
-  /@types/web@0.0.169:
-    resolution: {integrity: sha512-oRSjHjC3f3/e/8b6jpPfjDnQxJR9s6ajeHJTaN6fnjg466wDO/inKStV52uplNraDg5MJ3sFTYLoBJIdR0w2sg==}
+  /@types/web@0.0.172:
+    resolution: {integrity: sha512-O0u/qjyOGRfwXGEnHcPR2zsKZ7zTeUcRGXCLyF14LBhvJlcIYDLVAq0Gz6TRrbTi9Sb8DbpG2mf0Nga0S1eT6w==}
     dev: true
 
   /@types/ws@8.5.12:
     resolution: {integrity: sha512-3tPRkv1EtkDpzlgyKyI8pGsGZAGPEaXeu0DOj5DI25Ja91bdAYddYHbADRYVrZMRbfW+1l5YwXVDKohDJNQxkQ==}
     dependencies:
-      '@types/node': 18.19.54
+      '@types/node': 18.19.55
     dev: false
 
   /@types/yargs-parser@21.0.3:
@@ -413,7 +413,7 @@ packages:
     resolution: {integrity: sha512-oJoftv0LSuaDZE3Le4DbKX+KS9G36NzOeSap90UIK0yMA/NhKJhqlSGtNDORNRaIbQfzjXDrQa0ytJ6mNRGz/Q==}
     requiresBuild: true
     dependencies:
-      '@types/node': 18.19.54
+      '@types/node': 18.19.55
     dev: true
     optional: true
 
@@ -569,7 +569,7 @@ packages:
     resolution: {integrity: sha512-dOy+3AuW3a2wNbZHIuMZpTcgjGuLU/uBL/ubcZF9OXbDo8ff4O8yVp5Bf0efS8uEoYo5q4Fx7dY9OgQGXgAsQA==}
     dev: true
 
-  /cosmiconfig@9.0.0(typescript@5.6.2):
+  /cosmiconfig@9.0.0(typescript@5.6.3):
     resolution: {integrity: sha512-itvL5h8RETACmOTFc4UfIyB2RfEHi71Ax6E/PivVxq9NseKbOWpeyHEOIbmAw1rs8Ak0VursQNww7lf7YtUwzg==}
     engines: {node: '>=14'}
     peerDependencies:
@@ -582,7 +582,7 @@ packages:
       import-fresh: 3.3.0
       js-yaml: 4.1.0
       parse-json: 5.2.0
-      typescript: 5.6.2
+      typescript: 5.6.3
     dev: true
 
   /create-require@1.1.1:
@@ -1041,14 +1041,14 @@ packages:
       - utf-8-validate
     dev: true
 
-  /puppeteer@22.0.0(typescript@5.6.2):
+  /puppeteer@22.0.0(typescript@5.6.3):
     resolution: {integrity: sha512-zYVnjwJngnSB4dbkWp7DHFSIc3nqHvZzrdHyo9+ugV1nq1Lm8obOMcmCFaGfR3PJs0EmYNz+/skBeO45yvASCQ==}
     engines: {node: '>=18'}
     hasBin: true
     requiresBuild: true
     dependencies:
       '@puppeteer/browsers': 2.0.0
-      cosmiconfig: 9.0.0(typescript@5.6.2)
+      cosmiconfig: 9.0.0(typescript@5.6.3)
       puppeteer-core: 22.0.0
     transitivePeerDependencies:
       - bufferutil
@@ -1181,7 +1181,7 @@ packages:
     resolution: {integrity: sha512-N3WMsuqV66lT30CrXNbEjx4GEwlow3v6rr4mCcv6prnfwhS01rkgyFdjPNBYd9br7LpXV1+Emh01fHnq2Gdgrw==}
     dev: true
 
-  /ts-node@10.9.2(@types/node@18.19.54)(typescript@5.6.2):
+  /ts-node@10.9.2(@types/node@18.19.55)(typescript@5.6.3):
     resolution: {integrity: sha512-f0FFpIdcHgn8zcPSbf1dRevwt047YMnaiJM3u2w2RewrB+fob/zePZcrOyQoLMMO7aBIddLcQIEK5dYjkLnGrQ==}
     hasBin: true
     peerDependencies:
@@ -1200,14 +1200,14 @@ packages:
       '@tsconfig/node12': 1.0.11
       '@tsconfig/node14': 1.0.3
       '@tsconfig/node16': 1.0.4
-      '@types/node': 18.19.54
+      '@types/node': 18.19.55
       acorn: 8.12.1
       acorn-walk: 8.3.4
       arg: 4.1.3
       create-require: 1.1.1
       diff: 4.0.2
       make-error: 1.3.6
-      typescript: 5.6.2
+      typescript: 5.6.3
       v8-compile-cache-lib: 3.0.1
       yn: 3.1.1
     dev: true
@@ -1216,8 +1216,8 @@ packages:
     resolution: {integrity: sha512-gLXCKdN1/j47AiHiOkJN69hJmcbGTHI0ImLmbYLHykhgeN0jVGola9yVjFgzCUklsZQMW55o+dW7IXv3RCXDzA==}
     dev: true
 
-  /typescript@5.6.2:
-    resolution: {integrity: sha512-NW8ByodCSNCwZeghjN3o+JX5OFH0Ojg6sadjEKY4huZ52TqbJTJnDo5+Tw98lSy63NZvi4n+ez5m2u5d4PkZyw==}
+  /typescript@5.6.3:
+    resolution: {integrity: sha512-hjcS1mhfuyi4WW8IWtjP7brDrG2cuDZukyrYrSauoXGNgx0S7zceP07adYkJycEr56BOUTNPzbInooiN3fn1qw==}
     engines: {node: '>=14.17'}
     hasBin: true
     dev: true

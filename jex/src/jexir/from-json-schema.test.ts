@@ -132,8 +132,8 @@ test('JexIR should model map types', async () => {
   })
 })
 
-test('JexIR should model any type', async () => {
-  await expectZod($.any()).toEqualJex({ type: 'any' })
+test('JexIR should model unknown type', async () => {
+  await expectZod($.unknown()).toEqualJex({ type: 'unknown' })
 })
 
 test('JexIR should model tuple types', async () => {

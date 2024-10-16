@@ -1,5 +1,16 @@
 import * as types from './typings'
 
+/**
+ *
+ * Consider two sets S1 and S2:
+ * type S1 = A | (B | (C | D))
+ * type S2 = A | B | C | D
+ * Both sets are equivalent, but S1 is not in a flattened form.
+ * This function takes a schema and returns a new schema with all unions flattened to the top level.
+ *
+ * @param schema a JexIR schema
+ * @returns a new JexIR schema with all unions flattened
+ */
 export const flattenUnions = (schema: types.JexIR): types.JexIR => {
   if (schema.type === 'array') {
     return {

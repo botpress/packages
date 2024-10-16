@@ -12,8 +12,23 @@ const typeOf = <T extends PrimitiveType>(schema: T): TypeOf<T> => typeof schema 
 
 type NoInfer<T> = [T][T extends any ? 0 : never]
 
+const STRING = { type: 'string' } satisfies JSONSchema7
+const NUMBER = { type: 'number' } satisfies JSONSchema7
+const INTEGER = { type: 'integer' } satisfies JSONSchema7
+const BOOLEAN = { type: 'boolean' } satisfies JSONSchema7
+const NULL = { type: 'null' } satisfies JSONSchema7
+const UNDEFINED = { not: {} } satisfies JSONSchema7
+const ANY = {} satisfies JSONSchema7
+
 export type JsonSchemaBuilder = typeof jsonSchemaBuilder
 export const jsonSchemaBuilder = {
+  string: () => STRING,
+  number: () => NUMBER,
+  integer: () => INTEGER,
+  boolean: () => BOOLEAN,
+  null: () => NULL,
+  undefined: () => UNDEFINED,
+  any: () => ANY,
   object: <K extends string>(
     properties: Record<K, JSONSchema7>,
     required: NoInfer<K>[] = Object.keys(properties) as K[]
@@ -22,19 +37,14 @@ export const jsonSchemaBuilder = {
     properties,
     required
   }),
-  string: () => ({ type: 'string' }),
-  number: () => ({ type: 'number' }),
-  integer: () => ({ type: 'integer' }),
-  boolean: () => ({ type: 'boolean' }),
-  null: () => ({ type: 'null' }),
   array: (items: JSONSchema7) => ({ type: 'array', items }),
   tuple: (items: JSONSchema7[]) => ({ type: 'array', items, minItems: items.length, maxItems: items.length }),
   record: (values: JSONSchema7) => ({ type: 'object', additionalProperties: values }),
-  any: () => ({}),
-  union: <T extends JSONSchema7[]>(...schemas: T) => ({ anyOf: schemas }),
+  union: <T extends JSONSchema7[]>(schemas: T) => ({ anyOf: schemas }),
   enum: <P extends string | number | boolean>(...values: P[]) => ({ enum: values }),
   ref: ($ref: string) => ({ $ref }),
   literal: (value: string | number | boolean) => ({ type: typeOf(value), enum: [value] }),
-  nullable: (schema: JSONSchema7) => ({ anyOf: [schema, { type: 'null' }] }),
+  nullable: (schema: JSONSchema7) => ({ anyOf: [schema, NULL] }),
+  optional: (schema: JSONSchema7) => ({ anyOf: [schema, UNDEFINED] }),
   intersection: <T extends JSONSchema7[]>(...schemas: T) => ({ allOf: schemas })
 } satisfies Record<string, (...args: any[]) => JSONSchema7>

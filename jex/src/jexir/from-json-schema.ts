@@ -103,7 +103,7 @@ const _toInternalRep = (schema: JSONSchema7): types.JexIR => {
     return _toInternalPrimitive('string', schema)
   }
 
-  if (schema.type === 'number') {
+  if (schema.type === 'number' || schema.type === 'integer') {
     return _toInternalPrimitive('number', schema)
   }
 

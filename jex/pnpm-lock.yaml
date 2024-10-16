@@ -40,12 +40,6 @@ devDependencies:
   vitest:
     specifier: 1.6.0
     version: 1.6.0(@types/node@22.7.4)
-  zod:
-    specifier: ^3.22.4
-    version: 3.22.4
-  zod-to-json-schema:
-    specifier: ^3.22.4
-    version: 3.23.3(zod@3.22.4)
 
 packages:
 
@@ -1432,16 +1426,4 @@ packages:
   /yocto-queue@1.1.1:
     resolution: {integrity: sha512-b4JR1PFR10y1mKjhHY9LaGo6tmrgjit7hxVIeAmyMw3jegXR4dhYqLaQF5zMXZxY7tLpMyJeLjr1C4rLmkVe8g==}
     engines: {node: '>=12.20'}
-    dev: true
-
-  /zod-to-json-schema@3.23.3(zod@3.22.4):
-    resolution: {integrity: sha512-TYWChTxKQbRJp5ST22o/Irt9KC5nj7CdBKYB/AosCRdj/wxEMvv4NNaj9XVUHDOIp53ZxArGhnw5HMZziPFjog==}
-    peerDependencies:
-      zod: ^3.23.3
-    dependencies:
-      zod: 3.22.4
-    dev: true
-
-  /zod@3.22.4:
-    resolution: {integrity: sha512-iC+8Io04lddc+mVqQ9AZ7OQ2MrUKGN+oIQyq1vemgt46jwCwLfhq7/pwnBnNXXXZb8VTVLKwp9EDkx+ryxIWmg==}
     dev: true

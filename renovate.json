@@ -59,11 +59,6 @@
     {
       "matchUpdateTypes": ["major"],
       "enabled": false
-    },
-    {
-      "matchFileNames": ["jex/**"],
-      "matchPackageNames": ["typescript"],
-      "enabled": false
     }
   ]
 }

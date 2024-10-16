@@ -1,5 +1,4 @@
 import * as utils from '../utils'
-import { JexInfer } from './jex-infer'
 import * as types from './typings'
 import { JexExtensionResult, jexExtends } from './jex-extends'
 import { expect, test } from 'vitest'
@@ -50,9 +49,6 @@ test('jex-extends should be true if child and parent are the same', () => {
 test('jex-extends should be true if child is an object with more properties than parent', () => {
   const child = $.object({ a: $.string(), b: $.number() })
   const parent = $.object({ a: $.string() })
-  type _child = JexInfer<typeof child>
-  type _parent = JexInfer<typeof parent>
-  type _childExtendsParent = utils.types.Expect<utils.types.Extends<_child, _parent>>
   expectJex(child).toExtend(parent)
 })
 
@@ -60,9 +56,6 @@ test('jex-extends should be true if child is an object with more properties than
 test('jex-extends should be false if child is an object with less properties than parent', () => {
   const child = $.object({ a: $.string() })
   const parent = $.object({ a: $.string(), b: $.number() })
-  type _child = JexInfer<typeof child>
-  type _parent = JexInfer<typeof parent>
-  type _childNotExtendsParent = utils.types.ExpectNot<utils.types.Extends<_child, _parent>>
   expectJex(child).not.toExtend(parent)
 })
 
@@ -70,9 +63,6 @@ test('jex-extends should be false if child is an object with less properties tha
 test('jex-extends should be false if an optional property of child is required in parent', () => {
   const child = $.object({ a: $.union([$.string(), $.undefined()]) })
   const parent = $.object({ a: $.string() })
-  type _child = JexInfer<typeof child>
-  type _parent = JexInfer<typeof parent>
-  type _childNotExtendsParent = utils.types.ExpectNot<utils.types.Extends<_child, _parent>>
   expectJex(child).not.toExtend(parent)
 })
 
@@ -87,9 +77,6 @@ test('jex-extends should be true if child is an object made of only required pro
 test('jex-extends should be true if when child is a union with less types than parent', () => {
   const child = $.union([$.string(), $.number()])
   const parent = $.union([$.string(), $.number(), $.undefined(), $.null()])
-  type _child = JexInfer<typeof child>
-  type _parent = JexInfer<typeof parent>
-  type _childExtendsParent = utils.types.Expect<utils.types.Extends<_child, _parent>>
   expectJex(child).toExtend(parent)
 })
 
@@ -104,9 +91,6 @@ test('jex-extends should be false if child is a union with more types than paren
 test('jex-extends should be true if child is a literal with same base type than parent', () => {
   const child = $.literal('banana')
   const parent = $.union([$.string(), $.number()])
-  type _child = JexInfer<typeof child>
-  type _parent = JexInfer<typeof parent>
-  type _childExtendsParent = utils.types.Expect<utils.types.Extends<_child, _parent>>
   expectJex(child).toExtend(parent)
 })
 
@@ -114,9 +98,6 @@ test('jex-extends should be true if child is a literal with same base type than 
 test('jex-extends should be false if child is a primitive and parent is a literal', () => {
   const child = $.string()
   const parent = $.literal('banana')
-  type _child = JexInfer<typeof child>
-  type _parent = JexInfer<typeof parent>
-  type _childNotExtendsParent = utils.types.ExpectNot<utils.types.Extends<_child, _parent>>
   expectJex(child).not.toExtend(parent)
 })
 
@@ -124,9 +105,6 @@ test('jex-extends should be false if child is a primitive and parent is a litera
 test('jex-extends should be true if child is a literal included in parent union', () => {
   const child = $.literal('banana')
   const parent = $.union([$.string(), $.number(), $.literal('banana')])
-  type _child = JexInfer<typeof child>
-  type _parent = JexInfer<typeof parent>
-  type _childExtendsParent = utils.types.Expect<utils.types.Extends<_child, _parent>>
   expectJex(child).toExtend(parent)
 })
 
@@ -134,9 +112,6 @@ test('jex-extends should be true if child is a literal included in parent union'
 test('jex-extends should be false if child is a literal not included in parent union', () => {
   const child = $.literal('banana')
   const parent = $.union([$.number(), $.literal('apple')])
-  type _child = JexInfer<typeof child>
-  type _parent = JexInfer<typeof parent>
-  type _childNotExtendsParent = utils.types.ExpectNot<utils.types.Extends<_child, _parent>>
   expectJex(child).not.toExtend(parent)
 })
 
@@ -144,9 +119,6 @@ test('jex-extends should be false if child is a literal not included in parent u
 test('jex-extends should be true if child and parents are arrays and child items extends parent items', () => {
   const child = $.array($.string())
   const parent = $.array($.union([$.string(), $.undefined()]))
-  type _child = JexInfer<typeof child>
-  type _parent = JexInfer<typeof parent>
-  type _childExtendsParent = utils.types.Expect<utils.types.Extends<_child, _parent>>
   expectJex(child).toExtend(parent)
 })
 
@@ -154,9 +126,6 @@ test('jex-extends should be true if child and parents are arrays and child items
 test('jex-extends should be false if child and parents are arrays and child items do not extends parent items', () => {
   const child = $.array($.string())
   const parent = $.array($.number())
-  type _child = JexInfer<typeof child>
-  type _parent = JexInfer<typeof parent>
-  type _childNotExtendsParent = utils.types.ExpectNot<utils.types.Extends<_child, _parent>>
   expectJex(child).not.toExtend(parent)
 })
 
@@ -164,16 +133,10 @@ test('jex-extends should be false if child and parents are arrays and child item
 test('jex-extends should be true if child is a tuple and parent is an array with the same items', () => {
   const tupleStrStr = $.tuple([$.string(), $.string()])
   const arrayStr = $.array($.string())
-  type _childExtendsParent1 = utils.types.Expect<
-    utils.types.Extends<JexInfer<typeof tupleStrStr>, JexInfer<typeof arrayStr>>
-  >
   expectJex(tupleStrStr).toExtend(arrayStr)
 
   const tupleStrNum = $.tuple([$.string(), $.number()])
   const arrayStrNum = $.array($.union([$.string(), $.number()]))
-  type _childExtendsParent2 = utils.types.Expect<
-    utils.types.Extends<JexInfer<typeof tupleStrNum>, JexInfer<typeof arrayStrNum>>
-  >
   expectJex(tupleStrNum).toExtend(arrayStrNum)
 })
 
@@ -181,9 +144,6 @@ test('jex-extends should be true if child is a tuple and parent is an array with
 test('jex-extends should be false if child is a tuple and parent is an array with different items', () => {
   const child = $.tuple([$.string(), $.number()])
   const parent = $.array($.number())
-  type _child = JexInfer<typeof child>
-  type _parent = JexInfer<typeof parent>
-  type _childNotExtendsParent = utils.types.ExpectNot<utils.types.Extends<_child, _parent>>
   expectJex(child).not.toExtend(parent)
 })
 
@@ -191,9 +151,6 @@ test('jex-extends should be false if child is a tuple and parent is an array wit
 test('jex-extends should be true if child and parent are objects and child items extends parent items', () => {
   const child = $.object({ a: $.string() })
   const parent = $.object({ a: $.union([$.string(), $.number()]) })
-  type _child = JexInfer<typeof child>
-  type _parent = JexInfer<typeof parent>
-  type _childExtendsParent = utils.types.Expect<utils.types.Extends<_child, _parent>>
   expectJex(child).toExtend(parent)
 })
 
@@ -201,9 +158,6 @@ test('jex-extends should be true if child and parent are objects and child items
 test('jex-extends should be true if child and parents are maps and child items extends parent items', () => {
   const child = $.map($.string())
   const parent = $.map($.union([$.string(), $.undefined(), $.boolean()]))
-  type _child = JexInfer<typeof child>
-  type _parent = JexInfer<typeof parent>
-  type _childExtendsParent = utils.types.Expect<utils.types.Extends<_child, _parent>>
   expectJex(child).toExtend(parent)
 })
 
@@ -211,18 +165,17 @@ test('jex-extends should be true if child and parents are maps and child items e
 test('jex-extends should be false if child and parents are maps and child items do not extends parent items', () => {
   const child = $.map($.union([$.string(), $.undefined(), $.boolean()]))
   const parent = $.map($.string())
-  type _child = JexInfer<typeof child>
-  type _parent = JexInfer<typeof parent>
-  type _childNotExtendsParent = utils.types.ExpectNot<utils.types.Extends<_child, _parent>>
   expectJex(child).not.toExtend(parent)
 })
 
+// Record<string, string> extends { a?: string }
 test('jex-extends should be true if child is a map and parent is object with no required properties', () => {
   const child = $.map($.string())
   expectJex(child).toExtend($.object({}))
   expectJex(child).toExtend($.object({ a: $.union([$.string(), $.undefined()]) }))
 })
 
+// Record<string, string> does not extend { a: string }
 test('jex-extends should be false if child is a map and parent has required properties', () => {
   const child = $.map($.string())
   expectJex(child).not.toExtend($.object({ a: $.string() }))

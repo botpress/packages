@@ -3,7 +3,6 @@ import { expect, test } from 'vitest'
 import { $ } from './jex-builder'
 import { JexType } from './typings'
 import { JSONSchema7 } from 'json-schema'
-import { flattenUnions } from './flatten-unions'
 
 const expectJex = (jex: JexType) => ({
   toEqualJsonSchema: (expectedJsonSchema: JSONSchema7) => {

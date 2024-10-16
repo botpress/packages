@@ -7,6 +7,11 @@ const _primitiveToString = (jexPrimitive: types.JexPrimitive): string => {
   return jexPrimitive.type
 }
 
+/**
+ *
+ * @param jexSchema the schema to convert
+ * @returns A string representation of the schema for easier debugging. This string is used when returning an extension failure reason.
+ */
 export const toString = (jexSchema: types.JexType): string => {
   if (jexSchema.type === 'undefined') return 'undefined'
   if (jexSchema.type === 'null') return 'null'

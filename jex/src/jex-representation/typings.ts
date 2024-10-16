@@ -68,7 +68,7 @@ export type JexAny = {
 
 export type JexTuple = {
   type: 'tuple'
-  items: utils.types.Tuple<JexType, number>
+  items: JexType[]
 }
 
 export type JexType =

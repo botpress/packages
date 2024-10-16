@@ -17,9 +17,6 @@ export type Resolve<T> = T extends (...args: infer A) => infer R
 
 export type Cast<T, U> = T extends U ? T : U
 
-type _Tuple<T, N extends number, R extends any[]> = R['length'] extends N ? R : _Tuple<T, N, [T, ...R]>
-export type Tuple<T, N extends number> = number extends N ? T[] : _Tuple<T, N, []>
-
 export type Expect<T extends true> = T extends true ? true : 'Expectation failed'
 export type ExpectNot<T extends false> = T extends false ? true : 'Expectation failed'
 

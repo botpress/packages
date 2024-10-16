@@ -18,7 +18,7 @@ const expectZod = (zodSchema: z.ZodType) => ({
   }
 })
 
-test('jex-rep should model primitive types', async () => {
+test('JexIR should model primitive types', async () => {
   await expectZod(z.string()).toEqualJex({ type: 'string' })
   await expectZod(z.number()).toEqualJex({ type: 'number' })
   await expectZod(z.boolean()).toEqualJex({ type: 'boolean' })
@@ -26,13 +26,13 @@ test('jex-rep should model primitive types', async () => {
   await expectZod(z.undefined()).toEqualJex({ type: 'undefined' })
 })
 
-test('jex-rep should model literal types', async () => {
+test('JexIR should model literal types', async () => {
   await expectZod(z.literal('a')).toEqualJex({ type: 'string', value: 'a' })
   await expectZod(z.literal(1)).toEqualJex({ type: 'number', value: 1 })
   await expectZod(z.literal(true)).toEqualJex({ type: 'boolean', value: true })
 })
 
-test('jex-rep should model union of primitives', async () => {
+test('JexIR should model union of primitives', async () => {
   await expectZod(z.union([z.string(), z.number()])).toEqualJex({
     type: 'union',
     anyOf: [{ type: 'string' }, { type: 'number' }]
@@ -47,7 +47,7 @@ test('jex-rep should model union of primitives', async () => {
   })
 })
 
-test('jex-rep should model union of literals of a single primitive', async () => {
+test('JexIR should model union of literals of a single primitive', async () => {
   await expectZod(z.union([z.literal('a'), z.literal('b')])).toEqualJex({
     type: 'union',
     anyOf: [
@@ -71,7 +71,7 @@ test('jex-rep should model union of literals of a single primitive', async () =>
   })
 })
 
-test('jex-rep should model optional and nullable fields', async () => {
+test('JexIR should model optional and nullable fields', async () => {
   await expectZod(z.string().optional()).toEqualJex({
     type: 'union',
     anyOf: [{ type: 'undefined' }, { type: 'string' }]
@@ -83,7 +83,7 @@ test('jex-rep should model optional and nullable fields', async () => {
   })
 })
 
-test('jex-rep should model union of literals of multiple primitives', async () => {
+test('JexIR should model union of literals of multiple primitives', async () => {
   await expectZod(z.union([z.literal('a'), z.literal(1)])).toEqualJex({
     type: 'union',
     anyOf: [
@@ -103,7 +103,7 @@ test('jex-rep should model union of literals of multiple primitives', async () =
   })
 })
 
-test('jex-rep should model object types', async () => {
+test('JexIR should model object types', async () => {
   await expectZod(
     z.object({
       name: z.string(),
@@ -118,31 +118,31 @@ test('jex-rep should model object types', async () => {
   })
 })
 
-test('jex-rep should model array types', async () => {
+test('JexIR should model array types', async () => {
   await expectZod(z.array(z.string())).toEqualJex({
     type: 'array',
     items: { type: 'string' }
   })
 })
 
-test('jex-rep should model map types', async () => {
+test('JexIR should model map types', async () => {
   await expectZod(z.record(z.string())).toEqualJex({
     type: 'map',
     items: { type: 'string' }
   })
 })
 
-test('jex-rep should model any type', async () => {
+test('JexIR should model any type', async () => {
   await expectZod(z.any()).toEqualJex({ type: 'any' })
 })
 
-test('jex-rep should model tuple types', async () => {
+test('JexIR should model tuple types', async () => {
   await expectZod(z.tuple([z.string(), z.number()])).toEqualJex({
     type: 'tuple',
     items: [{ type: 'string' }, { type: 'number' }]
   })
 })
 
-test('jex-rep should model bot create schema', async () => {
+test('JexIR should model bot create schema', async () => {
   await expectZod(zodBotCreateSchema).toEqualJex(jexBotCreateSchema)
 })

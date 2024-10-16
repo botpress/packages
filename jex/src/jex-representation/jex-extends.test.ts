@@ -1,4 +1,3 @@
-import * as utils from '../utils'
 import * as types from './typings'
 import { JexExtensionResult, jexExtends } from './jex-extends'
 import { expect, test } from 'vitest'

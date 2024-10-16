@@ -14,6 +14,11 @@ export type PropertyPathSection =
 
 export type PropertyPath = PropertyPathSection[]
 
+/**
+ *
+ * @param path A data structure that represents a path to a property in a JSON object
+ * @returns A string representation of the path for easier debugging. This string is used when returning an extension failure reason.
+ */
 export const pathToString = (path: PropertyPath): string =>
   '#' +
   path

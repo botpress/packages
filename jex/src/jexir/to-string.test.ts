@@ -11,7 +11,7 @@ const expectJex = (jex: JexIR) => ({
 })
 
 test('jexir toString should correctly convert jexir schema to string representation', () => {
-  expectJex($.any()).toStringifyAs('any')
+  expectJex($.unknown()).toStringifyAs('unknown')
   expectJex($.undefined()).toStringifyAs('undefined')
   expectJex($.null()).toStringifyAs('null')
   expectJex($.string()).toStringifyAs('string')

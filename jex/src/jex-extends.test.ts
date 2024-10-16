@@ -25,11 +25,15 @@ const expectJex = (typeA: jexir.JexIR) => ({
   }
 })
 
-// any extends string, string extends any, any extends any
-test('jex-extends should be true if child or parent is any', () => {
-  expectJex($.any()).toExtend($.any())
-  expectJex($.string()).toExtend($.any())
-  expectJex($.any()).toExtend($.string())
+// string extends unknown, unknown extends unknown
+test('jex-extends should be true if child or parent is unknown', () => {
+  expectJex($.unknown()).toExtend($.unknown())
+  expectJex($.string()).toExtend($.unknown())
+})
+
+// unknown does not extend string
+test('jex-extends should be false if child is unknown and parent is not', () => {
+  expectJex($.unknown()).not.toExtend($.string())
 })
 
 // string extends string, { a: string } extends { a: string }, etc..

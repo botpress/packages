@@ -71,7 +71,7 @@ const _toInternalRep = (schema: JSONSchema7): types.JexIR => {
   if (schema.not !== undefined) {
     if (schema.not === true) {
       return {
-        type: 'any'
+        type: 'unknown'
       }
     }
 
@@ -82,7 +82,7 @@ const _toInternalRep = (schema: JSONSchema7): types.JexIR => {
     }
 
     const not = _toInternalRep(schema.not)
-    if (not.type === 'any') {
+    if (not.type === 'unknown') {
       return {
         type: 'undefined'
       }
@@ -119,7 +119,7 @@ const _toInternalRep = (schema: JSONSchema7): types.JexIR => {
     if (schema.items === undefined) {
       return {
         type: 'array',
-        items: { type: 'any' }
+        items: { type: 'unknown' }
       }
     }
 
@@ -149,7 +149,7 @@ const _toInternalRep = (schema: JSONSchema7): types.JexIR => {
       if (schema.additionalProperties === true) {
         return {
           type: 'map',
-          items: { type: 'any' }
+          items: { type: 'unknown' }
         }
       }
       if (schema.additionalProperties === false) {
@@ -208,7 +208,7 @@ const _toInternalRep = (schema: JSONSchema7): types.JexIR => {
     }
   }
 
-  return { type: 'any' }
+  return { type: 'unknown' }
 }
 
 export const fromJsonSchema = async (schema: JSONSchema7): Promise<types.JexIR> => {

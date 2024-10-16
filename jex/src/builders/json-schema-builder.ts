@@ -18,7 +18,7 @@ const INTEGER = { type: 'integer' } satisfies JSONSchema7
 const BOOLEAN = { type: 'boolean' } satisfies JSONSchema7
 const NULL = { type: 'null' } satisfies JSONSchema7
 const UNDEFINED = { not: {} } satisfies JSONSchema7
-const ANY = {} satisfies JSONSchema7
+const UNKOWN = {} satisfies JSONSchema7
 
 export type JsonSchemaBuilder = typeof jsonSchemaBuilder
 export const jsonSchemaBuilder = {
@@ -28,7 +28,7 @@ export const jsonSchemaBuilder = {
   boolean: () => BOOLEAN,
   null: () => NULL,
   undefined: () => UNDEFINED,
-  any: () => ANY,
+  unknown: () => UNKOWN,
   object: <K extends string>(
     properties: Record<K, JSONSchema7>,
     required: NoInfer<K>[] = Object.keys(properties) as K[]

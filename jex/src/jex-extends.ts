@@ -57,8 +57,13 @@ const _primitiveExtends = <T extends jexir.JexIRPrimitive>(
 }
 
 const _jexExtends = (path: PropertyPath, typeA: jexir.JexIR, typeB: jexir.JexIR): _JexExtensionResult => {
-  if (typeB.type === 'any' || typeA.type === 'any') {
-    return { result: true }
+  if (typeB.type === 'unknown') {
+    return { result: true } // everything extends unknown
+  }
+
+  if (typeA.type === 'unknown') {
+    // nothing extends unknown except unknown itself
+    return { result: false, reasons: [{ path, typeA, typeB }] }
   }
 
   if (typeA.type === 'union') {

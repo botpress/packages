@@ -17,7 +17,7 @@ function _literal(value: string | number | boolean) {
 
 export type jexirBuilder = typeof jexirBuilder
 export const jexirBuilder = {
-  any: () => ({ type: 'any' }),
+  unknown: () => ({ type: 'unknown' }),
   string: () => ({ type: 'string' }),
   number: () => ({ type: 'number' }),
   boolean: () => ({ type: 'boolean' }),

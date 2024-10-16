@@ -132,10 +132,10 @@ test('JexIR of map types should map to json-schema', () => {
   })
 })
 
-// JexIR of any type should map to json-schema
+// JexIR of unknown type should map to json-schema
 
-test('JexIR of any type should map to json-schema', () => {
-  expectJex($.any()).toEqualJsonSchema({})
+test('JexIR of unknown type should map to json-schema', () => {
+  expectJex($.unknown()).toEqualJsonSchema({})
 })
 
 // JexIR of tuple types should map to json-schema

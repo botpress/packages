@@ -44,5 +44,5 @@ export const toString = (jexirSchema: types.JexIR): string => {
       .join(', ')} }`
   }
 
-  return 'any'
+  return 'unknown'
 }

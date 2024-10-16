@@ -1,6 +1,6 @@
-import * as jexir from '../jexir'
+import * as types from './typings'
 
-const _primitiveToString = (jexPrimitive: jexir.JexPrimitive): string => {
+const _primitiveToString = (jexPrimitive: types.JexPrimitive): string => {
   if ('value' in jexPrimitive) {
     return JSON.stringify(jexPrimitive.value)
   }
@@ -12,7 +12,7 @@ const _primitiveToString = (jexPrimitive: jexir.JexPrimitive): string => {
  * @param jexSchema the schema to convert
  * @returns A string representation of the schema for easier debugging. This string is used when returning an extension failure reason.
  */
-export const toString = (jexSchema: jexir.JexType): string => {
+export const toString = (jexSchema: types.JexType): string => {
   if (jexSchema.type === 'undefined') return 'undefined'
   if (jexSchema.type === 'null') return 'null'
   if (jexSchema.type === 'string' || jexSchema.type === 'number' || jexSchema.type === 'boolean')

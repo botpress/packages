@@ -177,6 +177,9 @@ const _reasonToString = (reason: _JexFailureReason): string =>
 
 export type JexExtensionResult = { extends: true } | { extends: false; reasons: string[] }
 export const jexExtends = (typeA: jexir.JexIR, typeB: jexir.JexIR): JexExtensionResult => {
+  typeA = jexir.normalize(typeA)
+  typeB = jexir.normalize(typeB)
+
   const extension = _jexExtends([], typeA, typeB)
   if (extension.result) return { extends: true }
   return { extends: false, reasons: extension.reasons.map(_reasonToString) }

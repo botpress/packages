@@ -146,6 +146,8 @@ const _toInternalRep = (schema: JSONSchema7): types.JexType => {
   }
 
   if (schema.type === 'object') {
+    // TODO: if both additionalProperties and properties are defined, the resulting type should be an intersection
+
     if (schema.additionalProperties !== undefined && schema.properties === undefined) {
       if (schema.additionalProperties === true) {
         return {

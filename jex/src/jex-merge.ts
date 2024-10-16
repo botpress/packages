@@ -1,7 +1,7 @@
-import * as types from './typings'
+import * as jexir from './jexir'
 
-export const jexMerge = (a: types.JexObject, b: types.JexObject): types.JexObject => {
-  const merged: types.JexObject = { type: 'object', properties: {} }
+export const jexMerge = (a: jexir.JexObject, b: jexir.JexObject): jexir.JexObject => {
+  const merged: jexir.JexObject = { type: 'object', properties: {} }
 
   const aKeys = Object.keys(a.properties)
   const bKeys = Object.keys(b.properties)

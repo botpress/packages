@@ -103,10 +103,23 @@ const _jexExtends = (path: PropertyPath, typeA: types.JexType, typeB: types.JexT
   }
 
   if (typeA.type === 'map') {
-    if (typeB.type !== 'map') return { result: false, reasons: [{ path, typeA, typeB }] }
+    if (typeB.type === 'object') {
+      const valueA: types.JexUnion = { type: 'union', anyOf: [typeA.items, { type: 'undefined' }] } // could be undefined
+      const extensions = Object.entries(typeB.properties).map(([key, valueB]) => {
+        const newPath: PropertyPath = [...path, { type: 'key', value: key }]
+        return _jexExtends(newPath, valueA, valueB)
+      })
+      const [_, failures] = _splitSuccessFailure(extensions)
+      if (failures.length === 0) return { result: true } // All properties of A extend B
+      return { result: false, reasons: failures.flatMap((f) => f.reasons) }
+    }
 
-    const newPath: PropertyPath = [...path, { type: 'string-index' }]
-    return _jexExtends(newPath, typeA.items, typeB.items)
+    if (typeB.type === 'map') {
+      const newPath: PropertyPath = [...path, { type: 'string-index' }]
+      return _jexExtends(newPath, typeA.items, typeB.items)
+    }
+
+    return { result: false, reasons: [{ path, typeA, typeB }] }
   }
 
   if (typeA.type === 'tuple') {

@@ -41,6 +41,11 @@ export const traverseJexIR = (schema: JexIR, cb: TraverseJexIRCallback): JexIR =
     return cb(newSchema)
   }
 
+  if (schema.type === 'intersection') {
+    const newSchema: JexIR = { ...schema, allOf: schema.allOf.map((item) => traverseJexIR(item, cb)) }
+    return cb(newSchema)
+  }
+
   // so that we don't forget a level of recursion
   type _expectPrimitive = utils.types.Expect<utils.types.Equals<typeof schema, types.JexIRBaseType>>
   return cb(schema)

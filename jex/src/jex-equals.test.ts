@@ -77,6 +77,24 @@ test('union should not be equal if anyOf have different length', () => {
   expectJex(a).not.toEqual(b)
 })
 
+test('intersection should be equal if allOf are equal even if order is different', () => {
+  const a = $.intersection([$.string(), $.number()])
+  const b = $.intersection([$.number(), $.string()])
+  expect(jexEquals(a, b)).toBe(true)
+})
+
+test('intersection should not be equal if allOf are different', () => {
+  const a = $.intersection([$.string(), $.number()])
+  const b = $.intersection([$.number(), $.boolean()])
+  expect(jexEquals(a, b)).toBe(false)
+})
+
+test('intersection should not be equal if allOf have different length', () => {
+  const a = $.intersection([$.string(), $.number()])
+  const b = $.intersection([$.number(), $.number(), $.boolean()])
+  expect(jexEquals(a, b)).toBe(false)
+})
+
 test('arrays should be equal if items are equal recursively', () => {
   const a = $.array(stringOrNumber)
   const b = $.array(numberOrString)

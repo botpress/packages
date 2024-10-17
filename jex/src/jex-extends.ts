@@ -80,6 +80,16 @@ const _jexExtends = (path: PropertyPath, typeA: jexir.JexIR, typeB: jexir.JexIR)
     return { result: false, reasons: failures.flatMap((f) => f.reasons) }
   }
 
+  if (typeA.type === 'intersection') {
+    // TODO: properly implement intersection
+    return { result: false, reasons: [{ path, typeA, typeB }] }
+  }
+
+  if (typeB.type === 'intersection') {
+    // TODO: properly implement intersection
+    return { result: false, reasons: [{ path, typeA, typeB }] }
+  }
+
   if (typeA.type === 'object') {
     if (typeB.type === 'map') {
       const extensions = Object.entries(typeA.properties).map(([key, valueA]) => {

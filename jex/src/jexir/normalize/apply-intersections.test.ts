@@ -17,7 +17,7 @@ test('applyIntersections remain an intersection if some children are not objects
   const bar = $.object({ b: $.number() })
   const baz = $.map($.boolean())
   const schema = $.intersection([foo, bar, baz])
-  const expectedSchema = $.intersection([baz, $.object({ ...foo.properties, ...bar.properties })])
+  const expectedSchema = $.intersection([$.object({ ...foo.properties, ...bar.properties }), baz])
   const actualSchema = applyIntersections(schema)
   expect(actualSchema).toEqual(expectedSchema)
 })
@@ -45,25 +45,17 @@ test('applyIntersections should deep merge objects with common keys even if some
   const baz = $.map($.boolean())
   const schema = $.intersection([foo, bar, baz])
   const expectedSchema = $.intersection([
-    baz,
     $.object({
       a: $.string(),
-      b: $.number(),
       c: $.intersection([
         //
         $.object({ d: $.undefined(), e: $.null() }),
         banana
-      ])
-    })
+      ]),
+      b: $.number()
+    }),
+    baz
   ])
   const actualSchema = applyIntersections(schema)
   expect(actualSchema).toEqual(expectedSchema)
 })
-
-type Simplify<T> = { [K in keyof T]: T[K] }
-
-type Foo = { a: string; c: { d: undefined } }
-type Bar = { b: number; c: { e: null } }
-type Baz = Record<string, boolean>
-
-type Actual = Simplify<Foo & Bar & Baz>

@@ -2,7 +2,20 @@ import _ from 'lodash'
 import * as types from '../typings'
 import { traverseJexIRPreOrder } from './traverse-jexir'
 
-const mergeObjects = (objectA: types.JexIRObject, objectB: types.JexIRObject): types.JexIRObject => {
+const intersectTypes = (typeA: types.JexIR, typeB: types.JexIR): types.JexIR => {
+  if (typeA.type === 'intersection' && typeB.type === 'intersection') {
+    return { type: 'intersection', allOf: [...typeA.allOf, ...typeB.allOf] }
+  }
+  if (typeA.type === 'intersection') {
+    return { type: 'intersection', allOf: [...typeA.allOf, typeB] }
+  }
+  if (typeB.type === 'intersection') {
+    return { type: 'intersection', allOf: [typeA, ...typeB.allOf] }
+  }
+  return { type: 'intersection', allOf: [typeA, typeB] }
+}
+
+const mergeObjectsBinary = (objectA: types.JexIRObject, objectB: types.JexIRObject): types.JexIRObject => {
   const objectC: types.JexIRObject = { type: 'object', properties: {} }
   const keysA = Object.keys(objectA.properties)
   const keysB = Object.keys(objectB.properties)
@@ -11,7 +24,7 @@ const mergeObjects = (objectA: types.JexIRObject, objectB: types.JexIRObject): t
     const propA = objectA.properties[key]
     const propB = objectB.properties[key]
     if (propA && propB) {
-      objectC.properties[key] = { type: 'intersection', allOf: [propA, propB] }
+      objectC.properties[key] = intersectTypes(propA, propB)
     } else if (propA) {
       objectC.properties[key] = propA
     } else if (propB) {
@@ -19,6 +32,33 @@ const mergeObjects = (objectA: types.JexIRObject, objectB: types.JexIRObject): t
     }
   }
   return objectC
+}
+
+// const mergeObjects = (objects: types.JexIRObject[]): types.JexIRObject => {
+//   const mergedObject: types.JexIRObject = { type: 'object', properties: {} }
+//   const allKeys = objects.flatMap((object) => Object.keys(object.properties))
+//   const uniqueKeys = new Set<string>(allKeys)
+//   for (const key of uniqueKeys) {
+//     const values = objects.map((object) => object.properties[key]).filter((v) => v !== undefined)
+//     if (values.length > 1) {
+//       mergedObject.properties[key] = { type: 'intersection', allOf: values }
+//       continue
+//     }
+//     const [value] = values
+//     if (value) {
+//       mergedObject.properties[key] = value
+//       continue
+//     }
+//   }
+//   return mergedObject
+// }
+
+const mergeObjects = (objects: types.JexIRObject[]): types.JexIRObject => {
+  let mergedObject: types.JexIRObject = { type: 'object', properties: {} }
+  for (const object of objects) {
+    mergedObject = mergeObjectsBinary(mergedObject, object)
+  }
+  return mergedObject
 }
 
 /**
@@ -42,17 +82,12 @@ export const applyIntersections = (schema: types.JexIR): types.JexIR =>
       return s
     }
 
-    let mergedObject: types.JexIRObject = { type: 'object', properties: {} }
-    for (const object of objects) {
-      mergedObject = mergeObjects(mergedObject, object)
-    }
+    const mergedObject = mergeObjects(objects)
 
     if (others.length === 0) {
       return mergedObject
     }
 
-    return {
-      ...s,
-      allOf: [...others, mergedObject]
-    }
+    const mergedIntersection: types.JexIRIntersection = { type: 'intersection', allOf: [mergedObject, ...others] }
+    return mergedIntersection
   })

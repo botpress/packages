@@ -1,3 +1,4 @@
+import * as utils from '../utils'
 import * as types from './typings'
 
 const _primitiveToString = (jexPrimitive: types.JexIRPrimitive): string => {
@@ -38,11 +39,17 @@ export const toString = (jexirSchema: types.JexIR): string => {
     return jexirSchema.anyOf.map(toString).join(' | ')
   }
 
+  if (jexirSchema.type === 'intersection') {
+    return jexirSchema.allOf.map(toString).join(' & ')
+  }
+
   if (jexirSchema.type === 'object') {
     return `{ ${Object.entries(jexirSchema.properties)
       .map(([key, value]) => `${key}: ${toString(value)}`)
       .join(', ')} }`
   }
 
+  // so that we don't forget anything
+  type _expectPrimitive = utils.types.Expect<utils.types.Equals<typeof jexirSchema, types.JexIRUnknown>>
   return 'unknown'
 }

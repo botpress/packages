@@ -24,6 +24,7 @@ test('jexir toString should correctly convert jexir schema to string representat
   expectJex($.tuple([$.string(), $.number()])).toStringifyAs('[string, number]')
   expectJex($.map($.number())).toStringifyAs('{ [key: string]: number }')
   expectJex($.union([$.string(), $.number()])).toStringifyAs('string | number')
+  expectJex($.intersection([$.string(), $.number()])).toStringifyAs('string & number')
   expectJex($.object({ a: $.string(), b: $.number() })).toStringifyAs('{ a: string, b: number }')
   expectJex($.array($.union([$.string(), $.number()]))).toStringifyAs('(string | number)[]')
 })

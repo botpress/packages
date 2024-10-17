@@ -186,3 +186,50 @@ test('jex-extends should be false if child is a map and parent has required prop
   const child = $.map($.string())
   expectJex(child).not.toExtend($.object({ a: $.string() }))
 })
+
+// string & number & boolean extends string & number
+test('jex-extends should be true if child is an intersection with more types than parent intersection', () => {
+  const a = $.string()
+  const b = $.number()
+  const c = $.boolean()
+  const child = $.intersection([a, b, c])
+  const parent = $.intersection([a, b])
+  expectJex(child).toExtend(parent)
+})
+
+// string & number does not extend string & number & boolean
+test('jex-extends should be false if child is an intersection with less types than parent intersection', () => {
+  const a = $.string()
+  const b = $.number()
+  const c = $.boolean()
+  const child = $.intersection([a, b])
+  const parent = $.intersection([a, b, c])
+  expectJex(child).not.toExtend(parent)
+})
+
+// string & number extends string
+test('jex-extends should be true if child is an intersection that includes the parent', () => {
+  const a = $.string()
+  const b = $.number()
+  const child = $.intersection([a, b])
+  const parent = a
+  expectJex(child).toExtend(parent)
+})
+
+// string does not extend string & number
+test('jex-extends should be false if parent is an intersection that includes child', () => {
+  const a = $.string()
+  const b = $.number()
+  const child = a
+  const parent = $.intersection([a, b])
+  expectJex(child).not.toExtend(parent)
+})
+
+// { a: string } extends { a: string } & Record<string, string>
+test('jex-extends should be true when child implements all parent intersection', () => {
+  const foo = $.object({ a: $.string() })
+  const bar = $.map($.string()) // foo is a valid bar
+  const child = foo
+  const parent = $.intersection([foo, bar])
+  expectJex(child).toExtend(parent)
+})

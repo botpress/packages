@@ -132,6 +132,32 @@ test('JexIR should model map types', () => {
   })
 })
 
+test('JexIR should model a object type with both properties and additionalProperties', () => {
+  expectJsonSchema({
+    type: 'object',
+    properties: {
+      name: $.string(),
+      age: $.number(),
+      email: $.string()
+    },
+    required: ['name', 'age'],
+    additionalProperties: $.string()
+  }).toEqualJex({
+    type: 'intersection',
+    allOf: [
+      {
+        type: 'object',
+        properties: {
+          name: { type: 'string' },
+          age: { type: 'number' },
+          email: { type: 'union', anyOf: [{ type: 'string' }, { type: 'undefined' }] }
+        }
+      },
+      { type: 'map', items: { type: 'string' } }
+    ]
+  })
+})
+
 test('JexIR should model unknown type', () => {
   expectJsonSchema($.unknown()).toEqualJex({ type: 'unknown' })
 })
@@ -140,5 +166,12 @@ test('JexIR should model tuple types', () => {
   expectJsonSchema($.tuple([$.string(), $.number()])).toEqualJex({
     type: 'tuple',
     items: [{ type: 'string' }, { type: 'number' }]
+  })
+})
+
+test('JexIR should model intersection types', async () => {
+  await expectJsonSchema($.intersection([$.string(), $.number()])).toEqualJex({
+    type: 'intersection',
+    allOf: [{ type: 'string' }, { type: 'number' }]
   })
 })

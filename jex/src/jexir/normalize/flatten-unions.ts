@@ -1,5 +1,5 @@
 import * as types from '../typings'
-import { traverseJexIR } from './traverse-jexir'
+import { traverseJexIRPostOrder } from './traverse-jexir'
 
 /**
  *
@@ -13,7 +13,7 @@ import { traverseJexIR } from './traverse-jexir'
  * @returns a new JexIR schema with all unions flattened
  */
 export const flattenUnions = (s: types.JexIR): types.JexIR =>
-  traverseJexIR(s, (s: types.JexIR): types.JexIR => {
+  traverseJexIRPostOrder(s, (s: types.JexIR): types.JexIR => {
     if (s.type !== 'union') {
       return s
     }

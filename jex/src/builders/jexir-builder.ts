@@ -28,5 +28,6 @@ export const jexirBuilder = {
   array: <const Args extends jexir.JexIR>(items: Args) => ({ type: 'array', items: items as Args }),
   map: <const Args extends jexir.JexIR>(items: Args) => ({ type: 'map', items: items as Args }),
   tuple: <const Args extends jexir.JexIR[]>(items: Args) => ({ type: 'tuple', items }),
-  union: <const Args extends jexir.JexIR[]>(anyOf: Args) => ({ type: 'union', anyOf })
+  union: <const Args extends jexir.JexIR[]>(anyOf: Args) => ({ type: 'union', anyOf }),
+  intersection: <const Args extends jexir.JexIR[]>(allOf: Args) => ({ type: 'intersection', allOf })
 } satisfies Record<string, (...args: any[]) => jexir.JexIR>

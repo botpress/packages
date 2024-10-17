@@ -66,6 +66,15 @@ const _jexEquals = (a: jexir.JexIR, b: jexir.JexIR): boolean => {
     return aSet.isEqual(bSet)
   }
 
+  if (a.type === 'intersection') {
+    if (b.type !== 'intersection') {
+      return false
+    }
+    const aSet = new JexSet(a.allOf)
+    const bSet = new JexSet(b.allOf)
+    return aSet.isEqual(bSet)
+  }
+
   // so that we don't forget a level of recursion
   type _expectPrimitive = utils.types.Expect<utils.types.Equals<typeof a, jexir.JexIRBaseType>>
   return _.isEqual(a, b)

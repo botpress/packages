@@ -36,14 +36,34 @@ test('applyIntersections should deep merge objects with common keys', () => {
 })
 
 test('applyIntersections should deep merge objects with common keys even if some children are not objects', () => {
+  const banana = $.tuple([$.literal('banana')])
   const foo = $.object({ a: $.string(), c: $.object({ d: $.undefined() }) })
-  const bar = $.object({ b: $.number(), c: $.object({ e: $.null() }) })
+  const bar = $.object({
+    b: $.number(),
+    c: $.intersection([$.object({ e: $.null() }), banana])
+  })
   const baz = $.map($.boolean())
   const schema = $.intersection([foo, bar, baz])
   const expectedSchema = $.intersection([
     baz,
-    $.object({ a: $.string(), b: $.number(), c: $.object({ d: $.undefined(), e: $.null() }) })
+    $.object({
+      a: $.string(),
+      b: $.number(),
+      c: $.intersection([
+        //
+        $.object({ d: $.undefined(), e: $.null() }),
+        banana
+      ])
+    })
   ])
   const actualSchema = applyIntersections(schema)
   expect(actualSchema).toEqual(expectedSchema)
 })
+
+type Simplify<T> = { [K in keyof T]: T[K] }
+
+type Foo = { a: string; c: { d: undefined } }
+type Bar = { b: number; c: { e: null } }
+type Baz = Record<string, boolean>
+
+type Actual = Simplify<Foo & Bar & Baz>

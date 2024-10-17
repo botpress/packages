@@ -31,8 +31,8 @@ const mergeObjects = (objectA: types.JexIRObject, objectB: types.JexIRObject): t
  * @param schema a JexIR schema
  * @returns a new JexIR schema with intersections applied
  */
-export const applyIntersections = (s: types.JexIR): types.JexIR =>
-  traverseJexIRPreOrder(s, (s: types.JexIR): types.JexIR => {
+export const applyIntersections = (schema: types.JexIR): types.JexIR =>
+  traverseJexIRPreOrder(schema, (s: types.JexIR): types.JexIR => {
     if (s.type !== 'intersection') {
       return s
     }

@@ -49,6 +49,11 @@ export type JexIRUnion = {
   anyOf: JexIR[]
 }
 
+export type JexIRIntersection = {
+  type: 'intersection'
+  allOf: JexIR[]
+}
+
 export type JexIRObject = {
   type: 'object'
   properties: Record<string, JexIR> // properties are required
@@ -76,4 +81,4 @@ export type JexIRBaseType = JexIRPrimitive | JexIRNull | JexIRUndefined | JexIRL
  * This datastructure is simpler than a JSON Schema and easier to work with.
  * It has no requirement to be backward compatible since it is only used internally.
  */
-export type JexIR = JexIRBaseType | JexIRUnion | JexIRObject | JexIRArray | JexIRMap | JexIRTuple
+export type JexIR = JexIRBaseType | JexIRUnion | JexIRIntersection | JexIRObject | JexIRArray | JexIRMap | JexIRTuple

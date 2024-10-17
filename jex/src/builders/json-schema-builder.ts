@@ -41,6 +41,7 @@ export const jsonSchemaBuilder = {
   tuple: (items: JSONSchema7[]) => ({ type: 'array', items, minItems: items.length, maxItems: items.length }),
   record: (values: JSONSchema7) => ({ type: 'object', additionalProperties: values }),
   union: <T extends JSONSchema7[]>(schemas: T) => ({ anyOf: schemas }),
+  intersection: <T extends JSONSchema7[]>(schemas: T) => ({ allOf: schemas }),
   enum: <P extends string | number | boolean>(values: P[]) => ({ enum: values }),
   ref: ($ref: string) => ({ $ref }),
   date: () => ({ type: 'string', format: 'date-time' }),

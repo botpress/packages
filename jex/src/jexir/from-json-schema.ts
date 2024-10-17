@@ -154,7 +154,13 @@ const _toInternalRep = (schema: JSONSchema7): types.JexIR => {
 
   if (schema.type === 'object') {
     if (schema.additionalProperties !== undefined && schema.properties !== undefined) {
-      // TODO: return intersection of { ...schema, additionalProperties: undefined } and { ...schema, properties: undefined }
+      return {
+        type: 'intersection',
+        allOf: [
+          _toInternalRep({ ...schema, additionalProperties: undefined }),
+          _toInternalRep({ ...schema, properties: undefined })
+        ]
+      }
     }
 
     if (schema.additionalProperties !== undefined) {
@@ -216,6 +222,23 @@ const _toInternalRep = (schema: JSONSchema7): types.JexIR => {
     return {
       type: 'union',
       anyOf: anyOf
+    }
+  }
+
+  if (schema.allOf !== undefined) {
+    const allOf: types.JexIR[] = []
+
+    for (const item of schema.allOf) {
+      if (item === true || item === false) {
+        allOf.push({ type: 'unknown' })
+      } else {
+        allOf.push(_toInternalRep(item))
+      }
+    }
+
+    return {
+      type: 'intersection',
+      allOf: allOf
     }
   }
 

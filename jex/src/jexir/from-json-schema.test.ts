@@ -134,6 +134,32 @@ test('JexIR should model map types', async () => {
   })
 })
 
+test('JexIR should model a object type with both properties and additionalProperties', async () => {
+  await expectJsonSchema({
+    type: 'object',
+    properties: {
+      name: $.string(),
+      age: $.number(),
+      email: $.string()
+    },
+    required: ['name', 'age'],
+    additionalProperties: $.string()
+  }).toEqualJex({
+    type: 'intersection',
+    allOf: [
+      {
+        type: 'object',
+        properties: {
+          name: { type: 'string' },
+          age: { type: 'number' },
+          email: { type: 'union', anyOf: [{ type: 'string' }, { type: 'undefined' }] }
+        }
+      },
+      { type: 'map', items: { type: 'string' } }
+    ]
+  })
+})
+
 test('JexIR should model unknown type', async () => {
   await expectJsonSchema($.unknown()).toEqualJex({ type: 'unknown' })
 })
@@ -142,5 +168,12 @@ test('JexIR should model tuple types', async () => {
   await expectJsonSchema($.tuple([$.string(), $.number()])).toEqualJex({
     type: 'tuple',
     items: [{ type: 'string' }, { type: 'number' }]
+  })
+})
+
+test('JexIR should model intersection types', async () => {
+  await expectJsonSchema($.intersection([$.string(), $.number()])).toEqualJex({
+    type: 'intersection',
+    allOf: [{ type: 'string' }, { type: 'number' }]
   })
 })

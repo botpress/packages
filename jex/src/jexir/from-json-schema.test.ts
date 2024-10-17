@@ -134,7 +134,7 @@ test('JexIR should model map types', async () => {
   })
 })
 
-test('JexIR should model a complex object type', async () => {
+test('JexIR should model a object type with both properties and additionalProperties', async () => {
   await expectJsonSchema({
     type: 'object',
     properties: {

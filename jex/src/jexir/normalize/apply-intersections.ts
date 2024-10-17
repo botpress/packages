@@ -34,25 +34,6 @@ const mergeObjectsBinary = (objectA: types.JexIRObject, objectB: types.JexIRObje
   return objectC
 }
 
-// const mergeObjects = (objects: types.JexIRObject[]): types.JexIRObject => {
-//   const mergedObject: types.JexIRObject = { type: 'object', properties: {} }
-//   const allKeys = objects.flatMap((object) => Object.keys(object.properties))
-//   const uniqueKeys = new Set<string>(allKeys)
-//   for (const key of uniqueKeys) {
-//     const values = objects.map((object) => object.properties[key]).filter((v) => v !== undefined)
-//     if (values.length > 1) {
-//       mergedObject.properties[key] = { type: 'intersection', allOf: values }
-//       continue
-//     }
-//     const [value] = values
-//     if (value) {
-//       mergedObject.properties[key] = value
-//       continue
-//     }
-//   }
-//   return mergedObject
-// }
-
 const mergeObjects = (objects: types.JexIRObject[]): types.JexIRObject => {
   let mergedObject: types.JexIRObject = { type: 'object', properties: {} }
   for (const object of objects) {

@@ -1,8 +1,6 @@
 import { JSONSchema7, JSONSchema7Type } from 'json-schema'
 import * as types from './typings'
-import * as err from '../errors'
 import _ from 'lodash'
-import { dereference, JSONParserError } from '@apidevtools/json-schema-ref-parser'
 
 type _Primitives = {
   string: types.JexIRString
@@ -14,29 +12,6 @@ type _Literals = {
   string: types.JexIRStringLiteral
   number: types.JexIRNumberLiteral
   boolean: types.JexIRBooleanLiteral
-}
-
-const _dereference = async (schema: JSONSchema7): Promise<JSONSchema7> => {
-  try {
-    const unref = await dereference(schema, {
-      dereference: {
-        circular: false // TODO: add support for circular references
-      }
-    })
-    return unref as JSONSchema7
-  } catch (thrown) {
-    if (thrown instanceof ReferenceError) {
-      const mapped = new err.JexReferenceError(thrown)
-      mapped.stack = thrown.stack
-      throw mapped
-    }
-    if (thrown instanceof JSONParserError) {
-      const mapped = new err.JexParserError(thrown)
-      mapped.stack = thrown.stack
-      throw mapped
-    }
-    throw thrown
-  }
 }
 
 const _toInternalPrimitive = <T extends 'string' | 'number' | 'boolean'>(type: T, schema: JSONSchema7): types.JexIR => {
@@ -222,8 +197,7 @@ const _toInternalRep = (schema: JSONSchema7): types.JexIR => {
   return { type: 'unknown' }
 }
 
-export const fromJsonSchema = async (schema: JSONSchema7): Promise<types.JexIR> => {
-  const unref = await _dereference(schema)
-  const jexirSchema = _toInternalRep(unref)
+export const fromJsonSchema = (schema: JSONSchema7): types.JexIR => {
+  const jexirSchema = _toInternalRep(schema)
   return jexirSchema
 }

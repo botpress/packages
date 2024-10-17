@@ -15,12 +15,16 @@ const successMessage = (typeA: jexir.JexIR, typeB: jexir.JexIR): string => {
 const expectJex = (typeA: jexir.JexIR) => ({
   not: {
     toExtend: (typeB: jexir.JexIR) => {
-      const actual = jexExtends(typeA, typeB)
+      const normalizedA = jexir.normalize(typeA)
+      const normalizedB = jexir.normalize(typeB)
+      const actual = jexExtends(normalizedA, normalizedB)
       expect(actual.extends).to.eq(false, successMessage(typeA, typeB))
     }
   },
   toExtend: (typeB: jexir.JexIR) => {
-    const actual = jexExtends(typeA, typeB)
+    const normalizedA = jexir.normalize(typeA)
+    const normalizedB = jexir.normalize(typeB)
+    const actual = jexExtends(normalizedA, normalizedB)
     expect(actual.extends).to.eq(true, failureMessage(actual))
   }
 })

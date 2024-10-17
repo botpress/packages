@@ -71,8 +71,6 @@ const _jexEquals = (a: jexir.JexIR, b: jexir.JexIR): boolean => {
   return _.isEqual(a, b)
 }
 
-export const jexEquals = (a: jexir.JexIR, b: jexir.JexIR): boolean => {
-  a = jexir.normalize(a)
-  b = jexir.normalize(b)
-  return _jexEquals(a, b)
+export const jexEquals = (typeA: jexir.JexIR, typeB: jexir.JexIR): boolean => {
+  return _jexEquals(typeA, typeB)
 }

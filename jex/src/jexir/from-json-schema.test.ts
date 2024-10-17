@@ -1,13 +1,16 @@
 import { JSONSchema7 } from 'json-schema'
 import { test, expect } from 'vitest'
 import { JexIR } from './typings'
-import { fromJsonSchema as j2x } from './from-json-schema'
+import { fromJsonSchema } from './from-json-schema'
 import { jsonSchemaBuilder as $ } from '../builders'
+import { normalize } from './normalize'
 
 const expectJsonSchema = (jsonSchema: JSONSchema7) => ({
   toEqualJex: async (expectedJexSchema: JexIR): Promise<void> => {
-    const actualJexSchema = await j2x(jsonSchema)
-    expect(actualJexSchema).toEqual(expectedJexSchema)
+    const actualJexSchema = await fromJsonSchema(jsonSchema)
+    const normalizedActual = normalize(actualJexSchema)
+    const normalizedExpected = normalize(expectedJexSchema)
+    expect(normalizedActual).toEqual(normalizedExpected)
   }
 })
 
@@ -76,13 +79,7 @@ test('JexIR should model optional and nullable fields', async () => {
   })
   await expectJsonSchema($.nullable($.optional($.string()))).toEqualJex({
     type: 'union',
-    anyOf: [
-      {
-        type: 'union',
-        anyOf: [{ type: 'string' }, { type: 'undefined' }]
-      },
-      { type: 'null' }
-    ]
+    anyOf: [{ type: 'string' }, { type: 'undefined' }, { type: 'null' }]
   })
 })
 

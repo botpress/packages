@@ -224,5 +224,6 @@ const _toInternalRep = (schema: JSONSchema7): types.JexIR => {
 
 export const fromJsonSchema = async (schema: JSONSchema7): Promise<types.JexIR> => {
   const unref = await _dereference(schema)
-  return _toInternalRep(unref)
+  const jexirSchema = _toInternalRep(unref)
+  return jexirSchema
 }

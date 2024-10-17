@@ -1,4 +1,5 @@
 import { JSONSchema7, JSONSchema7Type } from 'json-schema'
+import * as utils from '../utils'
 import * as types from './typings'
 import _ from 'lodash'
 
@@ -217,6 +218,7 @@ const _toInternalRep = (schema: JSONSchema7): types.JexIR => {
     }
   }
 
+  type _expectUndefined = utils.types.Expect<utils.types.Equals<typeof schema.type, undefined>>
   return { type: 'unknown' }
 }
 

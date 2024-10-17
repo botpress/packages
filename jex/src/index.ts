@@ -11,20 +11,26 @@ export * as errors from './errors'
 export type JSONSchema = JSONSchema7
 
 export const jsonSchemaEquals = async (a: JSONSchema, b: JSONSchema): Promise<boolean> => {
-  const jexA = await jexir.fromJsonSchema(a)
-  const jexB = await jexir.fromJsonSchema(b)
+  let jexA = await jexir.fromJsonSchema(a)
+  let jexB = await jexir.fromJsonSchema(b)
+  jexA = jexir.normalize(jexA)
+  jexB = jexir.normalize(jexB)
   return jexEquals(jexA, jexB)
 }
 
 export const jsonSchemaExtends = async (a: JSONSchema, b: JSONSchema): Promise<JexExtensionResult> => {
-  const jexA = await jexir.fromJsonSchema(a)
-  const jexB = await jexir.fromJsonSchema(b)
+  let jexA = await jexir.fromJsonSchema(a)
+  let jexB = await jexir.fromJsonSchema(b)
+  jexA = jexir.normalize(jexA)
+  jexB = jexir.normalize(jexB)
   return jexExtends(jexA, jexB)
 }
 
 export const jsonSchemaMerge = async (a: JSONSchema, b: JSONSchema): Promise<JSONSchema> => {
-  const jexA = await jexir.fromJsonSchema(a)
-  const jexB = await jexir.fromJsonSchema(b)
+  let jexA = await jexir.fromJsonSchema(a)
+  let jexB = await jexir.fromJsonSchema(b)
+  jexA = jexir.normalize(jexA)
+  jexB = jexir.normalize(jexB)
 
   if (jexA.type !== 'object' || jexB.type !== 'object') {
     throw new JexError('Both schemas must be objects to be merged')

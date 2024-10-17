@@ -80,14 +80,18 @@ const _jexExtends = (path: PropertyPath, typeA: jexir.JexIR, typeB: jexir.JexIR)
     return { result: false, reasons: failures.flatMap((f) => f.reasons) }
   }
 
-  if (typeA.type === 'intersection') {
-    // TODO: properly implement intersection
-    return { result: false, reasons: [{ path, typeA, typeB }] }
+  if (typeB.type === 'intersection') {
+    const extensions = typeB.allOf.map((c) => _jexExtends(path, typeA, c))
+    const [_, failures] = _splitSuccessFailure(extensions)
+    if (failures.length === 0) return { result: true } // A extends all of the B intersection
+    return { result: false, reasons: failures.flatMap((f) => f.reasons) }
   }
 
-  if (typeB.type === 'intersection') {
-    // TODO: properly implement intersection
-    return { result: false, reasons: [{ path, typeA, typeB }] }
+  if (typeA.type === 'intersection') {
+    const extensions = typeA.allOf.map((c) => _jexExtends(path, c, typeB))
+    const [success, failures] = _splitSuccessFailure(extensions)
+    if (success.length > 0) return { result: true } // At least one of A extends B
+    return { result: false, reasons: failures.flatMap((f) => f.reasons) }
   }
 
   if (typeA.type === 'object') {

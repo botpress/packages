@@ -1,5 +1,5 @@
 import * as types from '../typings'
-import { traverseJexIR } from './traverse-jexir'
+import { traverseJexIRPostOrder } from './traverse-jexir'
 
 /**
  *
@@ -13,7 +13,7 @@ import { traverseJexIR } from './traverse-jexir'
  * @returns a new JexIR schema with all intersections flattened
  */
 export const flattenIntersections = (schema: types.JexIR): types.JexIR =>
-  traverseJexIR(schema, (s) => {
+  traverseJexIRPostOrder(schema, (s) => {
     if (s.type !== 'intersection') {
       return s
     }

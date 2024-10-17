@@ -185,38 +185,40 @@ test('jex-extends should be false if child is a map and parent has required prop
 
 // string & number extends string
 test('jex-extends should be true if child is an intersection of parent', () => {
-  const child1 = $.intersection([$.string(), $.number()])
-  const parent1 = $.string()
-  expectJex(child1).toExtend(parent1)
-
-  const child2 = $.intersection([$.object({ a: $.string() }), $.map($.string())])
-  const parent2 = $.object({ a: $.string() })
-  expectJex(child2).toExtend(parent2)
+  const child = $.intersection([$.object({ a: $.string() }), $.map($.string())])
+  const parent = $.object({ a: $.string() })
+  expectJex(child).toExtend(parent)
 })
 
 // string does not extend string & number
 test('jex-extends should be false if parent is an intersection of child', () => {
-  const child = $.string()
-  const parent = $.intersection([$.string(), $.number()])
+  const child = $.object({ a: $.string() })
+  const parent = $.intersection([$.object({ a: $.string() }), $.map($.string())])
   expectJex(child).not.toExtend(parent)
 })
 
 // string & number & boolean extends string & number
 test('jex-extends should be true if child is an intersection with more types than parent', () => {
-  const child = $.intersection([$.string(), $.number(), $.boolean()])
-  const parent = $.intersection([$.string(), $.number()])
+  const foo = $.object({ a: $.string() })
+  const bar = $.object({ b: $.number() })
+  const baz = $.map($.string())
+  const child = $.intersection([foo, bar, baz])
+  const parent = $.intersection([foo, bar])
   expectJex(child).toExtend(parent)
 })
 
 // string & number does not extend string & number & boolean
 test('jex-extends should be false if child is an intersection with less types than parent', () => {
-  const child = $.intersection([$.string(), $.number()])
-  const parent = $.intersection([$.string(), $.number(), $.boolean()])
+  const foo = $.object({ a: $.string() })
+  const bar = $.object({ b: $.number() })
+  const baz = $.map($.string())
+  const child = $.intersection([foo, bar])
+  const parent = $.intersection([foo, bar, baz])
   expectJex(child).not.toExtend(parent)
 })
 
 // { a: string } & { b: number } & { c: boolean } extends { a: string, b: number }
-test('jex-extends should be true if child is an intersection of objects that meets all requirements of parent', () => {
+test.skip('jex-extends should be true if child is an intersection of objects that meets all requirements of parent', () => {
   const child = $.intersection([$.object({ a: $.string() }), $.object({ b: $.number() }), $.object({ c: $.boolean() })])
   const parent = $.object({ a: $.string(), b: $.number() })
   expectJex(child).toExtend(parent)

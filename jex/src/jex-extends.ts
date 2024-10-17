@@ -80,17 +80,17 @@ const _jexExtends = (path: PropertyPath, typeA: jexir.JexIR, typeB: jexir.JexIR)
     return { result: false, reasons: failures.flatMap((f) => f.reasons) }
   }
 
-  if (typeA.type === 'intersection') {
-    const extensions = typeA.allOf.map((c) => _jexExtends(path, c, typeB))
-    const [success, failures] = _splitSuccessFailure(extensions)
-    if (success.length > 0) return { result: true } // at least on of A intersection extends B
-    return { result: false, reasons: failures.flatMap((f) => f.reasons) }
-  }
-
   if (typeB.type === 'intersection') {
     const extensions = typeB.allOf.map((c) => _jexExtends(path, typeA, c))
     const [_, failures] = _splitSuccessFailure(extensions)
     if (failures.length === 0) return { result: true } // A extends all of B intersection
+    return { result: false, reasons: failures.flatMap((f) => f.reasons) }
+  }
+
+  if (typeA.type === 'intersection') {
+    const extensions = typeA.allOf.map((c) => _jexExtends(path, c, typeB))
+    const [success, failures] = _splitSuccessFailure(extensions)
+    if (success.length > 0) return { result: true } // at least on of A intersection extends B
     return { result: false, reasons: failures.flatMap((f) => f.reasons) }
   }
 
@@ -191,6 +191,9 @@ const _reasonToString = (reason: _JexFailureReason): string =>
 
 export type JexExtensionResult = { extends: true } | { extends: false; reasons: string[] }
 export const jexExtends = (typeA: jexir.JexIR, typeB: jexir.JexIR): JexExtensionResult => {
+  typeA = jexir.normalize(typeA)
+  typeB = jexir.normalize(typeB)
+
   const extension = _jexExtends([], typeA, typeB)
   if (extension.result) return { extends: true }
   return { extends: false, reasons: extension.reasons.map(_reasonToString) }

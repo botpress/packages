@@ -2,18 +2,44 @@ import * as jexir from './jexir'
 import * as utils from './utils'
 import _ from 'lodash'
 
-export class JexSet extends utils.collection.CustomSet<jexir.JexIR> {
+class JexSet extends utils.collection.CustomSet<jexir.JexIR> {
   public constructor(items: jexir.JexIR[] = []) {
-    super(items, { compare: jexEquals })
+    super(items, { compare: _jexEquals })
   }
 }
 
-export const jexEquals = (a: jexir.JexIR, b: jexir.JexIR): boolean => {
-  if (a.type === 'array' && b.type === 'array') {
-    return jexEquals(a.items, b.items)
+const _jexEquals = (a: jexir.JexIR, b: jexir.JexIR): boolean => {
+  if (a.type === 'array') {
+    if (b.type !== 'array') {
+      return false
+    }
+    return _jexEquals(a.items, b.items)
   }
 
-  if (a.type === 'object' && b.type === 'object') {
+  if (a.type === 'tuple') {
+    if (b.type !== 'tuple') {
+      return false
+    }
+    const zipped = _.zip(a.items, b.items)
+    return zipped.every(([aItem, bItem]) => {
+      if (aItem === undefined || bItem === undefined) {
+        return false
+      }
+      return _jexEquals(aItem, bItem)
+    })
+  }
+
+  if (a.type === 'map') {
+    if (b.type !== 'map') {
+      return false
+    }
+    return _jexEquals(a.items, b.items)
+  }
+
+  if (a.type === 'object') {
+    if (b.type !== 'object') {
+      return false
+    }
     const aKeys = new utils.collection.CustomSet<string>(Object.keys(a.properties))
     const bKeys = new utils.collection.CustomSet<string>(Object.keys(b.properties))
 
@@ -24,18 +50,38 @@ export const jexEquals = (a: jexir.JexIR, b: jexir.JexIR): boolean => {
     for (const aKey of aKeys.items) {
       const aValue = a.properties[aKey]!
       const bValue = b.properties[aKey]!
-      if (!jexEquals(aValue, bValue)) {
+      if (!_jexEquals(aValue, bValue)) {
         return false
       }
     }
     return true
   }
 
-  if (a.type === 'union' && b.type === 'union') {
+  if (a.type === 'union') {
+    if (b.type !== 'union') {
+      return false
+    }
     const aSet = new JexSet(a.anyOf)
     const bSet = new JexSet(b.anyOf)
     return aSet.isEqual(bSet)
   }
 
+  if (a.type === 'intersection') {
+    if (b.type !== 'intersection') {
+      return false
+    }
+    const aSet = new JexSet(a.allOf)
+    const bSet = new JexSet(b.allOf)
+    return aSet.isEqual(bSet)
+  }
+
+  // so that we don't forget a level of recursion
+  type _expectPrimitive = utils.types.Expect<utils.types.Equals<typeof a, jexir.JexIRBaseType>>
   return _.isEqual(a, b)
+}
+
+export const jexEquals = (a: jexir.JexIR, b: jexir.JexIR): boolean => {
+  a = jexir.normalize(a)
+  b = jexir.normalize(b)
+  return _jexEquals(a, b)
 }

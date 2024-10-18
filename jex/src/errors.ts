@@ -36,7 +36,6 @@ export class JexUnresolvedReferenceError extends JexInvalidJsonSchemaError {
   }
 }
 
-// TODO: add a property path to explain where the error occurred in the schema
 export class JexUnsuportedJsonSchemaError extends JexInvalidJsonSchemaError {
   public constructor(path: PropertyPath, schema: JSONSchema7Definition) {
     const pathString = pathToString(path)

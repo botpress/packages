@@ -1,7 +1,28 @@
-import { JSONSchema7, JSONSchema7Type } from 'json-schema'
+import { JSONSchema7, JSONSchema7Definition, JSONSchema7Type } from 'json-schema'
 import * as utils from '../utils'
 import * as types from './typings'
+import * as errors from '../errors'
 import _ from 'lodash'
+import { PropertyPath } from '../property-path'
+
+class JSONSchemaPropertyPath {
+  public constructor(private _path: PropertyPath) {}
+
+  public get path(): PropertyPath {
+    return this._path
+  }
+
+  public key(key: string): JSONSchemaPropertyPath {
+    return new JSONSchemaPropertyPath([...this._path, { type: 'key', value: key }])
+  }
+
+  public index(index: number | string): JSONSchemaPropertyPath {
+    if (typeof index === 'string') {
+      return new JSONSchemaPropertyPath([...this._path, { type: 'string-index', value: index }])
+    }
+    return new JSONSchemaPropertyPath([...this._path, { type: 'number-index', value: index }])
+  }
+}
 
 type _Primitives = {
   string: types.JexIRString
@@ -42,38 +63,69 @@ const _toInternalPrimitive = <T extends 'string' | 'number' | 'boolean'>(type: T
   } as types.JexIRUnion
 }
 
-const _toInternalRep = (schema: JSONSchema7): types.JexIR => {
+const _toInternalRep = (path: JSONSchemaPropertyPath, schema: JSONSchema7Definition): types.JexIR => {
+  if (schema === true) {
+    return { type: 'unknown' }
+  }
+
+  if (schema === false) {
+    return { type: 'undefined' }
+  }
+
+  if (schema.oneOf !== undefined) {
+    throw new errors.JexUnsuportedJsonSchemaError(path.path, { oneOf: schema.oneOf })
+  }
+
+  if (schema.$ref !== undefined) {
+    throw new errors.JexUnresolvedReferenceError(path.path)
+  }
+
+  if (schema.additionalItems !== undefined) {
+    throw new errors.JexUnsuportedJsonSchemaError(path.path, { additionalItems: schema.additionalItems })
+  }
+
+  if (schema.patternProperties !== undefined) {
+    throw new errors.JexUnsuportedJsonSchemaError(path.path, { patternProperties: schema.patternProperties })
+  }
+
+  if (schema.propertyNames !== undefined) {
+    throw new errors.JexUnsuportedJsonSchemaError(path.path, { propertyNames: schema.propertyNames })
+  }
+
+  if (schema.if !== undefined) {
+    throw new errors.JexUnsuportedJsonSchemaError(path.path, { if: schema.if })
+  }
+
+  if (schema.then !== undefined) {
+    throw new errors.JexUnsuportedJsonSchemaError(path.path, { then: schema.then })
+  }
+
+  if (schema.else !== undefined) {
+    throw new errors.JexUnsuportedJsonSchemaError(path.path, { else: schema.else })
+  }
+
   if (schema.not !== undefined) {
-    if (schema.not === true) {
-      return {
-        type: 'unknown'
-      }
-    }
-
-    if (schema.not === false) {
-      return {
-        type: 'undefined'
-      }
-    }
-
-    const not = _toInternalRep(schema.not)
+    const not = _toInternalRep(path.key('not'), schema.not)
     if (not.type === 'unknown') {
       return {
         type: 'undefined'
       }
     }
 
-    // not is only partially supported
-    return {
-      type: 'unknown'
+    if (not.type === 'undefined') {
+      return {
+        type: 'unknown'
+      }
     }
+
+    throw new errors.JexUnsuportedJsonSchemaError(path.path, { not: schema.not })
   }
 
   if (Array.isArray(schema.type)) {
     const { type: _, ...tmp } = schema
     return {
       type: 'union',
-      anyOf: schema.type.map((type) => _toInternalRep({ type, ...tmp }))
+      anyOf: schema.type.map((type) => _toInternalRep(path, { type, ...tmp }))
     }
   }
 
@@ -102,29 +154,15 @@ const _toInternalRep = (schema: JSONSchema7): types.JexIR => {
     }
 
     if (Array.isArray(schema.items)) {
-      const items = schema.items.filter(<T>(i: T | boolean): i is T => typeof i !== 'boolean')
       return {
         type: 'tuple',
-        items: items.map(_toInternalRep)
+        items: schema.items.map((s, i) => _toInternalRep(path.key('items').index(i), s))
       }
     }
-
-    if (schema.items === true) {
-      return {
-        type: 'array',
-        items: { type: 'unknown' }
-      }
-    }
-
-    if (schema.items === false) {
-      return { type: 'tuple', items: [] }
-    }
-
-    // TODO: check for prefixItems and additionalItems
 
     return {
       type: 'array',
-      items: _toInternalRep(schema.items)
+      items: _toInternalRep(path.key('items'), schema.items)
     }
   }
 
@@ -133,36 +171,24 @@ const _toInternalRep = (schema: JSONSchema7): types.JexIR => {
       return {
         type: 'intersection',
         allOf: [
-          _toInternalRep({ ...schema, additionalProperties: undefined }),
-          _toInternalRep({ ...schema, properties: undefined })
+          _toInternalRep(path, { ...schema, additionalProperties: undefined }),
+          _toInternalRep(path, { ...schema, properties: undefined })
         ]
       }
     }
 
     if (schema.additionalProperties !== undefined) {
-      if (schema.additionalProperties === true) {
-        return {
-          type: 'map',
-          items: { type: 'unknown' }
-        }
-      }
-      if (schema.additionalProperties === false) {
-        return {
-          type: 'object',
-          properties: {}
-        }
-      }
       return {
         type: 'map',
-        items: _toInternalRep(schema.additionalProperties)
+        items: _toInternalRep(path.key('additionalProperties'), schema.additionalProperties)
       }
     }
 
     if (schema.properties !== undefined) {
       const properties: Record<string, types.JexIR> = {}
       for (const [key, value] of Object.entries(schema.properties)) {
+        const mapped: types.JexIR = _toInternalRep(path.key('properties').index(key), value)
         const isRequired = schema.required?.includes(key)
-        const mapped = _toInternalRep(value as JSONSchema7)
         if (isRequired) {
           properties[key] = mapped
         } else {
@@ -185,36 +211,16 @@ const _toInternalRep = (schema: JSONSchema7): types.JexIR => {
   }
 
   if (schema.anyOf !== undefined) {
-    const anyOf: types.JexIR[] = []
-
-    for (const item of schema.anyOf) {
-      if (item === true || item === false) {
-        anyOf.push({ type: 'unknown' })
-      } else {
-        anyOf.push(_toInternalRep(item))
-      }
-    }
-
     return {
       type: 'union',
-      anyOf: anyOf
+      anyOf: schema.anyOf.map((s, i) => _toInternalRep(path.key('anyOf').index(i), s))
     }
   }
 
   if (schema.allOf !== undefined) {
-    const allOf: types.JexIR[] = []
-
-    for (const item of schema.allOf) {
-      if (item === true || item === false) {
-        allOf.push({ type: 'unknown' })
-      } else {
-        allOf.push(_toInternalRep(item))
-      }
-    }
-
     return {
       type: 'intersection',
-      allOf: allOf
+      allOf: schema.allOf.map((s, i) => _toInternalRep(path.key('allOf').index(i), s))
     }
   }
 
@@ -223,6 +229,6 @@ const _toInternalRep = (schema: JSONSchema7): types.JexIR => {
 }
 
 export const fromJsonSchema = (schema: JSONSchema7): types.JexIR => {
-  const jexirSchema = _toInternalRep(schema)
+  const jexirSchema = _toInternalRep(new JSONSchemaPropertyPath([]), schema)
   return jexirSchema
 }

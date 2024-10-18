@@ -4,6 +4,18 @@ import { JexIR } from './typings'
 import { fromJsonSchema } from './from-json-schema'
 import { jsonSchemaBuilder as $ } from '../builders'
 import { normalize } from './normalize'
+import { JexInvalidJsonSchemaError } from '../errors'
+import { PropertyPath } from '../property-path'
+
+const getError = (fn: () => void): Error | undefined => {
+  try {
+    fn()
+  } catch (thrown) {
+    const err = thrown instanceof Error ? thrown : new Error(String(thrown))
+    return err
+  }
+  return
+}
 
 const expectJsonSchema = (jsonSchema: JSONSchema7) => ({
   toEqualJex: (expectedJexSchema: JexIR): void => {
@@ -11,7 +23,37 @@ const expectJsonSchema = (jsonSchema: JSONSchema7) => ({
     const normalizedActual = normalize(actualJexSchema)
     const normalizedExpected = normalize(expectedJexSchema)
     expect(normalizedActual).toEqual(normalizedExpected)
+  },
+  toFailAt: (path: PropertyPath) => {
+    const err = getError(() => fromJsonSchema(jsonSchema))
+    expect(err, `Expected an error to be thrown`).toBeDefined()
+    expect(err).toBeInstanceOf(JexInvalidJsonSchemaError)
+    expect((err as JexInvalidJsonSchemaError).path).toEqual(path)
   }
+})
+
+test('JexIR should should throw an error when the JSON schema is unsuported', () => {
+  const foo = (schema: JSONSchema7) => $.object({ foo: schema })
+  const path: PropertyPath = [
+    { type: 'key', value: 'properties' },
+    { type: 'string-index', value: 'foo' }
+  ]
+  expectJsonSchema(foo({ not: { type: 'number' } })).toFailAt(path)
+  expectJsonSchema(foo({ oneOf: [] })).toFailAt(path)
+  expectJsonSchema(foo({ additionalItems: {} })).toFailAt(path)
+  expectJsonSchema(foo({ patternProperties: {} })).toFailAt(path)
+  expectJsonSchema(foo({ propertyNames: {} })).toFailAt(path)
+  expectJsonSchema(foo({ if: {} })).toFailAt(path)
+  expectJsonSchema(foo({ then: {} })).toFailAt(path)
+  expectJsonSchema(foo({ else: {} })).toFailAt(path)
+})
+
+test('JexIR should should throw an error when schema contains unresolved references', () => {
+  const path: PropertyPath = [
+    { type: 'key', value: 'items' },
+    { type: 'number-index', value: 2 }
+  ]
+  expectJsonSchema({ type: 'array', items: [{}, {}, { $ref: '#/definitions/foo' }] }).toFailAt(path)
 })
 
 test('JexIR should model primitive types', () => {

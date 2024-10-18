@@ -20,12 +20,19 @@ export class JexParserError extends JexError {
   }
 }
 
-export class JexInvalidJsonSchemaError extends JexError {}
+export class JexInvalidJsonSchemaError extends JexError {
+  public constructor(
+    public readonly path: PropertyPath,
+    message: string
+  ) {
+    super(message)
+  }
+}
 
-export class JexUnresolvedReferenceError extends JexError {
+export class JexUnresolvedReferenceError extends JexInvalidJsonSchemaError {
   public constructor(path: PropertyPath) {
     const pathString = pathToString(path)
-    super(`Unresolved reference at ${pathString}`)
+    super(path, `Unresolved reference at ${pathString}`)
   }
 }
 
@@ -33,6 +40,6 @@ export class JexUnresolvedReferenceError extends JexError {
 export class JexUnsuportedJsonSchemaError extends JexInvalidJsonSchemaError {
   public constructor(path: PropertyPath, schema: JSONSchema7Definition) {
     const pathString = pathToString(path)
-    super(`Unsupported JSON schema at ${pathString}: ${JSON.stringify(schema)}`)
+    super(path, `Unsupported JSON schema at ${pathString}: ${JSON.stringify(schema)}`)
   }
 }

@@ -1,6 +1,6 @@
 {
   "name": "@bpinternal/genenv",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Small CLI to generate typescript file exporting constants from environment variables.",
   "bin": {
     "genenv": "./bin.js"
@@ -12,12 +12,12 @@
     "test": "vitest run"
   },
   "dependencies": {
-    "@bpinternal/yargs-extra": "0.0.14",
+    "@bpinternal/yargs-extra": "0.0.16",
     "dotenv": "^16.4.4"
   },
   "devDependencies": {
     "@types/node": "^22.7.5",
-    "esbuild": "^0.16.12",
+    "esbuild": "^0.24.0",
     "ts-node": "^10.9.2",
     "typescript": "^4.9.4",
     "vitest": "^2.1.3"

@@ -1,6 +1,6 @@
 {
   "name": "@bpinternal/verel",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Vector Remap Language for JavaScript",
   "main": "./dist/node/index.js",
   "module": "./dist/web/index.js",
@@ -30,7 +30,7 @@
     "lodash": "^4.17.21",
     "playwright": "^1.47.2",
     "ts-node": "^10.9.1",
-    "typescript": "5.6.2",
+    "typescript": "5.6.3",
     "vitest": "^2.1.1",
     "wasm-pack": "^0.13.0"
   },

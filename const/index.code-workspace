@@ -1,5 +1,9 @@
 {
-  "folders": [{ "path": "./jex" }],
+  "folders": [
+    {
+      "path": "."
+    }
+  ],
   "settings": {
     "typescript.tsdk": "node_modules/typescript/lib"
   }

@@ -80,10 +80,6 @@ const _toInternalRep = (path: JSONSchemaPropertyPath, schema: JSONSchema7Definit
     throw new errors.JexUnresolvedReferenceError(path.path)
   }
 
-  if (schema.additionalItems !== undefined) {
-    throw new errors.JexUnsuportedJsonSchemaError(path.path, { additionalItems: schema.additionalItems })
-  }
-
   if (schema.patternProperties !== undefined) {
     throw new errors.JexUnsuportedJsonSchemaError(path.path, { patternProperties: schema.patternProperties })
   }
@@ -146,28 +142,45 @@ const _toInternalRep = (path: JSONSchemaPropertyPath, schema: JSONSchema7Definit
   }
 
   if (schema.type === 'array') {
-    if (schema.items === undefined) {
+    if (schema.additionalItems && schema.items !== undefined) {
       return {
-        type: 'array',
-        items: { type: 'unknown' }
+        type: 'intersection',
+        allOf: [
+          _toInternalRep(path, { ...schema, additionalItems: undefined }),
+          _toInternalRep(path, { ...schema, items: undefined })
+        ]
       }
     }
 
-    if (Array.isArray(schema.items)) {
+    if (schema.additionalItems) {
       return {
-        type: 'tuple',
-        items: schema.items.map((s, i) => _toInternalRep(path.key('items').index(i), s))
+        type: 'array',
+        items: _toInternalRep(path.key('additionalItems'), schema.additionalItems)
+      }
+    }
+
+    if (schema.items !== undefined) {
+      if (Array.isArray(schema.items)) {
+        return {
+          type: 'tuple',
+          items: schema.items.map((s, i) => _toInternalRep(path.key('items').index(i), s))
+        }
+      }
+
+      return {
+        type: 'array',
+        items: _toInternalRep(path.key('items'), schema.items)
       }
     }
 
     return {
-      type: 'array',
-      items: _toInternalRep(path.key('items'), schema.items)
+      type: 'tuple',
+      items: []
     }
   }
 
   if (schema.type === 'object') {
-    if (schema.additionalProperties !== undefined && schema.properties !== undefined) {
+    if (schema.additionalProperties && schema.properties !== undefined) {
       return {
         type: 'intersection',
         allOf: [
@@ -177,7 +190,7 @@ const _toInternalRep = (path: JSONSchemaPropertyPath, schema: JSONSchema7Definit
       }
     }
 
-    if (schema.additionalProperties !== undefined) {
+    if (schema.additionalProperties) {
       return {
         type: 'map',
         items: _toInternalRep(path.key('additionalProperties'), schema.additionalProperties)

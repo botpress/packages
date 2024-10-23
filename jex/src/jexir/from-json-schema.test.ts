@@ -40,7 +40,6 @@ test('JexIR should should throw an error when the JSON schema is unsuported', ()
   ]
   expectJsonSchema(foo({ not: { type: 'number' } })).toFailAt(path)
   expectJsonSchema(foo({ oneOf: [] })).toFailAt(path)
-  expectJsonSchema(foo({ additionalItems: {} })).toFailAt(path)
   expectJsonSchema(foo({ patternProperties: {} })).toFailAt(path)
   expectJsonSchema(foo({ propertyNames: {} })).toFailAt(path)
   expectJsonSchema(foo({ if: {} })).toFailAt(path)
@@ -200,6 +199,25 @@ test('JexIR should model a object type with both properties and additionalProper
   })
 })
 
+test('JexIR should not treat additionalProperties false as an intersection with a record', () => {
+  // { name: string; age: number } ⊈ { name: string; age: number } & Record<string, never>
+  expectJsonSchema({
+    type: 'object',
+    properties: {
+      name: $.string(),
+      age: $.number()
+    },
+    required: ['name', 'age'],
+    additionalProperties: false
+  }).toEqualJex({
+    type: 'object',
+    properties: {
+      name: { type: 'string' },
+      age: { type: 'number' }
+    }
+  })
+})
+
 test('JexIR should model unknown type', () => {
   expectJsonSchema($.unknown()).toEqualJex({ type: 'unknown' })
 })
@@ -211,8 +229,8 @@ test('JexIR should model tuple types', () => {
   })
 })
 
-test('JexIR should model intersection types', async () => {
-  await expectJsonSchema($.intersection([$.string(), $.number()])).toEqualJex({
+test('JexIR should model intersection types', () => {
+  expectJsonSchema($.intersection([$.string(), $.number()])).toEqualJex({
     type: 'intersection',
     allOf: [{ type: 'string' }, { type: 'number' }]
   })

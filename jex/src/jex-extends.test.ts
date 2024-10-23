@@ -40,6 +40,11 @@ test('jex-extends should be false if child is unknown and parent is not', () => 
   expectJex($.unknown()).not.toExtend($.string())
 })
 
+// unknown extends unknown | undefined
+test('jex-extends should be true if child is unknown and parent is a union of unknown', () => {
+  expectJex($.unknown()).toExtend($.union([$.unknown(), $.undefined()]))
+})
+
 // string extends string, { a: string } extends { a: string }, etc..
 test('jex-extends should be true if child and parent are the same', () => {
   expectJex($.string()).toExtend($.string())

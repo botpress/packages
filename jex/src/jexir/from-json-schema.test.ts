@@ -144,6 +144,13 @@ test('JexIR should model union of literals of multiple primitives', () => {
   })
 })
 
+test('JexIR should model empty object type as a map of unknown', () => {
+  expectJsonSchema({ type: 'object' }).toEqualJex({
+    type: 'map',
+    items: { type: 'unknown' }
+  })
+})
+
 test('JexIR should model object types', () => {
   expectJsonSchema(
     $.object({
@@ -156,6 +163,13 @@ test('JexIR should model object types', () => {
       name: { type: 'string' },
       age: { type: 'number' }
     }
+  })
+})
+
+test('JexIR should model empty array type as an array of unknown', () => {
+  expectJsonSchema({ type: 'array' }).toEqualJex({
+    type: 'array',
+    items: { type: 'unknown' }
   })
 })
 

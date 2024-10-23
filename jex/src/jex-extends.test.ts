@@ -233,3 +233,11 @@ test('jex-extends should be true when child implements all parent intersection',
   const parent = $.intersection([foo, bar])
   expectJex(child).toExtend(parent)
 })
+
+test('jex-extends should allow intersection of union to extend union', () => {
+  const typeA = $.string()
+  const typeB = $.union([$.literal('a'), $.literal('b')])
+  const child = $.intersection([typeA, typeB])
+  const parent = typeB
+  expectJex(child).toExtend(parent)
+})

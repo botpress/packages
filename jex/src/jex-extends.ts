@@ -66,20 +66,6 @@ const _jexExtends = (path: PropertyPath, typeA: jexir.JexIR, typeB: jexir.JexIR)
     return { result: false, reasons: [{ path, typeA, typeB }] }
   }
 
-  if (typeA.type === 'union') {
-    const extensions = typeA.anyOf.map((c) => _jexExtends(path, c, typeB))
-    const [_, failures] = _splitSuccessFailure(extensions)
-    if (failures.length === 0) return { result: true } // A union all extends B
-    return { result: false, reasons: failures.flatMap((f) => f.reasons) }
-  }
-
-  if (typeB.type === 'union') {
-    const extensions = typeB.anyOf.map((c) => _jexExtends(path, typeA, c))
-    const [success, failures] = _splitSuccessFailure(extensions)
-    if (success.length > 0) return { result: true } // A extends at least one of the B union
-    return { result: false, reasons: failures.flatMap((f) => f.reasons) }
-  }
-
   if (typeB.type === 'intersection') {
     const extensions = typeB.allOf.map((c) => _jexExtends(path, typeA, c))
     const [_, failures] = _splitSuccessFailure(extensions)
@@ -91,6 +77,20 @@ const _jexExtends = (path: PropertyPath, typeA: jexir.JexIR, typeB: jexir.JexIR)
     const extensions = typeA.allOf.map((c) => _jexExtends(path, c, typeB))
     const [success, failures] = _splitSuccessFailure(extensions)
     if (success.length > 0) return { result: true } // At least one of A extends B
+    return { result: false, reasons: failures.flatMap((f) => f.reasons) }
+  }
+
+  if (typeA.type === 'union') {
+    const extensions = typeA.anyOf.map((c) => _jexExtends(path, c, typeB))
+    const [_, failures] = _splitSuccessFailure(extensions)
+    if (failures.length === 0) return { result: true } // A union all extends B
+    return { result: false, reasons: failures.flatMap((f) => f.reasons) }
+  }
+
+  if (typeB.type === 'union') {
+    const extensions = typeB.anyOf.map((c) => _jexExtends(path, typeA, c))
+    const [success, failures] = _splitSuccessFailure(extensions)
+    if (success.length > 0) return { result: true } // A extends at least one of the B union
     return { result: false, reasons: failures.flatMap((f) => f.reasons) }
   }
 

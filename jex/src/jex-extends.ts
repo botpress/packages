@@ -57,15 +57,6 @@ const _primitiveExtends = <T extends jexir.JexIRPrimitive>(
 }
 
 const _jexExtends = (path: PropertyPath, typeA: jexir.JexIR, typeB: jexir.JexIR): _JexExtensionResult => {
-  if (typeB.type === 'unknown') {
-    return { result: true } // everything extends unknown
-  }
-
-  if (typeA.type === 'unknown') {
-    // nothing extends unknown except unknown itself
-    return { result: false, reasons: [{ path, typeA, typeB }] }
-  }
-
   if (typeB.type === 'intersection') {
     const extensions = typeB.allOf.map((c) => _jexExtends(path, typeA, c))
     const [_, failures] = _splitSuccessFailure(extensions)
@@ -92,6 +83,15 @@ const _jexExtends = (path: PropertyPath, typeA: jexir.JexIR, typeB: jexir.JexIR)
     const [success, failures] = _splitSuccessFailure(extensions)
     if (success.length > 0) return { result: true } // A extends at least one of the B union
     return { result: false, reasons: failures.flatMap((f) => f.reasons) }
+  }
+
+  if (typeB.type === 'unknown') {
+    return { result: true } // everything extends unknown
+  }
+
+  if (typeA.type === 'unknown') {
+    // nothing extends unknown except unknown itself
+    return { result: false, reasons: [{ path, typeA, typeB }] }
   }
 
   if (typeA.type === 'object') {

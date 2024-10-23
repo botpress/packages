@@ -142,13 +142,20 @@ const _toInternalRep = (path: JSONSchemaPropertyPath, schema: JSONSchema7Definit
   }
 
   if (schema.type === 'array') {
-    if (schema.additionalItems && schema.items !== undefined) {
+    if (schema.additionalItems !== undefined && schema.items !== undefined) {
       return {
         type: 'intersection',
         allOf: [
           _toInternalRep(path, { ...schema, additionalItems: undefined }),
           _toInternalRep(path, { ...schema, items: undefined })
         ]
+      }
+    }
+
+    if (schema.additionalItems === false) {
+      return {
+        type: 'tuple',
+        items: []
       }
     }
 
@@ -174,19 +181,26 @@ const _toInternalRep = (path: JSONSchemaPropertyPath, schema: JSONSchema7Definit
     }
 
     return {
-      type: 'tuple',
-      items: []
+      type: 'array',
+      items: { type: 'unknown' }
     }
   }
 
   if (schema.type === 'object') {
-    if (schema.additionalProperties && schema.properties !== undefined) {
+    if (schema.additionalProperties !== undefined && schema.properties !== undefined) {
       return {
         type: 'intersection',
         allOf: [
           _toInternalRep(path, { ...schema, additionalProperties: undefined }),
           _toInternalRep(path, { ...schema, properties: undefined })
         ]
+      }
+    }
+
+    if (schema.additionalProperties === false) {
+      return {
+        type: 'object',
+        properties: {}
       }
     }
 
@@ -218,8 +232,8 @@ const _toInternalRep = (path: JSONSchemaPropertyPath, schema: JSONSchema7Definit
     }
 
     return {
-      type: 'object',
-      properties: {}
+      type: 'map',
+      items: { type: 'unknown' }
     }
   }
 

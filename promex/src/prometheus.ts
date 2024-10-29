@@ -34,7 +34,7 @@ export const config = (options: TOptionalPromsterOptions = {}): ReturnType<typeo
         ...defaultNormalizers,
         normalizePath: normalizePath() as any, // The type of normalizePath is wrong any is required
         metricBuckets: {
-          httpRequestDurationInSeconds: [0.05, 0.1, 0.5, 1, 3],
+          httpRequestDurationInSeconds: [0.05, 0.1, 0.5, 1, 3, 10, 60, 120],
         },
         ...options,
       }

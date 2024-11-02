@@ -148,7 +148,6 @@ export class ZodDate extends ZodType<Date, ZodDateDef> {
 
   isEqual(schema: ZodType): boolean {
     if (!(schema instanceof ZodDate)) return false
-    // TODO: maybe other of checks is not important for equality
-    return isEqual(this._def.checks, schema._def.checks) && this._def.coerce === schema._def.coerce
+    return isEqual(this._def, schema._def) // TODO: implement correctly
   }
 }

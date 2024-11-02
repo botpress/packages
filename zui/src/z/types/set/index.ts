@@ -1,3 +1,4 @@
+import isEqual from 'lodash/isEqual'
 import {
   ZodIssueCode,
   ParseInputLazyPath,
@@ -136,5 +137,10 @@ export class ZodSet<Value extends ZodTypeAny = ZodTypeAny> extends ZodType<
       typeName: ZodFirstPartyTypeKind.ZodSet,
       ...processCreateParams(params),
     })
+  }
+
+  isEqual(schema: ZodType): boolean {
+    if (!(schema instanceof ZodSet)) return false
+    return isEqual(this._def, schema._def) // TODO: implement correctly
   }
 }

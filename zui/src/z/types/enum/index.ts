@@ -1,3 +1,4 @@
+import isEqual from 'lodash/isEqual'
 import {
   ZodIssueCode,
   RawCreateParams,
@@ -133,4 +134,9 @@ export class ZodEnum<T extends [string, ...string[]] = [string, ...string[]]> ex
   }
 
   static create = createZodEnum
+
+  isEqual(schema: ZodType): boolean {
+    if (!(schema instanceof ZodEnum)) return false
+    return isEqual(this._def, schema._def) // TODO: implement correctly
+  }
 }

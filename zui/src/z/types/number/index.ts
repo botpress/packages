@@ -1,3 +1,4 @@
+import isEqual from 'lodash/isEqual'
 import {
   ZodIssueCode,
   RawCreateParams,
@@ -283,5 +284,10 @@ export class ZodNumber extends ZodType<number, ZodNumberDef> {
       }
     }
     return Number.isFinite(min) && Number.isFinite(max)
+  }
+
+  isEqual(schema: ZodType): boolean {
+    if (!(schema instanceof ZodNumber)) return false
+    return isEqual(this._def, schema._def) // TODO: implement correctly
   }
 }

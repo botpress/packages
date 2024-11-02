@@ -1,3 +1,4 @@
+import isEqual from 'lodash/isEqual'
 import { unique } from '../../utils'
 import {
   RawCreateParams,
@@ -158,5 +159,10 @@ export class ZodUnion<T extends ZodUnionOptions = DefaultZodUnionOptions> extend
       typeName: ZodFirstPartyTypeKind.ZodUnion,
       ...processCreateParams(params),
     })
+  }
+
+  isEqual(schema: ZodType): boolean {
+    if (!(schema instanceof ZodUnion)) return false
+    return isEqual(this._def, schema._def) // TODO: implement correctly
   }
 }

@@ -1,3 +1,4 @@
+import isEqual from 'lodash/isEqual'
 import { unique } from '../../utils'
 import {
   ZodIssueCode,
@@ -115,5 +116,10 @@ export class ZodMap<Key extends ZodTypeAny = ZodTypeAny, Value extends ZodTypeAn
       typeName: ZodFirstPartyTypeKind.ZodMap,
       ...processCreateParams(params),
     })
+  }
+
+  isEqual(schema: ZodType): boolean {
+    if (!(schema instanceof ZodMap)) return false
+    return isEqual(this._def, schema._def) // TODO: implement correctly
   }
 }

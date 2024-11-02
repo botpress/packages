@@ -1,3 +1,4 @@
+import isEqual from 'lodash/isEqual'
 import { unique } from '../../utils'
 import {
   defaultErrorMap,
@@ -197,5 +198,10 @@ export class ZodFunction<
       typeName: ZodFirstPartyTypeKind.ZodFunction,
       ...processCreateParams(params),
     }) as any
+  }
+
+  isEqual(schema: ZodType): boolean {
+    if (!(schema instanceof ZodFunction)) return false
+    return isEqual(this._def, schema._def) // TODO: implement correctly
   }
 }

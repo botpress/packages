@@ -1,3 +1,4 @@
+import isEqual from 'lodash/isEqual'
 import { unique } from '../../utils'
 import {
   ZodIssueCode,
@@ -141,5 +142,10 @@ export class ZodTuple<
       rest: null,
       ...processCreateParams(params),
     })
+  }
+
+  isEqual(schema: ZodType): boolean {
+    if (!(schema instanceof ZodTuple)) return false
+    return isEqual(this._def, schema._def) // TODO: implement correctly
   }
 }

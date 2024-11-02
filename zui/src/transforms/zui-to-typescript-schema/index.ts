@@ -1,4 +1,4 @@
-import z, { util, ZodError } from '../../z'
+import z, { util } from '../../z'
 import { escapeString, getMultilineComment } from '../zui-to-typescript-type/utils'
 import { mapValues, toTypesriptPrimitive } from './utils'
 import * as errors from '../common/errors'
@@ -141,7 +141,7 @@ function sUnwrapZod(schema: z.Schema): string {
 
     case z.ZodFirstPartyTypeKind.ZodCatch:
       // TODO: should write a function if a function was passed at the constructor; otherwise, should write a value
-      const catchValue = toTypesriptPrimitive(def.catchValue({ error: new ZodError([]), input: null }))
+      const catchValue = toTypesriptPrimitive(def.catchValue())
       return `${getMultilineComment(def.description)}${sUnwrapZod(def.innerType)}.catch(${catchValue})`.trim()
 
     case z.ZodFirstPartyTypeKind.ZodPromise:

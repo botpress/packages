@@ -1,3 +1,4 @@
+import isEqual from 'lodash/isEqual'
 import {
   ZodIssueCode,
   processCreateParams,
@@ -143,5 +144,11 @@ export class ZodDate extends ZodType<Date, ZodDateDef> {
       typeName: ZodFirstPartyTypeKind.ZodDate,
       ...processCreateParams(params),
     })
+  }
+
+  isEqual(schema: ZodType): boolean {
+    if (!(schema instanceof ZodDate)) return false
+    // TODO: maybe other of checks is not important for equality
+    return isEqual(this._def.checks, schema._def.checks) && this._def.coerce === schema._def.coerce
   }
 }

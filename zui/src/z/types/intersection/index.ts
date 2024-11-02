@@ -1,3 +1,4 @@
+import isEqual from 'lodash/isEqual'
 import { unique } from '../../utils'
 import {
   ZodIssueCode,
@@ -155,5 +156,10 @@ export class ZodIntersection<T extends ZodTypeAny = ZodTypeAny, U extends ZodTyp
       typeName: ZodFirstPartyTypeKind.ZodIntersection,
       ...processCreateParams(params),
     })
+  }
+
+  isEqual(schema: ZodType): boolean {
+    if (!(schema instanceof ZodIntersection)) return false
+    return isEqual(this._def, schema._def) // TODO: implement correctly
   }
 }

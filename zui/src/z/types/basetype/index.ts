@@ -167,6 +167,9 @@ export abstract class ZodType<Output = any, Def extends ZodTypeDef = ZodTypeDef,
     return []
   }
 
+  /** checks if a schema is equal to another */
+  abstract isEqual(schema: ZodType): boolean
+
   _getType(input: ParseInput): string {
     return getParsedType(input.data)
   }

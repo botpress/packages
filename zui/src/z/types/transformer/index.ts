@@ -1,3 +1,4 @@
+import isEqual from 'lodash/isEqual'
 import {
   IssueData,
   input,
@@ -211,6 +212,11 @@ export class ZodEffects<T extends ZodTypeAny = ZodTypeAny, Output = output<T>, I
       typeName: ZodFirstPartyTypeKind.ZodEffects,
       ...processCreateParams(params),
     })
+  }
+
+  isEqual(schema: ZodType): boolean {
+    if (!(schema instanceof ZodEffects)) return false
+    return isEqual(this._def, schema._def) // TODO: implement correctly
   }
 }
 export { ZodEffects as ZodTransformer }

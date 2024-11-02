@@ -1,3 +1,4 @@
+import isEqual from 'lodash/isEqual'
 import { unique } from '../../utils'
 import {
   ZodBranded,
@@ -217,5 +218,10 @@ export class ZodDiscriminatedUnion<
     }
 
     return optionsMap
+  }
+
+  isEqual(schema: ZodType): boolean {
+    if (!(schema instanceof ZodDiscriminatedUnion)) return false
+    return isEqual(this._def, schema._def) // TODO: implement correctly
   }
 }

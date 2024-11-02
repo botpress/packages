@@ -1,3 +1,4 @@
+import isEqual from 'lodash/isEqual'
 import { unique } from '../../utils'
 import {
   ZodArray,
@@ -582,6 +583,11 @@ export class ZodObject<
 
   keyof(): ZodEnum<enumUtil.UnionToTupleString<keyof T>> {
     return createZodEnum(util.objectKeys(this.shape) as [string, ...string[]]) as any
+  }
+
+  isEqual(schema: ZodType): boolean {
+    if (!(schema instanceof ZodObject)) return false
+    return isEqual(this._def, schema._def) // TODO: implement correctly
   }
 
   static create = <T extends ZodRawShape>(shape: T, params?: RawCreateParams): ZodObject<T, 'strip'> => {

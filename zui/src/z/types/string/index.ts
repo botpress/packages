@@ -1,3 +1,4 @@
+import isEqual from 'lodash/isEqual'
 import { zuiKey } from '../../../ui/constants'
 import {
   StringValidation,
@@ -546,5 +547,10 @@ export class ZodString extends ZodType<string, ZodStringDef> {
       coerce: params?.coerce ?? false,
       ...processCreateParams(params),
     })
+  }
+
+  isEqual(schema: ZodType): boolean {
+    if (!(schema instanceof ZodString)) return false
+    return isEqual(this._def, schema._def) // TODO: implement correctly
   }
 }

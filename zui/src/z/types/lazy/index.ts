@@ -1,3 +1,4 @@
+import isEqual from 'lodash/isEqual'
 import {
   RawCreateParams,
   ZodFirstPartyTypeKind,
@@ -33,5 +34,10 @@ export class ZodLazy<T extends ZodTypeAny = ZodTypeAny> extends ZodType<output<T
       typeName: ZodFirstPartyTypeKind.ZodLazy,
       ...processCreateParams(params),
     })
+  }
+
+  isEqual(schema: ZodType): boolean {
+    if (!(schema instanceof ZodLazy)) return false
+    return isEqual(this._def.getter(), schema._def.getter())
   }
 }

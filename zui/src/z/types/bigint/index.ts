@@ -1,3 +1,4 @@
+import isEqual from 'lodash/isEqual'
 import {
   addIssueToContext,
   INVALID,
@@ -98,6 +99,13 @@ export class ZodBigInt extends ZodType<bigint, ZodBigIntDef> {
       coerce: params?.coerce ?? false,
       ...processCreateParams(params),
     })
+  }
+
+  isEqual(schema: ZodType): boolean {
+    if (!(schema instanceof ZodBigInt)) {
+      return false
+    }
+    return isEqual(this._def.checks, schema._def.checks) && this._def.coerce === schema._def.coerce
   }
 
   gte(value: bigint, message?: errorUtil.ErrMessage) {

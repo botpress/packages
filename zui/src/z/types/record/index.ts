@@ -1,3 +1,4 @@
+import isEqual from 'lodash/isEqual'
 import { unique } from '../../utils'
 import {
   BRAND,
@@ -122,5 +123,10 @@ export class ZodRecord<Key extends KeySchema = ZodString, Value extends ZodTypeA
       typeName: ZodFirstPartyTypeKind.ZodRecord,
       ...processCreateParams(second),
     })
+  }
+
+  isEqual(schema: ZodType): boolean {
+    if (!(schema instanceof ZodRecord)) return false
+    return isEqual(this._def, schema._def) // TODO: implement correctly
   }
 }

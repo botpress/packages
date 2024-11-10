@@ -1,4 +1,3 @@
-import isEqual from 'lodash/isEqual'
 import { unique } from '../../utils'
 import {
   ZodBranded,
@@ -34,6 +33,7 @@ import {
   ParseReturnType,
   Primitive,
 } from '../index'
+import { CustomSet } from '../utils/custom-set'
 
 const getDiscriminator = <T extends ZodTypeAny>(type: T): Primitive[] => {
   if (type instanceof ZodLazy) {
@@ -222,6 +222,14 @@ export class ZodDiscriminatedUnion<
 
   isEqual(schema: ZodType): boolean {
     if (!(schema instanceof ZodDiscriminatedUnion)) return false
-    return isEqual(this._def, schema._def) // TODO: implement correctly
+    if (this._def.discriminator !== schema._def.discriminator) return false
+
+    const compare = (a: ZodObject, b: ZodObject) => a.isEqual(b)
+    const thisOptions = new CustomSet<ZodObject>(this._def.options, { compare })
+    const thatOptions = new CustomSet<ZodObject>(schema._def.options, { compare })
+
+    // no need to compare optionsMap, as it is derived from discriminator + options
+
+    return thisOptions.isEqual(thatOptions)
   }
 }

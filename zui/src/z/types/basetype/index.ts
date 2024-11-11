@@ -47,6 +47,7 @@ import {
   ZodUnion,
   KindToDef,
 } from '../index'
+import { CatchFn } from '../catch'
 import type { ZuiSchemaOptions } from '../../../transforms/zui-to-json-schema/zui-extension'
 import type { ObjectToZuiOptions } from '../../../transforms/object-to-zui'
 import { TypescriptGenerationOptions, toTypescript } from '../../../transforms/zui-to-typescript-type'
@@ -446,11 +447,8 @@ export abstract class ZodType<Output = any, Def extends ZodTypeDef = ZodTypeDef,
     })
   }
 
-  catch(def: Output): ZodCatch<this>
-  catch(def: () => Output): ZodCatch<this>
-  catch(def: Output | (() => Output)) {
-    type CatchFn = () => Output
-    const catchValueFunc = typeof def === 'function' ? (def as CatchFn) : () => def
+  catch(def: Output | CatchFn<Output>) {
+    const catchValueFunc = typeof def === 'function' ? (def as CatchFn<Output>) : () => def
 
     return new ZodCatch({
       ...processCreateParams(this._def),

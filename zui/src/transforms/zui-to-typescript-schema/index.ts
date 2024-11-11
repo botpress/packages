@@ -141,10 +141,7 @@ function sUnwrapZod(schema: z.Schema): string {
       return `${getMultilineComment(def.description)}${sUnwrapZod(def.innerType)}.default(${defaultValue})`.trim()
 
     case z.ZodFirstPartyTypeKind.ZodCatch:
-      // TODO: should write a function if a function was passed at the constructor; otherwise, should write a value
-      const catchValue = toTypesriptPrimitive(def.catchValue())
-      // TODO: use z.catch() notation
-      return `${getMultilineComment(def.description)}${sUnwrapZod(def.innerType)}.catch(${catchValue})`.trim()
+      throw new errors.UnsupportedZuiToTypescriptSchemaError(z.ZodFirstPartyTypeKind.ZodCatch)
 
     case z.ZodFirstPartyTypeKind.ZodPromise:
       return `${getMultilineComment(def.description)}z.promise(${sUnwrapZod(def.type)})`.trim()

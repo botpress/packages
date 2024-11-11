@@ -1,5 +1,5 @@
-import isEqual from 'lodash/isEqual'
 import {
+  ZodError,
   RawCreateParams,
   ZodFirstPartyTypeKind,
   ZodType,
@@ -10,11 +10,13 @@ import {
   ParseContext,
   ParseInput,
   ParseReturnType,
+  util,
 } from '../index'
 
+export type CatchFn<Y> = (ctx: { error: ZodError; input: unknown }) => Y
 export interface ZodCatchDef<T extends ZodTypeAny = ZodTypeAny> extends ZodTypeDef {
   innerType: T
-  catchValue: () => T['_output']
+  catchValue: CatchFn<T['_output']>
   typeName: ZodFirstPartyTypeKind.ZodCatch
 }
 
@@ -47,13 +49,29 @@ export class ZodCatch<T extends ZodTypeAny = ZodTypeAny> extends ZodType<
       return result.then((result) => {
         return {
           status: 'valid',
-          value: result.status === 'valid' ? result.value : this._def.catchValue(),
+          value:
+            result.status === 'valid'
+              ? result.value
+              : this._def.catchValue({
+                  get error() {
+                    return new ZodError(newCtx.common.issues)
+                  },
+                  input: newCtx.data,
+                }),
         }
       })
     } else {
       return {
         status: 'valid',
-        value: result.status === 'valid' ? result.value : this._def.catchValue(),
+        value:
+          result.status === 'valid'
+            ? result.value
+            : this._def.catchValue({
+                get error() {
+                  return new ZodError(newCtx.common.issues)
+                },
+                input: newCtx.data,
+              }),
       }
     }
   }
@@ -65,7 +83,7 @@ export class ZodCatch<T extends ZodTypeAny = ZodTypeAny> extends ZodType<
   static create = <T extends ZodTypeAny>(
     type: T,
     params: RawCreateParams & {
-      catch: T['_output']
+      catch: T['_output'] | CatchFn<T['_output']>
     },
   ): ZodCatch<T> => {
     return new ZodCatch({
@@ -79,7 +97,8 @@ export class ZodCatch<T extends ZodTypeAny = ZodTypeAny> extends ZodType<
   isEqual(schema: ZodType): boolean {
     if (!(schema instanceof ZodCatch)) return false
     return (
-      this._def.innerType.isEqual(schema._def.innerType) && isEqual(this._def.catchValue(), schema._def.catchValue())
+      this._def.innerType.isEqual(schema._def.innerType) &&
+      util.compareFunctions(this._def.catchValue, schema._def.catchValue)
     )
   }
 }

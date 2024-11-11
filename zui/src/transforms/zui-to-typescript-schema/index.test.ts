@@ -165,7 +165,7 @@ describe('toTypescriptZuiString', () => {
   })
   test('catch', async () => {
     const schema = z.string().catch('banana')
-    await assert(schema).toGenerateItself()
+    await assert(schema).toThrowErrorWhenGenerating()
   })
   test('promise', async () => {
     const schema = z.promise(z.string())

@@ -23,6 +23,9 @@ describe('isEqual', () => {
   })
   test('bigint', () => {
     expectZui(z.bigint()).toEqual(z.bigint())
+    const min = BigInt(1)
+    const max = BigInt(100)
+    expectZui(z.bigint().min(min).max(max)).toEqual(z.bigint().max(max).min(min))
   })
   test('boolean', () => {
     expectZui(z.boolean()).toEqual(z.boolean())
@@ -265,4 +268,17 @@ describe('isEqual', () => {
   test('void', () => {
     expectZui(z.void()).toEqual(z.void())
   })
+})
+
+describe('isNotEqual', () => {
+  test('array', () => {
+    expectZui(z.array(z.string())).not.toEqual(z.array(z.string()).max(10))
+  })
+  test('bigint', () => {
+    const min1 = BigInt(1)
+    const min2 = BigInt(2)
+    expectZui(z.bigint().min(min1)).not.toEqual(z.bigint().min(min2))
+  })
+
+  // TODO: add more not equal tests
 })

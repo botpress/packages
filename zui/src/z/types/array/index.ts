@@ -52,9 +52,10 @@ export class ZodArray<T extends ZodTypeAny = ZodTypeAny, Cardinality extends Arr
       return false
     }
     return (
-      isEqual(this._def.exactLength, schema._def.exactLength) &&
-      isEqual(this._def.maxLength, schema._def.maxLength) &&
-      isEqual(this._def.minLength, schema._def.minLength) &&
+      // message is not considered for equality
+      isEqual(this._def.exactLength?.value, schema._def.exactLength?.value) &&
+      isEqual(this._def.maxLength?.value, schema._def.maxLength?.value) &&
+      isEqual(this._def.minLength?.value, schema._def.minLength?.value) &&
       this._def.type.isEqual(schema._def.type)
     )
   }

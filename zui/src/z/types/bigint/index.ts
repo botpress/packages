@@ -1,4 +1,3 @@
-import isEqual from 'lodash/isEqual'
 import {
   addIssueToContext,
   INVALID,
@@ -16,6 +15,7 @@ import {
   ZodParsedType,
   errorUtil,
 } from '../index'
+import { CustomSet } from '../utils/custom-set'
 
 export type ZodBigIntCheck =
   | { kind: 'min'; value: bigint; inclusive: boolean; message?: string }
@@ -105,7 +105,12 @@ export class ZodBigInt extends ZodType<bigint, ZodBigIntDef> {
     if (!(schema instanceof ZodBigInt)) {
       return false
     }
-    return isEqual(this._def.checks, schema._def.checks) && this._def.coerce === schema._def.coerce
+    if (this._def.coerce !== schema._def.coerce) return false
+
+    const thisChecks = new CustomSet<ZodBigIntCheck>(this._def.checks)
+    const thatChecks = new CustomSet<ZodBigIntCheck>(schema._def.checks)
+
+    return thisChecks.isEqual(thatChecks)
   }
 
   gte(value: bigint, message?: errorUtil.ErrMessage) {

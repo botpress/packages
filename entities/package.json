@@ -30,8 +30,7 @@
     "vitest": "1.6.0",
     "wasm-pack": "^0.13.0"
   },
-  "keywords": [],
-  "author": "",
+  "author": "Botpress, Inc.",
   "license": "MIT",
   "engines": {
     "node": ">=16.0.0",

@@ -1,8 +1,6 @@
-# Tunnel
+# Const
 
-Contains the tunneling logic for both the client and server.
-
-Used in the botpress tunnel system.
+Botpress specific constants
 
 ## Disclaimer ⚠️
 

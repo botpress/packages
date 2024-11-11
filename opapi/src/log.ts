@@ -1,7 +1,7 @@
 import winston from 'winston'
 
 const customFormat = winston.format.printf(({ message }) => {
-  return message
+  return message as string
 })
 
 export type Logger = {

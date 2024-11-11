@@ -160,11 +160,11 @@ describe('toTypescriptZuiString', () => {
     await assert(schema).toGenerateItself()
   })
   test('default', async () => {
-    const schema = z.string().default('banana') // TODO: should use `z.default(z.string(), 'banana')` for uniformity
+    const schema = z.string().default('banana')
     await assert(schema).toGenerateItself()
   })
   test('catch', async () => {
-    const schema = z.string().catch('banana') // TODO: should use `z.catch(z.string(), 'banana')` for uniformity
+    const schema = z.string().catch('banana')
     await assert(schema).toGenerateItself()
   })
   test('promise', async () => {
@@ -172,7 +172,7 @@ describe('toTypescriptZuiString', () => {
     await assert(schema).toGenerateItself()
   })
   test('branded', async () => {
-    const schema = z.string().brand('MyString') // TODO: should use `z.brand(z.string(), 'MyString')` for uniformity
+    const schema = z.string().brand('MyString')
     await assert(schema).toThrowErrorWhenGenerating()
   })
   test('pipeline', async () => {

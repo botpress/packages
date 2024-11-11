@@ -137,11 +137,13 @@ function sUnwrapZod(schema: z.Schema): string {
 
     case z.ZodFirstPartyTypeKind.ZodDefault:
       const defaultValue = toTypesriptPrimitive(def.defaultValue())
+      // TODO: use z.default() notation
       return `${getMultilineComment(def.description)}${sUnwrapZod(def.innerType)}.default(${defaultValue})`.trim()
 
     case z.ZodFirstPartyTypeKind.ZodCatch:
       // TODO: should write a function if a function was passed at the constructor; otherwise, should write a value
       const catchValue = toTypesriptPrimitive(def.catchValue())
+      // TODO: use z.catch() notation
       return `${getMultilineComment(def.description)}${sUnwrapZod(def.innerType)}.catch(${catchValue})`.trim()
 
     case z.ZodFirstPartyTypeKind.ZodPromise:

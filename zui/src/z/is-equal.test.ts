@@ -135,19 +135,19 @@ describe('isEqual', () => {
     expectZui(z.nan()).toEqual(z.nan())
   })
   test('nativeEnum', () => {
-    expectZui(
-      z.nativeEnum({
-        Apple: 'apple',
-        Banana: 'banana',
-        Orange: 'orange',
-      }),
-    ).toEqual(
-      z.nativeEnum({
-        Orange: 'orange',
-        Banana: 'banana',
-        Apple: 'apple',
-      }),
-    )
+    enum FruitA {
+      Apple = 'apple',
+      Banana = 'banana',
+      Orange = 'orange',
+    }
+
+    enum FruitB {
+      Orange = 'orange',
+      Banana = 'banana',
+      Apple = 'apple',
+    }
+
+    expectZui(z.nativeEnum(FruitA)).toEqual(z.nativeEnum(FruitB))
   })
   test('never', () => {
     expectZui(z.never()).toEqual(z.never())
@@ -160,6 +160,7 @@ describe('isEqual', () => {
   })
   test('number', () => {
     expectZui(z.number()).toEqual(z.number())
+    expectZui(z.number().int().nonnegative()).toEqual(z.number().nonnegative().int())
   })
   test('object', () => {
     expectZui(
@@ -221,6 +222,7 @@ describe('isEqual', () => {
   })
   test('string', () => {
     expectZui(z.string()).toEqual(z.string())
+    expectZui(z.string().email().max(255)).toEqual(z.string().max(255).email())
   })
   test('symbol', () => {
     expectZui(z.symbol()).toEqual(z.symbol())

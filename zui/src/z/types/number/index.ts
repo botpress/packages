@@ -1,4 +1,3 @@
-import isEqual from 'lodash/isEqual'
 import {
   ZodIssueCode,
   RawCreateParams,
@@ -16,6 +15,7 @@ import {
   ParseReturnType,
   ParseStatus,
 } from '../index'
+import { CustomSet } from '../utils/custom-set'
 
 export type ZodNumberCheck =
   | { kind: 'min'; value: number; inclusive: boolean; message?: string }
@@ -288,6 +288,8 @@ export class ZodNumber extends ZodType<number, ZodNumberDef> {
 
   isEqual(schema: ZodType): boolean {
     if (!(schema instanceof ZodNumber)) return false
-    return isEqual(this._def, schema._def) // TODO: implement correctly
+    const thisChecks = new CustomSet<ZodNumberCheck>(this._def.checks)
+    const thatChecks = new CustomSet<ZodNumberCheck>(schema._def.checks)
+    return thisChecks.isEqual(thatChecks)
   }
 }

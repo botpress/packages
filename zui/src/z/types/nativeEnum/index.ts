@@ -64,6 +64,6 @@ export class ZodNativeEnum<T extends EnumLike = EnumLike> extends ZodType<T[keyo
 
   isEqual(schema: ZodType): boolean {
     if (!(schema instanceof ZodNativeEnum)) return false
-    return isEqual(this._def, schema._def) // TODO: implement correctly
+    return isEqual(this._def.values, schema._def.values)
   }
 }

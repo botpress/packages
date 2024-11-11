@@ -1,4 +1,3 @@
-import isEqual from 'lodash/isEqual'
 import { zuiKey } from '../../../ui/constants'
 import {
   StringValidation,
@@ -18,6 +17,7 @@ import {
   ParseReturnType,
   ParseStatus,
 } from '../index'
+import { CustomSet } from '../utils/custom-set'
 
 export type IpVersion = 'v4' | 'v6'
 export type ZodStringCheck =
@@ -551,6 +551,8 @@ export class ZodString extends ZodType<string, ZodStringDef> {
 
   isEqual(schema: ZodType): boolean {
     if (!(schema instanceof ZodString)) return false
-    return isEqual(this._def, schema._def) // TODO: implement correctly
+    const thisChecks = new CustomSet<ZodStringCheck>(this._def.checks)
+    const thatChecks = new CustomSet<ZodStringCheck>(schema._def.checks)
+    return thisChecks.isEqual(thatChecks)
   }
 }

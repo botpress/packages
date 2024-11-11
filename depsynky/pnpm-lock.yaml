@@ -6,8 +6,8 @@ settings:
 
 dependencies:
   '@bpinternal/yargs-extra':
-    specifier: ^0.0.13
-    version: 0.0.13
+    specifier: ^0.0.16
+    version: 0.0.16
   chalk:
     specifier: ^4.1.2
     version: 4.1.2
@@ -25,12 +25,12 @@ dependencies:
     version: 7.6.3
   yaml:
     specifier: ^2.3.1
-    version: 2.5.1
+    version: 2.6.0
 
 devDependencies:
   '@types/node':
     specifier: ^18.11.18
-    version: 18.19.54
+    version: 18.19.64
   '@types/prettier':
     specifier: ^2.7.3
     version: 2.7.3
@@ -45,15 +45,15 @@ devDependencies:
     version: 0.24.0
   ts-node:
     specifier: ^10.9.1
-    version: 10.9.2(@types/node@18.19.54)(typescript@4.9.4)
+    version: 10.9.2(@types/node@18.19.64)(typescript@4.9.4)
   typescript:
     specifier: ^4.9.4
     version: 4.9.4
 
 packages:
 
-  /@bpinternal/yargs-extra@0.0.13:
-    resolution: {integrity: sha512-564rYqGkccAg8dSg83YCPKMvHQNPyZe+WCdyOEVn+3N2oJoIrHAHTNVPQC0lJfmHPZl48hPC775sLxPNv+rMWQ==}
+  /@bpinternal/yargs-extra@0.0.16:
+    resolution: {integrity: sha512-qBnjOZnfzDVP2XD2NItHBWgXVQzlECUqu2+qDSU3X1IjE58ORteN5HT7TndO0hwI6XfLIXWwKSuRjVsj2nN7aA==}
     engines: {node: '>=16.0.0', pnpm: 8.6.2}
     dependencies:
       '@types/yargs': 17.0.33
@@ -319,8 +319,8 @@ packages:
     resolution: {integrity: sha512-vxhUy4J8lyeyinH7Azl1pdd43GJhZH/tP2weN8TntQblOY+A0XbT8DJk1/oCPuOOyg/Ja757rG0CgHcWC8OfMA==}
     dev: true
 
-  /@types/node@18.19.54:
-    resolution: {integrity: sha512-+BRgt0G5gYjTvdLac9sIeE0iZcJxi4Jc4PV5EUzqi+88jmQLr+fRZdv2tCTV7IHKSGxM6SaLoOXQWWUiLUItMw==}
+  /@types/node@18.19.64:
+    resolution: {integrity: sha512-955mDqvO2vFf/oL7V3WiUtiz+BugyX8uVbaT2H8oj3+8dRyH2FLiNdowe7eNqRM7IOIZvzDH76EoAT+gwm6aIQ==}
     dependencies:
       undici-types: 5.26.5
     dev: true
@@ -332,7 +332,7 @@ packages:
   /@types/prompts@2.4.9:
     resolution: {integrity: sha512-qTxFi6Buiu8+50/+3DGIWLHM6QuWsEKugJnnP6iv2Mc4ncxE4A/OJkjuVOA+5X0X1S/nq5VJRa8Lu+nwcvbrKA==}
     dependencies:
-      '@types/node': 18.19.54
+      '@types/node': 18.19.64
       kleur: 3.0.3
     dev: true
 
@@ -598,7 +598,7 @@ packages:
       has-flag: 4.0.0
     dev: false
 
-  /ts-node@10.9.2(@types/node@18.19.54)(typescript@4.9.4):
+  /ts-node@10.9.2(@types/node@18.19.64)(typescript@4.9.4):
     resolution: {integrity: sha512-f0FFpIdcHgn8zcPSbf1dRevwt047YMnaiJM3u2w2RewrB+fob/zePZcrOyQoLMMO7aBIddLcQIEK5dYjkLnGrQ==}
     hasBin: true
     peerDependencies:
@@ -617,7 +617,7 @@ packages:
       '@tsconfig/node12': 1.0.11
       '@tsconfig/node14': 1.0.3
       '@tsconfig/node16': 1.0.4
-      '@types/node': 18.19.54
+      '@types/node': 18.19.64
       acorn: 8.12.1
       acorn-walk: 8.3.4
       arg: 4.1.3
@@ -657,8 +657,8 @@ packages:
     engines: {node: '>=10'}
     dev: false
 
-  /yaml@2.5.1:
-    resolution: {integrity: sha512-bLQOjaX/ADgQ20isPJRvF0iRUHIxVhYvr53Of7wGcWlO2jvtUlH5m87DsmulFVxRpNLOnI4tB6p/oh8D7kpn9Q==}
+  /yaml@2.6.0:
+    resolution: {integrity: sha512-a6ae//JvKDEra2kdi1qzCyrJW/WZCgFi8ydDV+eXExl95t+5R+ijnqHJbz9tmMh8FUjx3iv2fCQ4dclAQlO2UQ==}
     engines: {node: '>= 14'}
     hasBin: true
     dev: false

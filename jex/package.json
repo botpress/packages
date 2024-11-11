@@ -15,9 +15,8 @@
     "check": "pnpm check:format && pnpm check:type",
     "fix": "pnpm fix:format"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
+  "author": "Botpress, Inc.",
+  "license": "MIT",
   "devDependencies": {
     "@types/lodash": "^4.14.202",
     "ajv": "^8.12.0",

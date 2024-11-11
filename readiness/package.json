@@ -6,7 +6,7 @@
     "start": "node dist/index.js",
     "check:type": "tsc --noEmit"
   },
-  "keywords": [],
+  
   "author": "Botpress, Inc.",
   "license": "MIT",
   "bin": {

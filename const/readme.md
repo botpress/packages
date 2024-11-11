@@ -1,6 +1,6 @@
-# DepSynky
+# Const
 
-CLI to synchronize dependencies accross a pnpm mono-repo
+Botpress specific constants
 
 ## Disclaimer ⚠️
 

@@ -11,6 +11,7 @@
     "build": "ts-node -T ./build.ts",
     "test": "vitest run"
   },
+  "license": "MIT",
   "dependencies": {
     "@bpinternal/yargs-extra": "0.0.14",
     "dotenv": "^16.4.4"

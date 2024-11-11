@@ -183,15 +183,9 @@ test('reported issues with nested usage', () => {
 })
 
 test('catch error', () => {
-  let catchError: z.ZodError | undefined = undefined
-
   const schema = z.object({
     age: z.number(),
-    name: z.string().catch((ctx) => {
-      catchError = ctx.error
-
-      return 'John Doe'
-    }),
+    name: z.string().catch(() => 'John Doe'),
   })
 
   const result = schema.safeParse({
@@ -202,16 +196,4 @@ test('catch error', () => {
   expect(result.success).toEqual(false)
   expect(!result.success && result.error.issues.length).toEqual(1)
   expect(!result.success && result.error.issues[0]?.message).toMatch('number')
-
-  expect(catchError).toBeInstanceOf(z.ZodError)
-  expect(catchError !== undefined && (catchError as z.ZodError).issues.length).toEqual(1)
-  expect(catchError !== undefined && (catchError as z.ZodError).issues[0]?.message).toMatch('string')
-})
-
-test('ctx.input', () => {
-  const schema = z.string().catch((ctx) => {
-    return String(ctx.input)
-  })
-
-  expect(schema.parse(123)).toEqual('123')
 })

@@ -447,16 +447,17 @@ export abstract class ZodType<Output = any, Def extends ZodTypeDef = ZodTypeDef,
   }
 
   catch(def: Output): ZodCatch<this>
-  catch(def: (ctx: { error: ZodError; input: Input }) => Output): ZodCatch<this>
-  catch(def: any) {
-    const catchValueFunc = typeof def === 'function' ? def : () => def
+  catch(def: () => Output): ZodCatch<this>
+  catch(def: Output | (() => Output)) {
+    type CatchFn = () => Output
+    const catchValueFunc = typeof def === 'function' ? (def as CatchFn) : () => def
 
     return new ZodCatch({
       ...processCreateParams(this._def),
       innerType: this,
       catchValue: catchValueFunc,
       typeName: ZodFirstPartyTypeKind.ZodCatch,
-    }) as any
+    })
   }
 
   describe(description: string): this {

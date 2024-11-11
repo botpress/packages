@@ -1,4 +1,3 @@
-import isEqual from 'lodash/isEqual'
 import { unique } from '../../utils'
 import {
   ZodFirstPartyTypeKind,
@@ -90,6 +89,8 @@ export class ZodPipeline<A extends ZodTypeAny = ZodTypeAny, B extends ZodTypeAny
 
   isEqual(schema: ZodType): boolean {
     if (!(schema instanceof ZodPipeline)) return false
-    return isEqual(this._def, schema._def) // TODO: implement correctly
+    if (!this._def.in.isEqual(schema._def.in)) return false
+    if (!this._def.out.isEqual(schema._def.out)) return false
+    return true
   }
 }

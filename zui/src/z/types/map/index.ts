@@ -1,4 +1,3 @@
-import isEqual from 'lodash/isEqual'
 import { unique } from '../../utils'
 import {
   ZodIssueCode,
@@ -120,6 +119,8 @@ export class ZodMap<Key extends ZodTypeAny = ZodTypeAny, Value extends ZodTypeAn
 
   isEqual(schema: ZodType): boolean {
     if (!(schema instanceof ZodMap)) return false
-    return isEqual(this._def, schema._def) // TODO: implement correctly
+    if (!this._def.keyType.isEqual(schema._def.keyType)) return false
+    if (!this._def.valueType.isEqual(schema._def.valueType)) return false
+    return true
   }
 }

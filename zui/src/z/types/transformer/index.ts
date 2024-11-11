@@ -1,4 +1,3 @@
-import isEqual from 'lodash/isEqual'
 import {
   IssueData,
   input,
@@ -216,7 +215,36 @@ export class ZodEffects<T extends ZodTypeAny = ZodTypeAny, Output = output<T>, I
 
   isEqual(schema: ZodType): boolean {
     if (!(schema instanceof ZodEffects)) return false
-    return isEqual(this._def, schema._def) // TODO: implement correctly
+    if (!this._def.schema.isEqual(schema._def.schema)) return false
+
+    if (this._def.effect.type === 'refinement') {
+      if (schema._def.effect.type !== 'refinement') return false
+      return this._compareFn(this._def.effect.refinement, schema._def.effect.refinement)
+    }
+
+    if (this._def.effect.type === 'transform') {
+      if (schema._def.effect.type !== 'transform') return false
+      return this._compareFn(this._def.effect.transform, schema._def.effect.transform)
+    }
+
+    if (this._def.effect.type === 'preprocess') {
+      if (schema._def.effect.type !== 'preprocess') return false
+      return this._compareFn(this._def.effect.transform, schema._def.effect.transform)
+    }
+
+    util.assertNever(this._def.effect)
+    return false
+  }
+
+  private _compareFn = (a: Function, b: Function) => {
+    /**
+     * The only proper way to deeply compare functions would be to ensure they return the same value for the same input.
+     * This is impossible to do unless the domain of the function is known and the function is pure.
+     *
+     * Comparing source code is not ideal since 2 function could be equivalent but have different source code,
+     * but that's our best option.
+     */
+    return a.toString() === b.toString()
   }
 }
 export { ZodEffects as ZodTransformer }

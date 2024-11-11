@@ -1,4 +1,3 @@
-import isEqual from 'lodash/isEqual'
 import { unique } from '../../utils'
 import {
   ZodIssueCode,
@@ -17,6 +16,7 @@ import {
   ParseStatus,
   SyncParseReturnType,
 } from '../index'
+import { CustomSet } from '../utils/custom-set'
 
 export type ZodTupleItems = [ZodTypeAny, ...ZodTypeAny[]]
 export type AssertArray<T> = T extends any[] ? T : never
@@ -146,6 +146,18 @@ export class ZodTuple<
 
   isEqual(schema: ZodType): boolean {
     if (!(schema instanceof ZodTuple)) return false
-    return isEqual(this._def, schema._def) // TODO: implement correctly
+    if (!this._restEquals(schema)) return false
+
+    const compare = (a: ZodType, b: ZodType) => a.isEqual(b)
+    const thisItems = new CustomSet<ZodType>(this._def.items, { compare })
+    const schemaItems = new CustomSet<ZodType>(schema._def.items, { compare })
+    return thisItems.isEqual(schemaItems)
+  }
+
+  private _restEquals(schema: ZodTuple) {
+    if (this._def.rest === null) {
+      return schema._def.rest === null
+    }
+    return schema._def.rest !== null && this._def.rest.isEqual(schema._def.rest)
   }
 }

@@ -1,4 +1,3 @@
-import isEqual from 'lodash/isEqual'
 import { unique } from '../../utils'
 import {
   RawCreateParams,
@@ -18,6 +17,7 @@ import {
   ParseReturnType,
   SyncParseReturnType,
 } from '../index'
+import { CustomSet } from '../utils/custom-set'
 
 type DefaultZodUnionOptions = Readonly<[ZodTypeAny, ZodTypeAny, ...ZodTypeAny[]]>
 export type ZodUnionOptions = Readonly<[ZodTypeAny, ...ZodTypeAny[]]>
@@ -163,6 +163,11 @@ export class ZodUnion<T extends ZodUnionOptions = DefaultZodUnionOptions> extend
 
   isEqual(schema: ZodType): boolean {
     if (!(schema instanceof ZodUnion)) return false
-    return isEqual(this._def, schema._def) // TODO: implement correctly
+
+    const compare = (a: ZodType, b: ZodType) => a.isEqual(b)
+    const thisOptions = new CustomSet<ZodType>([...this._def.options], { compare })
+    const thatOptions = new CustomSet<ZodType>([...schema._def.options], { compare })
+
+    return thisOptions.isEqual(thatOptions)
   }
 }

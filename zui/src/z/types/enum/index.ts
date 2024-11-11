@@ -1,4 +1,3 @@
-import isEqual from 'lodash/isEqual'
 import {
   ZodIssueCode,
   RawCreateParams,
@@ -13,6 +12,7 @@ import {
   ParseInput,
   ParseReturnType,
 } from '../index'
+import { CustomSet } from '../utils/custom-set'
 
 export type ArrayKeys = keyof any[]
 export type Indices<T> = Exclude<keyof T, ArrayKeys>
@@ -137,6 +137,8 @@ export class ZodEnum<T extends [string, ...string[]] = [string, ...string[]]> ex
 
   isEqual(schema: ZodType): boolean {
     if (!(schema instanceof ZodEnum)) return false
-    return isEqual(this._def, schema._def) // TODO: implement correctly
+    const thisValues = new CustomSet<string>(this._def.values)
+    const thatValues = new CustomSet<string>(schema._def.values)
+    return thisValues.isEqual(thatValues)
   }
 }

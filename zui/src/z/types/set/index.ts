@@ -1,4 +1,3 @@
-import isEqual from 'lodash/isEqual'
 import {
   ZodIssueCode,
   ParseInputLazyPath,
@@ -141,6 +140,15 @@ export class ZodSet<Value extends ZodTypeAny = ZodTypeAny> extends ZodType<
 
   isEqual(schema: ZodType): boolean {
     if (!(schema instanceof ZodSet)) return false
-    return isEqual(this._def, schema._def) // TODO: implement correctly
+
+    const thisMin = this._def.minSize?.value
+    const thatMin = schema._def.minSize?.value
+    if (thisMin !== thatMin) return false // min message is not important for equality
+
+    const thisMax = this._def.maxSize?.value
+    const thatMax = schema._def.maxSize?.value
+    if (thisMax !== thatMax) return false // max message is not important for equality
+
+    return this._def.valueType.isEqual(schema._def.valueType)
   }
 }

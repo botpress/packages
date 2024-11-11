@@ -1,4 +1,3 @@
-import isEqual from 'lodash/isEqual'
 import { unique } from '../../utils'
 import {
   defaultErrorMap,
@@ -202,6 +201,8 @@ export class ZodFunction<
 
   isEqual(schema: ZodType): boolean {
     if (!(schema instanceof ZodFunction)) return false
-    return isEqual(this._def, schema._def) // TODO: implement correctly
+    if (!this._def.args.isEqual(schema._def.args)) return false
+    if (!this._def.returns.isEqual(schema._def.returns)) return false
+    return true
   }
 }

@@ -226,23 +226,20 @@ describe('isEqual', () => {
     expectZui(z.symbol()).toEqual(z.symbol())
   })
   test('transformer', () => {
-    const isUpper = (s: string) => s === s.toUpperCase()
-    const toUpper = (s: string) => s.toUpperCase()
-
     expectZui(
       //
-      z.string().refine(isUpper, 'string must be upper case'),
+      z.string().transform((s) => s.toUpperCase()),
     ).toEqual(
       //
-      z.string().refine(isUpper, 'string is not upper case'),
+      z.string().transform((s) => s.toUpperCase()),
     )
 
     expectZui(
       //
-      z.string().transform(toUpper),
+      z.string().refine((s: string) => s === s.toUpperCase(), 'string must be upper case'),
     ).toEqual(
       //
-      z.string().transform(toUpper),
+      z.string().refine((s: string) => s === s.toUpperCase(), 'string is not upper case'),
     )
   })
   test('tuple', () => {

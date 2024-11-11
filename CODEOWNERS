@@ -4,7 +4,6 @@ const @botpress/cloud-services
 entities @franklevasseur @botpress/cloud-services
 depsynky @franklevasseur @botpress/cloud-services
 es-node @franklevasseur @botpress/cloud-services
-expresso @franklevasseur @botpress/cloud-services
 jex @franklevasseur @botpress/cloud-services
 log4bot @franklevasseur @botpress/cloud-services
 opapi @michaelmass @franklevasseur @botpress/cloud-services

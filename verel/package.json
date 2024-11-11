@@ -16,7 +16,6 @@
     "test:node": "vitest --browser.enabled false --run",
     "test:browser": "vitest --browser.enabled true --run"
   },
-  
   "author": "Botpress, Inc.",
   "license": "MIT",
   "dependencies": {

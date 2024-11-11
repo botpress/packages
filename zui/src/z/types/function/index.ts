@@ -200,9 +200,10 @@ export class ZodFunction<
   }
 
   isEqual(schema: ZodType): boolean {
-    if (!(schema instanceof ZodFunction)) return false
-    if (!this._def.args.isEqual(schema._def.args)) return false
-    if (!this._def.returns.isEqual(schema._def.returns)) return false
-    return true
+    return (
+      schema instanceof ZodFunction &&
+      this._def.args.isEqual(schema._def.args) &&
+      this._def.returns.isEqual(schema._def.returns)
+    )
   }
 }

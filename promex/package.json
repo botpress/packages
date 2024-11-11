@@ -1,7 +1,7 @@
 {
   "name": "@bpinternal/promex",
   "description": "Prometheus express initialization package for nodejs.",
-  "version": "0.5.15",
+  "version": "0.5.16",
   "author": "Botpress, Inc.",
   "repository": {
     "type": "git",
@@ -31,10 +31,10 @@
   },
   "devDependencies": {
     "@types/express": "4.17.21",
-    "@types/node": "18.19.57",
+    "@types/node": "18.19.64",
     "axios": "1.7.7",
     "typescript": "5.6.3",
-    "vite": "5.4.9",
+    "vite": "5.4.11",
     "vitest": "1.6.0"
   },
   "scripts": {

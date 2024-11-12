@@ -120,6 +120,18 @@ describe.concurrent('functions', () => {
     await expect(typings).toMatchWithoutFormatting('declare const fn: (arg0?: string) => unknown;')
   })
 
+  it('function with readonly args', async () => {
+    const fn = z.function().title('fn').args(z.string().readonly())
+    const typings = toTypescript(fn)
+    await expect(typings).toMatchWithoutFormatting('declare const fn: (arg0: Readonly<string>) => unknown;')
+  })
+
+  it('function with readonly enumerable args', async () => {
+    const fn = z.function().title('fn').args(z.array(z.string()).readonly())
+    const typings = toTypescript(fn)
+    await expect(typings).toMatchWithoutFormatting('declare const fn: (arg0: Readonly<string[]>) => unknown;')
+  })
+
   it('string literals', async () => {
     const typings = toTypescript(
       z
@@ -327,6 +339,40 @@ describe.concurrent('objects', () => {
     const typings = toTypescript(obj)
 
     await expect(typings).toMatchWithoutFormatting('declare const MyObject: { address: {} | null };')
+  })
+
+  it('object with a description & readonly', async () => {
+    const obj = z
+      .object({
+        someStr: z.string().describe('Description').readonly(),
+      })
+      .title('MyObject')
+
+    const typings = toTypescript(obj)
+
+    await expect(typings).toMatchWithoutFormatting(`
+        declare const MyObject: {
+          /** Description */
+          someStr: Readonly<string>
+        };
+      `)
+  })
+
+  it('object with readonly and a description (opposite of previous test)', async () => {
+    const obj = z
+      .object({
+        someStr: z.string().readonly().describe('Description'),
+      })
+      .title('MyObject')
+
+    const typings = toTypescript(obj)
+
+    await expect(typings).toMatchWithoutFormatting(`
+        declare const MyObject: {
+          /** Description */
+          someStr: Readonly<string>
+        };
+      `)
   })
 
   it('zod record', async () => {

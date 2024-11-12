@@ -17,7 +17,16 @@ function getTypingVariations(type: z.ZodType, opts?: { declaration?: boolean; ma
 
   const typingsOptionalNullable = toTypescript(type.optional().nullable(), opts)
 
-  const output = [baseTypings, typingsNullable, typingsOptional, typingsNullableOptional, typingsOptionalNullable]
+  const typingsReadonly = toTypescript(type.readonly(), opts)
+
+  const output = [
+    baseTypings,
+    typingsNullable,
+    typingsOptional,
+    typingsNullableOptional,
+    typingsOptionalNullable,
+    typingsReadonly,
+  ]
 
   return output
 }

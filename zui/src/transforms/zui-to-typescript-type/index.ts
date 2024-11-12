@@ -27,6 +27,7 @@ class KeyValue {
     public key: string,
     public value: z.Schema,
     public optional: boolean = false,
+    public readonly isReadonly: boolean = false,
   ) {}
 }
 
@@ -107,12 +108,15 @@ function sUnwrapZod(schema: z.Schema | KeyValue | FnParameters | Declaration | n
   }
 
   if (schema instanceof KeyValue) {
-    if (schema.value instanceof z.ZodOptional) {
+    if (schema.value instanceof z.ZodOptional || schema.value instanceof z.ZodReadonly) {
       let innerType = schema.value._def.innerType as z.Schema
       if (innerType instanceof z.Schema && !innerType.description && schema.value.description) {
         innerType = innerType?.describe(schema.value.description)
       }
-      return sUnwrapZod(new KeyValue(schema.key, innerType, true), newConfig)
+
+      const isOptional = schema.value instanceof z.ZodOptional
+      const isReadonly = schema.value instanceof z.ZodReadonly
+      return sUnwrapZod(new KeyValue(schema.key, innerType, isOptional, isReadonly), newConfig)
     }
 
     const description = getMultilineComment(schema.value._def.description)
@@ -122,7 +126,11 @@ function sUnwrapZod(schema: z.Schema | KeyValue | FnParameters | Declaration | n
     // either we are children of a z.ZodOptional or there is a z.ZodOptional in the children
     const isOptional = schema.optional || schema.value.isOptional()
     const optionalModifier = isOptional ? '?' : ''
-    return `${delimiter}${description}${delimiter}${schema.key}${optionalModifier}: ${sUnwrapZod(withoutDesc, newConfig)}${delimiter}`
+
+    const readonlyModifierStart = schema.isReadonly ? 'Readonly<' : ''
+    const readonlyModifierEnd = schema.isReadonly ? '>' : ''
+
+    return `${delimiter}${description}${delimiter}${schema.key}${optionalModifier}: ${readonlyModifierStart}${sUnwrapZod(withoutDesc, newConfig)}${readonlyModifierEnd}${delimiter}`
   }
 
   if (schema instanceof FnParameters) {
@@ -305,7 +313,7 @@ ${value}`.trim()
       return `${getMultilineComment(def.description)} symbol`.trim()
 
     case z.ZodFirstPartyTypeKind.ZodReadonly:
-      return `readonly ${sUnwrapZod(def.innerType, newConfig)}`
+      return `Readonly<${sUnwrapZod(def.innerType, newConfig)}>`
 
     case z.ZodFirstPartyTypeKind.ZodRef:
       return toTypeArgumentName(def.uri)

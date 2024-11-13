@@ -1,21 +1,25 @@
 import { camelCase, deburr } from '../../ui/utils'
 
-export function escapeString(str: string) {
-  if (typeof str !== 'string') {
-    return ''
+export function toTypescriptPrimitive(x: string | number | boolean | null | symbol | undefined | bigint): string {
+  if (typeof x === 'undefined') {
+    return 'undefined'
   }
-
-  // Use String.raw to get the raw string with escapes preserved
-  const rawStr = String.raw`${str}`
-
-  // Determine the appropriate quote style
-  if (rawStr.includes('`')) {
-    return `"${rawStr.replace(/"/g, '\\"')}"`
-  } else if (rawStr.includes("'")) {
-    return `'${rawStr.replace(/'/g, "\\'")}'`
-  } else {
-    return `'${rawStr}'`
+  if (typeof x === 'symbol') {
+    return `Symbol(${toTypescriptPrimitive(x.description)})`
   }
+  if (typeof x === 'bigint') {
+    const y: number = Number(x)
+    return `BigInt(${y})`
+  }
+  return JSON.stringify(x)
+}
+
+export function toTypescriptValue(x: unknown): string {
+  if (typeof x === 'undefined') {
+    return 'undefined'
+  }
+  // will fail or not behave as expected if x contains a symbol or a bigint
+  return JSON.stringify(x)
 }
 
 export const toPropertyKey = (key: string) => {
@@ -23,7 +27,7 @@ export const toPropertyKey = (key: string) => {
     return key
   }
 
-  return escapeString(key)
+  return toTypescriptPrimitive(key)
 }
 
 const capitalize = (s: string): string => s.charAt(0).toUpperCase() + s.slice(1)

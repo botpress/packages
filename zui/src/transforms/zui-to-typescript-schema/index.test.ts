@@ -9,7 +9,7 @@ const assert = (source: ZodType) => ({
     const actual = toTypescript(source)
     const evalResult = evalZuiString(actual)
     if (!evalResult.sucess) {
-      throw new Error(evalResult.error)
+      throw new Error(`${evalResult.error}: ${actual}`)
     }
     const destination = evalResult.value
     expect(source.isEqual(destination)).toBe(true)
@@ -160,8 +160,14 @@ describe('toTypescriptZuiString', () => {
     await assert(schema).toGenerateItself()
   })
   test('default', async () => {
-    const schema = z.string().default('banana')
-    await assert(schema).toGenerateItself()
+    const schema1 = z.string().default('banana')
+    await assert(schema1).toGenerateItself()
+
+    const schema2 = z
+      .string()
+      .array()
+      .default(() => ['banana'])
+    await assert(schema2).toGenerateItself()
   })
   test('catch', async () => {
     const schema = z.string().catch('banana')

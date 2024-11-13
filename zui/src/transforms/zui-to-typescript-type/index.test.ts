@@ -170,8 +170,8 @@ describe.concurrent('functions', () => {
 
   it('bigint literals', async () => {
     const n = BigInt(100)
-    const fn = () => toTypescript(z.literal(n))
-    expect(fn).toThrowError()
+    const typings = toTypescript(z.literal(n))
+    await expect(typings).toMatchWithoutFormatting('declare const x: BigInt(100)')
   })
 
   it('non explicitly discriminated union', async () => {

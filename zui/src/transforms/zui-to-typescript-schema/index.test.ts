@@ -163,10 +163,7 @@ describe('toTypescriptZuiString', () => {
     const schema1 = z.string().default('banana')
     await assert(schema1).toGenerateItself()
 
-    const schema2 = z
-      .string()
-      .array()
-      .default(() => ['banana'])
+    const schema2 = z.string().array().default(['banana'])
     await assert(schema2).toGenerateItself()
   })
   test('catch', async () => {

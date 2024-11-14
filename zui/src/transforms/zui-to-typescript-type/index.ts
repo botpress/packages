@@ -1,5 +1,11 @@
 import z, { util } from '../../z'
-import { toTypescriptPrimitive, getMultilineComment, toPropertyKey, toTypeArgumentName } from './utils'
+import {
+  primitiveToTypscriptValue,
+  getMultilineComment,
+  toPropertyKey,
+  toTypeArgumentName,
+  primitiveToTypscriptLiteralType,
+} from './utils'
 import * as errors from '../common/errors'
 
 const Primitives = [
@@ -263,12 +269,12 @@ ${opts.join(' | ')}`
       return sUnwrapZod(def.getter(), newConfig)
 
     case z.ZodFirstPartyTypeKind.ZodLiteral:
-      const value: string = toTypescriptPrimitive(def.value)
+      const value: string = primitiveToTypscriptLiteralType(def.value)
       return `${getMultilineComment(def.description)}
 ${value}`.trim()
 
     case z.ZodFirstPartyTypeKind.ZodEnum:
-      const values = def.values.map(toTypescriptPrimitive)
+      const values = def.values.map(primitiveToTypscriptValue)
       return values.join(' | ')
 
     case z.ZodFirstPartyTypeKind.ZodEffects:

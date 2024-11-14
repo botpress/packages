@@ -1,20 +1,44 @@
 import { camelCase, deburr } from '../../ui/utils'
+import { Primitive } from '../../z'
 
-export function toTypescriptPrimitive(x: string | number | boolean | null | symbol | undefined | bigint): string {
+/**
+ * @returns a valid typescript literal type usable in `type MyType = ${x}`
+ */
+export function primitiveToTypscriptLiteralType(x: Primitive): string {
+  if (typeof x === 'symbol') {
+    return 'symbol' // there's no way to represent a symbol literal in a single line with typescript
+  }
+  if (typeof x === 'bigint') {
+    const str = x.toString()
+    return `${str}n`
+  }
+  return primitiveToTypscriptValue(x)
+}
+
+/**
+ * @returns a valid typescript primitive value usable in `const myValue = ${x}`
+ */
+export function primitiveToTypscriptValue(x: Primitive): string {
   if (typeof x === 'undefined') {
     return 'undefined'
   }
   if (typeof x === 'symbol') {
-    return `Symbol(${toTypescriptPrimitive(x.description)})`
+    if (x.description) {
+      return `Symbol(${primitiveToTypscriptValue(x.description)})`
+    }
+    return 'Symbol()'
   }
   if (typeof x === 'bigint') {
-    const y: number = Number(x)
-    return `BigInt(${y})`
+    const str = x.toString()
+    return `BigInt(${str})`
   }
   return JSON.stringify(x)
 }
 
-export function toTypescriptValue(x: unknown): string {
+/**
+ * @returns a valid typescript value usable in `const myValue = ${x}`
+ */
+export function unknownToTypescriptValue(x: unknown): string {
   if (typeof x === 'undefined') {
     return 'undefined'
   }
@@ -27,7 +51,7 @@ export const toPropertyKey = (key: string) => {
     return key
   }
 
-  return toTypescriptPrimitive(key)
+  return primitiveToTypscriptValue(key)
 }
 
 const capitalize = (s: string): string => s.charAt(0).toUpperCase() + s.slice(1)

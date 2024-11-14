@@ -131,8 +131,24 @@ describe('toTypescriptZuiString', () => {
     const schema = z.literal(42)
     await assert(schema).toGenerateItself()
   })
+  test('literal symbol', async () => {
+    const schema = z.literal(Symbol('banana'))
+    await assert(schema).toGenerateItself()
+  })
+  test('literal bigint', async () => {
+    const schema = z.literal(BigInt(42))
+    await assert(schema).toGenerateItself()
+  })
   test('literal boolean', async () => {
     const schema = z.literal(true)
+    await assert(schema).toGenerateItself()
+  })
+  test('literal null', async () => {
+    const schema = z.literal(null)
+    await assert(schema).toGenerateItself()
+  })
+  test('literal undefined', async () => {
+    const schema = z.literal(undefined)
     await assert(schema).toGenerateItself()
   })
   test('enum', async () => {

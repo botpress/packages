@@ -12,19 +12,19 @@ export function primitiveToTypscriptLiteralType(x: Primitive): string {
     const str = x.toString()
     return `${str}n`
   }
-  return primitiveToTypscriptValue(x)
+  return primitiveToTypescriptValue(x)
 }
 
 /**
  * @returns a valid typescript primitive value usable in `const myValue = ${x}`
  */
-export function primitiveToTypscriptValue(x: Primitive): string {
+export function primitiveToTypescriptValue(x: Primitive): string {
   if (typeof x === 'undefined') {
     return 'undefined'
   }
   if (typeof x === 'symbol') {
     if (x.description) {
-      return `Symbol(${primitiveToTypscriptValue(x.description)})`
+      return `Symbol(${primitiveToTypescriptValue(x.description)})`
     }
     return 'Symbol()'
   }
@@ -51,7 +51,7 @@ export const toPropertyKey = (key: string) => {
     return key
   }
 
-  return primitiveToTypscriptValue(key)
+  return primitiveToTypescriptValue(key)
 }
 
 const capitalize = (s: string): string => s.charAt(0).toUpperCase() + s.slice(1)

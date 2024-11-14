@@ -1,7 +1,7 @@
 import mapValues from 'lodash/mapValues'
 import z, { util } from '../../z'
 import {
-  primitiveToTypscriptValue,
+  primitiveToTypescriptValue,
   getMultilineComment,
   unknownToTypescriptValue,
 } from '../zui-to-typescript-type/utils'
@@ -85,7 +85,7 @@ function sUnwrapZod(schema: z.Schema): string {
 
     case z.ZodFirstPartyTypeKind.ZodDiscriminatedUnion:
       const opts = (def.options as z.ZodSchema[]).map(sUnwrapZod)
-      const discriminator = primitiveToTypscriptValue(def.discriminator)
+      const discriminator = primitiveToTypescriptValue(def.discriminator)
       return `${getMultilineComment(def.description)}z.discriminatedUnion(${discriminator}, [${opts.join(', ')}])`.trim()
 
     case z.ZodFirstPartyTypeKind.ZodIntersection:
@@ -120,11 +120,11 @@ function sUnwrapZod(schema: z.Schema): string {
       return `${getMultilineComment(def.description)}z.lazy(() => ${sUnwrapZod(def.getter())})`.trim()
 
     case z.ZodFirstPartyTypeKind.ZodLiteral:
-      const value = primitiveToTypscriptValue(def.value)
+      const value = primitiveToTypescriptValue(def.value)
       return `${getMultilineComment(def.description)}z.literal(${value})`.trim()
 
     case z.ZodFirstPartyTypeKind.ZodEnum:
-      const values = def.values.map(primitiveToTypscriptValue)
+      const values = def.values.map(primitiveToTypescriptValue)
       return `${getMultilineComment(def.description)}z.enum([${values.join(', ')}])`.trim()
 
     case z.ZodFirstPartyTypeKind.ZodEffects:
@@ -163,7 +163,7 @@ function sUnwrapZod(schema: z.Schema): string {
       return `${getMultilineComment(def.description)}z.readonly(${sUnwrapZod(def.innerType)})`.trim()
 
     case z.ZodFirstPartyTypeKind.ZodRef:
-      const uri = primitiveToTypscriptValue(def.uri)
+      const uri = primitiveToTypescriptValue(def.uri)
       return `${getMultilineComment(def.description)}z.ref(${uri})`.trim()
 
     default:

@@ -1,6 +1,6 @@
 import z, { util } from '../../z'
 import {
-  primitiveToTypscriptValue,
+  primitiveToTypescriptValue,
   getMultilineComment,
   toPropertyKey,
   toTypeArgumentName,
@@ -274,7 +274,7 @@ ${opts.join(' | ')}`
 ${value}`.trim()
 
     case z.ZodFirstPartyTypeKind.ZodEnum:
-      const values = def.values.map(primitiveToTypscriptValue)
+      const values = def.values.map(primitiveToTypescriptValue)
       return values.join(' | ')
 
     case z.ZodFirstPartyTypeKind.ZodEffects:

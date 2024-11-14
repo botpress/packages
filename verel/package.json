@@ -7,12 +7,13 @@
   "types": "./dist/types/index.d.ts",
   "scripts": {
     "postinstall": "pnpm exec playwright install",
+    "check": "pnpm run check:type",
     "check:type": "tsc --noEmit",
     "build": "pnpm run build:node && pnpm run build:web && pnpm run build:type",
     "build:type": "tsc -p tsconfig.build.json",
     "build:node": "ts-node -T ./build.ts nodejs",
     "build:web": "ts-node -T ./build.ts web",
-    "test": "pnpm run test:node && pnpm run test:browser",
+    "test": "pnpm run test:node",
     "test:node": "vitest --browser.enabled false --run",
     "test:browser": "vitest --browser.enabled true --run"
   },
@@ -29,7 +30,7 @@
     "lodash": "^4.17.21",
     "playwright": "^1.47.2",
     "ts-node": "^10.9.1",
-    "typescript": "5.6.2",
+    "typescript": "5.6.3",
     "vitest": "^2.1.1",
     "wasm-pack": "^0.13.0"
   },

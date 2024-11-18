@@ -26,8 +26,8 @@ devDependencies:
     specifier: 0.0.22
     version: 0.0.22
   '@bpinternal/yargs-extra':
-    specifier: 0.0.16
-    version: 0.0.16
+    specifier: 0.0.17
+    version: 0.0.17
   '@tsconfig/node18-strictest':
     specifier: ^1.0.0
     version: 1.0.0
@@ -38,8 +38,8 @@ devDependencies:
     specifier: ^18.11.17
     version: 18.19.64
   '@types/web':
-    specifier: ^0.0.178
-    version: 0.0.178
+    specifier: ^0.0.180
+    version: 0.0.180
   esbuild:
     specifier: ^0.24.0
     version: 0.24.0
@@ -88,8 +88,8 @@ packages:
       regex-parser: 2.3.0
     dev: true
 
-  /@bpinternal/yargs-extra@0.0.16:
-    resolution: {integrity: sha512-qBnjOZnfzDVP2XD2NItHBWgXVQzlECUqu2+qDSU3X1IjE58ORteN5HT7TndO0hwI6XfLIXWwKSuRjVsj2nN7aA==}
+  /@bpinternal/yargs-extra@0.0.17:
+    resolution: {integrity: sha512-Q8RyT8zZ5NY6enmjFxuaOheujH12V7rWRtBxTBSuZs4EnuxEmDfv9VcdcnRQvk/HvRT/Ps9VshjNr0J8LBt/vw==}
     engines: {node: '>=16.0.0', pnpm: 8.6.2}
     dependencies:
       '@types/yargs': 17.0.33
@@ -389,8 +389,8 @@ packages:
     dependencies:
       undici-types: 5.26.5
 
-  /@types/web@0.0.178:
-    resolution: {integrity: sha512-+lV0ucKXG4sQuaa9dJRyTUjEA7q2RSOwsAvh28luoJfAKPFqR5KfCtisEdGR/WoY4x4+qcmInqCvMjrR6E8f6A==}
+  /@types/web@0.0.180:
+    resolution: {integrity: sha512-G4sAw9smNoDTMBQtNupDd+2v9SWlqJfdOSRXbMg/KFLmYYhq+RI5oK98kXubfLB/49LKMN7eEzBaGtLMSEAy9A==}
     dev: true
 
   /@types/ws@8.5.13:

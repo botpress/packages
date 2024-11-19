@@ -268,6 +268,11 @@ describe('isEqual', () => {
   test('void', () => {
     expectZui(z.void()).toEqual(z.void())
   })
+  test('nested unions', () => {
+    const a = z.string().or(z.number().or(z.boolean()))
+    const b = z.union([z.string(), z.number(), z.boolean()])
+    expectZui(a).toEqual(b)
+  })
 })
 
 describe('isNotEqual', () => {

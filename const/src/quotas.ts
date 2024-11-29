@@ -158,5 +158,117 @@ export const quotaConfigs = {
     kind: 'workspace',
     category: 'count',
     trackUsagePerBot: false,
+  }
+} as const satisfies Record<QuotaType, Quota>
+
+export const quotaConfigsV3 = {
+  invocation_timeout: {
+    name: 'Invocation Timeout',
+    description: 'Maximum time in milliseconds a bot can run before timing out.',
+    default: 60_000,
+    kind: 'workspace',
+    category: 'timeout',
+    trackUsagePerBot: false
   },
+  storage_count: {
+    name: 'Storage Count',
+    description: 'Maximum number of storage bytes that can be stored.',
+    default: 100_000_000, // 100 MB
+    kind: 'workspace',
+    category: 'count',
+    trackUsagePerBot: true
+  },
+  bot_count: {
+    name: 'Bot Count',
+    description: 'Maximum number of bots that can be created.',
+    default: 1,
+    kind: 'workspace',
+    category: 'count',
+    trackUsagePerBot: false
+  },
+  workspace_member_count: {
+    name: 'Workspace Member Count',
+    description: 'Maximum number of members that can be added to a workspace.',
+    default: 1,
+    kind: 'workspace',
+    category: 'count',
+    trackUsagePerBot: false
+  },
+  knowledgebase_vector_storage: {
+    name: 'Knowledgebase Vector Storage',
+    description: 'Maximum size of knowledge base documents',
+    default: 100_000_000, // 100 MB
+    kind: 'workspace',
+    category: 'count',
+    trackUsagePerBot: true
+  },
+  table_row_count: {
+    name: 'Table Row Count',
+    description: 'Maximum number of rows that can be stored in a table.',
+    default: 1_000,
+    kind: 'workspace',
+    category: 'count',
+    trackUsagePerBot: true
+  },
+  invocation_calls: {
+    name: 'Messages',
+    description: 'Maximum number of messages sent to a bot in a month.',
+    default: 500,
+    kind: 'workspace',
+    category: 'calls',
+    trackUsagePerBot: true
+  },
+  workspace_ratelimit: {
+    name: 'Workspace Ratelimit',
+    description: 'Maximum number of API calls per second for a workspace.',
+    default: 100,
+    kind: 'workspace',
+    category: 'ratelimit',
+    trackUsagePerBot: false
+  },
+  integrations_owned_count: {
+    name: 'Owned Integrations Count',
+    description: 'Maximum number of integrations that can be created.',
+    default: 20,
+    kind: 'workspace',
+    category: 'count',
+    trackUsagePerBot: false
+  },
+  ai_spend: {
+    name: 'AI Spend',
+    description:
+      'Maximum amount of AI spend, expressed in nano-dollars (1 nano-dollar = $0.000000001) that can be used in a month.',
+    default: 5_000_000_000,
+    kind: 'workspace',
+    category: 'credit',
+    trackUsagePerBot: true
+  },
+  openai_spend: {
+    name: 'OpenAI Spend',
+    description:
+      'Maximum amount of OpenAI spend, expressed in nano-dollars (1 nano-dollar = $0.000000001) that can be used in a month.',
+    default: 5_000_000_000,
+    kind: 'workspace',
+    category: 'credit',
+    trackUsagePerBot: true,
+    parent: 'ai_spend'
+  },
+  bing_search_spend: {
+    name: 'Bing Search Spend',
+    description:
+      'Maximum amount of Bing Search spend, expressed in nano-dollars (1 nano-dollar = $0.000000001) that can be used in a month.',
+    default: 5_000_000_000,
+    kind: 'workspace',
+    category: 'credit',
+    trackUsagePerBot: true,
+    parent: 'ai_spend'
+  },
+  always_alive: {
+    name: 'Always Alive',
+    description: 'Maximum number of bots that can be in always alive mode.',
+    default: 0,
+    kind: 'workspace',
+    category: 'count',
+    trackUsagePerBot: false,
+  }
 } as const satisfies Record<QuotaType, Quota>

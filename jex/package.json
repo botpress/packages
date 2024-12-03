@@ -4,10 +4,17 @@
   "description": "JSON-Extends; JSON Schema type checking library",
   "main": "dist/index.cjs",
   "types": "dist/src/index.d.ts",
+  "exports": {
+    "types": "./dist/src/index.d.ts",
+    "import": "./dist/index.js",
+    "require": "./dist/index.cjs",
+    "default": "./dist/index.js"
+  },
   "scripts": {
-    "build:node": "esbuild src/index.ts --bundle --platform=node --format=cjs --outfile=dist/index.cjs",
+    "build:node": "node build-node.js",
+    "build:browser": "node build-browser.js",
     "build:types": "tsc --emitDeclarationOnly",
-    "build": "pnpm build:node && pnpm build:types",
+    "build": "pnpm build:node && pnpm build:browser && pnpm build:types",
     "test": "vitest --run",
     "check:type": "tsc --noEmit",
     "check:format": "prettier --check .",
@@ -21,13 +28,14 @@
     "@types/lodash": "^4.14.202",
     "ajv": "^8.12.0",
     "esbuild": "^0.24.0",
+    "esbuild-plugin-polyfill-node": "^0.3.0",
     "prettier": "^3.2.4",
     "ts-node": "^10.9.2",
     "typescript": "^5.6.3",
     "vitest": "1.6.0"
   },
   "dependencies": {
-    "@apidevtools/json-schema-ref-parser": "^11.1.0",
+    "@apidevtools/json-schema-ref-parser": "^11.7.2",
     "@types/json-schema": "^7.0.15",
     "lodash": "^4.17.21",
     "node-fetch": "^3.3.2"

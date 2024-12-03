@@ -1,12 +1,11 @@
 {
   "name": "@bpinternal/jex",
-  "version": "1.2.1",
+  "version": "1.2.2",
   "description": "JSON-Extends; JSON Schema type checking library",
   "main": "dist/index.cjs",
   "module": "./dist/index.mjs",
   "types": "dist/src/index.d.ts",
   "scripts": {
-    "postinstall": "pnpm exec playwright install",
     "build:node": "node build-node.js",
     "build:browser": "node build-browser.js",
     "build:types": "tsc --emitDeclarationOnly",
@@ -18,7 +17,7 @@
     "fix": "pnpm fix:format",
     "test": "pnpm run test:node && pnpm run test:browser",
     "test:node": "vitest --browser.enabled false --run",
-    "test:browser": "vitest --browser.enabled true --run"
+    "test:browser": "pnpm exec playwright install && vitest --browser.enabled true --run"
   },
   "author": "Botpress, Inc.",
   "license": "MIT",

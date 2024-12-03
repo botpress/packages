@@ -7,7 +7,7 @@ esbuild
     bundle: true,
     platform: 'browser',
     format: 'esm',
-    outfile: 'dist/index.js',
+    outfile: 'dist/index.mjs',
     plugins: [polyfillNode()]
   })
   .catch(() => process.exit(1))

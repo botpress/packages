@@ -3,36 +3,36 @@
   "version": "1.2.0",
   "description": "JSON-Extends; JSON Schema type checking library",
   "main": "dist/index.cjs",
+  "module": "./dist/index.mjs",
   "types": "dist/src/index.d.ts",
-  "exports": {
-    "types": "./dist/src/index.d.ts",
-    "import": "./dist/index.js",
-    "require": "./dist/index.cjs",
-    "default": "./dist/index.js"
-  },
   "scripts": {
+    "postinstall": "pnpm exec playwright install",
     "build:node": "node build-node.js",
     "build:browser": "node build-browser.js",
     "build:types": "tsc --emitDeclarationOnly",
     "build": "pnpm build:node && pnpm build:browser && pnpm build:types",
-    "test": "vitest --run",
     "check:type": "tsc --noEmit",
     "check:format": "prettier --check .",
     "fix:format": "prettier --write .",
     "check": "pnpm check:format && pnpm check:type",
-    "fix": "pnpm fix:format"
+    "fix": "pnpm fix:format",
+    "test": "pnpm run test:node && pnpm run test:browser",
+    "test:node": "vitest --browser.enabled false --run",
+    "test:browser": "vitest --browser.enabled true --run"
   },
   "author": "Botpress, Inc.",
   "license": "MIT",
   "devDependencies": {
     "@types/lodash": "^4.14.202",
+    "@vitest/browser": "^2.1.8",
     "ajv": "^8.12.0",
     "esbuild": "^0.24.0",
     "esbuild-plugin-polyfill-node": "^0.3.0",
+    "playwright": "^1.49.0",
     "prettier": "^3.2.4",
     "ts-node": "^10.9.2",
     "typescript": "^5.6.3",
-    "vitest": "1.6.0"
+    "vitest": "^2.1.8"
   },
   "dependencies": {
     "@apidevtools/json-schema-ref-parser": "^11.7.2",

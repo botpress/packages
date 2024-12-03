@@ -8,6 +8,7 @@ esbuild
     platform: 'browser',
     format: 'esm',
     outfile: 'dist/index.mjs',
+    inject: ['shims.js'],
     plugins: [polyfillNode()]
   })
   .catch(() => process.exit(1))

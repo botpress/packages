@@ -17,13 +17,23 @@ import { parseNullable } from './parseNullable'
 import { parseRef } from './parseRef'
 import { ParserSelector, Refs, JsonSchemaObject, JsonSchema, Serializable, JSONSchemaExtended } from '../types'
 import { parseDiscriminator } from './parseDiscriminator'
+import { isEqual } from 'lodash'
 
 export const parseSchema = (
   schema: JSONSchemaExtended,
   refs: Refs = { seen: new Map(), path: [] },
   blockMeta?: boolean,
 ): string => {
-  if (typeof schema !== 'object') return schema ? 'z.any()' : 'z.never()'
+  if (its.anything(schema)) {
+    return 'z.any()'
+  }
+  if (its.nothing(schema)) {
+    /**
+     * Nothing in JSONSchema both means undefined and never in TypeScript
+     * We map to never for backwards compatibility
+     */
+    return 'z.never()'
+  }
 
   if (refs.parserOverride) {
     const custom = refs.parserOverride(schema, refs)
@@ -121,6 +131,29 @@ const selectParser: ParserSelector = (schema, refs) => {
   }
 }
 
+const anything = (x: JSONSchemaExtended): boolean => {
+  if (typeof x === 'boolean') {
+    return x
+  }
+  if (isEqual(x, {})) {
+    return true
+  }
+  if (x.not) {
+    return nothing(x.not)
+  }
+  return false
+}
+
+const nothing = (x: JSONSchemaExtended): boolean => {
+  if (typeof x === 'boolean') {
+    return !x
+  }
+  if (x.not) {
+    return anything(x.not)
+  }
+  return false
+}
+
 export const its = {
   an: {
     object: (x: JsonSchemaObject): x is JsonSchemaObject & { type: 'object' } => x.type === 'object',
@@ -178,4 +211,6 @@ export const its = {
     } => x.oneOf !== undefined,
     ref: (x: JsonSchemaObject): x is JsonSchemaObject & { $ref: string } => x.$ref !== undefined,
   },
+  anything,
+  nothing,
 }

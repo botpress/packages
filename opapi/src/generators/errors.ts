@@ -18,7 +18,7 @@ const codes = {
   HTTP_STATUS_BAD_GATEWAY: 502,
   HTTP_STATUS_SERVICE_UNAVAILABLE: 503,
   HTTP_STATUS_GATEWAY_TIMEOUT: 504,
-} as const
+} as const satisfies Record<string, ApiError['status']>
 
 export function generateErrors(errors: ApiError[]) {
   const types = errors.map((error) => error.type)

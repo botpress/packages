@@ -44,7 +44,7 @@ const internalError: ApiError = {
 }
 
 export type ApiError = {
-  status: 400 | 401 | 402 | 403 | 404 | 405 | 408 | 409 | 413 | 415 | 429 | 500 | 501 | 502 | 503 | 504
+  status: 400 | 401 | 402 | 403 | 404 | 405 | 408 | 409 | 413 | 415 | 424 | 429 | 500 | 501 | 502 | 503 | 504
   type: string
   description: string
 }

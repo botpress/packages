@@ -30,7 +30,7 @@ dependencies:
 devDependencies:
   '@types/node':
     specifier: ^18.11.18
-    version: 18.19.67
+    version: 18.19.68
   '@types/prettier':
     specifier: ^2.7.3
     version: 2.7.3
@@ -45,7 +45,7 @@ devDependencies:
     version: 0.24.0
   ts-node:
     specifier: ^10.9.1
-    version: 10.9.2(@types/node@18.19.67)(typescript@4.9.4)
+    version: 10.9.2(@types/node@18.19.68)(typescript@4.9.4)
   typescript:
     specifier: ^4.9.4
     version: 4.9.4
@@ -319,8 +319,8 @@ packages:
     resolution: {integrity: sha512-vxhUy4J8lyeyinH7Azl1pdd43GJhZH/tP2weN8TntQblOY+A0XbT8DJk1/oCPuOOyg/Ja757rG0CgHcWC8OfMA==}
     dev: true
 
-  /@types/node@18.19.67:
-    resolution: {integrity: sha512-wI8uHusga+0ZugNp0Ol/3BqQfEcCCNfojtO6Oou9iVNGPTL6QNSdnUdqq85fRgIorLhLMuPIKpsN98QE9Nh+KQ==}
+  /@types/node@18.19.68:
+    resolution: {integrity: sha512-QGtpFH1vB99ZmTa63K4/FU8twThj4fuVSBkGddTp7uIL/cuoLWIUSL2RcOaigBhfR+hg5pgGkBnkoOxrTVBMKw==}
     dependencies:
       undici-types: 5.26.5
     dev: true
@@ -332,7 +332,7 @@ packages:
   /@types/prompts@2.4.9:
     resolution: {integrity: sha512-qTxFi6Buiu8+50/+3DGIWLHM6QuWsEKugJnnP6iv2Mc4ncxE4A/OJkjuVOA+5X0X1S/nq5VJRa8Lu+nwcvbrKA==}
     dependencies:
-      '@types/node': 18.19.67
+      '@types/node': 18.19.68
       kleur: 3.0.3
     dev: true
 
@@ -598,7 +598,7 @@ packages:
       has-flag: 4.0.0
     dev: false
 
-  /ts-node@10.9.2(@types/node@18.19.67)(typescript@4.9.4):
+  /ts-node@10.9.2(@types/node@18.19.68)(typescript@4.9.4):
     resolution: {integrity: sha512-f0FFpIdcHgn8zcPSbf1dRevwt047YMnaiJM3u2w2RewrB+fob/zePZcrOyQoLMMO7aBIddLcQIEK5dYjkLnGrQ==}
     hasBin: true
     peerDependencies:
@@ -617,7 +617,7 @@ packages:
       '@tsconfig/node12': 1.0.11
       '@tsconfig/node14': 1.0.3
       '@tsconfig/node16': 1.0.4
-      '@types/node': 18.19.67
+      '@types/node': 18.19.68
       acorn: 8.12.1
       acorn-walk: 8.3.4
       arg: 4.1.3

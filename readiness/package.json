@@ -1,6 +1,6 @@
 {
   "name": "@bpinternal/readiness",
-  "version": "0.0.16",
+  "version": "0.0.17",
   "scripts": {
     "build": "pnpm run check:type && esbuild --bundle --platform=node --target=node18 --outdir=dist src/index.ts",
     "start": "node dist/index.js",
@@ -13,7 +13,7 @@
   },
   "dependencies": {
     "@aws-sdk/client-dynamodb": "^3.565.0",
-    "@bpinternal/log4bot": "0.0.23",
+    "@bpinternal/log4bot": "0.0.24",
     "chalk": "4.1.2",
     "express": "^4.18.2",
     "ioredis": "^5.2.4",
@@ -25,7 +25,7 @@
   "devDependencies": {
     "@tsconfig/node18-strictest": "^1.0.0",
     "@types/express": "^4.17.15",
-    "@types/node": "18.19.67",
+    "@types/node": "18.19.68",
     "@types/pg": "^8.6.6",
     "esbuild": "^0.24.0",
     "typescript": "5.7.2"

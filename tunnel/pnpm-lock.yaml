@@ -23,8 +23,8 @@ dependencies:
 
 devDependencies:
   '@bpinternal/log4bot':
-    specifier: 0.0.22
-    version: 0.0.22
+    specifier: 0.0.24
+    version: 0.0.24
   '@bpinternal/yargs-extra':
     specifier: 0.0.17
     version: 0.0.17
@@ -36,22 +36,22 @@ devDependencies:
     version: 4.17.13
   '@types/node':
     specifier: ^18.11.17
-    version: 18.19.64
+    version: 18.19.68
   '@types/web':
-    specifier: ^0.0.180
-    version: 0.0.180
+    specifier: ^0.0.187
+    version: 0.0.187
   esbuild:
     specifier: ^0.24.0
     version: 0.24.0
   puppeteer:
     specifier: ^22.0.0
-    version: 22.0.0(typescript@5.6.3)
+    version: 22.0.0(typescript@5.7.2)
   ts-node:
     specifier: ^10.9.1
-    version: 10.9.2(@types/node@18.19.64)(typescript@5.6.3)
+    version: 10.9.2(@types/node@18.19.68)(typescript@5.7.2)
   typescript:
-    specifier: 5.6.3
-    version: 5.6.3
+    specifier: 5.7.2
+    version: 5.7.2
 
 packages:
 
@@ -78,8 +78,8 @@ packages:
       picocolors: 1.1.0
     dev: true
 
-  /@bpinternal/log4bot@0.0.22:
-    resolution: {integrity: sha512-ga+gn4YbYRvmQmdS+hR9LI31mz2EsZ1dp8rvzP1CpQ4lwt280OWK3/IYMetrs9mSseRArrmHGzL8HQVF1Dt+PQ==}
+  /@bpinternal/log4bot@0.0.24:
+    resolution: {integrity: sha512-j4MsEk6wrisJl9qx6OHdgQGk1l/wSBYpODEXCBVRMSjv5RLsmVeugZV7MgoPU2S6KtiKGPHdXanG7TnNVmsjQA==}
     engines: {node: '>=16.0.0', pnpm: 8.6.2}
     dependencies:
       chalk: 4.1.2
@@ -384,19 +384,19 @@ packages:
     resolution: {integrity: sha512-lfx+dftrEZcdBPczf9d0Qv0x+j/rfNCMuC6OcfXmO8gkfeNAY88PgKUbvG56whcN23gc27yenwF6oJZXGFpYxg==}
     dev: true
 
-  /@types/node@18.19.64:
-    resolution: {integrity: sha512-955mDqvO2vFf/oL7V3WiUtiz+BugyX8uVbaT2H8oj3+8dRyH2FLiNdowe7eNqRM7IOIZvzDH76EoAT+gwm6aIQ==}
+  /@types/node@18.19.68:
+    resolution: {integrity: sha512-QGtpFH1vB99ZmTa63K4/FU8twThj4fuVSBkGddTp7uIL/cuoLWIUSL2RcOaigBhfR+hg5pgGkBnkoOxrTVBMKw==}
     dependencies:
       undici-types: 5.26.5
 
-  /@types/web@0.0.180:
-    resolution: {integrity: sha512-G4sAw9smNoDTMBQtNupDd+2v9SWlqJfdOSRXbMg/KFLmYYhq+RI5oK98kXubfLB/49LKMN7eEzBaGtLMSEAy9A==}
+  /@types/web@0.0.187:
+    resolution: {integrity: sha512-PNvOlIo9AkUA8dvdqJHrvvIZG40Qi37QHNyl1qOD1m/4Lj+2thAtwJM2N9UmtGBtkhb3x9mP/6JlXYtQcZ3uFg==}
     dev: true
 
   /@types/ws@8.5.13:
     resolution: {integrity: sha512-osM/gWBTPKgHV8XkTunnegTRIsvF6owmf5w+JtAfOw472dptdm0dlGv4xCt6GwQRcC2XVOvvRE/0bAoQcL2QkA==}
     dependencies:
-      '@types/node': 18.19.64
+      '@types/node': 18.19.68
     dev: false
 
   /@types/yargs-parser@21.0.3:
@@ -413,7 +413,7 @@ packages:
     resolution: {integrity: sha512-oJoftv0LSuaDZE3Le4DbKX+KS9G36NzOeSap90UIK0yMA/NhKJhqlSGtNDORNRaIbQfzjXDrQa0ytJ6mNRGz/Q==}
     requiresBuild: true
     dependencies:
-      '@types/node': 18.19.64
+      '@types/node': 18.19.68
     dev: true
     optional: true
 
@@ -569,7 +569,7 @@ packages:
     resolution: {integrity: sha512-dOy+3AuW3a2wNbZHIuMZpTcgjGuLU/uBL/ubcZF9OXbDo8ff4O8yVp5Bf0efS8uEoYo5q4Fx7dY9OgQGXgAsQA==}
     dev: true
 
-  /cosmiconfig@9.0.0(typescript@5.6.3):
+  /cosmiconfig@9.0.0(typescript@5.7.2):
     resolution: {integrity: sha512-itvL5h8RETACmOTFc4UfIyB2RfEHi71Ax6E/PivVxq9NseKbOWpeyHEOIbmAw1rs8Ak0VursQNww7lf7YtUwzg==}
     engines: {node: '>=14'}
     peerDependencies:
@@ -582,7 +582,7 @@ packages:
       import-fresh: 3.3.0
       js-yaml: 4.1.0
       parse-json: 5.2.0
-      typescript: 5.6.3
+      typescript: 5.7.2
     dev: true
 
   /create-require@1.1.1:
@@ -1041,14 +1041,14 @@ packages:
       - utf-8-validate
     dev: true
 
-  /puppeteer@22.0.0(typescript@5.6.3):
+  /puppeteer@22.0.0(typescript@5.7.2):
     resolution: {integrity: sha512-zYVnjwJngnSB4dbkWp7DHFSIc3nqHvZzrdHyo9+ugV1nq1Lm8obOMcmCFaGfR3PJs0EmYNz+/skBeO45yvASCQ==}
     engines: {node: '>=18'}
     hasBin: true
     requiresBuild: true
     dependencies:
       '@puppeteer/browsers': 2.0.0
-      cosmiconfig: 9.0.0(typescript@5.6.3)
+      cosmiconfig: 9.0.0(typescript@5.7.2)
       puppeteer-core: 22.0.0
     transitivePeerDependencies:
       - bufferutil
@@ -1181,7 +1181,7 @@ packages:
     resolution: {integrity: sha512-N3WMsuqV66lT30CrXNbEjx4GEwlow3v6rr4mCcv6prnfwhS01rkgyFdjPNBYd9br7LpXV1+Emh01fHnq2Gdgrw==}
     dev: true
 
-  /ts-node@10.9.2(@types/node@18.19.64)(typescript@5.6.3):
+  /ts-node@10.9.2(@types/node@18.19.68)(typescript@5.7.2):
     resolution: {integrity: sha512-f0FFpIdcHgn8zcPSbf1dRevwt047YMnaiJM3u2w2RewrB+fob/zePZcrOyQoLMMO7aBIddLcQIEK5dYjkLnGrQ==}
     hasBin: true
     peerDependencies:
@@ -1200,14 +1200,14 @@ packages:
       '@tsconfig/node12': 1.0.11
       '@tsconfig/node14': 1.0.3
       '@tsconfig/node16': 1.0.4
-      '@types/node': 18.19.64
+      '@types/node': 18.19.68
       acorn: 8.12.1
       acorn-walk: 8.3.4
       arg: 4.1.3
       create-require: 1.1.1
       diff: 4.0.2
       make-error: 1.3.6
-      typescript: 5.6.3
+      typescript: 5.7.2
       v8-compile-cache-lib: 3.0.1
       yn: 3.1.1
     dev: true
@@ -1216,8 +1216,8 @@ packages:
     resolution: {integrity: sha512-gLXCKdN1/j47AiHiOkJN69hJmcbGTHI0ImLmbYLHykhgeN0jVGola9yVjFgzCUklsZQMW55o+dW7IXv3RCXDzA==}
     dev: true
 
-  /typescript@5.6.3:
-    resolution: {integrity: sha512-hjcS1mhfuyi4WW8IWtjP7brDrG2cuDZukyrYrSauoXGNgx0S7zceP07adYkJycEr56BOUTNPzbInooiN3fn1qw==}
+  /typescript@5.7.2:
+    resolution: {integrity: sha512-i5t66RHxDvVN40HfDd1PsEThGNnlMCMT3jMUuoh9/0TaqWevNontacunWyN02LA9/fIbEWlcHZcgTKb9QoaLfg==}
     engines: {node: '>=14.17'}
     hasBin: true
     dev: true

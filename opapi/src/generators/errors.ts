@@ -61,7 +61,8 @@ abstract class BaseApiError<Code extends ErrorCode, Type extends string, Descrip
     public readonly type: Type,
     public override readonly message: string,
     public readonly error?: Error,
-    public readonly id?: string
+    public readonly id?: string,
+    public readonly metadata?: Record<string, unknown>,
   ) {
     super(message)
 
@@ -80,6 +81,7 @@ abstract class BaseApiError<Code extends ErrorCode, Type extends string, Descrip
       code: this.code,
       type: this.type,
       message: this.message,
+      metadata: this.metadata,
     }
   }
 
@@ -92,7 +94,7 @@ abstract class BaseApiError<Code extends ErrorCode, Type extends string, Descrip
       .map(x => x.toString(16).padStart(2, '0'))
       .join('')
       .toUpperCase()
-    
+
     return \`\${prefix}_\${timestamp}x\${randomHexSuffix}\`
   }
 
@@ -138,7 +140,7 @@ function getApiErrorFromObject(err: any) {
       return new UnknownError(\`An unclassified API error occurred: \${err.message} (Type: \${err.type}, Code: \${err.code})\`)
     }
 
-    return new ErrorClass(err.message, undefined, <string>err.id || 'UNKNOWN') // If error ID was not received do not pass undefined to generate a new one, flag it as UNKNOWN so we can fix the issue.
+    return new ErrorClass(err.message, undefined, <string>err.id || 'UNKNOWN', err.metadata) // If error ID was not received do not pass undefined to generate a new one, flag it as UNKNOWN so we can fix the issue.
   }
 
   return new UnknownError('An invalid error occurred: ' + JSON.stringify(err))
@@ -155,8 +157,8 @@ function generateError(error: ApiError) {
  *  ${description}
  */
 export class ${error.type}Error extends BaseApiError<${error.status}, ${error.type}Type, '${description}'> {
-  constructor(message: string, error?: Error, id?: string) {
-    super(${error.status}, '${description}', '${error.type}', message, error, id)
+  constructor(message: string, error?: Error, id?: string, metadata?: Record<string, unknown>) {
+    super(${error.status}, '${description}', '${error.type}', message, error, id, metadata)
   }
 }\n`
 }
@@ -170,7 +172,7 @@ function generateApiError(types: string[]) {
 }
 
 function generateErrorTypeMap(types: string[]) {
-  return `const errorTypes: { [type: string]: new (message: string, error?: Error, id?: string) => ApiError } = {
+  return `const errorTypes: { [type: string]: new (message: string, error?: Error, id?: string, metadata?: Record<string, unknown>) => ApiError } = {
 ${types.map((type) => `  ${type}: ${type}Error,`).join('\n')}
 }\n`
 }

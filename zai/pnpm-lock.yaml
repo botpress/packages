@@ -13,7 +13,7 @@ dependencies:
     version: 1.6.3(react@18.3.1)
   '@botpress/wasm':
     specifier: ^1.0.0
-    version: 1.0.0
+    version: 1.0.0-beta.2
   json5:
     specifier: ^2.2.1
     version: 2.2.3
@@ -27,7 +27,7 @@ dependencies:
 devDependencies:
   '@botpress/vai':
     specifier: 0.0.1-beta.7
-    version: 0.0.1-beta.7(@botpress/client@0.36.2)(@botpress/sdk@1.6.3)(@botpress/wasm@1.0.0)(vitest@2.1.8)
+    version: 0.0.1-beta.7(@botpress/client@0.36.2)(@botpress/sdk@1.6.3)(@botpress/wasm@1.0.0-beta.2)(vitest@2.1.8)
   '@types/lodash':
     specifier: ^4.17.0
     version: 4.17.0
@@ -80,7 +80,7 @@ packages:
       - debug
       - react
 
-  /@botpress/vai@0.0.1-beta.7(@botpress/client@0.36.2)(@botpress/sdk@1.6.3)(@botpress/wasm@1.0.0)(vitest@2.1.8):
+  /@botpress/vai@0.0.1-beta.7(@botpress/client@0.36.2)(@botpress/sdk@1.6.3)(@botpress/wasm@1.0.0-beta.2)(vitest@2.1.8):
     resolution: {integrity: sha512-5o1ZWElfH4iB1isF8PgBCktLLh2adLGPnqGGJ7YPdEvdFJeffcE0PfNrEZMwD5mq8FQ2BMg+3ZGmHDlkFyS72Q==}
     peerDependencies:
       '@botpress/client': ^0.36.2
@@ -90,15 +90,15 @@ packages:
     dependencies:
       '@botpress/client': 0.36.2
       '@botpress/sdk': 1.6.3(react@18.3.1)
-      '@botpress/wasm': 1.0.0
+      '@botpress/wasm': 1.0.0-beta.2
       json5: 2.2.3
       jsonrepair: 3.11.2
       lodash: 4.17.21
       vitest: 2.1.8(@types/node@22.10.2)
     dev: true
 
-  /@botpress/wasm@1.0.0:
-    resolution: {integrity: sha512-U5EwP3CM/0z57DVR1XdF9YDZrTyv7JRF/+nEWE1D2bdPcZ3ci9l7WmF5ebeN+5H7DHE765RWzP/QISsS1UqJLg==}
+  /@botpress/wasm@1.0.0-beta.2:
+    resolution: {integrity: sha512-hmRplVcH6k6ATQMtqePsUh4lmZLZeo3wg4+DLuKKTDm/RvxC6Nm+q3MMxntWSGpZAZUNuHmh02kMImyKtG6BAw==}
     dependencies:
       tiktoken: 1.0.18
 

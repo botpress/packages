@@ -4,7 +4,7 @@ import topLevelAwait from 'vite-plugin-top-level-await'
 import dts from 'vite-plugin-dts'
 
 export default defineConfig({
-  plugins: [wasm(), topLevelAwait(), dts()],
+  plugins: [topLevelAwait(), wasm(), dts()],
   resolve: {
     alias: {
       path: 'path-browserify'

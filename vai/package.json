@@ -1,0 +1,45 @@
+{
+  "name": "@botpress/vai",
+  "version": "0.0.1-beta.1",
+  "type": "module",
+  "description": "Vitest AI (vai) – a vitest extension for testing with LLMs",
+  "main": "src/index.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/src/index.d.ts",
+      "import": "./dist/src/index.js",
+      "require": "./dist/src/index.js"
+    }
+  },
+  "scripts": {
+    "build": "tsup",
+    "watch": "tsup --watch",
+    "test": "vitest run --config vitest.config.ts",
+    "test:update": "vitest -u run --config vitest.config.ts",
+    "test:watch": "vitest --config vitest.config.ts",
+    "build-with-latest-models": "pnpm run update-types && pnpm run update-models && pnpm run build",
+    "update-models": "ts-node ./src/scripts/update-models.ts",
+    "update-types": "ts-node ./src/scripts/update-types.ts"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "json5": "^2.2.1",
+    "jsonrepair": "^3.2.0",
+    "lodash": "^4.17.21"
+  },
+  "devDependencies": {
+    "@types/lodash": "^4.17.0",
+    "dotenv": "^16.3.1",
+    "ts-node": "^10.9.2",
+    "tsup": "^8.3.5",
+    "typescript": "^5.7.2"
+  },
+  "peerDependencies": {
+    "@botpress/client": "^0.36.2",
+    "@botpress/sdk": "^1.6.1",
+    "@botpress/wasm": "^1.0.0",
+    "vitest": "^2.0.5"
+  }
+}

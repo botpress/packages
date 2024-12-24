@@ -1,8 +1,9 @@
 {
-  "name": "@botpress/vai",
-  "version": "0.0.1-beta.7",
+  "name": "@botpress/zai",
+  "version": "1.0.0-beta.8",
   "type": "module",
-  "description": "Vitest AI (vai) – a vitest extension for testing with LLMs",
+  "private": false,
+  "description": "Zui AI (zai) – An LLM utility library written on top of Zui and the Botpress API",
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
@@ -29,16 +30,17 @@
     "lodash": "^4.17.21"
   },
   "devDependencies": {
+    "@botpress/vai": "0.0.1-beta.7",
     "@types/lodash": "^4.17.0",
     "dotenv": "^16.3.1",
     "ts-node": "^10.9.2",
     "tsup": "^8.3.5",
-    "typescript": "^5.7.2"
+    "typescript": "^5.7.2",
+    "vitest": "^2.0.5"
   },
   "peerDependencies": {
     "@botpress/client": "^0.36.2",
     "@botpress/sdk": "^1.6.1",
-    "@botpress/wasm": "^1.0.0",
-    "vitest": "^2 || ^3 || ^4 || ^5"
+    "@botpress/wasm": "^1.0.0"
   }
 }

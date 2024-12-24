@@ -1,0 +1,32 @@
+{
+  "compilerOptions": {
+    "target": "ESNext",
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "allowJs": true,
+    "skipLibCheck": true,
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "forceConsistentCasingInFileNames": true,
+    "disableReferencedProjectLoad": true,
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "strict": false,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noUncheckedIndexedAccess": true,
+    "lib": ["dom", "ESNext", "dom.iterable"],
+    "declaration": false,
+    "noEmit": false,
+    "paths": {
+      "@botpress/zai": ["./src/zai.ts"]
+    }
+  },
+  "exclude": ["node_modules", "dist"],
+  "include": ["src/**/*", "vitest.d.ts"],
+
+  "ts-node": {
+    "esm": true,
+    "require": ["dotenv/config", "./ensure-env.cjs"]
+  }
+}

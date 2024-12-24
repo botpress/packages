@@ -1,4 +1,4 @@
-import { z } from '@botpress/sdk'
+import { z } from '../utils/zui'
 
 import { Context } from '../context'
 import { asyncExpect } from '../utils/asyncAssertion'

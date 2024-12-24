@@ -1,4 +1,6 @@
-import { z } from '@botpress/sdk'
+import { z as Z } from '@botpress/sdk'
+import { z } from '../utils/zui'
+
 import { TestFunction } from 'vitest'
 import { createTaskCollector, getCurrentSuite } from 'vitest/suite'
 import { TestMetadata } from '../context'
@@ -10,7 +12,7 @@ const scenarioId = z
   .min(1, 'Scenario ID/name must not be empty')
   .max(50, 'Scenario ID/name is too long')
 
-export type ScenarioLike = z.infer<typeof ScenarioLike>
+export type ScenarioLike = Z.infer<typeof ScenarioLike>
 const ScenarioLike = z.union([
   scenarioId,
   z.object({ name: scenarioId }).passthrough(),

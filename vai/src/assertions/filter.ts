@@ -1,4 +1,4 @@
-import { literal, z } from '@botpress/sdk'
+import { z } from '../utils/zui'
 
 import { Context } from '../context'
 import { asyncExpect } from '../utils/asyncAssertion'
@@ -12,7 +12,7 @@ export type FilterOptions<T> = {
 export function filter<U>(values: U[], condition: string, options?: FilterOptions<U>) {
   const mappedValues = values.map((_, idx) =>
     z.object({
-      index: literal(idx),
+      index: z.literal(idx),
       reason: z.string(),
       keep: z.boolean()
     })

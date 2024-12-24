@@ -1,6 +1,6 @@
 import { describe, test } from 'vitest'
 import { extract } from './extract'
-import { z } from '@botpress/sdk'
+import { z } from '../utils/zui'
 
 describe('extract', { timeout: 30_000 }, () => {
   const person = z.object({

@@ -6,14 +6,14 @@ settings:
 
 dependencies:
   '@botpress/client':
-    specifier: ^0.36.2
-    version: 0.36.2
-  '@botpress/sdk':
-    specifier: ^1.6.1
-    version: 1.6.1(react@18.3.1)
+    specifier: ^0.40.0
+    version: 0.40.0
   '@botpress/wasm':
-    specifier: ^1.0.0
-    version: 1.0.0
+    specifier: ^1.0.1
+    version: 1.0.1
+  '@bpinternal/zui':
+    specifier: ^0.13.4
+    version: 0.13.4(react@18.3.1)
   json5:
     specifier: ^2.2.1
     version: 2.2.1
@@ -54,8 +54,8 @@ packages:
       '@jridgewell/trace-mapping': 0.3.25
     dev: false
 
-  /@botpress/client@0.35.0:
-    resolution: {integrity: sha512-K50pcx77l70bkaXl5ygzoEUcJDLgjosMSp/k/BeOoC1025ZQoHoIyE/2AyFdNKyOVK/5b84IT/fmnVZBWic6oA==}
+  /@botpress/client@0.40.0:
+    resolution: {integrity: sha512-ed4XvbIkK0B/oL2uFRedb97qJwbC1rHKi3FWRt2aM9yDOxLY9e7nZbCnA42OZWu995/sOBSiJ78uuMCyaSmPkQ==}
     dependencies:
       axios: 1.7.9
       axios-retry: 4.5.0(axios@1.7.9)
@@ -66,36 +66,14 @@ packages:
       - debug
     dev: false
 
-  /@botpress/client@0.36.2:
-    resolution: {integrity: sha512-xO7T5Nbmcpht1b2v59OFQDfQu6EBMR9RChWTFWCK1KXDWrjnbxvOcFG06BseY5H1YIsXWoR386SHsodk+0yv8g==}
-    dependencies:
-      axios: 1.7.9
-      axios-retry: 4.5.0(axios@1.7.9)
-      browser-or-node: 2.1.1
-      qs: 6.13.1
-      type-fest: 3.13.1
-    transitivePeerDependencies:
-      - debug
-    dev: false
-
-  /@botpress/sdk@1.6.1(react@18.3.1):
-    resolution: {integrity: sha512-BW+BKISodWAAJELEPH7srZJjEl4o99dObNHwKb18HlKGPt0MMuZH2zm6K7YsZBwCHLDmOlH47FR1R5Pmsh0qEg==}
-    dependencies:
-      '@botpress/client': 0.35.0
-      '@bpinternal/zui': 0.12.0(react@18.3.1)
-    transitivePeerDependencies:
-      - debug
-      - react
-    dev: false
-
-  /@botpress/wasm@1.0.0:
-    resolution: {integrity: sha512-U5EwP3CM/0z57DVR1XdF9YDZrTyv7JRF/+nEWE1D2bdPcZ3ci9l7WmF5ebeN+5H7DHE765RWzP/QISsS1UqJLg==}
+  /@botpress/wasm@1.0.1:
+    resolution: {integrity: sha512-CxZmjOZR38KcaHaitfpBTTPc3iPDnv53glTGK58clrnzdH6vfW6yFt0fxXqM9wPL1x2ih+45beY+nh4r3pWnQQ==}
     dependencies:
       tiktoken: 1.0.18
     dev: false
 
-  /@bpinternal/zui@0.12.0(react@18.3.1):
-    resolution: {integrity: sha512-ztSLi+XuFT9WSURqwA3aWvMw3OH28PQNBGCr7/+TGm8xEqov9paoQUQXqsavF/RwHZFT9IYkPkcSkZ3qc8deZg==}
+  /@bpinternal/zui@0.13.4(react@18.3.1):
+    resolution: {integrity: sha512-m/URunnJxDViDTyXcmeKHr5LQR500nH1X6Px7LuMgIx52+AHUxg/8jp+eBiez/OtIIGKIE6zo9yiUiWKBvFzEQ==}
     engines: {node: '>=16.0.0', pnpm: 8.6.2}
     peerDependencies:
       react: ^18.2.0

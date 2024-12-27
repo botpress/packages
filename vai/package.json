@@ -37,8 +37,8 @@
   "peerDependencies": {
     "lodash": "^4.17.21",
     "@botpress/client": "^0.40.0",
-    "@bpinternal/zui": "^0.13.0",
-    "@botpress/wasm": "^1.0.0",
+    "@bpinternal/zui": "^0.13.4",
+    "@botpress/wasm": "^1.0.1",
     "vitest": "^2 || ^3 || ^4 || ^5"
   }
 }

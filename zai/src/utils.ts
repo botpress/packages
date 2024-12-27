@@ -1,6 +1,5 @@
 import type { Client } from '@botpress/client'
-import sdk from '@botpress/sdk'
-const { z } = sdk
+import { z } from '@bpinternal/zui'
 
 export const stringify = (input: unknown, beautify = true) => {
   return typeof input === 'string' && !!input.length
@@ -10,7 +9,7 @@ export const stringify = (input: unknown, beautify = true) => {
     : '<input is null, false, undefined or empty>'
 }
 
-export const BotpressClient = z.custom<Client>(
+export const BotpressClient = z.custom<Client | any>(
   (value) =>
     typeof value === 'object' && value !== null && 'callAction' in value && typeof value.callAction === 'function',
   {
@@ -43,7 +42,7 @@ export const takeUntilTokens = <T>(arr: T[], tokens: number, count: (el: T) => n
   return result
 }
 
-export type GenerationMetadata = sdk.z.input<typeof GenerationMetadata>
+export type GenerationMetadata = z.input<typeof GenerationMetadata>
 export const GenerationMetadata = z.object({
   model: z.string(),
   cost: z

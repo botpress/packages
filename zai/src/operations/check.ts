@@ -1,5 +1,4 @@
-import sdk from '@botpress/sdk'
-const { z } = sdk
+import { z } from '@bpinternal/zui'
 
 import { fastHash, stringify, takeUntilTokens } from '../utils'
 import { Zai } from '../zai'
@@ -11,7 +10,7 @@ const Example = z.object({
   reason: z.string().optional()
 })
 
-export type Options = sdk.z.input<typeof Options>
+export type Options = z.input<typeof Options>
 const Options = z.object({
   examples: z.array(Example).describe('Examples to check the condition against').default([])
 })

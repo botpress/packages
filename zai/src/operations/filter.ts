@@ -1,19 +1,18 @@
-import sdk from '@botpress/sdk'
-const { z } = sdk
+import { z } from '@bpinternal/zui'
 
-import _ from 'lodash'
+import { clamp } from 'lodash-es'
 import { fastHash, stringify, takeUntilTokens } from '../utils'
 import { Zai } from '../zai'
 import { PROMPT_INPUT_BUFFER, PROMPT_OUTPUT_BUFFER } from './constants'
 
-type Example = sdk.z.input<typeof Example>
+type Example = z.input<typeof Example>
 const Example = z.object({
   input: z.any(),
   filter: z.boolean(),
   reason: z.string().optional()
 })
 
-export type Options = sdk.z.input<typeof Options>
+export type Options = z.input<typeof Options>
 const Options = z.object({
   tokensPerItem: z
     .number()
@@ -44,7 +43,7 @@ Zai.prototype.filter = async function (this: Zai, input, condition, _options) {
   const MAX_ITEMS_PER_CHUNK = 50
   const TOKENS_TOTAL_MAX = this.Model.input.maxTokens - PROMPT_INPUT_BUFFER - PROMPT_OUTPUT_BUFFER
   const TOKENS_EXAMPLES_MAX = Math.floor(Math.max(250, TOKENS_TOTAL_MAX * 0.5))
-  const TOKENS_CONDITION_MAX = _.clamp(TOKENS_TOTAL_MAX * 0.25, 250, tokenizer.count(condition))
+  const TOKENS_CONDITION_MAX = clamp(TOKENS_TOTAL_MAX * 0.25, 250, tokenizer.count(condition))
   const TOKENS_INPUT_ARRAY_MAX = TOKENS_TOTAL_MAX - TOKENS_EXAMPLES_MAX - TOKENS_CONDITION_MAX
 
   condition = tokenizer.truncate(condition, TOKENS_CONDITION_MAX)

@@ -1,11 +1,10 @@
-import sdk from '@botpress/sdk'
-const { z } = sdk
+import { z } from '@bpinternal/zui'
 
-import _ from 'lodash'
+import { clamp } from 'lodash-es'
 import { Zai } from '../zai'
 import { PROMPT_INPUT_BUFFER, PROMPT_OUTPUT_BUFFER } from './constants'
 
-export type Options = sdk.z.input<typeof Options>
+export type Options = z.input<typeof Options>
 const Options = z.object({
   length: z.number().min(1).max(100_000).optional().describe('The maximum number of tokens to generate')
 })
@@ -31,7 +30,7 @@ Zai.prototype.text = async function (this: Zai, prompt, _options) {
   let chart = ''
 
   if (options.length) {
-    const length = _.clamp(options.length * 0.75, 5, options.length)
+    const length = clamp(options.length * 0.75, 5, options.length)
     instructions.push(`IMPORTANT: Length constraint: ${length} tokens/words`)
     instructions.push(`The text must be standalone and complete in less than ${length} tokens/words`)
   }

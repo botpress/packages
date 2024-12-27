@@ -1,6 +1,5 @@
 import { type Client } from '@botpress/client'
-import sdk from '@botpress/sdk'
-const { z } = sdk
+import { z } from '@bpinternal/zui'
 
 import { BotpressClient, GenerationMetadata } from '../utils'
 import { Adapter, GetExamplesProps, SaveExampleProps } from './adapter'
@@ -31,7 +30,7 @@ const Props = z.object({
     )
 })
 
-export type TableSchema = sdk.z.input<typeof TableSchema>
+export type TableSchema = z.input<typeof TableSchema>
 const TableSchema = z.object({
   taskType: z.string().describe('The type of the task (filter, extract, etc.)'),
   taskId: z.string(),
@@ -65,9 +64,8 @@ export class TableAdapter extends Adapter {
   private tableName: string
 
   private status: 'initialized' | 'ready' | 'error'
-  private errors = [] as string[]
 
-  constructor(props: sdk.z.input<typeof Props>) {
+  constructor(props: z.input<typeof Props>) {
     super()
     props = Props.parse(props)
     this.client = props.client
@@ -158,9 +156,8 @@ export class TableAdapter extends Adapter {
         },
         schema: TableJsonSchema
       })
-      .catch((err) => {
+      .catch(() => {
         this.status = 'error'
-        this.errors = [err.message]
         return { table: null, created: false }
       })
 
@@ -205,7 +202,6 @@ export class TableAdapter extends Adapter {
 
       if (issues.length) {
         this.status = 'error'
-        this.errors = issues
       }
     }
 

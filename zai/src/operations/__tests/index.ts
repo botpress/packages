@@ -1,5 +1,6 @@
 import { Client } from '@botpress/client'
 import { type TextTokenizer, getWasmTokenizer } from '@botpress/wasm'
+
 import fs from 'node:fs'
 import path from 'node:path'
 import { beforeAll } from 'vitest'

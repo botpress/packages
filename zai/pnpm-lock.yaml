@@ -6,34 +6,40 @@ settings:
 
 dependencies:
   '@botpress/client':
-    specifier: ^0.36.2
-    version: 0.36.2
-  '@botpress/sdk':
-    specifier: ^1.6.1
-    version: 1.6.3(react@18.3.1)
+    specifier: ^0.40.0
+    version: 0.40.0
   '@botpress/wasm':
     specifier: ^1.0.0
-    version: 1.0.0-beta.2
+    version: 1.0.1
+  '@bpinternal/zui':
+    specifier: ^0.13.4
+    version: 0.13.4(react@18.3.1)
   json5:
-    specifier: ^2.2.1
+    specifier: ^2.2.3
     version: 2.2.3
   jsonrepair:
-    specifier: ^3.2.0
+    specifier: ^3.11.2
     version: 3.11.2
-  lodash:
+  lodash-es:
     specifier: ^4.17.21
     version: 4.17.21
 
 devDependencies:
   '@botpress/vai':
     specifier: 0.0.1-beta.7
-    version: 0.0.1-beta.7(@botpress/client@0.36.2)(@botpress/sdk@1.6.3)(@botpress/wasm@1.0.0-beta.2)(vitest@2.1.8)
-  '@types/lodash':
-    specifier: ^4.17.0
-    version: 4.17.0
+    version: 0.0.1-beta.7(@botpress/client@0.40.0)(@botpress/sdk@1.6.3)(@botpress/wasm@1.0.1)(vitest@2.1.8)
+  '@types/lodash-es':
+    specifier: ^4.17.12
+    version: 4.17.12
   dotenv:
-    specifier: ^16.3.1
-    version: 16.3.1
+    specifier: ^16.4.7
+    version: 16.4.7
+  esbuild:
+    specifier: ^0.24.2
+    version: 0.24.2
+  lodash:
+    specifier: ^4.17.21
+    version: 4.17.21
   ts-node:
     specifier: ^10.9.2
     version: 10.9.2(@types/node@22.10.2)(typescript@5.7.2)
@@ -44,7 +50,7 @@ devDependencies:
     specifier: ^5.7.2
     version: 5.7.2
   vitest:
-    specifier: ^2.0.5
+    specifier: ^2.1.8
     version: 2.1.8(@types/node@22.10.2)
 
 packages:
@@ -59,9 +65,10 @@ packages:
       type-fest: 3.13.1
     transitivePeerDependencies:
       - debug
+    dev: true
 
-  /@botpress/client@0.36.2:
-    resolution: {integrity: sha512-xO7T5Nbmcpht1b2v59OFQDfQu6EBMR9RChWTFWCK1KXDWrjnbxvOcFG06BseY5H1YIsXWoR386SHsodk+0yv8g==}
+  /@botpress/client@0.40.0:
+    resolution: {integrity: sha512-ed4XvbIkK0B/oL2uFRedb97qJwbC1rHKi3FWRt2aM9yDOxLY9e7nZbCnA42OZWu995/sOBSiJ78uuMCyaSmPkQ==}
     dependencies:
       axios: 1.7.9
       axios-retry: 4.5.0(axios@1.7.9)
@@ -79,8 +86,9 @@ packages:
     transitivePeerDependencies:
       - debug
       - react
+    dev: true
 
-  /@botpress/vai@0.0.1-beta.7(@botpress/client@0.36.2)(@botpress/sdk@1.6.3)(@botpress/wasm@1.0.0-beta.2)(vitest@2.1.8):
+  /@botpress/vai@0.0.1-beta.7(@botpress/client@0.40.0)(@botpress/sdk@1.6.3)(@botpress/wasm@1.0.1)(vitest@2.1.8):
     resolution: {integrity: sha512-5o1ZWElfH4iB1isF8PgBCktLLh2adLGPnqGGJ7YPdEvdFJeffcE0PfNrEZMwD5mq8FQ2BMg+3ZGmHDlkFyS72Q==}
     peerDependencies:
       '@botpress/client': ^0.36.2
@@ -88,17 +96,17 @@ packages:
       '@botpress/wasm': ^1.0.0
       vitest: ^2 || ^3 || ^4 || ^5
     dependencies:
-      '@botpress/client': 0.36.2
+      '@botpress/client': 0.40.0
       '@botpress/sdk': 1.6.3(react@18.3.1)
-      '@botpress/wasm': 1.0.0-beta.2
+      '@botpress/wasm': 1.0.1
       json5: 2.2.3
       jsonrepair: 3.11.2
       lodash: 4.17.21
       vitest: 2.1.8(@types/node@22.10.2)
     dev: true
 
-  /@botpress/wasm@1.0.0-beta.2:
-    resolution: {integrity: sha512-hmRplVcH6k6ATQMtqePsUh4lmZLZeo3wg4+DLuKKTDm/RvxC6Nm+q3MMxntWSGpZAZUNuHmh02kMImyKtG6BAw==}
+  /@botpress/wasm@1.0.1:
+    resolution: {integrity: sha512-CxZmjOZR38KcaHaitfpBTTPc3iPDnv53glTGK58clrnzdH6vfW6yFt0fxXqM9wPL1x2ih+45beY+nh4r3pWnQQ==}
     dependencies:
       tiktoken: 1.0.18
 
@@ -109,6 +117,16 @@ packages:
       react: ^18.2.0
     dependencies:
       react: 18.3.1
+    dev: true
+
+  /@bpinternal/zui@0.13.4(react@18.3.1):
+    resolution: {integrity: sha512-m/URunnJxDViDTyXcmeKHr5LQR500nH1X6Px7LuMgIx52+AHUxg/8jp+eBiez/OtIIGKIE6zo9yiUiWKBvFzEQ==}
+    engines: {node: '>=16.0.0', pnpm: 8.6.2}
+    peerDependencies:
+      react: ^18.2.0
+    dependencies:
+      react: 18.3.1
+    dev: false
 
   /@cspotcode/source-map-support@0.8.1:
     resolution: {integrity: sha512-IchNf6dN4tHoMFIn/7OE8LWZ19Y6q/67Bmf6vnGREv8RSbBVb9LPJxEcnwrcwX6ixSvaiGoomAUvu4YSxXrVgw==}
@@ -777,8 +795,14 @@ packages:
     resolution: {integrity: sha512-AYnb1nQyY49te+VRAVgmzfcgjYS91mY5P0TKUDCLEM+gNnA+3T6rWITXRLYCpahpqSQbN5cE+gHpnPyXjHWxcw==}
     dev: true
 
-  /@types/lodash@4.17.0:
-    resolution: {integrity: sha512-t7dhREVv6dbNj0q17X12j7yDG4bD/DHYX7o5/DbDxobP0HnGPgpRz2Ej77aL7TZT3DSw13fqUTj8J4mMnqa7WA==}
+  /@types/lodash-es@4.17.12:
+    resolution: {integrity: sha512-0NgftHUcV4v34VhXm8QBSftKVXtbkBG3ViCjs6+eJ5a6y6Mi/jiFGPc1sC7QK+9BFhWrURE3EOggmWaSxL9OzQ==}
+    dependencies:
+      '@types/lodash': 4.17.13
+    dev: true
+
+  /@types/lodash@4.17.13:
+    resolution: {integrity: sha512-lfx+dftrEZcdBPczf9d0Qv0x+j/rfNCMuC6OcfXmO8gkfeNAY88PgKUbvG56whcN23gc27yenwF6oJZXGFpYxg==}
     dev: true
 
   /@types/node@22.10.2:
@@ -1003,8 +1027,8 @@ packages:
     engines: {node: '>= 6'}
     dev: true
 
-  /consola@3.3.1:
-    resolution: {integrity: sha512-GyKnPG3/I+a4RtJxgHquJXWr70g9I3c4NT3dvqh0LPHQP2nZFQBOBszb7a5u/pGzqr40AKplQA6UxM1BSynSXg==}
+  /consola@3.3.3:
+    resolution: {integrity: sha512-Qil5KwghMzlqd51UXM0b6fyaGHtOC22scxrwrz4A2882LyUMwQjnvaedN1HAeXzphspQ6CpHkzMAWxBTUruDLg==}
     engines: {node: ^14.18.0 || >=16.10.0}
     dev: true
 
@@ -1047,8 +1071,8 @@ packages:
     engines: {node: '>=0.3.1'}
     dev: true
 
-  /dotenv@16.3.1:
-    resolution: {integrity: sha512-IPzF4w4/Rd94bA9imS68tZBaYyBWSCE47V1RGuMrB94iyTOIEwRmVL2x/4An+6mETpLrKJ5hQkB8W4kFAadeIQ==}
+  /dotenv@16.4.7:
+    resolution: {integrity: sha512-47qPchRCykZC03FhkYAhrvwU4xDBFIj1QPqaarj6mdM/hgUzfPHcpkHJOn3mJAufFeeAxAzeGsr5X0M4k6fLZQ==}
     engines: {node: '>=12'}
     dev: true
 
@@ -1080,8 +1104,8 @@ packages:
     resolution: {integrity: sha512-Zf5H2Kxt2xjTvbJvP2ZWLEICxA6j+hAmMzIlypy4xcBg1vKVnx89Wy0GbS+kf5cwCVFFzdCFh2XSCFNULS6csw==}
     engines: {node: '>= 0.4'}
 
-  /es-module-lexer@1.5.4:
-    resolution: {integrity: sha512-MVNK56NiMrOwitFB7cqDwq0CQutbw+0BvLshJSse0MUNU+y1FC3bUS/AQg7oUng+/wKrrki7JfmwtVHkVfPLlw==}
+  /es-module-lexer@1.6.0:
+    resolution: {integrity: sha512-qqnD1yMU6tk/jnaMosogGySTZP8YtUgAffA9nMN+E/rjxcfRQ6IEk7IiozUjgxKoFHBGjTLnrHB/YC45r/59EQ==}
     dev: true
 
   /es-object-atoms@1.0.0:
@@ -1305,12 +1329,17 @@ packages:
     engines: {node: ^12.20.0 || ^14.13.1 || >=16.0.0}
     dev: true
 
+  /lodash-es@4.17.21:
+    resolution: {integrity: sha512-mKnC+QJ9pWVzv+C4/U3rRsHapFfHvQFoFB92e52xeyGMcX6/OlIl78je1u8vePzYZSkkogMPJ2yjxxsb89cxyw==}
+    dev: false
+
   /lodash.sortby@4.7.0:
     resolution: {integrity: sha512-HDWXG8isMntAyRF5vZ7xKuEvOhT4AhlRt/3czTSjvGUxjYCBVRQY48ViDHyfYz9VIoBkW4TMGQNapx+l3RUwdA==}
     dev: true
 
   /lodash@4.17.21:
     resolution: {integrity: sha512-v2kDEe57lecTulaDIuNTPy3Ry4gLGJ6Z1O3vE1krgXZNrsQ+LFTGHVxVjcXPs17LhbZVGedAJv8XZ1tvj5FvSg==}
+    dev: true
 
   /loose-envify@1.4.0:
     resolution: {integrity: sha512-lyuxPGr/Wfhrlem2CL/UcnUc1zcqKAImBDzukY7Y5F/yQiNdko6+fRLevlw1HgMySw7f611UIY408EtxRSoK3Q==}
@@ -1756,7 +1785,7 @@ packages:
       bundle-require: 5.1.0(esbuild@0.24.2)
       cac: 6.7.14
       chokidar: 4.0.3
-      consola: 3.3.1
+      consola: 3.3.3
       debug: 4.4.0
       esbuild: 0.24.2
       joycon: 3.1.1
@@ -1802,7 +1831,7 @@ packages:
     dependencies:
       cac: 6.7.14
       debug: 4.4.0
-      es-module-lexer: 1.5.4
+      es-module-lexer: 1.6.0
       pathe: 1.1.2
       vite: 5.4.11(@types/node@22.10.2)
     transitivePeerDependencies:

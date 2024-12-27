@@ -1,5 +1,5 @@
 import { Client } from '@botpress/client'
-import sdk from '@botpress/sdk'
+import { z } from '@bpinternal/zui'
 import { type TextTokenizer, getWasmTokenizer } from '@botpress/wasm'
 
 import { Adapter } from './adapters/adapter'
@@ -7,12 +7,12 @@ import { TableAdapter } from './adapters/botpress-table'
 import { MemoryAdapter } from './adapters/memory'
 import { Models } from './models'
 import { llm } from './sdk-interfaces/llm/generateContent'
+
 import { BotpressClient, GenerationMetadata } from './utils'
 
-const { z } = sdk
 type ModelId = (typeof Models)[number]['id']
 
-type ActiveLearning = sdk.z.input<typeof ActiveLearning>
+type ActiveLearning = z.input<typeof ActiveLearning>
 const ActiveLearning = z.object({
   enable: z.boolean().describe('Whether to enable active learning').default(false),
   tableName: z
@@ -33,7 +33,7 @@ const ActiveLearning = z.object({
     .default('default')
 })
 
-type ZaiConfig = sdk.z.input<typeof ZaiConfig>
+type ZaiConfig = z.input<typeof ZaiConfig>
 const ZaiConfig = z.object({
   client: BotpressClient,
   userId: z.string().describe('The ID of the user consuming the API').optional(),

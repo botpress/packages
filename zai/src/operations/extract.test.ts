@@ -1,8 +1,10 @@
 import { describe, it, expect, beforeEach, afterEach, afterAll } from 'vitest'
 
 import { BotpressDocumentation, getClient, getZai, metadata } from './__tests'
-import { z } from '@botpress/sdk'
+
+import { z } from '@bpinternal/zui'
 import { check } from '@botpress/vai'
+
 import { TableAdapter } from '../adapters/botpress-table'
 
 describe('zai.extract', () => {

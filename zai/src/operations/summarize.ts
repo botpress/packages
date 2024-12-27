@@ -1,11 +1,10 @@
-import sdk from '@botpress/sdk'
-const { z } = sdk
+import { z } from '@bpinternal/zui'
 
-import _ from 'lodash'
+import { chunk } from 'lodash-es'
 import { Zai } from '../zai'
 import { PROMPT_INPUT_BUFFER, PROMPT_OUTPUT_BUFFER } from './constants'
 
-export type Options = sdk.z.input<typeof Options>
+export type Options = z.input<typeof Options>
 const Options = z.object({
   prompt: z
     .string()
@@ -93,7 +92,7 @@ ${newText}
   const chunkSize = Math.ceil(tokens.length / (parts * N))
 
   if (useMergeSort) {
-    const chunks = _.chunk(tokens, chunkSize).map((x) => x.join(''))
+    const chunks = chunk(tokens, chunkSize).map((x) => x.join(''))
     const allSummaries = await Promise.all(chunks.map((chunk) => this.summarize(chunk, options)))
     return this.summarize(allSummaries.join('\n\n============\n\n'), options)
   }

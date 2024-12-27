@@ -1,7 +1,6 @@
-import sdk from '@botpress/sdk'
-const { z } = sdk
+import { z } from '@bpinternal/zui'
 
-import _ from 'lodash'
+import { clamp, chunk } from 'lodash-es'
 import { fastHash, stringify, takeUntilTokens } from '../utils'
 import { Zai } from '../zai'
 import { PROMPT_INPUT_BUFFER } from './constants'
@@ -21,7 +20,7 @@ type Example<T extends string> = {
   labels: Partial<Record<T, { label: Label; explanation?: string }>>
 }
 
-export type Options<T extends string> = Omit<sdk.z.input<typeof Options>, 'examples'> & {
+export type Options<T extends string> = Omit<z.input<typeof Options>, 'examples'> & {
   examples?: Array<Partial<Example<T>>>
 }
 
@@ -108,9 +107,9 @@ Zai.prototype.label = async function <T extends string>(this: Zai, input, _label
   const taskId = this.taskId
   const taskType = 'zai.label'
 
-  const TOTAL_MAX_TOKENS = _.clamp(options.chunkLength, 1000, this.Model.input.maxTokens - PROMPT_INPUT_BUFFER)
-  const CHUNK_EXAMPLES_MAX_TOKENS = _.clamp(Math.floor(TOTAL_MAX_TOKENS * 0.5), 250, 10_000)
-  const CHUNK_INPUT_MAX_TOKENS = _.clamp(
+  const TOTAL_MAX_TOKENS = clamp(options.chunkLength, 1000, this.Model.input.maxTokens - PROMPT_INPUT_BUFFER)
+  const CHUNK_EXAMPLES_MAX_TOKENS = clamp(Math.floor(TOTAL_MAX_TOKENS * 0.5), 250, 10_000)
+  const CHUNK_INPUT_MAX_TOKENS = clamp(
     TOTAL_MAX_TOKENS - CHUNK_EXAMPLES_MAX_TOKENS,
     TOTAL_MAX_TOKENS * 0.5,
     TOTAL_MAX_TOKENS
@@ -120,7 +119,7 @@ Zai.prototype.label = async function <T extends string>(this: Zai, input, _label
 
   if (tokenizer.count(inputAsString) > CHUNK_INPUT_MAX_TOKENS) {
     const tokens = tokenizer.split(inputAsString)
-    const chunks = _.chunk(tokens, CHUNK_INPUT_MAX_TOKENS).map((x) => x.join(''))
+    const chunks = chunk(tokens, CHUNK_INPUT_MAX_TOKENS).map((x) => x.join(''))
     const allLabels = await Promise.all(chunks.map((chunk) => this.label(chunk, _labels)))
 
     // Merge all the labels together (those who are true will remain true)

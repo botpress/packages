@@ -1,16 +1,15 @@
-import sdk from '@botpress/sdk'
-const { z } = sdk
+import { z } from '@bpinternal/zui'
 
 import JSON5 from 'json5'
 import { jsonrepair } from 'jsonrepair'
 
-import _ from 'lodash'
+import { chunk, isArray } from 'lodash-es'
 import { fastHash, stringify, takeUntilTokens } from '../utils'
 import { Zai } from '../zai'
 import { PROMPT_INPUT_BUFFER } from './constants'
 import { JsonParsingError } from './errors'
 
-export type Options = sdk.z.input<typeof Options>
+export type Options = z.input<typeof Options>
 const Options = z.object({
   instructions: z.string().optional().describe('Instructions to guide the user on how to extract the data'),
   chunkLength: z
@@ -25,12 +24,12 @@ const Options = z.object({
 declare module '@botpress/zai' {
   interface Zai {
     /** Extracts one or many elements from an arbitrary input */
-    extract<S extends sdk.z.AnyZodObject>(input: unknown, schema: S, options?: Options): Promise<sdk.z.infer<S>>
-    extract<S extends sdk.z.AnyZodObject>(
+    extract<S extends z.AnyZodObject>(input: unknown, schema: S, options?: Options): Promise<z.infer<S>>
+    extract<S extends z.AnyZodObject>(
       input: unknown,
-      schema: sdk.z.ZodArray<S>,
+      schema: z.ZodArray<S>,
       options?: Options
-    ): Promise<Array<sdk.z.infer<S>>>
+    ): Promise<Array<z.infer<S>>>
   }
 }
 
@@ -50,10 +49,10 @@ Zai.prototype.extract = async function (this: Zai, input, schema, _options) {
   let isArrayOfObjects = false
   const originalSchema = schema
 
-  if (schema instanceof sdk.ZodObject) {
+  if (schema instanceof z.ZodObject) {
     // Do nothing
-  } else if (schema instanceof sdk.ZodArray) {
-    if (schema._def.type instanceof sdk.ZodObject) {
+  } else if (schema instanceof z.ZodArray) {
+    if (schema._def.type instanceof z.ZodObject) {
       isArrayOfObjects = true
       schema = schema._def.type
     } else {
@@ -76,8 +75,8 @@ Zai.prototype.extract = async function (this: Zai, input, schema, _options) {
     // If we want to extract an array of objects, we will run this function recursively
     if (isArrayOfObjects) {
       const tokens = tokenizer.split(inputAsString)
-      const chunks = _.chunk(tokens, options.chunkLength).map((x) => x.join(''))
-      const all = await Promise.all(chunks.map((chunk) => this.extract(chunk, originalSchema as sdk.AnyZodObject)))
+      const chunks = chunk(tokens, options.chunkLength).map((x) => x.join(''))
+      const all = await Promise.all(chunks.map((chunk) => this.extract(chunk, originalSchema as z.AnyZodObject)))
 
       return all.flat()
     } else {
@@ -194,7 +193,7 @@ ${input.trim()}
   }
 
   const formatOutput = (extracted: any) => {
-    extracted = _.isArray(extracted) ? extracted : [extracted]
+    extracted = isArray(extracted) ? extracted : [extracted]
 
     return (
       extracted

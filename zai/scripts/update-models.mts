@@ -1,6 +1,6 @@
 import { Client } from '@botpress/client'
 
-import _ from 'lodash'
+import { orderBy, isArray } from 'lodash-es'
 import fs from 'node:fs'
 
 const LLM_LIST_MODELS = 'listLanguageModels'
@@ -43,7 +43,7 @@ for (const integrationId in bot.integrations) {
         input: {}
       })
 
-      if (_.isArray(output?.models)) {
+      if (isArray(output?.models)) {
         for (const model of output.models) {
           models.push({
             id: `${integration.name}__${model.id}`,
@@ -60,7 +60,7 @@ for (const integrationId in bot.integrations) {
   }
 }
 
-const content = JSON.stringify(_.orderBy(models, ['integration', 'name']), null, 2)
+const content = JSON.stringify(orderBy(models, ['integration', 'name']), null, 2)
 
 fs.writeFileSync(
   './src/models.ts',

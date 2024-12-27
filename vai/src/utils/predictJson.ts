@@ -1,5 +1,4 @@
-import { z } from '../utils/zui'
-import { type ZodSchema, z as Z } from '@botpress/sdk'
+import { type ZodSchema, z } from '@bpinternal/zui'
 import JSON5 from 'json5'
 import { Context } from '../context'
 import { llm } from '../sdk-interfaces/llm/generateContent'
@@ -12,11 +11,11 @@ const nonEmptyObject = z
     message: 'Expected a non-empty object'
   })
 
-export type Input = Z.infer<typeof Input>
+export type Input = z.infer<typeof Input>
 const Input = nonEmptyString.or(nonEmptyObject).or(z.array(z.any()))
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export type Output<T = any> = Z.infer<typeof Output> & { result: T }
+export type Output<T = any> = z.infer<typeof Output> & { result: T }
 const Output = z.object({
   reason: nonEmptyString.describe('A human-readable explanation of the result'),
   result: z
@@ -26,14 +25,14 @@ const Output = z.object({
     )
 })
 
-type Example = Z.infer<typeof Example>
+type Example = z.infer<typeof Example>
 const Example = z.object({
   input: Input,
   output: Output
 })
 
-type InputOptions<T extends ZodSchema = ZodSchema> = Z.input<typeof Options> & { outputSchema: T }
-type Options = Z.infer<typeof Options>
+type InputOptions<T extends ZodSchema = ZodSchema> = z.input<typeof Options> & { outputSchema: T }
+type Options = z.infer<typeof Options>
 const Options = z.object({
   systemMessage: z.string(),
   examples: z.array(Example).default([]),
@@ -55,7 +54,7 @@ const isValidExample =
     Output.safeParse(example.output).success &&
     outputSchema.safeParse(example.output.result).success
 
-export async function predictJson<T extends ZodSchema>(_options: InputOptions<T>): Promise<Output<Z.infer<T>>> {
+export async function predictJson<T extends ZodSchema>(_options: InputOptions<T>): Promise<Output<z.infer<T>>> {
   const options = Options.parse(_options)
   const [integration, model] = options.model.split('__')
 
@@ -111,5 +110,5 @@ ${await outputSchema.toTypescriptAsync()}
     throw new Error('No response from the model')
   }
 
-  return outputSchema.parse(JSON5.parse(json)) as Output<Z.infer<T>>
+  return outputSchema.parse(JSON5.parse(json)) as Output<z.infer<T>>
 }

@@ -1,11 +1,9 @@
 import { Client } from '@botpress/client'
-import sdk from '@botpress/sdk'
+import { z } from '@bpinternal/zui'
 
 import _ from 'lodash'
 import fs from 'node:fs'
 import path from 'node:path'
-
-const { z } = sdk
 
 const Interfaces = ['llm'] as const
 
@@ -40,16 +38,8 @@ for (const name of Interfaces) {
 
 export namespace ${name} {
     export namespace ${action} {
-      export ${sdk.z
-        .fromJsonSchema(input)
-        .title('Input')
-        .dereference(references)
-        .toTypescript({ declaration: 'type' })};
-      export ${sdk.z
-        .fromJsonSchema(output)
-        .title('Output')
-        .dereference(references)
-        .toTypescript({ declaration: 'type' })};
+      export ${z.fromJsonSchema(input).title('Input').dereference(references).toTypescript({ declaration: 'type' })};
+      export ${z.fromJsonSchema(output).title('Output').dereference(references).toTypescript({ declaration: 'type' })};
     }
 }`
 

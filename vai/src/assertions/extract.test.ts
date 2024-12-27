@@ -1,6 +1,6 @@
 import { describe, test } from 'vitest'
 import { extract } from './extract'
-import { z } from '../utils/zui'
+import { z } from '@bpinternal/zui'
 
 describe('extract', { timeout: 30_000 }, () => {
   const person = z.object({

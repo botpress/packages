@@ -1,5 +1,4 @@
-import { z as Z } from '@botpress/sdk'
-
+import { z, AnyZodObject } from '@bpinternal/zui'
 import { Context } from '../context'
 import { asyncExpect } from '../utils/asyncAssertion'
 import { Input, predictJson } from '../utils/predictJson'
@@ -10,10 +9,10 @@ export type ExtractOptions<T, S> = {
   examples?: { value: T; extracted: S; reason: string }[]
 }
 
-export function extract<T extends Input, S extends Z.AnyZodObject>(
+export function extract<T extends Input, S extends AnyZodObject>(
   value: T,
   shape: S,
-  options?: ExtractOptions<T, Z.infer<S>>
+  options?: ExtractOptions<T, z.infer<S>>
 ) {
   const additionalMessage = options?.description
     ? `\nIn order to extract the right information, follow these instructions:\n${options.description}\n`
@@ -32,8 +31,8 @@ export function extract<T extends Input, S extends Z.AnyZodObject>(
 
   return {
     ...toAssertion(promise),
-    toBe: (expected: Z.infer<S>) => asyncExpect(promise, (expect) => expect.toEqual(expected)),
-    toMatchObject: (expected: Partial<Z.infer<S>>) => asyncExpect(promise, (expect) => expect.toMatchObject(expected)),
+    toBe: (expected: z.infer<S>) => asyncExpect(promise, (expect) => expect.toEqual(expected)),
+    toMatchObject: (expected: Partial<z.infer<S>>) => asyncExpect(promise, (expect) => expect.toMatchObject(expected)),
     toMatchInlineSnapshot: makeToMatchInlineSnapshot(promise)
   }
 }

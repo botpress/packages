@@ -1,4 +1,4 @@
-import { z } from '../utils/zui'
+import { z } from '@bpinternal/zui'
 
 import { Context } from '../context'
 import { asyncExpect } from '../utils/asyncAssertion'

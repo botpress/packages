@@ -1,0 +1,31 @@
+{
+  "compilerOptions": {
+    "allowJs": true,
+    "skipLibCheck": true,
+    "module": "ESNext",
+    "target": "ESNext",
+    "moduleResolution": "bundler",
+    "lib": ["ES2023.Array"],
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "disableReferencedProjectLoad": true,
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "composite": true,
+    "declaration": true,
+    "sourceMap": true,
+    "strict": true,
+    "noImplicitAny": false,
+    "noEmitOnError": false,
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
+    "useUnknownInCatchVariables": false,
+    "forceConsistentCasingInFileNames": true,
+    "outDir": "./dist",
+    "rootDir": "./src",
+    "types": ["node"],
+    "declarationDir": "./dist"
+  },
+  "exclude": ["**/dist/", "**/node_modules/", "**/*.test.ts"],
+  "include": ["./src/**/*"]
+}

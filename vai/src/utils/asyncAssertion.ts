@@ -34,7 +34,12 @@ export const asyncExpect = <T>(output: Promise<Output<T>>, assertion: (assert: A
     }
     return x
   })
-  getCurrentTest()!.promises ??= []
-  getCurrentTest()!.promises!.push(promise)
+  const currentTest = getCurrentTest()
+
+  if (currentTest) {
+    currentTest.promises ??= []
+    currentTest.promises.push(promise)
+  }
+
   return promise
 }

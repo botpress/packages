@@ -66,7 +66,7 @@ export const limitConfigs = {
     unit: 'bytes'
   },
   state_definition_count: {
-    value: 5,
+    value: 10,
     unit: 'count'
   },
   state_item_payload_bytes: {

@@ -51,6 +51,8 @@ export type JsonSchemaObject = {
   const?: Serializable
   enum?: Serializable[]
 
+  not?: JsonSchema
+
   errorMessage?: { [key: string]: string | undefined }
   [zuiKey]?: ZuiExtensionObject
 } & { [key: string]: any }

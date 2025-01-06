@@ -5,7 +5,7 @@
   "prHourlyLimit": 16,
   "separateMajorMinor": false,
   "timezone": "America/Toronto",
-  "schedule": ["before 3am on monday"],
+  "schedule": ["0 0 1 * *"],
   "bumpVersion": "patch",
   "constraints": {
     "pnpm": "8.6.2"

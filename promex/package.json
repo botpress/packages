@@ -35,12 +35,12 @@
     "axios": "1.7.8",
     "typescript": "5.7.2",
     "vite": "5.4.11",
-    "vitest": "1.6.0"
+    "vitest": "2.1.8"
   },
   "scripts": {
     "build": "tsc --build",
     "check:type": "tsc --noEmit",
-    "test": "vitest",
+    "test": "vitest --run",
     "clean": "rimraf ./dist && rimraf ./node_modules"
   },
   "engines": {

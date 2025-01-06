@@ -40,7 +40,7 @@
   "scripts": {
     "build": "tsc --build",
     "check:type": "tsc --noEmit",
-    "test": "vitest --run",
+    "test": "vitest --run --sequence.concurrent=false",
     "clean": "rimraf ./dist && rimraf ./node_modules"
   },
   "engines": {

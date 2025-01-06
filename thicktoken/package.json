@@ -1,7 +1,7 @@
 {
   "name": "@bpinternal/thicktoken",
   "version": "1.0.2",
-  "description": "A bundled tokenizer (TikToken) with added helper functions",
+  "description": "Tiktoken but thicker; A bundled tokenizer with added helper functions",
   "type": "module",
   "scripts": {
     "build": "vite build",

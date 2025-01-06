@@ -1,6 +1,6 @@
 # ThickToken
 
-A bundled tokenizer (TikToken) with added helper functions
+Tiktoken but thicker; A bundled tokenizer with added helper functions
 
 ## Disclaimer ⚠️
 

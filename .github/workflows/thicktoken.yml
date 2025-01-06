@@ -1,24 +1,24 @@
-name: wasm
+name: thicktoken
 
 on:
   push:
     branches:
       - master
     paths:
-      - 'wasm/**'
+      - 'thicktoken/**'
 
   pull_request:
     paths:
-      - 'wasm/**'
+      - 'thicktoken/**'
 
   workflow_dispatch: {}
 
 defaults:
   run:
-    working-directory: ./wasm
+    working-directory: ./thicktoken
 
 jobs:
-  wasm:
+  thicktoken:
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
@@ -33,5 +33,5 @@ jobs:
         if: github.ref == 'refs/heads/master' || github.event_name == 'workflow_dispatch'
         uses: botpress/gh-actions/publish-if-not-exists@master
         with:
-          path: './wasm'
+          path: './thicktoken'
           token: '${{ secrets.NPM_ACCESS_TOKEN }}'

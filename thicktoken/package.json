@@ -1,5 +1,5 @@
 {
-  "name": "@botpress/wasm",
+  "name": "@bpinternal/thicktoken",
   "version": "1.0.2",
   "description": "A bundled tokenizer (TikToken) with added helper functions",
   "type": "module",

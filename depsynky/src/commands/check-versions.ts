@@ -10,7 +10,11 @@ export type CheckVersionsOpts = {
 }
 
 const checker =
-  (pkg: utils.pkgjson.PackageJson) => (current: Record<string, string>, target: Record<string, string>) => {
+  (pkg: utils.pkgjson.PackageJson) => (current: Record<string, string> | undefined, target: Record<string, string>) => {
+    if (!current) {
+      return
+    }
+
     for (const [name, version] of utils.objects.entries(target)) {
       const currentVersion = current[name]
       if (!currentVersion) {
@@ -35,17 +39,13 @@ export const checkVersions = (argv: YargsConfig<typeof config.checkSchema>, opts
   const allPackages = utils.pnpm.searchWorkspaces(argv.rootDir)
   const targetVersions = opts.targetVersions ?? utils.pnpm.versions(allPackages)
 
-  for (const { path: pkgPath, content } of allPackages) {
-    const { dependencies, devDependencies } = utils.pkgjson.read(pkgPath)
+  for (const { content } of allPackages) {
+    const { dependencies, devDependencies, peerDependencies } = content
 
     const check = checker(content)
-    dependencies && check(dependencies, targetVersions)
-
-    if (argv.ignoreDev) {
-      continue
-    }
-
-    devDependencies && check(devDependencies, targetVersions)
+    check(dependencies, targetVersions)
+    check(peerDependencies, targetVersions)
+    !argv.ignoreDev && check(devDependencies, targetVersions)
   }
 
   logger.info('All versions are in sync')

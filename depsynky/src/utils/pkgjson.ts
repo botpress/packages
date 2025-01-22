@@ -8,6 +8,7 @@ export type PackageJson = {
   private?: boolean
   dependencies?: Record<string, string>
   devDependencies?: Record<string, string>
+  peerDependencies?: Record<string, string>
 }
 
 export const read = (filePath: string): PackageJson => {

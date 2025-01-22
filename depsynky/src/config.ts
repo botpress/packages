@@ -4,6 +4,11 @@ const defaultOptions = {
   rootDir: {
     type: 'string',
     default: process.cwd()
+  },
+  ignoreDev: {
+    type: 'boolean',
+    description: 'Ignore dev dependencies',
+    default: false
   }
 } satisfies YargsSchema
 
@@ -15,15 +20,12 @@ export const bumpSchema = {
   }
 } satisfies YargsSchema
 
-export const syncSchema = defaultOptions satisfies YargsSchema
+export const syncSchema = {
+  ...defaultOptions
+} satisfies YargsSchema
 
 export const checkSchema = {
-  ...defaultOptions,
-  ignoreDev: {
-    type: 'boolean',
-    description: 'Ignore dev dependencies',
-    default: false
-  }
+  ...defaultOptions
 } satisfies YargsSchema
 
 export const listSchema = defaultOptions satisfies YargsSchema

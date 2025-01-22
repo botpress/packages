@@ -8,7 +8,11 @@ export type SyncVersionsOpts = {
 }
 
 const updater =
-  (pkg: utils.pkgjson.PackageJson) => (current: Record<string, string>, target: Record<string, string>) => {
+  (pkg: utils.pkgjson.PackageJson) => (current: Record<string, string> | undefined, target: Record<string, string>) => {
+    if (!current) {
+      return current
+    }
+
     for (const [name, version] of utils.objects.entries(target)) {
       const currentVersion = current[name]
       if (!currentVersion) {
@@ -36,12 +40,18 @@ export const syncVersions = (argv: YargsConfig<typeof config.syncSchema>, opts: 
   const targetVersions = opts.targetVersions ?? utils.pnpm.versions(allPackages)
 
   for (const { path: pkgPath, content } of allPackages) {
-    const { dependencies, devDependencies } = utils.pkgjson.read(pkgPath)
+    const { dependencies, devDependencies, peerDependencies } = content
 
     const update = updater(content)
-    const updatedDeps = dependencies && update(dependencies, targetVersions)
-    const updatedDevDeps = devDependencies && update(devDependencies, targetVersions)
 
-    utils.pkgjson.update(pkgPath, { dependencies: updatedDeps, devDependencies: updatedDevDeps })
+    const updatedDeps = update(dependencies, targetVersions)
+    const updatedPeerDeps = update(peerDependencies, targetVersions)
+    const updatedDevDeps = argv.ignoreDev ? devDependencies : update(devDependencies, targetVersions)
+
+    utils.pkgjson.update(pkgPath, {
+      dependencies: updatedDeps,
+      devDependencies: updatedDevDeps,
+      peerDependencies: updatedPeerDeps
+    })
   }
 }

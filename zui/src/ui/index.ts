@@ -11,6 +11,8 @@ export type {
   ZuiReactComponent,
   ZuiReactComponentProps,
   JSONSchema,
+  ObjectSchema,
+  ArraySchema,
   JSONSchemaOfType,
   MergeUIComponentDefinitions,
   FormValidation,

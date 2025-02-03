@@ -87,7 +87,7 @@ export type ParsedRequest = {
 const isDefined = <T>(pair: [string, T | undefined]): pair is [string, T] => pair[1] !== undefined
 
 export const toAxiosRequest = (req: ParsedRequest): AxiosRequestConfig => {
-  const { method, path, query, headers: headerParams, body: data } = req
+  const { method, path, query, headers: headerParams, body } = req
 
   // prepare headers
   const headerEntries: [string, string][] = Object.entries(headerParams).filter(isDefined)
@@ -97,6 +97,10 @@ export const toAxiosRequest = (req: ParsedRequest): AxiosRequestConfig => {
   const queryString = qs.stringify(query, { encode: true, arrayFormat: 'repeat', allowDots: true })
 
   const url = queryString ? [path, queryString].join('?') : path
+  const data =
+    ['put', 'post', 'delete', 'patch'].includes(method.toLowerCase())
+      ? body
+      : undefined
 
   return {
     method,

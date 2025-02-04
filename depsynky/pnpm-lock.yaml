@@ -22,7 +22,7 @@ dependencies:
     version: 2.4.2
   semver:
     specifier: ^7.5.1
-    version: 7.6.3
+    version: 7.7.1
   yaml:
     specifier: ^2.3.1
     version: 2.7.0
@@ -30,7 +30,7 @@ dependencies:
 devDependencies:
   '@types/node':
     specifier: ^18.11.18
-    version: 18.19.69
+    version: 18.19.75
   '@types/prettier':
     specifier: ^2.7.3
     version: 2.7.3
@@ -45,7 +45,7 @@ devDependencies:
     version: 0.24.2
   ts-node:
     specifier: ^10.9.1
-    version: 10.9.2(@types/node@18.19.69)(typescript@4.9.4)
+    version: 10.9.2(@types/node@18.19.75)(typescript@4.9.4)
   typescript:
     specifier: ^4.9.4
     version: 4.9.4
@@ -328,8 +328,8 @@ packages:
     resolution: {integrity: sha512-vxhUy4J8lyeyinH7Azl1pdd43GJhZH/tP2weN8TntQblOY+A0XbT8DJk1/oCPuOOyg/Ja757rG0CgHcWC8OfMA==}
     dev: true
 
-  /@types/node@18.19.69:
-    resolution: {integrity: sha512-ECPdY1nlaiO/Y6GUnwgtAAhLNaQ53AyIVz+eILxpEo5OvuqE6yWkqWBIb5dU0DqhKQtMeny+FBD3PK6lm7L5xQ==}
+  /@types/node@18.19.75:
+    resolution: {integrity: sha512-UIksWtThob6ZVSyxcOqCLOUNg/dyO1Qvx4McgeuhrEtHTLFTf7BBhEazaE4K806FGTPtzd/2sE90qn4fVr7cyw==}
     dependencies:
       undici-types: 5.26.5
     dev: true
@@ -341,7 +341,7 @@ packages:
   /@types/prompts@2.4.9:
     resolution: {integrity: sha512-qTxFi6Buiu8+50/+3DGIWLHM6QuWsEKugJnnP6iv2Mc4ncxE4A/OJkjuVOA+5X0X1S/nq5VJRa8Lu+nwcvbrKA==}
     dependencies:
-      '@types/node': 18.19.69
+      '@types/node': 18.19.75
       kleur: 3.0.3
     dev: true
 
@@ -575,8 +575,8 @@ packages:
     engines: {node: '>=0.10.0'}
     dev: false
 
-  /semver@7.6.3:
-    resolution: {integrity: sha512-oVekP1cKtI+CTDvHWYFUcMtsK/00wmAEfyqKfNdARm8u1wNVhSgaX7A8d4UuIlUI5e84iEwOhs7ZPYRmzU9U6A==}
+  /semver@7.7.1:
+    resolution: {integrity: sha512-hlq8tAfn0m/61p4BVRcPzIGr6LKiMwo4VM6dGi6pt4qcRkmNzTcWq6eCEjEh+qXjkMDvPlOFFSGwQjoEa6gyMA==}
     engines: {node: '>=10'}
     hasBin: true
     dev: false
@@ -608,7 +608,7 @@ packages:
       has-flag: 4.0.0
     dev: false
 
-  /ts-node@10.9.2(@types/node@18.19.69)(typescript@4.9.4):
+  /ts-node@10.9.2(@types/node@18.19.75)(typescript@4.9.4):
     resolution: {integrity: sha512-f0FFpIdcHgn8zcPSbf1dRevwt047YMnaiJM3u2w2RewrB+fob/zePZcrOyQoLMMO7aBIddLcQIEK5dYjkLnGrQ==}
     hasBin: true
     peerDependencies:
@@ -627,7 +627,7 @@ packages:
       '@tsconfig/node12': 1.0.11
       '@tsconfig/node14': 1.0.3
       '@tsconfig/node16': 1.0.4
-      '@types/node': 18.19.69
+      '@types/node': 18.19.75
       acorn: 8.12.1
       acorn-walk: 8.3.4
       arg: 4.1.3

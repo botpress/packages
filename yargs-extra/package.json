@@ -1,8 +1,9 @@
 {
   "name": "@bpinternal/yargs-extra",
   "description": "Utils functions that leverage yargs.",
-  "version": "0.0.18",
+  "version": "0.0.19",
   "author": "Botpress, Inc.",
+  "type": "commonjs",
   "repository": {
     "type": "git",
     "url": "https://github.com/botpress/packages",

@@ -1,37 +1,28 @@
 {
   "name": "@bpinternal/thicktoken",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Tiktoken but thicker; A bundled tokenizer with added helper functions",
-  "type": "module",
   "scripts": {
-    "build": "vite build",
-    "watch": "vite --port 1666",
-    "test": "vitest run --config vitest.config.ts",
+    "build": "tsup",
+    "test": "tsup && vitest run --config vitest.config.ts",
     "test:update": "vitest -u run --config vitest.config.ts",
     "test:watch": "vitest --config vitest.config.ts"
   },
-  "main": "dist/tokenizer.js",
-  "types": "dist/tokenizer.d.ts",
   "exports": {
     ".": {
-      "types": "./dist/tokenizer.d.ts",
-      "import": "./dist/tokenizer.js",
+      "types": "./src/tokenizer.ts",
+      "import": "./dist/tokenizer.mjs",
       "require": "./dist/tokenizer.js"
     }
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "dependencies": {
-    "tiktoken": "^1.0.17"
-  },
   "devDependencies": {
     "dotenv": "^16.4.7",
-    "path-browserify": "1.0.1",
-    "vite": "^5.4.11",
-    "vite-plugin-dts": "^4.3.0",
-    "vite-plugin-top-level-await": "^1.4.4",
-    "vite-plugin-wasm": "^3.2.2",
+    "tiktoken": "^1.0.17",
+    "tsup": "^8.3.6",
+    "typescript": "^5.7.3",
     "vitest": "^2.0.5"
   },
   "packageManager": "pnpm@8.15.8+sha256.691fe176eea9a8a80df20e4976f3dfb44a04841ceb885638fe2a26174f81e65e"

@@ -1,34 +1,9 @@
 import cl100k_base from 'tiktoken/encoders/cl100k_base.json'
-import { Tiktoken } from 'tiktoken/lite'
+import { Tiktoken, init } from 'tiktoken/lite/init'
 import { deepClone, mapValues, uniq } from './utils'
 
 let tokenizer: TextTokenizer | null = null
 let lock: Promise<void> | false = false
-
-export const getWasmTokenizer = async () => {
-  if (tokenizer) {
-    return tokenizer
-  }
-
-  if (lock) {
-    await lock
-  } else {
-    lock = initialize()
-    await lock
-    lock = false
-  }
-
-  if (!tokenizer) {
-    throw new Error('Tokenizer failed to initialize')
-  }
-
-  return tokenizer!
-}
-
-const initialize = async () => {
-  const _tokenizer = new Tiktoken(cl100k_base.bpe_ranks, cl100k_base.special_tokens, cl100k_base.pat_str)
-  tokenizer = new TextTokenizer(_tokenizer)
-}
 
 const CHUNK_SIZE = 100_000
 
@@ -189,4 +164,31 @@ export class TextTokenizer {
 
     return total
   }
+}
+
+const initialize = async () => {
+  const bytes = (await import('tiktoken/lite/tiktoken_bg.wasm')).default
+  await init((imports) => WebAssembly.instantiate(bytes, imports))
+  const _tokenizer = new Tiktoken(cl100k_base.bpe_ranks, cl100k_base.special_tokens, cl100k_base.pat_str)
+  tokenizer = new TextTokenizer(_tokenizer)
+}
+
+export const getWasmTokenizer = async () => {
+  if (tokenizer) {
+    return tokenizer
+  }
+
+  if (lock) {
+    await lock
+  } else {
+    lock = initialize()
+    await lock
+    lock = false
+  }
+
+  if (!tokenizer) {
+    throw new Error('Tokenizer failed to initialize')
+  }
+
+  return tokenizer!
 }

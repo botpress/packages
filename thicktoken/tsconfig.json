@@ -5,7 +5,7 @@
     "module": "ESNext",
     "target": "ESNext",
     "moduleResolution": "bundler",
-    "lib": ["ES2023.Array"],
+    "lib": ["ES2023.Array", "ESNext", "DOM"],
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
     "disableReferencedProjectLoad": true,
@@ -26,6 +26,6 @@
     "types": ["node"],
     "declarationDir": "./dist"
   },
-  "exclude": ["**/dist/", "**/node_modules/", "**/*.test.ts"],
+  "exclude": ["**/dist/", "**/node_modules/", "**/*.test.ts", "**/__tests"],
   "include": ["./src/**/*"]
 }

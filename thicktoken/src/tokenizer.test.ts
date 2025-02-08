@@ -1,5 +1,6 @@
 import { describe, it, expect, beforeEach, afterEach, beforeAll } from 'vitest'
-import { getWasmTokenizer, TextTokenizer } from './tokenizer'
+import { getWasmTokenizer } from '../dist/tokenizer.mjs'
+import { type TextTokenizer } from './tokenizer'
 import { performance } from 'perf_hooks'
 import { generateSentence } from './__tests/utils'
 

@@ -1,6 +1,6 @@
 {
   "name": "@bpinternal/zui",
-  "version": "0.14.0",
+  "version": "0.13.6",
   "description": "A fork of Zod with additional features",
   "type": "module",
   "source": "./src/index.ts",
@@ -51,7 +51,7 @@
     "tsx": "^4.7.2",
     "typescript": "5.7.2",
     "vite": "^5.2.6",
-    "vitest": "^2.1.9"
+    "vitest": "1.6.0"
   },
   "peerDependencies": {
     "react": "^18.2.0"

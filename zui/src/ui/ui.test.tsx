@@ -3,14 +3,7 @@ import { fireEvent, render } from '@testing-library/react'
 import { ZuiForm, ZuiFormProps } from './index'
 import { resolveDiscriminatedSchema, resolveDiscriminator } from './hooks/useDiscriminator'
 import { ZuiComponentMap } from '../index'
-import {
-  ObjectSchema,
-  JSONSchema,
-  ZuiReactComponentBaseProps,
-  BaseType,
-  UIComponentDefinitions,
-  FormValidation,
-} from './types'
+import { ObjectSchema, JSONSchema, ZuiReactComponentBaseProps, BaseType, UIComponentDefinitions } from './types'
 import { FC, PropsWithChildren, useState } from 'react'
 import { vi } from 'vitest'
 import { z as zui } from '../z/index'
@@ -375,18 +368,18 @@ describe('UI', () => {
     const ageInput = rendered.getByTestId('number:age:input') as HTMLInputElement
 
     fireEvent.change(nameInput, { target: { value: 'Joh' } })
-    expect(spy.mock.calls.every(([call]: FormValidation[]) => call?.formValid === true)).toStrictEqual(false)
-    expect(spy.mock.lastCall?.[0].formErrors).toHaveLength(1)
+    expect(spy.mock.calls.every((call) => call.formValid === false)).toStrictEqual(false)
+    expect(spy.mock.lastCall[0].formErrors).toHaveLength(1)
 
     fireEvent.change(ageInput, { target: { value: '5' } })
 
-    expect(spy.mock.calls.every(([call]: FormValidation[]) => call?.formValid === true)).toStrictEqual(false)
-    expect(spy.mock.lastCall?.[0].formErrors).toHaveLength(1)
+    expect(spy.mock.calls.every((call) => call.formValid === false)).toStrictEqual(false)
+    expect(spy.mock.lastCall[0].formErrors).toHaveLength(1)
 
     fireEvent.change(ageInput, { target: { value: '10' } })
 
-    expect(spy.mock.lastCall?.[0].formValid).toStrictEqual(true)
-    expect(spy.mock.lastCall?.[0].formErrors).toHaveLength(0)
+    expect(spy.mock.lastCall[0].formValid).toStrictEqual(true)
+    expect(spy.mock.lastCall[0].formErrors).toHaveLength(0)
   })
 
   it('returns null formValidation when disableValidation is true', () => {

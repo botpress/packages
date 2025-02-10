@@ -38,12 +38,39 @@ export function primitiveToTypescriptValue(x: Primitive): string {
 /**
  * @returns a valid typescript value usable in `const myValue = ${x}`
  */
-export function unknownToTypescriptValue(x: unknown): string {
-  if (typeof x === 'undefined') {
-    return 'undefined'
+export function unknownToTypescriptValue(value: unknown): string {
+  if (typeof value === 'object' && value !== null) {
+    return Array.isArray(value)
+      ? arrayOfUnknownToTypescriptArray(value)
+      : recordOfUnknownToTypescriptRecord(value as Record<string | number | symbol, unknown>)
   }
-  // will fail or not behave as expected if x contains a symbol or a bigint
-  return JSON.stringify(x)
+  return ['symbol', 'bigint', 'undefined'].includes(typeof value)
+    ? primitiveToTypescriptValue(value as Primitive)
+    : JSON.stringify(value)
+}
+
+/**
+ * @returns a valid typescript value usable in `const myValue = ${x}`
+ */
+export const arrayOfUnknownToTypescriptArray = (arr: Primitive[], asConst?: boolean) => {
+  const maybeAsConst = asConst ? ' as const' : ''
+
+  return `[${arr.map(unknownToTypescriptValue).join(', ')}]${maybeAsConst}`
+}
+
+/**
+ * @returns a valid typescript value usable in `const myValue = ${x}`
+ */
+export const recordOfUnknownToTypescriptRecord = (
+  record: Record<string | number | symbol, unknown>,
+  asConst?: boolean,
+) => {
+  const entries = Object.entries(record)
+  const maybeAsConst = asConst ? ' as const' : ''
+
+  return `{ ${entries
+    .map(([key, value]) => `${toPropertyKey(key)}: ${unknownToTypescriptValue(value)}`)
+    .join(', ')}${maybeAsConst}}`
 }
 
 export const toPropertyKey = (key: string) => {

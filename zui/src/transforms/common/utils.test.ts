@@ -1,7 +1,7 @@
-import { expect } from 'vitest'
-import { toTypeArgumentName, primitiveToTypescriptValue } from './utils'
+import { expect, describe, it } from 'vitest'
+import { toTypeArgumentName, primitiveToTypescriptValue, unknownToTypescriptValue } from './utils'
 
-describe('primitiveToTypscriptLiteral', () => {
+describe.concurrent('primitiveToTypscriptLiteral', () => {
   it('converts a string to a valid typescript string value', () => {
     const input: string = 'hello'
     const tsValue: string = primitiveToTypescriptValue(input)
@@ -60,7 +60,7 @@ describe('primitiveToTypscriptLiteral', () => {
   })
 })
 
-describe('toTypeArgumentName', () => {
+describe.concurrent('toTypeArgumentName', () => {
   it('converts a valid key to a property key', () => {
     expect(toTypeArgumentName('T')).toBe('T')
     expect(toTypeArgumentName('TName')).toBe('TName')
@@ -70,5 +70,33 @@ describe('toTypeArgumentName', () => {
     expect(toTypeArgumentName('T-Name')).toBe('TName')
     expect(toTypeArgumentName('t Name')).toBe('TName')
     expect(toTypeArgumentName('#/t/Name')).toBe('TName')
+  })
+})
+
+describe.concurrent('unknownToTypescriptValue', () => {
+  const evalAndExtract = (tsValue: string) => {
+    try {
+      return eval(`const x = ${tsValue}; x`)
+    } catch (thrown: unknown) {
+      throw new Error(`Failed to eval ${tsValue}`, { cause: thrown })
+    }
+  }
+
+  it.for([
+    [1, 2, 3],
+    [1, 2, ['a', 'b']],
+    { a: 1, b: 2, c: { d: 3, e: [1] } },
+    BigInt(42),
+    'foo bar',
+    null,
+    false,
+    undefined,
+  ])('converts %s to a valid typescript value', (input: unknown) => {
+    // Act
+    const tsValue: string = unknownToTypescriptValue(input)
+
+    // Assert
+    const actual = evalAndExtract(tsValue)
+    expect(actual).toEqual(input)
   })
 })

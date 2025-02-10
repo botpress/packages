@@ -55,7 +55,7 @@ export function unknownToTypescriptValue(value: unknown): string {
 export const arrayOfUnknownToTypescriptArray = (arr: Primitive[], asConst?: boolean) => {
   const maybeAsConst = asConst ? ' as const' : ''
 
-  return `[${arr.map(unknownToTypescriptValue).join(', ')}]${maybeAsConst}`
+  return `[ ${arr.map(unknownToTypescriptValue).join(', ')} ]${maybeAsConst}`
 }
 
 /**
@@ -70,7 +70,7 @@ export const recordOfUnknownToTypescriptRecord = (
 
   return `{ ${entries
     .map(([key, value]) => `${toPropertyKey(key)}: ${unknownToTypescriptValue(value)}`)
-    .join(', ')}${maybeAsConst}}`
+    .join(', ')} }${maybeAsConst}`
 }
 
 export const toPropertyKey = (key: string) => {

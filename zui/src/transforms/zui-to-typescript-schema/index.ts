@@ -179,15 +179,15 @@ const _maybeDescribe = (def: z.ZodTypeDef) =>
   def.description ? `.describe(${primitiveToTypescriptValue(def.description)})` : ''
 
 const _addZuiExtensions = (def: z.ZodTypeDef) =>
-  `${_maybeTitle(def)}${_maybeTooltip(def)}${_maybeDisplayAs(def)}${_maybeDisabled(def)}${_maybeHidden(def)}${_maybePlaceholder(def)}${_maybeSecret(def)}${_maybeCoerce(def)}${_maybeSetMetadata(def)}`
+  `${_maybeTitle(def)}${_maybeDisplayAs(def)}${_maybeDisabled(def)}${_maybeHidden(def)}${_maybePlaceholder(def)}${_maybeSecret(def)}${_maybeSetMetadata(def)}`
 
 const _maybeTitle = (def: z.ZodTypeDef) =>
   def[zuiKey]?.title ? `.title(${primitiveToTypescriptValue(def[zuiKey].title)})` : ''
 
-const _maybeTooltip = (def: z.ZodTypeDef) => (def[zuiKey]?.tooltip ? '.tooltip()' : '')
-
 const _maybeDisplayAs = (def: z.ZodTypeDef) =>
-  def[zuiKey]?.displayAs ? `.displayAs([${arrayOfUnknownToTypescriptArray(def[zuiKey].displayAs)}])` : ''
+  def[zuiKey]?.displayAs
+    ? `.displayAs(${recordOfUnknownToTypescriptRecord({ id: def[zuiKey].displayAs[0], params: def[zuiKey].displayAs[1] })})`
+    : ''
 
 const _maybeDisabled = (def: z.ZodTypeDef) => (def[zuiKey]?.disabled ? `.disabled(${def[zuiKey].disabled})` : '')
 
@@ -197,8 +197,6 @@ const _maybePlaceholder = (def: z.ZodTypeDef) =>
   def[zuiKey]?.placeholder ? `.placeholder(${primitiveToTypescriptValue(def[zuiKey].placeholder)})` : ''
 
 const _maybeSecret = (def: z.ZodTypeDef) => (def[zuiKey]?.secret ? '.secret()' : '')
-
-const _maybeCoerce = (def: z.ZodTypeDef) => (def[zuiKey]?.coerce ? '.coerce()' : '')
 
 const _maybeSetMetadata = (def: z.ZodTypeDef) => {
   const reservedKeys = [
@@ -215,5 +213,5 @@ const _maybeSetMetadata = (def: z.ZodTypeDef) => {
     ([key]) => !reservedKeys.includes(key as (typeof reservedKeys)[number]),
   )
 
-  return metadata.length > 0 ? `.setMetadata(${recordOfUnknownToTypescriptRecord(Object.fromEntries(metadata))})` : ''
+  return metadata.length > 0 ? `.metadata(${recordOfUnknownToTypescriptRecord(Object.fromEntries(metadata))})` : ''
 }

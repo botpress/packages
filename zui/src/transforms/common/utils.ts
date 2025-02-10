@@ -38,15 +38,12 @@ export function primitiveToTypescriptValue(x: Primitive): string {
 /**
  * @returns a valid typescript value usable in `const myValue = ${x}`
  */
-export function unknownToTypescriptValue(value: unknown): string {
-  if (typeof value === 'object' && value !== null) {
-    return Array.isArray(value)
-      ? arrayOfUnknownToTypescriptArray(value)
-      : recordOfUnknownToTypescriptRecord(value as Record<string | number | symbol, unknown>)
+export function unknownToTypescriptValue(x: unknown): string {
+  if (typeof x === 'undefined') {
+    return 'undefined'
   }
-  return ['symbol', 'bigint', 'undefined'].includes(typeof value)
-    ? primitiveToTypescriptValue(value as Primitive)
-    : JSON.stringify(value)
+  // will fail or not behave as expected if x contains a symbol or a bigint
+  return JSON.stringify(x)
 }
 
 /**

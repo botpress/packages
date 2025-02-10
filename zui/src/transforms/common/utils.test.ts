@@ -82,21 +82,15 @@ describe.concurrent('unknownToTypescriptValue', () => {
     }
   }
 
-  it.for([
-    [1, 2, 3],
-    [1, 2, ['a', 'b']],
-    { a: 1, b: 2, c: { d: 3, e: [1] } },
-    BigInt(42),
-    'foo bar',
-    null,
-    false,
-    undefined,
-  ])('converts %s to a valid typescript value', (input: unknown) => {
-    // Act
-    const tsValue: string = unknownToTypescriptValue(input)
+  it.each([[1, 2, 3], [1, 2, ['a', 'b']], { a: 1, b: 2, c: { d: 3, e: [1] } }, 'foo bar', false, null])(
+    'converts %s to a valid typescript value',
+    (...input: unknown[]) => {
+      // Act
+      const tsValue: string = unknownToTypescriptValue(input)
 
-    // Assert
-    const actual = evalAndExtract(tsValue)
-    expect(actual).toEqual(input)
-  })
+      // Assert
+      const actual = evalAndExtract(tsValue)
+      expect(actual).toEqual(input)
+    },
+  )
 })

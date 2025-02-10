@@ -1,7 +1,13 @@
 import { mapValues } from 'lodash-es'
 
 import z, { util } from '../../z'
-import { primitiveToTypescriptValue, getMultilineComment, unknownToTypescriptValue } from '../common/utils'
+import {
+  primitiveToTypescriptValue,
+  getMultilineComment,
+  unknownToTypescriptValue,
+  arrayOfUnknownToTypescriptArray,
+  recordOfUnknownToTypescriptRecord,
+} from '../common/utils'
 import * as errors from '../common/errors'
 import { zuiKey } from '../../ui/constants'
 
@@ -169,24 +175,26 @@ function sUnwrapZod(schema: z.Schema): string {
   }
 }
 
-const _maybeDescribe = (def: z.ZodTypeDef) => (def.description ? `.describe(${JSON.stringify(def.description)})` : '')
+const _maybeDescribe = (def: z.ZodTypeDef) =>
+  def.description ? `.describe(${primitiveToTypescriptValue(def.description)})` : ''
 
 const _addZuiExtensions = (def: z.ZodTypeDef) =>
   `${_maybeTitle(def)}${_maybeTooltip(def)}${_maybeDisplayAs(def)}${_maybeDisabled(def)}${_maybeHidden(def)}${_maybePlaceholder(def)}${_maybeSecret(def)}${_maybeCoerce(def)}${_maybeSetMetadata(def)}`
 
-const _maybeTitle = (def: z.ZodTypeDef) => (def[zuiKey]?.title ? `.title(${JSON.stringify(def[zuiKey].title)})` : '')
+const _maybeTitle = (def: z.ZodTypeDef) =>
+  def[zuiKey]?.title ? `.title(${primitiveToTypescriptValue(def[zuiKey].title)})` : ''
 
 const _maybeTooltip = (def: z.ZodTypeDef) => (def[zuiKey]?.tooltip ? '.tooltip()' : '')
 
 const _maybeDisplayAs = (def: z.ZodTypeDef) =>
-  def[zuiKey]?.displayAs ? `.displayAs(${JSON.stringify(def[zuiKey].displayAs)})` : ''
+  def[zuiKey]?.displayAs ? `.displayAs([${arrayOfUnknownToTypescriptArray(def[zuiKey].displayAs)}])` : ''
 
 const _maybeDisabled = (def: z.ZodTypeDef) => (def[zuiKey]?.disabled ? `.disabled(${def[zuiKey].disabled})` : '')
 
 const _maybeHidden = (def: z.ZodTypeDef) => (def[zuiKey]?.hidden ? `.hidden(${def[zuiKey].hidden})` : '')
 
 const _maybePlaceholder = (def: z.ZodTypeDef) =>
-  def[zuiKey]?.placeholder ? `.placeholder(${JSON.stringify(def[zuiKey].placeholder)})` : ''
+  def[zuiKey]?.placeholder ? `.placeholder(${primitiveToTypescriptValue(def[zuiKey].placeholder)})` : ''
 
 const _maybeSecret = (def: z.ZodTypeDef) => (def[zuiKey]?.secret ? '.secret()' : '')
 
@@ -207,5 +215,5 @@ const _maybeSetMetadata = (def: z.ZodTypeDef) => {
     ([key]) => !reservedKeys.includes(key as (typeof reservedKeys)[number]),
   )
 
-  return metadata.length > 0 ? `.setMetadata(${JSON.stringify(Object.fromEntries(metadata))})` : ''
+  return metadata.length > 0 ? `.setMetadata(${recordOfUnknownToTypescriptRecord(Object.fromEntries(metadata))})` : ''
 }

@@ -5,7 +5,6 @@ import {
   primitiveToTypescriptValue,
   getMultilineComment,
   unknownToTypescriptValue,
-  arrayOfUnknownToTypescriptArray,
   recordOfUnknownToTypescriptRecord,
 } from '../common/utils'
 import * as errors from '../common/errors'

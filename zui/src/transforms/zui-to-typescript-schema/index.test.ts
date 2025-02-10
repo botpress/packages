@@ -4,7 +4,6 @@ import { evalZuiString } from '../common/eval-zui-string'
 import * as errors from '../common/errors'
 import z, { ZodLiteral, ZodSchema, ZodType } from '../../z'
 import { UIComponentDefinitions } from '../../ui'
-import { zuiKey } from '../../ui/constants'
 
 const evalZui = (source: string): ZodSchema => {
   const evalResult = evalZuiString(source)

@@ -24,7 +24,7 @@ describe.concurrent('primitiveToTypscriptLiteral', () => {
     expect(actual).toEqual(input)
   })
   it('converts a null to a valid typescript null value', () => {
-    const input: null = null
+    const input = null
     const tsValue: string = primitiveToTypescriptValue(input)
     const actual = eval(tsValue)
     expect(typeof actual).toEqual('object') // null is an object in javascript

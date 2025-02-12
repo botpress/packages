@@ -1,6 +1,7 @@
 import { JSONSchema7 } from 'json-schema'
 import { util } from '../../z/types/utils'
 import z from '../../z'
+import { ZuiExtensionObject } from '../../ui/types'
 
 /**
  * Definitions:
@@ -20,28 +21,12 @@ type AnyDef = util.Satisfies<{ typeName: z.ZodFirstPartyTypeKind.ZodAny }, Parti
 type UnknownDef = util.Satisfies<{ typeName: z.ZodFirstPartyTypeKind.ZodUnknown }, Partial<z.ZodUnknownDef>>
 
 /**
- * ZuiExtension:
- *
- * Metadata that is not part of the JSON schema spec
- */
-
-type ZuiExtension<Def extends Partial<z.ZodDef> = {}> = {
-  def?: Def
-  title?: string
-  disabled?: boolean
-  hidden?: boolean
-  tooltip?: boolean
-  placeholder?: string
-  secret?: boolean
-  [k: string]: unknown
-}
-
-/**
  * ZuiJsonSchema:
  *
  * A ZUI flavored subset of JSONSchema7
  */
 
+type ZuiExtension<Def extends Partial<z.ZodDef> = {}> = { def?: Def } & ZuiExtensionObject
 type JsonData = string | number | boolean | null | JsonData[] | { [key: string]: JsonData }
 type BaseZuiJsonSchema<Def extends Partial<z.ZodDef> = {}> = {
   readOnly?: boolean
@@ -63,7 +48,6 @@ export type ArraySchema = { type: 'array'; items: ZuiJsonSchema } & BaseZuiJsonS
 export type UnionSchema = { anyOf: ZuiJsonSchema[] } & BaseZuiJsonSchema<UnionDef>
 export type DiscriminatedUnionSchema = { anyOf: ZuiJsonSchema[] } & BaseZuiJsonSchema<DiscriminatedUnionDef>
 export type IntersectionSchema = { allOf: [ZuiJsonSchema, ZuiJsonSchema] } & BaseZuiJsonSchema
-export type MapSchema = { type: 'object'; additionalProperties: ZuiJsonSchema } & BaseZuiJsonSchema
 export type SetSchema = { type: 'array'; items: ZuiJsonSchema; uniqueItems: true } & BaseZuiJsonSchema
 export type EnumSchema = { type: 'string'; enum: string[] } & BaseZuiJsonSchema
 export type RefSchema = { $ref: string } & BaseZuiJsonSchema
@@ -72,7 +56,7 @@ export type ObjectSchema = {
   properties: { [key: string]: ZuiJsonSchema }
   required: string[]
 } & BaseZuiJsonSchema
-export type TupleSchema = { type: 'array'; items: ZuiJsonSchema[]; additionalItems: ZuiJsonSchema } & BaseZuiJsonSchema
+export type TupleSchema = { type: 'array'; items: ZuiJsonSchema[]; additionalItems?: ZuiJsonSchema } & BaseZuiJsonSchema
 export type RecordSchema = { type: 'object'; additionalProperties: ZuiJsonSchema } & BaseZuiJsonSchema
 export type LiteralStringSchema = { type: 'string'; const: string } & BaseZuiJsonSchema
 export type LiteralNumberSchema = { type: 'number'; const: number } & BaseZuiJsonSchema
@@ -105,7 +89,6 @@ export type ZuiJsonSchema =
   | IntersectionSchema
   | TupleSchema
   | RecordSchema
-  | MapSchema
   | SetSchema
   | LiteralSchema
   | EnumSchema
@@ -134,7 +117,6 @@ util.assertIs<JSONSchema7>(util.mock<DiscriminatedUnionSchema>())
 util.assertIs<JSONSchema7>(util.mock<IntersectionSchema>())
 util.assertIs<JSONSchema7>(util.mock<TupleSchema>())
 util.assertIs<JSONSchema7>(util.mock<RecordSchema>())
-util.assertIs<JSONSchema7>(util.mock<MapSchema>())
 util.assertIs<JSONSchema7>(util.mock<SetSchema>())
 util.assertIs<JSONSchema7>(util.mock<LiteralStringSchema>())
 util.assertIs<JSONSchema7>(util.mock<LiteralNumberSchema>())

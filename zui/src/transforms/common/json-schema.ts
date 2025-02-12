@@ -28,41 +28,76 @@ type UnknownDef = util.Satisfies<{ typeName: z.ZodFirstPartyTypeKind.ZodUnknown 
 
 type ZuiExtension<Def extends Partial<z.ZodDef> = {}> = { def?: Def } & ZuiExtensionObject
 type JsonData = string | number | boolean | null | JsonData[] | { [key: string]: JsonData }
-type BaseZuiJsonSchema<Def extends Partial<z.ZodDef> = {}> = {
-  readOnly?: boolean
-  default?: JsonData
-  ['x-zui']?: util.Normalize<ZuiExtension<Def>>
-}
+type BaseZuiJsonSchema<Def extends Partial<z.ZodDef> = {}> = util.Satisfies<
+  {
+    readOnly?: boolean
+    default?: JsonData
+    ['x-zui']?: ZuiExtension<Def>
+  },
+  JSONSchema7
+>
 
-export type StringSchema = { type: 'string' } & BaseZuiJsonSchema
-export type NumberSchema = { type: 'number' } & BaseZuiJsonSchema
-export type BigIntSchema = { type: 'integer' } & BaseZuiJsonSchema
-export type BooleanSchema = { type: 'boolean' } & BaseZuiJsonSchema
-export type DateSchema = { type: 'string'; format: 'date-time' } & BaseZuiJsonSchema
-export type NullSchema = { type: 'null' } & BaseZuiJsonSchema
-export type UndefinedSchema = { not: true } & BaseZuiJsonSchema<UndefinedDef>
-export type NeverSchema = { not: true } & BaseZuiJsonSchema<NeverDef>
-export type AnySchema = {} & BaseZuiJsonSchema<AnyDef>
-export type UnknownSchema = {} & BaseZuiJsonSchema<UnknownDef>
-export type ArraySchema = { type: 'array'; items: ZuiJsonSchema } & BaseZuiJsonSchema
-export type UnionSchema = { anyOf: ZuiJsonSchema[] } & BaseZuiJsonSchema<UnionDef>
-export type DiscriminatedUnionSchema = { anyOf: ZuiJsonSchema[] } & BaseZuiJsonSchema<DiscriminatedUnionDef>
-export type IntersectionSchema = { allOf: [ZuiJsonSchema, ZuiJsonSchema] } & BaseZuiJsonSchema
-export type SetSchema = { type: 'array'; items: ZuiJsonSchema; uniqueItems: true } & BaseZuiJsonSchema
-export type EnumSchema = { type: 'string'; enum: string[] } & BaseZuiJsonSchema
-export type RefSchema = { $ref: string } & BaseZuiJsonSchema
-export type ObjectSchema = {
-  type: 'object'
-  properties: { [key: string]: ZuiJsonSchema }
-  required: string[]
-} & BaseZuiJsonSchema
-export type TupleSchema = { type: 'array'; items: ZuiJsonSchema[]; additionalItems?: ZuiJsonSchema } & BaseZuiJsonSchema
-export type RecordSchema = { type: 'object'; additionalProperties: ZuiJsonSchema } & BaseZuiJsonSchema
-export type LiteralStringSchema = { type: 'string'; const: string } & BaseZuiJsonSchema
-export type LiteralNumberSchema = { type: 'number'; const: number } & BaseZuiJsonSchema
-export type LiteralBooleanSchema = { type: 'boolean'; const: boolean } & BaseZuiJsonSchema
-export type LiteralBigIntSchema = { type: 'integer'; const: number } & BaseZuiJsonSchema
-export type LiteralNullSchema = { type: 'null'; const: null } & BaseZuiJsonSchema
+type _StringSchema = util.Satisfies<{ type: 'string' }, JSONSchema7>
+type _NumberSchema = util.Satisfies<{ type: 'number' }, JSONSchema7>
+type _BigIntSchema = util.Satisfies<{ type: 'integer' }, JSONSchema7>
+type _BooleanSchema = util.Satisfies<{ type: 'boolean' }, JSONSchema7>
+type _DateSchema = util.Satisfies<{ type: 'string'; format: 'date-time' }, JSONSchema7>
+type _NullSchema = util.Satisfies<{ type: 'null' }, JSONSchema7>
+type _UndefinedSchema = util.Satisfies<{ not: true }, JSONSchema7>
+type _NeverSchema = util.Satisfies<{ not: true }, JSONSchema7>
+type _AnySchema = util.Satisfies<{}, JSONSchema7>
+type _UnknownSchema = util.Satisfies<{}, JSONSchema7>
+type _ArraySchema = util.Satisfies<{ type: 'array'; items: ZuiJsonSchema }, JSONSchema7>
+type _UnionSchema = util.Satisfies<{ anyOf: ZuiJsonSchema[] }, JSONSchema7>
+type _DiscriminatedUnionSchema = util.Satisfies<{ anyOf: ZuiJsonSchema[] }, JSONSchema7>
+type _IntersectionSchema = util.Satisfies<{ allOf: [ZuiJsonSchema, ZuiJsonSchema] }, JSONSchema7>
+type _SetSchema = util.Satisfies<{ type: 'array'; items: ZuiJsonSchema; uniqueItems: true }, JSONSchema7>
+type _EnumSchema = util.Satisfies<{ type: 'string'; enum: string[] }, JSONSchema7>
+type _RefSchema = util.Satisfies<{ $ref: string }, JSONSchema7>
+type _ObjectSchema = util.Satisfies<
+  { type: 'object'; properties: { [key: string]: ZuiJsonSchema }; required: string[] },
+  JSONSchema7
+>
+type _TupleSchema = util.Satisfies<
+  { type: 'array'; items: ZuiJsonSchema[]; additionalItems?: ZuiJsonSchema },
+  JSONSchema7
+>
+type _RecordSchema = util.Satisfies<{ type: 'object'; additionalProperties: ZuiJsonSchema }, JSONSchema7>
+type _LiteralStringSchema = util.Satisfies<{ type: 'string'; const: string }, JSONSchema7>
+type _LiteralNumberSchema = util.Satisfies<{ type: 'number'; const: number }, JSONSchema7>
+type _LiteralBooleanSchema = util.Satisfies<{ type: 'boolean'; const: boolean }, JSONSchema7>
+type _LiteralBigIntSchema = util.Satisfies<{ type: 'integer'; const: number }, JSONSchema7>
+type _LiteralNullSchema = util.Satisfies<{ type: 'null'; const: null }, JSONSchema7>
+type _OptionalSchema = util.Satisfies<{ anyOf: [ZuiJsonSchema, UndefinedSchema] }, JSONSchema7>
+type _NullableSchema = util.Satisfies<{ anyOf: [ZuiJsonSchema, NullSchema] }, JSONSchema7>
+
+export type StringSchema = _StringSchema & BaseZuiJsonSchema
+export type NumberSchema = _NumberSchema & BaseZuiJsonSchema
+export type BigIntSchema = _BigIntSchema & BaseZuiJsonSchema
+export type BooleanSchema = _BooleanSchema & BaseZuiJsonSchema
+export type DateSchema = _DateSchema & BaseZuiJsonSchema
+export type NullSchema = _NullSchema & BaseZuiJsonSchema
+export type UndefinedSchema = _UndefinedSchema & BaseZuiJsonSchema<UndefinedDef>
+export type NeverSchema = _NeverSchema & BaseZuiJsonSchema<NeverDef>
+export type AnySchema = _AnySchema & BaseZuiJsonSchema<AnyDef>
+export type UnknownSchema = _UnknownSchema & BaseZuiJsonSchema<UnknownDef>
+export type ArraySchema = _ArraySchema & BaseZuiJsonSchema
+export type UnionSchema = _UnionSchema & BaseZuiJsonSchema<UnionDef>
+export type DiscriminatedUnionSchema = _DiscriminatedUnionSchema & BaseZuiJsonSchema<DiscriminatedUnionDef>
+export type IntersectionSchema = _IntersectionSchema & BaseZuiJsonSchema
+export type SetSchema = _SetSchema & BaseZuiJsonSchema
+export type EnumSchema = _EnumSchema & BaseZuiJsonSchema
+export type RefSchema = _RefSchema & BaseZuiJsonSchema
+export type ObjectSchema = _ObjectSchema & BaseZuiJsonSchema
+export type TupleSchema = _TupleSchema & BaseZuiJsonSchema
+export type RecordSchema = _RecordSchema & BaseZuiJsonSchema
+export type LiteralStringSchema = _LiteralStringSchema & BaseZuiJsonSchema
+export type LiteralNumberSchema = _LiteralNumberSchema & BaseZuiJsonSchema
+export type LiteralBooleanSchema = _LiteralBooleanSchema & BaseZuiJsonSchema
+export type LiteralBigIntSchema = _LiteralBigIntSchema & BaseZuiJsonSchema
+export type LiteralNullSchema = _LiteralNullSchema & BaseZuiJsonSchema
+export type OptionalSchema = _OptionalSchema & BaseZuiJsonSchema
+export type NullableSchema = _NullableSchema & BaseZuiJsonSchema
 
 export type LiteralSchema =
   | LiteralStringSchema
@@ -93,41 +128,5 @@ export type ZuiJsonSchema =
   | LiteralSchema
   | EnumSchema
   | RefSchema
-
-/**
- * Tests:
- *
- * Ensure that all ZuiJsonSchema types are assignable to JSONSchema7
- */
-
-util.assertIs<JSONSchema7>(util.mock<StringSchema>())
-util.assertIs<JSONSchema7>(util.mock<NumberSchema>())
-util.assertIs<JSONSchema7>(util.mock<BigIntSchema>())
-util.assertIs<JSONSchema7>(util.mock<BooleanSchema>())
-util.assertIs<JSONSchema7>(util.mock<DateSchema>())
-util.assertIs<JSONSchema7>(util.mock<UndefinedSchema>())
-util.assertIs<JSONSchema7>(util.mock<NullSchema>())
-util.assertIs<JSONSchema7>(util.mock<AnySchema>())
-util.assertIs<JSONSchema7>(util.mock<UnknownSchema>())
-util.assertIs<JSONSchema7>(util.mock<NeverSchema>())
-util.assertIs<JSONSchema7>(util.mock<ArraySchema>())
-util.assertIs<JSONSchema7>(util.mock<ObjectSchema>())
-util.assertIs<JSONSchema7>(util.mock<UnionSchema>())
-util.assertIs<JSONSchema7>(util.mock<DiscriminatedUnionSchema>())
-util.assertIs<JSONSchema7>(util.mock<IntersectionSchema>())
-util.assertIs<JSONSchema7>(util.mock<TupleSchema>())
-util.assertIs<JSONSchema7>(util.mock<RecordSchema>())
-util.assertIs<JSONSchema7>(util.mock<SetSchema>())
-util.assertIs<JSONSchema7>(util.mock<LiteralStringSchema>())
-util.assertIs<JSONSchema7>(util.mock<LiteralNumberSchema>())
-util.assertIs<JSONSchema7>(util.mock<LiteralBooleanSchema>())
-util.assertIs<JSONSchema7>(util.mock<LiteralBigIntSchema>())
-util.assertIs<JSONSchema7>(util.mock<LiteralNullSchema>())
-util.assertIs<JSONSchema7>(util.mock<LiteralSchema>())
-util.assertIs<JSONSchema7>(util.mock<EnumSchema>())
-util.assertIs<JSONSchema7>(util.mock<RefSchema>())
-util.assertIs<JSONSchema7>(util.mock<ZuiJsonSchema>())
-// @ts-expect-error
-util.assertIs<JSONSchema7>(util.mock<{ type: 'invalid' }>())
-// @ts-expect-error
-util.assertIs<JSONSchema7>(util.mock<{ $ref: number }>())
+  | OptionalSchema
+  | NullableSchema

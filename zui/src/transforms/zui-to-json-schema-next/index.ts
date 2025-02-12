@@ -1,4 +1,5 @@
-import z, { ZodObject } from '../../z'
+import { ZuiExtensionObject } from '../../ui/types'
+import z from '../../z'
 import * as json from '../common/json-schema'
 
 /**
@@ -10,6 +11,16 @@ import * as json from '../common/json-schema'
 export function toJsonSchema(schema: z.Schema): json.ZuiJsonSchema {
   return _toJsonSchema(schema)
 }
+
+const undefinedSchema = (xZui?: ZuiExtensionObject): json.UndefinedSchema => ({
+  not: true,
+  'x-zui': { ...xZui, def: { typeName: z.ZodFirstPartyTypeKind.ZodUndefined } },
+})
+
+const nullSchema = (xZui?: ZuiExtensionObject): json.NullSchema => ({
+  type: 'null',
+  'x-zui': xZui,
+})
 
 function _toJsonSchema(schema: z.Schema): json.ZuiJsonSchema {
   const schemaTyped = schema as z.ZodFirstPartySchemaTypes
@@ -35,13 +46,10 @@ function _toJsonSchema(schema: z.Schema): json.ZuiJsonSchema {
       return { type: 'string', format: 'date-time', 'x-zui': def['x-zui'] } satisfies json.DateSchema
 
     case z.ZodFirstPartyTypeKind.ZodUndefined:
-      return {
-        not: true,
-        'x-zui': { ...def['x-zui'], def: { typeName: z.ZodFirstPartyTypeKind.ZodUndefined } },
-      } satisfies json.UndefinedSchema
+      return undefinedSchema(def['x-zui'])
 
     case z.ZodFirstPartyTypeKind.ZodNull:
-      return { type: 'null', 'x-zui': def['x-zui'] } satisfies json.NullSchema
+      return nullSchema(def['x-zui'])
 
     case z.ZodFirstPartyTypeKind.ZodAny:
       return {
@@ -74,7 +82,7 @@ function _toJsonSchema(schema: z.Schema): json.ZuiJsonSchema {
       const required = shape.filter(([_, value]) => !value.isOptional()).map(([key]) => key)
       return {
         type: 'object',
-        properties: Object.fromEntries(shape.map(([key, value]) => [key, _toJsonSchema(value)])),
+        properties: Object.fromEntries(shape.map(([key, value]) => [key, _toJsonSchema(value)])), // TODO: should we dedent ZodOptional values since they are already treated as optionals by the required key?
         required,
         'x-zui': def['x-zui'],
       } satisfies json.ObjectSchema
@@ -149,10 +157,16 @@ function _toJsonSchema(schema: z.Schema): json.ZuiJsonSchema {
       throw new Error('ZodNativeEnum is not supported')
 
     case z.ZodFirstPartyTypeKind.ZodOptional:
-      throw new Error('Not implemented') // TODO: implement
+      return {
+        anyOf: [_toJsonSchema(def.innerType), undefinedSchema()],
+        'x-zui': def['x-zui'],
+      } satisfies json.OptionalSchema
 
     case z.ZodFirstPartyTypeKind.ZodNullable:
-      throw new Error('Not implemented') // TODO: implement
+      return {
+        anyOf: [_toJsonSchema(def.innerType), nullSchema()],
+        'x-zui': def['x-zui'],
+      } satisfies json.NullableSchema
 
     case z.ZodFirstPartyTypeKind.ZodDefault:
       return {

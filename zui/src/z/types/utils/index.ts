@@ -93,6 +93,8 @@ export namespace util {
      */
     return a.toString() === b.toString()
   }
+
+  export const mock = <T>(): T => ({}) as T
 }
 
 export namespace objectUtil {

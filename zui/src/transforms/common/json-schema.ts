@@ -1,11 +1,10 @@
 import { JSONSchema7 } from 'json-schema'
+import { util } from '../../z/types/utils'
 
-type JSON = string | number | boolean | null | JSON[] | { [key: string]: JSON }
-
+type JsonData = string | number | boolean | null | JsonData[] | { [key: string]: JsonData }
 type Normalize<T extends object> = { [K in keyof T]: T[K] }
 
-const ZUI_KEY = 'x-zui'
-type ZuiExtensions = {
+type ZuiExtension = {
   title?: string
   disabled?: boolean
   hidden?: boolean
@@ -15,13 +14,13 @@ type ZuiExtensions = {
   [k: string]: unknown
 }
 
-type BaseSchema = {
-  readOnly?: boolean
-  default?: JSON
-  [ZUI_KEY]?: ZuiExtensions
-}
-
-type WithZuiBase<S extends JSONSchema7> = Normalize<S & BaseSchema>
+type WithZuiBase<S extends JSONSchema7> = Normalize<
+  S & {
+    readOnly?: boolean
+    default?: JsonData
+    ['x-zui']?: ZuiExtension
+  }
+>
 
 /**
  * Currently mutiple zui schemas map to the same JSON schema; undefined/never, any/unknown, union/discriminated-union
@@ -46,7 +45,11 @@ export type MapSchema = WithZuiBase<{ type: 'object'; additionalProperties: ZuiJ
 export type SetSchema = WithZuiBase<{ type: 'array'; items: ZuiJsonSchema; uniqueItems: true }>
 export type EnumSchema = WithZuiBase<{ type: 'string'; enum: string[] }>
 export type RefSchema = WithZuiBase<{ $ref: string }>
-export type ObjectSchema = Normalize<{ type: 'object'; properties: Record<string, ZuiJsonSchema>; required: string[] }>
+export type ObjectSchema = WithZuiBase<{
+  type: 'object'
+  properties: Record<string, ZuiJsonSchema>
+  required: string[]
+}>
 export type TupleSchema = WithZuiBase<{ type: 'array'; items: ZuiJsonSchema[]; additionalItems: ZuiJsonSchema }>
 export type RecordSchema = WithZuiBase<{ type: 'object'; additionalProperties: ZuiJsonSchema }>
 export type LiteralStringSchema = WithZuiBase<{ type: 'string'; const: string }>
@@ -88,38 +91,37 @@ export type ZuiJsonSchema =
   | EnumSchema
   | RefSchema
 
-const mock = <T>() => ({}) as T
-const assertJSONSchema = (value: JSONSchema7) => value
-assertJSONSchema(mock<StringSchema>())
-assertJSONSchema(mock<NumberSchema>())
-assertJSONSchema(mock<BigIntSchema>())
-assertJSONSchema(mock<BooleanSchema>())
-assertJSONSchema(mock<DateSchema>())
-assertJSONSchema(mock<UndefinedSchema>())
-assertJSONSchema(mock<NullSchema>())
-assertJSONSchema(mock<AnySchema>())
-assertJSONSchema(mock<UnknownSchema>())
-assertJSONSchema(mock<NeverSchema>())
-assertJSONSchema(mock<ArraySchema>())
-assertJSONSchema(mock<ObjectSchema>())
-assertJSONSchema(mock<UnionSchema>())
-assertJSONSchema(mock<DiscriminatedUnionSchema>())
-assertJSONSchema(mock<IntersectionSchema>())
-assertJSONSchema(mock<TupleSchema>())
-assertJSONSchema(mock<RecordSchema>())
-assertJSONSchema(mock<MapSchema>())
-assertJSONSchema(mock<SetSchema>())
-assertJSONSchema(mock<LiteralStringSchema>())
-assertJSONSchema(mock<LiteralNumberSchema>())
-assertJSONSchema(mock<LiteralBooleanSchema>())
-assertJSONSchema(mock<LiteralBigIntSchema>())
-assertJSONSchema(mock<LiteralNullSchema>())
-assertJSONSchema(mock<LiteralSchema>())
-assertJSONSchema(mock<EnumSchema>())
-assertJSONSchema(mock<RefSchema>())
-assertJSONSchema(mock<ZuiJsonSchema>())
+// tests
 
+util.assertIs<JSONSchema7>(util.mock<StringSchema>())
+util.assertIs<JSONSchema7>(util.mock<NumberSchema>())
+util.assertIs<JSONSchema7>(util.mock<BigIntSchema>())
+util.assertIs<JSONSchema7>(util.mock<BooleanSchema>())
+util.assertIs<JSONSchema7>(util.mock<DateSchema>())
+util.assertIs<JSONSchema7>(util.mock<UndefinedSchema>())
+util.assertIs<JSONSchema7>(util.mock<NullSchema>())
+util.assertIs<JSONSchema7>(util.mock<AnySchema>())
+util.assertIs<JSONSchema7>(util.mock<UnknownSchema>())
+util.assertIs<JSONSchema7>(util.mock<NeverSchema>())
+util.assertIs<JSONSchema7>(util.mock<ArraySchema>())
+util.assertIs<JSONSchema7>(util.mock<ObjectSchema>())
+util.assertIs<JSONSchema7>(util.mock<UnionSchema>())
+util.assertIs<JSONSchema7>(util.mock<DiscriminatedUnionSchema>())
+util.assertIs<JSONSchema7>(util.mock<IntersectionSchema>())
+util.assertIs<JSONSchema7>(util.mock<TupleSchema>())
+util.assertIs<JSONSchema7>(util.mock<RecordSchema>())
+util.assertIs<JSONSchema7>(util.mock<MapSchema>())
+util.assertIs<JSONSchema7>(util.mock<SetSchema>())
+util.assertIs<JSONSchema7>(util.mock<LiteralStringSchema>())
+util.assertIs<JSONSchema7>(util.mock<LiteralNumberSchema>())
+util.assertIs<JSONSchema7>(util.mock<LiteralBooleanSchema>())
+util.assertIs<JSONSchema7>(util.mock<LiteralBigIntSchema>())
+util.assertIs<JSONSchema7>(util.mock<LiteralNullSchema>())
+util.assertIs<JSONSchema7>(util.mock<LiteralSchema>())
+util.assertIs<JSONSchema7>(util.mock<EnumSchema>())
+util.assertIs<JSONSchema7>(util.mock<RefSchema>())
+util.assertIs<JSONSchema7>(util.mock<ZuiJsonSchema>())
 // @ts-expect-error
-assertJSONSchema(mock<WithZuiBase<{ type: 'invalid' }>>())
+util.assertIs<JSONSchema7>(util.mock<WithZuiBase<{ type: 'invalid' }>>())
 // @ts-expect-error
-assertJSONSchema(mock<WithZuiBase<{ $ref: number }>>())
+util.assertIs<JSONSchema7>(util.mock<WithZuiBase<{ $ref: number }>>())

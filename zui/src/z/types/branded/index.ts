@@ -2,7 +2,7 @@ import { ZodFirstPartyTypeKind, ZodType, ZodTypeAny, ZodTypeDef, ParseInput, Par
 
 type Key = string | number | symbol
 
-export interface ZodBrandedDef<T extends ZodTypeAny> extends ZodTypeDef {
+export interface ZodBrandedDef<T extends ZodTypeAny = ZodTypeAny> extends ZodTypeDef {
   type: T
   typeName: ZodFirstPartyTypeKind.ZodBranded
 }

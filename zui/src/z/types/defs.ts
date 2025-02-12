@@ -32,6 +32,8 @@ import type {
   ZodUnionDef,
   ZodUnknownDef,
   ZodVoidDef,
+  ZodRefDef,
+  ZodSetDef,
 } from './index'
 
 export type ZodDef =
@@ -68,6 +70,8 @@ export type ZodDef =
   | ZodOptionalDef
   | ZodNullableDef
   | ZodPromiseDef
+  | ZodRefDef
+  | ZodSetDef
 
 export enum ZodFirstPartyTypeKind {
   ZodString = 'ZodString',

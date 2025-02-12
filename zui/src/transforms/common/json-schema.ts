@@ -1,10 +1,30 @@
 import { JSONSchema7 } from 'json-schema'
 import { util } from '../../z/types/utils'
+import z from '../../z'
 
-type JsonData = string | number | boolean | null | JsonData[] | { [key: string]: JsonData }
-type Normalize<T extends object> = { [K in keyof T]: T[K] }
+/**
+ * Definitions:
+ *
+ * Mutiple zui schemas map to the same JSON schema; undefined/never, any/unknown, union/discriminated-union
+ * Adding some ZodDef to the ZuiExtension allows us to differentiate between them
+ */
 
-type ZuiExtension = {
+type UnionDef = util.Satisfies<{ typeName: z.ZodFirstPartyTypeKind.ZodUnion }, Partial<z.ZodUnionDef>>
+type DiscriminatedUnionDef = util.Satisfies<
+  { typeName: z.ZodFirstPartyTypeKind.ZodDiscriminatedUnion },
+  Partial<z.ZodDiscriminatedUnionDef>
+>
+type UndefinedDef = util.Satisfies<{ typeName: z.ZodFirstPartyTypeKind.ZodUndefined }, Partial<z.ZodUndefinedDef>>
+type NeverDef = util.Satisfies<{ typeName: z.ZodFirstPartyTypeKind.ZodNever }, Partial<z.ZodNeverDef>>
+type AnyDef = util.Satisfies<{ typeName: z.ZodFirstPartyTypeKind.ZodAny }, Partial<z.ZodAnyDef>>
+type UnknownDef = util.Satisfies<{ typeName: z.ZodFirstPartyTypeKind.ZodUnknown }, Partial<z.ZodUnknownDef>>
+
+/**
+ * ZuiExtension
+ */
+
+type ZuiExtension<Def extends Partial<z.ZodDef> = {}> = {
+  def?: Def
   title?: string
   disabled?: boolean
   hidden?: boolean
@@ -14,49 +34,44 @@ type ZuiExtension = {
   [k: string]: unknown
 }
 
-type WithZuiBase<S extends JSONSchema7> = Normalize<
-  S & {
-    readOnly?: boolean
-    default?: JsonData
-    ['x-zui']?: ZuiExtension
-  }
->
+type JsonData = string | number | boolean | null | JsonData[] | { [key: string]: JsonData }
+type ZuiSchema<S extends JSONSchema7, Def extends Partial<z.ZodDef> = {}> = S & {
+  readOnly?: boolean
+  default?: JsonData
+  ['x-zui']?: util.Normalize<ZuiExtension<Def>>
+}
 
-/**
- * Currently mutiple zui schemas map to the same JSON schema; undefined/never, any/unknown, union/discriminated-union
- * TODO: add ZuiDef information in x-zui to enforce the correct zui type when mapping back to zui
- */
-
-export type StringSchema = WithZuiBase<{ type: 'string' }>
-export type NumberSchema = WithZuiBase<{ type: 'number' }>
-export type BigIntSchema = WithZuiBase<{ type: 'integer' }>
-export type BooleanSchema = WithZuiBase<{ type: 'boolean' }>
-export type DateSchema = WithZuiBase<{ type: 'string'; format: 'date-time' }>
-export type NullSchema = WithZuiBase<{ type: 'null' }>
-export type UndefinedSchema = WithZuiBase<{ not: true }>
-export type NeverSchema = WithZuiBase<{ not: true }>
-export type AnySchema = WithZuiBase<{}>
-export type UnknownSchema = WithZuiBase<{}>
-export type ArraySchema = WithZuiBase<{ type: 'array'; items: ZuiJsonSchema }>
-export type UnionSchema = WithZuiBase<{ anyOf: ZuiJsonSchema[] }>
-export type DiscriminatedUnionSchema = WithZuiBase<{ anyOf: ZuiJsonSchema[] }>
-export type IntersectionSchema = WithZuiBase<{ allOf: [ZuiJsonSchema, ZuiJsonSchema] }>
-export type MapSchema = WithZuiBase<{ type: 'object'; additionalProperties: ZuiJsonSchema }>
-export type SetSchema = WithZuiBase<{ type: 'array'; items: ZuiJsonSchema; uniqueItems: true }>
-export type EnumSchema = WithZuiBase<{ type: 'string'; enum: string[] }>
-export type RefSchema = WithZuiBase<{ $ref: string }>
-export type ObjectSchema = WithZuiBase<{
+export type StringSchema = ZuiSchema<{ type: 'string' }>
+export type NumberSchema = ZuiSchema<{ type: 'number' }>
+export type BigIntSchema = ZuiSchema<{ type: 'integer' }>
+export type BooleanSchema = ZuiSchema<{ type: 'boolean' }>
+export type DateSchema = ZuiSchema<{ type: 'string'; format: 'date-time' }>
+export type NullSchema = ZuiSchema<{ type: 'null' }>
+export type UndefinedSchema = ZuiSchema<{ not: true }, UndefinedDef>
+export type NeverSchema = ZuiSchema<{ not: true }, NeverDef>
+export type AnySchema = ZuiSchema<{}, AnyDef>
+export type UnknownSchema = ZuiSchema<{}, UnknownDef>
+export type ArraySchema = ZuiSchema<{ type: 'array'; items: ZuiJsonSchema }>
+export type UnionSchema = ZuiSchema<{ anyOf: ZuiJsonSchema[] }, UnionDef>
+export type DiscriminatedUnionSchema = ZuiSchema<{ anyOf: ZuiJsonSchema[] }, DiscriminatedUnionDef>
+export type IntersectionSchema = ZuiSchema<{ allOf: [ZuiJsonSchema, ZuiJsonSchema] }>
+export type MapSchema = ZuiSchema<{ type: 'object'; additionalProperties: ZuiJsonSchema }>
+export type SetSchema = ZuiSchema<{ type: 'array'; items: ZuiJsonSchema; uniqueItems: true }>
+export type EnumSchema = ZuiSchema<{ type: 'string'; enum: string[] }>
+export type RefSchema = ZuiSchema<{ $ref: string }>
+export type ObjectSchema = ZuiSchema<{
   type: 'object'
-  properties: Record<string, ZuiJsonSchema>
+  properties: { [key: string]: ZuiJsonSchema }
   required: string[]
 }>
-export type TupleSchema = WithZuiBase<{ type: 'array'; items: ZuiJsonSchema[]; additionalItems: ZuiJsonSchema }>
-export type RecordSchema = WithZuiBase<{ type: 'object'; additionalProperties: ZuiJsonSchema }>
-export type LiteralStringSchema = WithZuiBase<{ type: 'string'; const: string }>
-export type LiteralNumberSchema = WithZuiBase<{ type: 'number'; const: number }>
-export type LiteralBooleanSchema = WithZuiBase<{ type: 'boolean'; const: boolean }>
-export type LiteralBigIntSchema = WithZuiBase<{ type: 'integer'; const: number }>
-export type LiteralNullSchema = WithZuiBase<{ type: 'null'; const: null }>
+export type TupleSchema = ZuiSchema<{ type: 'array'; items: ZuiJsonSchema[]; additionalItems: ZuiJsonSchema }>
+export type RecordSchema = ZuiSchema<{ type: 'object'; additionalProperties: ZuiJsonSchema }>
+export type LiteralStringSchema = ZuiSchema<{ type: 'string'; const: string }>
+export type LiteralNumberSchema = ZuiSchema<{ type: 'number'; const: number }>
+export type LiteralBooleanSchema = ZuiSchema<{ type: 'boolean'; const: boolean }>
+export type LiteralBigIntSchema = ZuiSchema<{ type: 'integer'; const: number }>
+export type LiteralNullSchema = ZuiSchema<{ type: 'null'; const: null }>
+
 export type LiteralSchema =
   | LiteralStringSchema
   | LiteralNumberSchema
@@ -122,6 +137,6 @@ util.assertIs<JSONSchema7>(util.mock<EnumSchema>())
 util.assertIs<JSONSchema7>(util.mock<RefSchema>())
 util.assertIs<JSONSchema7>(util.mock<ZuiJsonSchema>())
 // @ts-expect-error
-util.assertIs<JSONSchema7>(util.mock<WithZuiBase<{ type: 'invalid' }>>())
+util.assertIs<JSONSchema7>(util.mock<ZuiSchema<{ type: 'invalid' }>>())
 // @ts-expect-error
-util.assertIs<JSONSchema7>(util.mock<WithZuiBase<{ $ref: number }>>())
+util.assertIs<JSONSchema7>(util.mock<ZuiSchema<{ $ref: number }>>())

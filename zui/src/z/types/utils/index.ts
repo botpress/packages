@@ -95,6 +95,23 @@ export namespace util {
   }
 
   export const mock = <T>(): T => ({}) as T
+
+  export type Satisfies<X extends Y, Y> = X
+
+  type NormalizeObject<T extends object> = T extends infer O ? { [K in keyof O]: Normalize<O[K]> } : never
+  export type Normalize<T> = T extends (...args: infer A) => infer R
+    ? (...args: Normalize<A>) => Normalize<R>
+    : T extends Array<infer E>
+      ? Array<Normalize<E>>
+      : T extends ReadonlyArray<infer E>
+        ? ReadonlyArray<Normalize<E>>
+        : T extends Promise<infer R>
+          ? Promise<Normalize<R>>
+          : T extends Buffer
+            ? Buffer
+            : T extends object
+              ? NormalizeObject<T>
+              : T
 }
 
 export namespace objectUtil {

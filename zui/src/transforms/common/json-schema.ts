@@ -11,19 +11,13 @@ import { ZuiExtensionObject } from '../../ui/types'
  */
 type BigIntDef = util.Satisfies<{ typeName: z.ZodFirstPartyTypeKind.ZodBigInt }, Partial<z.ZodBigIntDef>>
 type DateDef = util.Satisfies<{ typeName: z.ZodFirstPartyTypeKind.ZodDate }, Partial<z.ZodDateDef>>
-
-type UnionDef = util.Satisfies<{ typeName: z.ZodFirstPartyTypeKind.ZodUnion }, Partial<z.ZodUnionDef>>
 type DiscriminatedUnionDef = util.Satisfies<
   { typeName: z.ZodFirstPartyTypeKind.ZodDiscriminatedUnion; discriminator: string },
   Partial<z.ZodDiscriminatedUnionDef>
 >
 type NullableDef = util.Satisfies<{ typeName: z.ZodFirstPartyTypeKind.ZodNullable }, Partial<z.ZodNullableDef>>
 type OptionalDef = util.Satisfies<{ typeName: z.ZodFirstPartyTypeKind.ZodOptional }, Partial<z.ZodOptionalDef>>
-
 type UndefinedDef = util.Satisfies<{ typeName: z.ZodFirstPartyTypeKind.ZodUndefined }, Partial<z.ZodUndefinedDef>>
-type NeverDef = util.Satisfies<{ typeName: z.ZodFirstPartyTypeKind.ZodNever }, Partial<z.ZodNeverDef>>
-
-type AnyDef = util.Satisfies<{ typeName: z.ZodFirstPartyTypeKind.ZodAny }, Partial<z.ZodAnyDef>>
 type UnknownDef = util.Satisfies<{ typeName: z.ZodFirstPartyTypeKind.ZodUnknown }, Partial<z.ZodUnknownDef>>
 
 /**
@@ -85,11 +79,11 @@ export type BooleanSchema = _BooleanSchema & BaseZuiJsonSchema
 export type DateSchema = _DateSchema & BaseZuiJsonSchema<DateDef>
 export type NullSchema = _NullSchema & BaseZuiJsonSchema
 export type UndefinedSchema = _UndefinedSchema & BaseZuiJsonSchema<UndefinedDef>
-export type NeverSchema = _NeverSchema & BaseZuiJsonSchema<NeverDef>
-export type AnySchema = BaseZuiJsonSchema<AnyDef>
+export type NeverSchema = _NeverSchema & BaseZuiJsonSchema
+export type AnySchema = BaseZuiJsonSchema
 export type UnknownSchema = BaseZuiJsonSchema<UnknownDef>
 export type ArraySchema = _ArraySchema & BaseZuiJsonSchema
-export type UnionSchema = _UnionSchema & BaseZuiJsonSchema<UnionDef>
+export type UnionSchema = _UnionSchema & BaseZuiJsonSchema
 export type DiscriminatedUnionSchema = _DiscriminatedUnionSchema & BaseZuiJsonSchema<DiscriminatedUnionDef>
 export type IntersectionSchema = _IntersectionSchema & BaseZuiJsonSchema
 export type SetSchema = _SetSchema & BaseZuiJsonSchema

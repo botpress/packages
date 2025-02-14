@@ -20,10 +20,16 @@ export function toJsonSchema(schema: z.Schema): json.ZuiJsonSchema {
       return { type: 'number', 'x-zui': def['x-zui'] } satisfies json.NumberSchema
 
     case z.ZodFirstPartyTypeKind.ZodNaN:
-      return { type: 'number', 'x-zui': def['x-zui'] } satisfies json.NumberSchema
+      throw new err.UnsupportedZuiToJsonSchemaError(z.ZodFirstPartyTypeKind.ZodNaN)
 
     case z.ZodFirstPartyTypeKind.ZodBigInt:
-      return { type: 'integer', 'x-zui': def['x-zui'] } satisfies json.BigIntSchema
+      return {
+        type: 'integer',
+        'x-zui': {
+          ...def['x-zui'],
+          def: { typeName: z.ZodFirstPartyTypeKind.ZodBigInt },
+        },
+      } satisfies json.BigIntSchema
 
     case z.ZodFirstPartyTypeKind.ZodBoolean:
       return { type: 'boolean', 'x-zui': def['x-zui'] } satisfies json.BooleanSchema
@@ -38,9 +44,7 @@ export function toJsonSchema(schema: z.Schema): json.ZuiJsonSchema {
       return nullSchema(def['x-zui'])
 
     case z.ZodFirstPartyTypeKind.ZodAny:
-      return {
-        'x-zui': { ...def['x-zui'], def: { typeName: z.ZodFirstPartyTypeKind.ZodAny } },
-      } satisfies json.AnySchema
+      return { 'x-zui': def['x-zui'] } satisfies json.AnySchema
 
     case z.ZodFirstPartyTypeKind.ZodUnknown:
       return {
@@ -50,7 +54,7 @@ export function toJsonSchema(schema: z.Schema): json.ZuiJsonSchema {
     case z.ZodFirstPartyTypeKind.ZodNever:
       return {
         not: true,
-        'x-zui': { ...def['x-zui'], def: { typeName: z.ZodFirstPartyTypeKind.ZodNever } },
+        'x-zui': def['x-zui'],
       } satisfies json.NeverSchema
 
     case z.ZodFirstPartyTypeKind.ZodVoid:
@@ -80,7 +84,7 @@ export function toJsonSchema(schema: z.Schema): json.ZuiJsonSchema {
     case z.ZodFirstPartyTypeKind.ZodUnion:
       return {
         anyOf: def.options.map((option) => toJsonSchema(option)),
-        'x-zui': { ...def['x-zui'], def: { typeName: z.ZodFirstPartyTypeKind.ZodUnion } },
+        'x-zui': def['x-zui'],
       } satisfies json.UnionSchema
 
     case z.ZodFirstPartyTypeKind.ZodDiscriminatedUnion:

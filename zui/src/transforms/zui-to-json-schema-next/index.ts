@@ -6,24 +6,9 @@ import * as err from '../common/errors'
 /**
  *
  * @param schema zui schema
- * @param options generation options
- * @returns ZUI flavored of JSON schema
+ * @returns ZUI flavored JSON schema
  */
 export function toJsonSchema(schema: z.Schema): json.ZuiJsonSchema {
-  return _toJsonSchema(schema)
-}
-
-const undefinedSchema = (xZui?: ZuiExtensionObject): json.UndefinedSchema => ({
-  not: true,
-  'x-zui': { ...xZui, def: { typeName: z.ZodFirstPartyTypeKind.ZodUndefined } },
-})
-
-const nullSchema = (xZui?: ZuiExtensionObject): json.NullSchema => ({
-  type: 'null',
-  'x-zui': xZui,
-})
-
-function _toJsonSchema(schema: z.Schema): json.ZuiJsonSchema {
   const schemaTyped = schema as z.ZodFirstPartySchemaTypes
   const def = schemaTyped._def
 
@@ -74,7 +59,7 @@ function _toJsonSchema(schema: z.Schema): json.ZuiJsonSchema {
     case z.ZodFirstPartyTypeKind.ZodArray:
       return {
         type: 'array',
-        items: _toJsonSchema(def.type),
+        items: toJsonSchema(def.type),
         'x-zui': def['x-zui'],
       } satisfies json.ArraySchema
 
@@ -83,7 +68,7 @@ function _toJsonSchema(schema: z.Schema): json.ZuiJsonSchema {
       const required = shape.filter(([_, value]) => !value.isOptional()).map(([key]) => key)
       const properties = shape
         .map(([key, value]) => [key, _toRequired(value)] satisfies [string, z.ZodType])
-        .map(([key, value]) => [key, _toJsonSchema(value)] satisfies [string, json.ZuiJsonSchema])
+        .map(([key, value]) => [key, toJsonSchema(value)] satisfies [string, json.ZuiJsonSchema])
 
       return {
         type: 'object',
@@ -94,13 +79,13 @@ function _toJsonSchema(schema: z.Schema): json.ZuiJsonSchema {
 
     case z.ZodFirstPartyTypeKind.ZodUnion:
       return {
-        anyOf: def.options.map((option) => _toJsonSchema(option)),
+        anyOf: def.options.map((option) => toJsonSchema(option)),
         'x-zui': { ...def['x-zui'], def: { typeName: z.ZodFirstPartyTypeKind.ZodUnion } },
       } satisfies json.UnionSchema
 
     case z.ZodFirstPartyTypeKind.ZodDiscriminatedUnion:
       return {
-        anyOf: def.options.map((option) => _toJsonSchema(option)),
+        anyOf: def.options.map((option) => toJsonSchema(option)),
         'x-zui': {
           ...def['x-zui'],
           def: { typeName: z.ZodFirstPartyTypeKind.ZodDiscriminatedUnion, discriminator: def.discriminator },
@@ -109,22 +94,22 @@ function _toJsonSchema(schema: z.Schema): json.ZuiJsonSchema {
 
     case z.ZodFirstPartyTypeKind.ZodIntersection:
       return {
-        allOf: [_toJsonSchema(def.left), _toJsonSchema(def.right)],
+        allOf: [toJsonSchema(def.left), toJsonSchema(def.right)],
         'x-zui': def['x-zui'],
       } satisfies json.IntersectionSchema
 
     case z.ZodFirstPartyTypeKind.ZodTuple:
       return {
         type: 'array',
-        items: def.items.map((item) => _toJsonSchema(item)),
-        additionalItems: def.rest ? _toJsonSchema(def.rest) : undefined,
+        items: def.items.map((item) => toJsonSchema(item)),
+        additionalItems: def.rest ? toJsonSchema(def.rest) : undefined,
         'x-zui': def['x-zui'],
       } satisfies json.TupleSchema
 
     case z.ZodFirstPartyTypeKind.ZodRecord:
       return {
         type: 'object',
-        additionalProperties: _toJsonSchema(def.valueType),
+        additionalProperties: toJsonSchema(def.valueType),
         'x-zui': def['x-zui'],
       } satisfies json.RecordSchema
 
@@ -134,7 +119,7 @@ function _toJsonSchema(schema: z.Schema): json.ZuiJsonSchema {
     case z.ZodFirstPartyTypeKind.ZodSet:
       return {
         type: 'array',
-        items: _toJsonSchema(def.valueType),
+        items: toJsonSchema(def.valueType),
         uniqueItems: true,
         'x-zui': def['x-zui'],
       } satisfies json.SetSchema
@@ -146,7 +131,38 @@ function _toJsonSchema(schema: z.Schema): json.ZuiJsonSchema {
       throw new err.UnsupportedZuiToJsonSchemaError(z.ZodFirstPartyTypeKind.ZodLazy)
 
     case z.ZodFirstPartyTypeKind.ZodLiteral:
-      throw new err.UnsupportedZuiToJsonSchemaError(z.ZodFirstPartyTypeKind.ZodLiteral)
+      if (typeof def.value === 'string') {
+        return {
+          type: 'string',
+          const: def.value,
+          'x-zui': def['x-zui'],
+        } satisfies json.LiteralStringSchema
+      } else if (typeof def.value === 'number') {
+        return {
+          type: 'number',
+          const: def.value,
+          'x-zui': def['x-zui'],
+        } satisfies json.LiteralNumberSchema
+      } else if (typeof def.value === 'boolean') {
+        return {
+          type: 'boolean',
+          const: def.value,
+          'x-zui': def['x-zui'],
+        } satisfies json.LiteralBooleanSchema
+      } else if (typeof def.value === 'bigint') {
+        return {
+          type: 'integer',
+          const: Number(def.value),
+          'x-zui': def['x-zui'],
+        } satisfies json.LiteralBigIntSchema
+      } else if (def.value === null) {
+        return nullSchema(def['x-zui'])
+      } else if (def.value === undefined) {
+        return undefinedSchema(def['x-zui'])
+      } else {
+        z.util.assertEqual<symbol, typeof def.value>(true)
+        throw new err.UnsupportedZuiToJsonSchemaError(z.ZodFirstPartyTypeKind.ZodSymbol)
+      }
 
     case z.ZodFirstPartyTypeKind.ZodEnum:
       return {
@@ -163,13 +179,13 @@ function _toJsonSchema(schema: z.Schema): json.ZuiJsonSchema {
 
     case z.ZodFirstPartyTypeKind.ZodOptional:
       return {
-        anyOf: [_toJsonSchema(def.innerType), undefinedSchema()],
+        anyOf: [toJsonSchema(def.innerType), undefinedSchema()],
         'x-zui': def['x-zui'],
       } satisfies json.OptionalSchema
 
     case z.ZodFirstPartyTypeKind.ZodNullable:
       return {
-        anyOf: [_toJsonSchema(def.innerType), nullSchema()],
+        anyOf: [toJsonSchema(def.innerType), nullSchema()],
         'x-zui': def['x-zui'],
       } satisfies json.NullableSchema
 
@@ -177,7 +193,7 @@ function _toJsonSchema(schema: z.Schema): json.ZuiJsonSchema {
       // ZodDefault is not treated as a metadata root so we don't need to preserve x-zui
       return {
         default: def.defaultValue(),
-        ..._toJsonSchema(def.innerType),
+        ...toJsonSchema(def.innerType),
       }
 
     case z.ZodFirstPartyTypeKind.ZodCatch:
@@ -200,7 +216,7 @@ function _toJsonSchema(schema: z.Schema): json.ZuiJsonSchema {
       // ZodReadonly is not treated as a metadata root so we don't need to preserve x-zui
       return {
         readOnly: true,
-        ..._toJsonSchema(def.innerType),
+        ...toJsonSchema(def.innerType),
       }
 
     case z.ZodFirstPartyTypeKind.ZodRef:
@@ -242,3 +258,13 @@ const _toRequired = (schema: z.ZodType): z.ZodType => {
 
   return newSchema
 }
+
+const undefinedSchema = (xZui?: ZuiExtensionObject): json.UndefinedSchema => ({
+  not: true,
+  'x-zui': { ...xZui, def: { typeName: z.ZodFirstPartyTypeKind.ZodUndefined } },
+})
+
+const nullSchema = (xZui?: ZuiExtensionObject): json.NullSchema => ({
+  type: 'null',
+  'x-zui': xZui,
+})

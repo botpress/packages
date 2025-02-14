@@ -10,6 +10,7 @@ import { ZuiExtensionObject } from '../../ui/types'
  * Adding some ZodDef to the ZuiExtension allows us to differentiate between them
  */
 type BigIntDef = util.Satisfies<{ typeName: z.ZodFirstPartyTypeKind.ZodBigInt }, Partial<z.ZodBigIntDef>>
+type DateDef = util.Satisfies<{ typeName: z.ZodFirstPartyTypeKind.ZodDate }, Partial<z.ZodDateDef>>
 
 type UnionDef = util.Satisfies<{ typeName: z.ZodFirstPartyTypeKind.ZodUnion }, Partial<z.ZodUnionDef>>
 type DiscriminatedUnionDef = util.Satisfies<
@@ -50,12 +51,10 @@ type _DateSchema = util.Satisfies<{ type: 'string'; format: 'date-time' }, JSONS
 type _NullSchema = util.Satisfies<{ type: 'null' }, JSONSchema7>
 type _UndefinedSchema = util.Satisfies<{ not: true }, JSONSchema7>
 type _NeverSchema = util.Satisfies<{ not: true }, JSONSchema7>
-type _AnySchema = util.Satisfies<{}, JSONSchema7>
-type _UnknownSchema = util.Satisfies<{}, JSONSchema7>
-type _ArraySchema = util.Satisfies<{ type: 'array'; items: ZuiJsonSchema }, JSONSchema7> // TODO: support all array checks
+type _ArraySchema = util.Satisfies<{ type: 'array'; items?: ZuiJsonSchema }, JSONSchema7> // TODO: support all array checks
 type _UnionSchema = util.Satisfies<{ anyOf: ZuiJsonSchema[] }, JSONSchema7>
 type _DiscriminatedUnionSchema = util.Satisfies<{ anyOf: ZuiJsonSchema[] }, JSONSchema7>
-type _IntersectionSchema = util.Satisfies<{ allOf: [ZuiJsonSchema, ZuiJsonSchema] }, JSONSchema7>
+type _IntersectionSchema = util.Satisfies<{ allOf: ZuiJsonSchema[] }, JSONSchema7>
 type _SetSchema = util.Satisfies<{ type: 'array'; items: ZuiJsonSchema; uniqueItems: true }, JSONSchema7> // TODO: support all set checks
 type _EnumSchema = util.Satisfies<{ type: 'string'; enum: string[] }, JSONSchema7>
 type _RefSchema = util.Satisfies<{ $ref: string }, JSONSchema7>
@@ -76,7 +75,6 @@ type _LiteralStringSchema = util.Satisfies<{ type: 'string'; const: string }, JS
 type _LiteralNumberSchema = util.Satisfies<{ type: 'number'; const: number }, JSONSchema7>
 type _LiteralBooleanSchema = util.Satisfies<{ type: 'boolean'; const: boolean }, JSONSchema7>
 type _LiteralBigIntSchema = util.Satisfies<{ type: 'integer'; const: number }, JSONSchema7>
-type _LiteralNullSchema = util.Satisfies<{ type: 'null'; const: null }, JSONSchema7>
 type _OptionalSchema = util.Satisfies<{ anyOf: [ZuiJsonSchema, UndefinedSchema] }, JSONSchema7>
 type _NullableSchema = util.Satisfies<{ anyOf: [ZuiJsonSchema, NullSchema] }, JSONSchema7>
 
@@ -84,12 +82,12 @@ export type StringSchema = _StringSchema & BaseZuiJsonSchema
 export type NumberSchema = _NumberSchema & BaseZuiJsonSchema
 export type BigIntSchema = _BigIntSchema & BaseZuiJsonSchema<BigIntDef>
 export type BooleanSchema = _BooleanSchema & BaseZuiJsonSchema
-export type DateSchema = _DateSchema & BaseZuiJsonSchema
+export type DateSchema = _DateSchema & BaseZuiJsonSchema<DateDef>
 export type NullSchema = _NullSchema & BaseZuiJsonSchema
 export type UndefinedSchema = _UndefinedSchema & BaseZuiJsonSchema<UndefinedDef>
 export type NeverSchema = _NeverSchema & BaseZuiJsonSchema<NeverDef>
-export type AnySchema = _AnySchema & BaseZuiJsonSchema<AnyDef>
-export type UnknownSchema = _UnknownSchema & BaseZuiJsonSchema<UnknownDef>
+export type AnySchema = BaseZuiJsonSchema<AnyDef>
+export type UnknownSchema = BaseZuiJsonSchema<UnknownDef>
 export type ArraySchema = _ArraySchema & BaseZuiJsonSchema
 export type UnionSchema = _UnionSchema & BaseZuiJsonSchema<UnionDef>
 export type DiscriminatedUnionSchema = _DiscriminatedUnionSchema & BaseZuiJsonSchema<DiscriminatedUnionDef>
@@ -104,16 +102,10 @@ export type LiteralStringSchema = _LiteralStringSchema & BaseZuiJsonSchema
 export type LiteralNumberSchema = _LiteralNumberSchema & BaseZuiJsonSchema
 export type LiteralBooleanSchema = _LiteralBooleanSchema & BaseZuiJsonSchema
 export type LiteralBigIntSchema = _LiteralBigIntSchema & BaseZuiJsonSchema
-export type LiteralNullSchema = _LiteralNullSchema & BaseZuiJsonSchema
 export type OptionalSchema = _OptionalSchema & BaseZuiJsonSchema<OptionalDef>
 export type NullableSchema = _NullableSchema & BaseZuiJsonSchema<NullableDef>
 
-export type LiteralSchema =
-  | LiteralStringSchema
-  | LiteralNumberSchema
-  | LiteralBooleanSchema
-  | LiteralBigIntSchema
-  | LiteralNullSchema
+export type LiteralSchema = LiteralStringSchema | LiteralNumberSchema | LiteralBooleanSchema | LiteralBigIntSchema
 
 export type ZuiJsonSchema =
   | StringSchema

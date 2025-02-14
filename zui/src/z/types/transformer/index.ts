@@ -232,7 +232,7 @@ export class ZodEffects<T extends ZodTypeAny = ZodTypeAny, Output = output<T>, I
       return util.compareFunctions(this._def.effect.transform, schema._def.effect.transform)
     }
 
-    util.assertNever(this._def.effect)
+    type _assertion = util.AssertNever<typeof this._def.effect>
     return false
   }
 

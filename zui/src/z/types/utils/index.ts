@@ -3,14 +3,16 @@ import type { ZodErrorMap } from '../error'
 import type { ProcessedCreateParams, RawCreateParams } from '../index'
 
 export namespace util {
-  type AssertEqual<T, U> = (<V>() => V extends T ? 1 : 2) extends <V>() => V extends U ? 1 : 2 ? true : false
+  type IsEqual<T, U> = (<V>() => V extends T ? 1 : 2) extends <V>() => V extends U ? 1 : 2 ? true : false
 
   export type isAny<T> = 0 extends 1 & T ? true : false
-  export const assertEqual = <A, B>(val: AssertEqual<A, B>) => val
+  export const assertEqual = <A, B>(val: IsEqual<A, B>) => val
   export function assertIs<T>(_arg: T): void {}
   export function assertNever(_x: never): never {
     throw new Error('assertNever called')
   }
+
+  export type AssertNever<_T extends never> = true
 
   export type Omit<T, K extends keyof T> = Pick<T, Exclude<keyof T, K>>
   export type OmitKeys<T, K extends string> = Pick<T, Exclude<keyof T, K>>

@@ -169,9 +169,10 @@ function _toJsonSchema(schema: z.Schema): json.ZuiJsonSchema {
       } satisfies json.NullableSchema
 
     case z.ZodFirstPartyTypeKind.ZodDefault:
+      // ZodDefault is not treated as a metadata root so we don't need to preserve x-zui
       return {
         default: def.defaultValue(),
-        ..._toJsonSchema(def.innerType), // TODO: what if x-zui is set both in innerType and outerType?
+        ..._toJsonSchema(def.innerType),
       }
 
     case z.ZodFirstPartyTypeKind.ZodCatch:
@@ -190,9 +191,10 @@ function _toJsonSchema(schema: z.Schema): json.ZuiJsonSchema {
       throw new Error('ZodPipeline is not supported')
 
     case z.ZodFirstPartyTypeKind.ZodReadonly:
+      // ZodReadonly is not treated as a metadata root so we don't need to preserve x-zui
       return {
         readOnly: true,
-        ..._toJsonSchema(def.innerType), // TODO: what if x-zui is set both in innerType and outerType?
+        ..._toJsonSchema(def.innerType),
       }
 
     case z.ZodFirstPartyTypeKind.ZodRef:

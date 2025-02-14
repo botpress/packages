@@ -37,4 +37,8 @@ export class ZodBranded<T extends ZodTypeAny = ZodTypeAny, B extends Key = Key> 
     if (!(schema instanceof ZodBranded)) return false
     return this._def.type.isEqual(schema._def.type)
   }
+
+  get _metadataRoot() {
+    return this._def.type._metadataRoot
+  }
 }

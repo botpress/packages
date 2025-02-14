@@ -235,5 +235,9 @@ export class ZodEffects<T extends ZodTypeAny = ZodTypeAny, Output = output<T>, I
     util.assertNever(this._def.effect)
     return false
   }
+
+  get _metadataRoot() {
+    return this._def.schema._metadataRoot
+  }
 }
 export { ZodEffects as ZodTransformer }

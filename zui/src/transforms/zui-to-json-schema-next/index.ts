@@ -1,6 +1,7 @@
 import { ZuiExtensionObject } from '../../ui/types'
 import z from '../../z'
 import * as json from '../common/json-schema'
+import * as err from '../common/errors'
 
 /**
  *
@@ -68,7 +69,7 @@ function _toJsonSchema(schema: z.Schema): json.ZuiJsonSchema {
       } satisfies json.NeverSchema
 
     case z.ZodFirstPartyTypeKind.ZodVoid:
-      throw new Error('ZodVoid is not supported')
+      throw new err.UnsupportedZuiToJsonSchemaError(z.ZodFirstPartyTypeKind.ZodVoid)
 
     case z.ZodFirstPartyTypeKind.ZodArray:
       return {
@@ -128,7 +129,7 @@ function _toJsonSchema(schema: z.Schema): json.ZuiJsonSchema {
       } satisfies json.RecordSchema
 
     case z.ZodFirstPartyTypeKind.ZodMap:
-      throw new Error('ZodMap is not supported')
+      throw new err.UnsupportedZuiToJsonSchemaError(z.ZodFirstPartyTypeKind.ZodMap)
 
     case z.ZodFirstPartyTypeKind.ZodSet:
       return {
@@ -139,13 +140,13 @@ function _toJsonSchema(schema: z.Schema): json.ZuiJsonSchema {
       } satisfies json.SetSchema
 
     case z.ZodFirstPartyTypeKind.ZodFunction:
-      throw new Error('ZodFunction is not supported')
+      throw new err.UnsupportedZuiToJsonSchemaError(z.ZodFirstPartyTypeKind.ZodFunction)
 
     case z.ZodFirstPartyTypeKind.ZodLazy:
-      throw new Error('ZodLazy is not supported')
+      throw new err.UnsupportedZuiToJsonSchemaError(z.ZodFirstPartyTypeKind.ZodLazy)
 
     case z.ZodFirstPartyTypeKind.ZodLiteral:
-      throw new Error('ZodLiteral is not supported')
+      throw new err.UnsupportedZuiToJsonSchemaError(z.ZodFirstPartyTypeKind.ZodLiteral)
 
     case z.ZodFirstPartyTypeKind.ZodEnum:
       return {
@@ -155,10 +156,10 @@ function _toJsonSchema(schema: z.Schema): json.ZuiJsonSchema {
       } satisfies json.EnumSchema
 
     case z.ZodFirstPartyTypeKind.ZodEffects:
-      throw new Error('ZodEffects is not supported')
+      throw new err.UnsupportedZuiToJsonSchemaError(z.ZodFirstPartyTypeKind.ZodEffects)
 
     case z.ZodFirstPartyTypeKind.ZodNativeEnum:
-      throw new Error('ZodNativeEnum is not supported')
+      throw new err.UnsupportedZuiToJsonSchemaError(z.ZodFirstPartyTypeKind.ZodNativeEnum)
 
     case z.ZodFirstPartyTypeKind.ZodOptional:
       return {
@@ -180,19 +181,20 @@ function _toJsonSchema(schema: z.Schema): json.ZuiJsonSchema {
       }
 
     case z.ZodFirstPartyTypeKind.ZodCatch:
-      throw new Error('ZodCatch is not supported') // TODO: could be supported with if-else json schema
+      // TODO: could be supported using if-else json schema
+      throw new err.UnsupportedZuiToJsonSchemaError(z.ZodFirstPartyTypeKind.ZodCatch)
 
     case z.ZodFirstPartyTypeKind.ZodPromise:
-      throw new Error('ZodPromise is not supported')
+      throw new err.UnsupportedZuiToJsonSchemaError(z.ZodFirstPartyTypeKind.ZodPromise)
 
     case z.ZodFirstPartyTypeKind.ZodBranded:
-      throw new Error('ZodBranded is not supported')
+      throw new err.UnsupportedZuiToJsonSchemaError(z.ZodFirstPartyTypeKind.ZodBranded)
 
     case z.ZodFirstPartyTypeKind.ZodPipeline:
-      throw new Error('ZodPipeline is not supported')
+      throw new err.UnsupportedZuiToJsonSchemaError(z.ZodFirstPartyTypeKind.ZodPipeline)
 
     case z.ZodFirstPartyTypeKind.ZodSymbol:
-      throw new Error('ZodPipeline is not supported')
+      throw new err.UnsupportedZuiToJsonSchemaError(z.ZodFirstPartyTypeKind.ZodPipeline)
 
     case z.ZodFirstPartyTypeKind.ZodReadonly:
       // ZodReadonly is not treated as a metadata root so we don't need to preserve x-zui

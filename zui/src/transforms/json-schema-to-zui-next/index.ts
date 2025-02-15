@@ -7,7 +7,17 @@ import * as guards from './guards'
  * @param schema json schema
  * @returns ZUI Schema
  */
-export function toZui(schema: JSONSchema7): z.ZodType {
+export function fromJsonSchema(schema: JSONSchema7): z.ZodType {
+  // annotations
+  if (schema.default !== undefined) {
+    const inner = fromJsonSchema({ ...schema, default: undefined })
+    return inner.default(schema.default)
+  }
+  if (schema.readOnly) {
+    const inner = fromJsonSchema({ ...schema, readOnly: undefined })
+    return inner.readonly()
+  }
+
   // ref
 
   if (guards.isRefSchema(schema)) {
@@ -26,7 +36,9 @@ export function toZui(schema: JSONSchema7): z.ZodType {
 
   if (guards.isEnumSchema(schema)) {
     const values = schema.enum
-    return values.length >= 1 ? z.enum(schema.enum as [string, ...string[]]) : toZui({ ...schema, enum: undefined })
+    return values.length >= 1
+      ? z.enum(schema.enum as [string, ...string[]])
+      : fromJsonSchema({ ...schema, enum: undefined })
   }
 
   if (guards.isStringSchema(schema)) {
@@ -36,7 +48,7 @@ export function toZui(schema: JSONSchema7): z.ZodType {
   // numbers
 
   if (guards.isLiteralBigIntSchema(schema)) {
-    return z.literal(schema.const)
+    return z.literal(BigInt(schema.const))
   }
 
   if (guards.isBigIntSchema(schema)) {
@@ -70,58 +82,55 @@ export function toZui(schema: JSONSchema7): z.ZodType {
   // arrays
 
   if (guards.isTupleSchema(schema)) {
-    const items = schema.items.map(toZui) as [z.ZodType, ...z.ZodType[]]
+    const items = schema.items.map(fromJsonSchema) as [z.ZodType, ...z.ZodType[]]
     if (schema.additionalItems) {
-      return z.tuple(items).rest(toZui(schema.additionalItems))
+      return z.tuple(items).rest(fromJsonSchema(schema.additionalItems))
     }
     return z.tuple(items)
   }
 
   if (guards.isSetSchema(schema)) {
-    return z.set(toZui(schema.items))
+    return z.set(fromJsonSchema(schema.items))
   }
 
   if (guards.isArraySchema(schema)) {
-    const items = schema.items ? toZui(schema.items) : z.unknown()
+    const items = schema.items ? fromJsonSchema(schema.items) : z.unknown()
     return z.array(items)
   }
 
   // objects
 
-  if (guards.isObjectSchema(schema)) {
-    const properties = schema.properties
-    const required = schema.required || []
-    const propMap: Record<string, z.ZodType> = {}
-    for (const key in properties) {
-      const prop = properties[key]
-      if (prop !== undefined) {
-        const zProp = toZui(prop)
-        propMap[key] = required.includes(key) ? zProp : zProp.optional()
-      }
-    }
-    return z.object(propMap)
+  if (guards.isRecordSchema(schema)) {
+    return z.record(fromJsonSchema(schema.additionalProperties))
   }
 
-  if (guards.isRecordSchema(schema)) {
-    return z.record(toZui(schema.additionalProperties))
+  if (guards.isObjectSchema(schema)) {
+    const properties = schema.properties
+    const required = schema.required ?? []
+    const propMap: Record<string, z.ZodType> = {}
+    for (const [key, prop] of Object.entries(properties)) {
+      const zProp = fromJsonSchema(prop)
+      propMap[key] = required.includes(key) ? zProp : zProp.optional()
+    }
+    return z.object(propMap)
   }
 
   // unions
 
   if (guards.isOptionalSchema(schema)) {
-    return toZui(schema.anyOf[0]).optional()
+    return fromJsonSchema(schema.anyOf[0]).optional()
   }
 
   if (guards.isNullableSchema(schema)) {
-    return toZui(schema.anyOf[0]).nullable()
+    return fromJsonSchema(schema.anyOf[0]).nullable()
   }
 
   if (guards.isDiscriminatedUnionSchema(schema)) {
     if (schema.anyOf.length < 2) {
-      return toZui({ ...schema, anyOf: undefined })
+      return fromJsonSchema({ ...schema, anyOf: undefined })
     }
 
-    const options = schema.anyOf.map(toZui) as [
+    const options = schema.anyOf.map(fromJsonSchema) as [
       z.ZodDiscriminatedUnionOption<string>,
       z.ZodDiscriminatedUnionOption<string>,
       ...z.ZodDiscriminatedUnionOption<string>[],
@@ -135,19 +144,21 @@ export function toZui(schema: JSONSchema7): z.ZodType {
 
   if (guards.isUnionSchema(schema)) {
     if (schema.anyOf.length < 2) {
-      return toZui({ ...schema, anyOf: undefined })
+      return fromJsonSchema({ ...schema, anyOf: undefined })
     }
-    const options = schema.anyOf.map(toZui) as [z.ZodType, z.ZodType, ...z.ZodType[]]
+    const options = schema.anyOf.map(fromJsonSchema) as [z.ZodType, z.ZodType, ...z.ZodType[]]
     return z.union(options)
   }
 
   if (guards.isIntersectionSchema(schema)) {
     if (schema.allOf.length < 2) {
-      return toZui({ ...schema, allOf: undefined })
+      return fromJsonSchema({ ...schema.allOf[0], allOf: undefined })
     }
 
     const [left, ...right] = schema.allOf as [JSONSchema7, ...JSONSchema7[]]
-    return z.intersection(toZui(left), toZui({ ...schema, allOf: right }))
+    const zLeft = fromJsonSchema(left)
+    const zRight = fromJsonSchema({ allOf: right })
+    return z.intersection(zLeft, zRight)
   }
 
   // never

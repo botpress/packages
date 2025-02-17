@@ -30,7 +30,7 @@ describe('zuiToJsonSchemaNext', () => {
 
   test('should map ZodDate to DateSchema', () => {
     const schema = toJsonSchema(z.date())
-    expect(schema).toEqual({ type: 'string', format: 'date-time' })
+    expect(schema).toEqual({ type: 'string', format: 'date-time', 'x-zui': { def: { typeName: 'ZodDate' } } })
   })
 
   test('should map ZodUndefined to UndefinedSchema', () => {

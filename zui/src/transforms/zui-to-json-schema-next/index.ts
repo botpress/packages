@@ -35,7 +35,14 @@ export function toJsonSchema(schema: z.Schema): json.ZuiJsonSchema {
       return { type: 'boolean', 'x-zui': def['x-zui'] } satisfies json.BooleanSchema
 
     case z.ZodFirstPartyTypeKind.ZodDate:
-      return { type: 'string', format: 'date-time', 'x-zui': def['x-zui'] } satisfies json.DateSchema
+      return {
+        type: 'string',
+        format: 'date-time',
+        'x-zui': {
+          ...def['x-zui'],
+          def: { typeName: z.ZodFirstPartyTypeKind.ZodDate },
+        },
+      } satisfies json.DateSchema
 
     case z.ZodFirstPartyTypeKind.ZodUndefined:
       return undefinedSchema(def['x-zui'])

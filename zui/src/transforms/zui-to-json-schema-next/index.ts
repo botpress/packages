@@ -4,7 +4,9 @@ import * as json from '../common/json-schema'
 import * as err from '../common/errors'
 
 /**
+ * # \#\#\# Experimental \#\#\#
  *
+ * @experimental This function is experimental and is subject to breaking changes in the future.
  * @param schema zui schema
  * @returns ZUI flavored JSON schema
  */

@@ -18,10 +18,92 @@ const assert = (src: z.Schema) => ({
 })
 
 describe('transformPipeline', () => {
-  it('should map ZodString to itself', async () => {
-    const srcSchema = z.string()
-    assert(srcSchema).toTransformBackToItself()
+  describe('ZodString', async () => {
+    it('should map a string to itself', async () => {
+      const srcSchema = z.string()
+      assert(srcSchema).toTransformBackToItself()
+    })
+
+    // TODO: enable and fix these tests
+
+    it.skip('should map a string with min to itself', async () => {
+      const srcSchema = z.string().min(1)
+      assert(srcSchema).toTransformBackToItself()
+    })
+    it.skip('should map a string with max to itself', async () => {
+      const srcSchema = z.string().max(1)
+      assert(srcSchema).toTransformBackToItself()
+    })
+    it.skip('should map a string with length to itself', async () => {
+      const srcSchema = z.string().length(1)
+      assert(srcSchema).toTransformBackToItself()
+    })
+    it.skip('should map a string with email to itself', async () => {
+      const srcSchema = z.string().email()
+      assert(srcSchema).toTransformBackToItself()
+    })
+    it.skip('should map a string with url to itself', async () => {
+      const srcSchema = z.string().url()
+      assert(srcSchema).toTransformBackToItself()
+    })
+    it.skip('should map a string with emoji to itself', async () => {
+      const srcSchema = z.string().emoji()
+      assert(srcSchema).toTransformBackToItself()
+    })
+    it.skip('should map a string with uuid to itself', async () => {
+      const srcSchema = z.string().uuid()
+      assert(srcSchema).toTransformBackToItself()
+    })
+    it.skip('should map a string with cuid to itself', async () => {
+      const srcSchema = z.string().cuid()
+      assert(srcSchema).toTransformBackToItself()
+    })
+    it.skip('should map a string with includes to itself', async () => {
+      const srcSchema = z.string().includes('foo')
+      assert(srcSchema).toTransformBackToItself()
+    })
+    it.skip('should map a string with cuid2 to itself', async () => {
+      const srcSchema = z.string().cuid2()
+      assert(srcSchema).toTransformBackToItself()
+    })
+    it.skip('should map a string with ulid to itself', async () => {
+      const srcSchema = z.string().ulid()
+      assert(srcSchema).toTransformBackToItself()
+    })
+    it.skip('should map a string with startsWith to itself', async () => {
+      const srcSchema = z.string().startsWith('foo')
+      assert(srcSchema).toTransformBackToItself()
+    })
+    it.skip('should map a string with endsWith to itself', async () => {
+      const srcSchema = z.string().endsWith('foo')
+      assert(srcSchema).toTransformBackToItself()
+    })
+    it.skip('should map a string with regex to itself', async () => {
+      const srcSchema = z.string().regex(/foo/)
+      assert(srcSchema).toTransformBackToItself()
+    })
+    it.skip('should map a string with trim to itself', async () => {
+      const srcSchema = z.string().trim()
+      assert(srcSchema).toTransformBackToItself()
+    })
+    it.skip('should map a string with toLowerCase to itself', async () => {
+      const srcSchema = z.string().toLowerCase()
+      assert(srcSchema).toTransformBackToItself()
+    })
+    it.skip('should map a string with toUpperCase to itself', async () => {
+      const srcSchema = z.string().toUpperCase()
+      assert(srcSchema).toTransformBackToItself()
+    })
+    it.skip('should map a string with datetime to itself', async () => {
+      const srcSchema = z.string().datetime()
+      assert(srcSchema).toTransformBackToItself()
+    })
+    it.skip('should map a string with ip to itself', async () => {
+      const srcSchema = z.string().ip()
+      assert(srcSchema).toTransformBackToItself()
+    })
   })
+
   it('should map ZodNumber to itself', async () => {
     const srcSchema = z.number()
     assert(srcSchema).toTransformBackToItself()

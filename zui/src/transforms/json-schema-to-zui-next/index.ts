@@ -6,7 +6,9 @@ import z from '../../z'
 const DEFAULT_TYPE = z.any()
 
 /**
+ * # \#\#\# Experimental \#\#\#
  *
+ * @experimental This function is experimental and is subject to breaking changes in the future.
  * @param schema json schema
  * @returns ZUI Schema
  */

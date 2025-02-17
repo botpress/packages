@@ -160,19 +160,14 @@ export function toJsonSchema(schema: z.Schema): json.ZuiJsonSchema {
           const: def.value,
           'x-zui': def['x-zui'],
         } satisfies json.LiteralBooleanSchema
-      } else if (typeof def.value === 'bigint') {
-        return {
-          type: 'integer',
-          const: Number(def.value),
-          'x-zui': def['x-zui'],
-        } satisfies json.LiteralBigIntSchema
       } else if (def.value === null) {
         return nullSchema(def['x-zui'])
       } else if (def.value === undefined) {
         return undefinedSchema(def['x-zui'])
       } else {
-        z.util.assertEqual<symbol, typeof def.value>(true)
-        throw new err.UnsupportedZuiToJsonSchemaError(z.ZodFirstPartyTypeKind.ZodSymbol)
+        z.util.assertEqual<bigint | symbol, typeof def.value>(true)
+        const unsupportedLiteral = typeof def.value
+        throw new err.ZuiToJsonSchemaError(`Unsupported literal type: "${unsupportedLiteral}"`)
       }
 
     case z.ZodFirstPartyTypeKind.ZodEnum:

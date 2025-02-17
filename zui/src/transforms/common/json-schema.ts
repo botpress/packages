@@ -68,7 +68,6 @@ type _RecordSchema = util.Satisfies<{ type: 'object'; additionalProperties: ZuiJ
 type _LiteralStringSchema = util.Satisfies<{ type: 'string'; const: string }, JSONSchema7>
 type _LiteralNumberSchema = util.Satisfies<{ type: 'number'; const: number }, JSONSchema7>
 type _LiteralBooleanSchema = util.Satisfies<{ type: 'boolean'; const: boolean }, JSONSchema7>
-type _LiteralBigIntSchema = util.Satisfies<{ type: 'integer'; const: number }, JSONSchema7>
 type _OptionalSchema = util.Satisfies<{ anyOf: [ZuiJsonSchema, UndefinedSchema] }, JSONSchema7>
 type _NullableSchema = util.Satisfies<{ anyOf: [ZuiJsonSchema, NullSchema] }, JSONSchema7>
 
@@ -95,11 +94,10 @@ export type RecordSchema = _RecordSchema & BaseZuiJsonSchema
 export type LiteralStringSchema = _LiteralStringSchema & BaseZuiJsonSchema
 export type LiteralNumberSchema = _LiteralNumberSchema & BaseZuiJsonSchema
 export type LiteralBooleanSchema = _LiteralBooleanSchema & BaseZuiJsonSchema
-export type LiteralBigIntSchema = _LiteralBigIntSchema & BaseZuiJsonSchema
 export type OptionalSchema = _OptionalSchema & BaseZuiJsonSchema<OptionalDef>
 export type NullableSchema = _NullableSchema & BaseZuiJsonSchema<NullableDef>
 
-export type LiteralSchema = LiteralStringSchema | LiteralNumberSchema | LiteralBooleanSchema | LiteralBigIntSchema
+export type LiteralSchema = LiteralStringSchema | LiteralNumberSchema | LiteralBooleanSchema
 
 export type ZuiJsonSchema =
   | StringSchema

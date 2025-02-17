@@ -218,13 +218,6 @@ describe('zuifromJsonSchemaNext', () => {
     assert(zSchema).toEqual(expected)
   })
 
-  test('should map LiteralBigIntSchema to ZodLiteral', () => {
-    const jSchema = buildSchema({ type: 'integer', const: 1 })
-    const zSchema = fromJsonSchema(jSchema)
-    const expected = z.literal(BigInt(1))
-    assert(zSchema).toEqual(expected)
-  })
-
   test('should map EnumSchema to ZodEnum', () => {
     const jSchema = buildSchema({ type: 'string', enum: ['a', 'b'] })
     const zSchema = fromJsonSchema(jSchema)

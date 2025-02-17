@@ -198,14 +198,14 @@ describe('zuiToJsonSchemaNext', () => {
     const booleanSchema = toJsonSchema(z.literal(true))
     expect(booleanSchema).toEqual({ type: 'boolean', const: true })
 
-    const bigintSchema = toJsonSchema(z.literal(BigInt(1)))
-    expect(bigintSchema).toEqual({ type: 'integer', const: 1 })
-
     const nullSchema = toJsonSchema(z.literal(null))
     expect(nullSchema).toEqual({ type: 'null' })
 
     const undefinedSchema = toJsonSchema(z.literal(undefined))
     expect(undefinedSchema).toEqual({ not: true, 'x-zui': { def: { typeName: 'ZodUndefined' } } })
+
+    expect(() => toJsonSchema(z.literal(BigInt(1)))).toThrowError(errs.ZuiToJsonSchemaError)
+    expect(() => toJsonSchema(z.literal(Symbol('a')))).toThrowError(errs.ZuiToJsonSchemaError)
   })
 
   test('should map ZodEnum to EnumSchema', () => {

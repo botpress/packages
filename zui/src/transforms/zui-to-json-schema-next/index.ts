@@ -81,6 +81,8 @@ export function toJsonSchema(schema: z.Schema): json.ZuiJsonSchema {
         .map(([key, value]) => [key, _toRequired(value)] satisfies [string, z.ZodType])
         .map(([key, value]) => [key, toJsonSchema(value)] satisfies [string, json.ZuiJsonSchema])
 
+      // TODO: ensure unknownKeys and catchall are not lost
+
       return {
         type: 'object',
         properties: Object.fromEntries(properties),

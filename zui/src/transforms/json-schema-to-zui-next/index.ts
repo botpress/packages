@@ -126,7 +126,6 @@ function _fromJsonSchema(schema: JSONSchema7Definition | undefined): z.ZodType {
         return z.set(_fromJsonSchema(schema.items))
       }
 
-      // TODO: ensure empty array gets modeled as z.tuple([]) instead of z.array(z.never())
       return z.array(_fromJsonSchema(schema.items))
     }
 
@@ -135,13 +134,11 @@ function _fromJsonSchema(schema: JSONSchema7Definition | undefined): z.ZodType {
 
   if (schema.type === 'object') {
     if (schema.additionalProperties !== undefined && schema.properties !== undefined) {
-      // TODO: technically an intersection between object and record
-    }
-
-    if (schema.additionalProperties !== undefined) {
-      // TODO: ensure empty object gets modeled as z.object({}) instead of z.record(z.never())
-      const inner = _fromJsonSchema(schema.additionalProperties)
-      return z.record(inner)
+      // TODO: should be supported with the .catchall() method but the behavior of this method is inconsistent
+      throw new errors.UnsupportedJSONSchemaToZuiError({
+        additionalProperties: schema.additionalProperties,
+        properties: schema.properties,
+      })
     }
 
     if (schema.properties !== undefined) {
@@ -152,6 +149,11 @@ function _fromJsonSchema(schema: JSONSchema7Definition | undefined): z.ZodType {
         properties[key] = required.includes(key) ? mapped : mapped.optional()
       }
       return z.object(properties)
+    }
+
+    if (schema.additionalProperties !== undefined) {
+      const inner = _fromJsonSchema(schema.additionalProperties)
+      return z.record(inner)
     }
 
     return z.record(DEFAULT_TYPE)

@@ -66,6 +66,10 @@ describe('transformPipeline', () => {
     const srcSchema = z.object({ foo: z.string() })
     assert(srcSchema).toTransformBackToItself()
   })
+  it('should map empty ZodObject to itself', async () => {
+    const srcSchema = z.object({})
+    assert(srcSchema).toTransformBackToItself()
+  })
   it('should map ZodUnion to itself', async () => {
     const srcSchema = z.union([z.string(), z.number()])
     assert(srcSchema).toTransformBackToItself()
@@ -86,6 +90,10 @@ describe('transformPipeline', () => {
   })
   it('should map ZodTuple to itself', async () => {
     const srcSchema = z.tuple([z.string(), z.number()])
+    assert(srcSchema).toTransformBackToItself()
+  })
+  it('should map empty ZodTuple to itself', async () => {
+    const srcSchema = z.tuple([])
     assert(srcSchema).toTransformBackToItself()
   })
   it('should map ZodRecord to itself', async () => {

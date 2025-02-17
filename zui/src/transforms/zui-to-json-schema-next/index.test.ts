@@ -76,7 +76,26 @@ describe('zuiToJsonSchemaNext', () => {
     })
   })
 
-  // TODO: add more object tests for optional keys
+  test('should map ZodObject with optional fields to ObjectSchema', () => {
+    const schema = toJsonSchema(
+      z.object({
+        name: z.string(),
+        age: z.number().optional(),
+        data: z.union([z.string(), z.null(), z.undefined()]),
+      }),
+    )
+    expect(schema).toEqual({
+      type: 'object',
+      properties: {
+        name: { type: 'string' },
+        age: { type: 'number' },
+        data: {
+          anyOf: [{ type: 'string' }, { type: 'null' }],
+        },
+      },
+      required: ['name'],
+    })
+  })
 
   test('should map ZodUnion to UnionSchema', () => {
     const schema = toJsonSchema(z.union([z.string(), z.number()]))

@@ -218,6 +218,7 @@ describe('zuiToJsonSchemaNext', () => {
     const schema = toJsonSchema(z.string().optional())
     expect(schema).toEqual({
       anyOf: [{ type: 'string' }, { not: true, 'x-zui': { def: { typeName: 'ZodUndefined' } } }],
+      'x-zui': { def: { typeName: 'ZodOptional' } },
     })
   })
 
@@ -225,6 +226,7 @@ describe('zuiToJsonSchemaNext', () => {
     const schema = toJsonSchema(z.string().nullable())
     expect(schema).toEqual({
       anyOf: [{ type: 'string' }, { type: 'null' }],
+      'x-zui': { def: { typeName: 'ZodNullable' } },
     })
   })
 

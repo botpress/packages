@@ -104,13 +104,11 @@ describe('transformPipeline', () => {
     const srcSchema = z.enum(['foo', 'bar'])
     assert(srcSchema).toTransformBackToItself()
   })
-  // TODO: enable and fix this test
-  it.skip('should map ZodOptional to itself', async () => {
+  it('should map ZodOptional to itself', async () => {
     const srcSchema = z.optional(z.string())
     assert(srcSchema).toTransformBackToItself()
   })
-  // TODO: enable and fix this test
-  it.skip('should map ZodNullable to itself', async () => {
+  it('should map ZodNullable to itself', async () => {
     const srcSchema = z.nullable(z.string())
     assert(srcSchema).toTransformBackToItself()
   })

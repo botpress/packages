@@ -191,13 +191,19 @@ export function toJsonSchema(schema: z.Schema): json.ZuiJsonSchema {
     case z.ZodFirstPartyTypeKind.ZodOptional:
       return {
         anyOf: [toJsonSchema(def.innerType), undefinedSchema()],
-        'x-zui': def['x-zui'],
+        'x-zui': {
+          ...def['x-zui'],
+          def: { typeName: z.ZodFirstPartyTypeKind.ZodOptional },
+        },
       } satisfies json.OptionalSchema
 
     case z.ZodFirstPartyTypeKind.ZodNullable:
       return {
         anyOf: [toJsonSchema(def.innerType), nullSchema()],
-        'x-zui': def['x-zui'],
+        'x-zui': {
+          ...def['x-zui'],
+          def: { typeName: z.ZodFirstPartyTypeKind.ZodNullable },
+        },
       } satisfies json.NullableSchema
 
     case z.ZodFirstPartyTypeKind.ZodDefault:

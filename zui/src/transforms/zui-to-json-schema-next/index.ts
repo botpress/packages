@@ -19,7 +19,8 @@ export function toJsonSchema(schema: z.Schema): json.ZuiJsonSchema {
       return { type: 'string', 'x-zui': def['x-zui'] } satisfies json.StringSchema
 
     case z.ZodFirstPartyTypeKind.ZodNumber:
-      return { type: 'number', 'x-zui': def['x-zui'] } satisfies json.NumberSchema
+      const type = def.checks.some((check) => check.kind === 'int') ? 'integer' : 'number'
+      return { type, 'x-zui': def['x-zui'] } satisfies json.NumberSchema
 
     case z.ZodFirstPartyTypeKind.ZodNaN:
       throw new err.UnsupportedZuiToJsonSchemaError(z.ZodFirstPartyTypeKind.ZodNaN)

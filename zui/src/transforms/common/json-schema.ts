@@ -38,7 +38,7 @@ type BaseZuiJsonSchema<Def extends Partial<z.ZodDef> = {}> = util.Satisfies<
 >
 
 type _StringSchema = util.Satisfies<{ type: 'string' }, JSONSchema7> // TODO: support all string checks
-type _NumberSchema = util.Satisfies<{ type: 'number' }, JSONSchema7> // TODO: support all number checks
+type _NumberSchema = util.Satisfies<{ type: 'number' | 'integer' }, JSONSchema7> // TODO: support all number checks
 type _BigIntSchema = util.Satisfies<{ type: 'integer' }, JSONSchema7> // TODO: support all bigint checks
 type _BooleanSchema = util.Satisfies<{ type: 'boolean' }, JSONSchema7>
 type _DateSchema = util.Satisfies<{ type: 'string'; format: 'date-time' }, JSONSchema7> // TODO: support all boolean checks

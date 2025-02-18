@@ -2,6 +2,7 @@ import { JSONSchema7, JSONSchema7Definition, JSONSchema7Type } from 'json-schema
 import * as errors from '../common/errors'
 import * as guards from './guards'
 import z from '../../z'
+import { toZuiPrimitive } from './primitives'
 
 const DEFAULT_TYPE = z.any()
 
@@ -96,22 +97,32 @@ function _fromJsonSchema(schema: JSONSchema7Definition | undefined): z.ZodType {
     if (schema.enum && schema.enum.length > 0) {
       return z.enum(schema.enum as [string, ...string[]])
     }
-    return _toZuiPrimitive('string', schema)
+    return toZuiPrimitive('string', schema)
   }
 
-  if (schema.type === 'number' || schema.type === 'integer') {
+  if (schema.type === 'integer') {
     if (guards.isBigIntSchema(schema)) {
       return z.bigint()
     }
-    return _toZuiPrimitive('number', schema)
+
+    const zSchema = toZuiPrimitive('number', schema)
+    if (zSchema instanceof z.ZodNumber) {
+      return zSchema.int()
+    }
+
+    return zSchema
+  }
+
+  if (schema.type === 'number') {
+    return toZuiPrimitive('number', schema)
   }
 
   if (schema.type === 'boolean') {
-    return _toZuiPrimitive('boolean', schema)
+    return toZuiPrimitive('boolean', schema)
   }
 
   if (schema.type === 'null') {
-    return _toZuiPrimitive('null', schema)
+    return toZuiPrimitive('null', schema)
   }
 
   if (schema.type === 'array') {
@@ -211,42 +222,4 @@ function _fromJsonSchema(schema: JSONSchema7Definition | undefined): z.ZodType {
     return z.unknown()
   }
   return DEFAULT_TYPE
-}
-
-const _toZuiPrimitive = <T extends 'string' | 'number' | 'boolean' | 'null'>(
-  type: T,
-  schema: JSONSchema7,
-): z.ZodType => {
-  let values: JSONSchema7Type[] = []
-  if (schema.enum !== undefined) {
-    values.push(...schema.enum)
-  }
-  if (schema.const !== undefined) {
-    values.push(schema.const)
-  }
-  values = values.filter((value) => typeof value === type)
-  if (values.length === 0) {
-    return type === 'string'
-      ? z.string()
-      : type === 'number'
-        ? z.number()
-        : type === 'boolean'
-          ? z.boolean()
-          : type === 'null'
-            ? z.null()
-            : DEFAULT_TYPE
-  }
-
-  if (values.length === 1) {
-    const value = values[0] as z.Primitive
-    return z.literal(value)
-  }
-
-  const items = values.map((value) => z.literal(value as z.Primitive)) as [
-    z.ZodLiteral,
-    z.ZodLiteral,
-    ...z.ZodLiteral[],
-  ]
-
-  return z.union(items)
 }

@@ -7,7 +7,6 @@ export const prefixToObjectMap = {
   audit: 'audit',
   bak: 'botApiKey',
   bot: 'bot',
-  plugin: 'plugin',
   card: 'card',
   cfg: 'configuration',
   channel: 'channel',
@@ -29,6 +28,8 @@ export const prefixToObjectMap = {
   node: 'node',
   notif: 'notification',
   pat: 'personalAccessToken',
+  plugin: 'plugin',
+  plugver: 'pluginVersion',
   quota: 'quota',
   recevt: 'recurringEvent',
   report: 'report',
@@ -76,6 +77,8 @@ export const objectToPrefixMap: Reverser<typeof prefixToObjectMap> = {
   node: 'node',
   notification: 'notif',
   personalAccessToken: 'pat',
+  plugin: 'plugin',
+  pluginVersion: 'plugver',
   quota: 'quota',
   recurringEvent: 'recevt',
   report: 'report',
@@ -90,8 +93,7 @@ export const objectToPrefixMap: Reverser<typeof prefixToObjectMap> = {
   user: 'user',
   webhook: 'webhook',
   workflow: 'wrkflow',
-  workspace: 'wkspace',
-  plugin: 'plugin'
+  workspace: 'wkspace'
 } as const
 
 export type Prefixes = (typeof objectToPrefixMap)[keyof typeof objectToPrefixMap]

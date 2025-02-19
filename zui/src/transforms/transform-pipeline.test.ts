@@ -105,12 +105,12 @@ describe('transformPipeline', () => {
   })
 
   describe('ZodNumber', async () => {
-    it('should a number to itself', async () => {
+    it('should map a number to itself', async () => {
       const srcSchema = z.number()
       assert(srcSchema).toTransformBackToItself()
     })
 
-    it('should an int to itself', async () => {
+    it('should map an int to itself', async () => {
       const srcSchema = z.number().int()
       assert(srcSchema).toTransformBackToItself()
     })

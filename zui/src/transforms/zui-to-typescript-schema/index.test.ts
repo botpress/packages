@@ -13,10 +13,11 @@ const evalZui = (source: string): ZodSchema => {
   return evalResult.value
 }
 
+const generate = <Z extends ZodType>(source: Z): Z => evalZui(toTypescript(source)) as Z
+
 const assert = (source: ZodType) => ({
   toGenerateItself() {
-    const actual = toTypescript(source)
-    const destination = evalZui(actual)
+    const destination = generate(source)
     let msg: string | undefined
     try {
       msg = `Expected ${JSON.stringify(source._def)} to equal ${JSON.stringify(destination._def)}`
@@ -34,108 +35,160 @@ describe.concurrent('toTypescriptZuiString', () => {
     test('no checks', () => {
       const schema = z.string()
       assert(schema).toGenerateItself()
+      const evaluated = generate(schema)
+      expect(evaluated._def.checks).toEqual([])
     })
     test('min', () => {
       const schema = z.string().min(42)
       assert(schema).toGenerateItself()
+      const evaluated = generate(schema)
+      expect(evaluated._def.checks).toEqual([{ kind: 'min', value: 42, message: undefined }])
     })
     test('max', () => {
       const schema = z.string().max(42)
       assert(schema).toGenerateItself()
+      const evaluated = generate(schema)
+      expect(evaluated._def.checks).toEqual([{ kind: 'max', value: 42, message: undefined }])
     })
     test('length', () => {
       const schema = z.string().length(42)
       assert(schema).toGenerateItself()
+      const evaluated = generate(schema)
+      expect(evaluated._def.checks).toEqual([{ kind: 'length', value: 42, message: undefined }])
     })
     test('email', () => {
       const schema = z.string().email()
       assert(schema).toGenerateItself()
+      const evaluated = generate(schema)
+      expect(evaluated._def.checks).toEqual([{ kind: 'email', message: undefined }])
     })
     test('url', () => {
       const schema = z.string().url()
       assert(schema).toGenerateItself()
+      const evaluated = generate(schema)
+      expect(evaluated._def.checks).toEqual([{ kind: 'url', message: undefined }])
     })
     test('emoji', () => {
       const schema = z.string().emoji()
       assert(schema).toGenerateItself()
+      const evaluated = generate(schema)
+      expect(evaluated._def.checks).toEqual([{ kind: 'emoji', message: undefined }])
     })
     test('uuid', () => {
       const schema = z.string().uuid()
       assert(schema).toGenerateItself()
+      const evaluated = generate(schema)
+      expect(evaluated._def.checks).toEqual([{ kind: 'uuid', message: undefined }])
     })
     test('cuid', () => {
       const schema = z.string().cuid()
       assert(schema).toGenerateItself()
+      const evaluated = generate(schema)
+      expect(evaluated._def.checks).toEqual([{ kind: 'cuid', message: undefined }])
     })
     test('cuid2', () => {
       const schema = z.string().cuid2()
       assert(schema).toGenerateItself()
+      const evaluated = generate(schema)
+      expect(evaluated._def.checks).toEqual([{ kind: 'cuid2', message: undefined }])
     })
     test('ulid', () => {
       const schema = z.string().ulid()
       assert(schema).toGenerateItself()
+      const evaluated = generate(schema)
+      expect(evaluated._def.checks).toEqual([{ kind: 'ulid', message: undefined }])
     })
     test('includes', () => {
       const schema = z.string().includes('banana')
       assert(schema).toGenerateItself()
+      const evaluated = generate(schema)
+      expect(evaluated._def.checks).toEqual([{ kind: 'includes', value: 'banana', message: undefined }])
     })
     test('startsWith', () => {
       const schema = z.string().startsWith('banana')
       assert(schema).toGenerateItself()
+      const evaluated = generate(schema)
+      expect(evaluated._def.checks).toEqual([{ kind: 'startsWith', value: 'banana', message: undefined }])
     })
     test('endsWith', () => {
       const schema = z.string().endsWith('banana')
       assert(schema).toGenerateItself()
+      const evaluated = generate(schema)
+      expect(evaluated._def.checks).toEqual([{ kind: 'endsWith', value: 'banana', message: undefined }])
     })
     test('regex', () => {
       const schema = z.string().regex(/banana/g)
       assert(schema).toGenerateItself()
+      const evaluated = generate(schema)
+      expect(evaluated._def.checks).toEqual([{ kind: 'regex', regex: /banana/g, message: undefined }])
     })
     test('trim', () => {
       const schema = z.string().trim()
       assert(schema).toGenerateItself()
+      const evaluated = generate(schema)
+      expect(evaluated._def.checks).toEqual([{ kind: 'trim', message: undefined }])
     })
     test('toLowerCase', () => {
       const schema = z.string().toLowerCase()
       assert(schema).toGenerateItself()
+      const evaluated = generate(schema)
+      expect(evaluated._def.checks).toEqual([{ kind: 'toLowerCase', message: undefined }])
     })
     test('toUpperCase', () => {
       const schema = z.string().toUpperCase()
       assert(schema).toGenerateItself()
+      const evaluated = generate(schema)
+      expect(evaluated._def.checks).toEqual([{ kind: 'toUpperCase', message: undefined }])
     })
     test('datetime', () => {
       const schema = z.string().datetime()
       assert(schema).toGenerateItself()
+      const evaluated = generate(schema)
+      expect(evaluated._def.checks).toEqual([{ kind: 'datetime', message: undefined, offset: false, precision: null }])
     })
     test('ip', () => {
       const schema = z.string().ip()
       assert(schema).toGenerateItself()
+      const evaluated = generate(schema)
+      expect(evaluated._def.checks).toEqual([{ kind: 'ip', message: undefined }])
     })
   })
   describe.concurrent('number', () => {
     test('no checks', () => {
       const schema = z.number()
       assert(schema).toGenerateItself()
+      const evaluated = generate(schema)
+      expect(evaluated._def.checks).toEqual([])
     })
     test('min', () => {
       const schema = z.number().min(42)
       assert(schema).toGenerateItself()
+      const evaluated = generate(schema)
+      expect(evaluated._def.checks).toEqual([{ kind: 'min', value: 42, message: undefined, inclusive: true }])
     })
     test('max', () => {
       const schema = z.number().max(42)
       assert(schema).toGenerateItself()
+      const evaluated = generate(schema)
+      expect(evaluated._def.checks).toEqual([{ kind: 'max', value: 42, message: undefined, inclusive: true }])
     })
     test('int', () => {
       const schema = z.number().int()
       assert(schema).toGenerateItself()
+      const evaluated = generate(schema)
+      expect(evaluated._def.checks).toEqual([{ kind: 'int', message: undefined }])
     })
     test('multipleOf', () => {
       const schema = z.number().multipleOf(42)
       assert(schema).toGenerateItself()
+      const evaluated = generate(schema)
+      expect(evaluated._def.checks).toEqual([{ kind: 'multipleOf', value: 42, message: undefined }])
     })
     test('finite', () => {
       const schema = z.number().finite()
       assert(schema).toGenerateItself()
+      const evaluated = generate(schema)
+      expect(evaluated._def.checks).toEqual([{ kind: 'finite', message: undefined }])
     })
   })
   test('nan', () => {
@@ -146,18 +199,26 @@ describe.concurrent('toTypescriptZuiString', () => {
     test('no checks', () => {
       const schema = z.bigint()
       assert(schema).toGenerateItself()
+      const evaluated = generate(schema)
+      expect(evaluated._def.checks).toEqual([])
     })
     test('min', () => {
       const schema = z.bigint().min(BigInt(42))
       assert(schema).toGenerateItself()
+      const evaluated = generate(schema)
+      expect(evaluated._def.checks).toEqual([{ kind: 'min', value: BigInt(42), message: undefined, inclusive: true }])
     })
     test('max', () => {
       const schema = z.bigint().min(BigInt(42))
       assert(schema).toGenerateItself()
+      const evaluated = generate(schema)
+      expect(evaluated._def.checks).toEqual([{ kind: 'min', value: BigInt(42), message: undefined, inclusive: true }])
     })
     test('multipleOf', () => {
       const schema = z.bigint().min(BigInt(42))
       assert(schema).toGenerateItself()
+      const evaluated = generate(schema)
+      expect(evaluated._def.checks).toEqual([{ kind: 'min', value: BigInt(42), message: undefined, inclusive: true }])
     })
   })
   test('boolean', () => {
@@ -168,16 +229,24 @@ describe.concurrent('toTypescriptZuiString', () => {
     test('no checks', () => {
       const schema = z.date()
       assert(schema).toGenerateItself()
+      const evaluated = generate(schema)
+      expect(evaluated._def.checks).toEqual([])
     })
 
     test('min', () => {
-      const schema = z.date().min(new Date())
+      const min = new Date()
+      const schema = z.date().min(min)
       assert(schema).toGenerateItself()
+      const evaluated = generate(schema)
+      expect(evaluated._def.checks).toEqual([{ kind: 'min', value: min.getTime(), message: undefined }])
     })
 
     test('max', () => {
-      const schema = z.date().max(new Date())
+      const max = new Date()
+      const schema = z.date().max(max)
       assert(schema).toGenerateItself()
+      const evaluated = generate(schema)
+      expect(evaluated._def.checks).toEqual([{ kind: 'max', value: max.getTime(), message: undefined }])
     })
   })
   test('undefined', () => {

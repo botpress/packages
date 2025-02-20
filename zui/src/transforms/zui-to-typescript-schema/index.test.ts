@@ -17,7 +17,11 @@ const assert = (source: ZodType) => ({
   toGenerateItself() {
     const actual = toTypescript(source)
     const destination = evalZui(actual)
-    expect(source.isEqual(destination)).toBe(true)
+    let msg: string | undefined
+    try {
+      msg = `Expected ${JSON.stringify(source._def)} to equal ${JSON.stringify(destination._def)}`
+    } catch {}
+    expect(source.isEqual(destination), msg).toBe(true)
   },
   toThrowErrorWhenGenerating() {
     const fn = () => toTypescript(source)
@@ -26,29 +30,155 @@ const assert = (source: ZodType) => ({
 })
 
 describe.concurrent('toTypescriptZuiString', () => {
-  test('string', () => {
-    const schema = z.string()
-    assert(schema).toGenerateItself()
+  describe.concurrent('string', () => {
+    test('no checks', () => {
+      const schema = z.string()
+      assert(schema).toGenerateItself()
+    })
+    test('min', () => {
+      const schema = z.string().min(42)
+      assert(schema).toGenerateItself()
+    })
+    test('max', () => {
+      const schema = z.string().max(42)
+      assert(schema).toGenerateItself()
+    })
+    test('length', () => {
+      const schema = z.string().length(42)
+      assert(schema).toGenerateItself()
+    })
+    test('email', () => {
+      const schema = z.string().email()
+      assert(schema).toGenerateItself()
+    })
+    test('url', () => {
+      const schema = z.string().url()
+      assert(schema).toGenerateItself()
+    })
+    test('emoji', () => {
+      const schema = z.string().emoji()
+      assert(schema).toGenerateItself()
+    })
+    test('uuid', () => {
+      const schema = z.string().uuid()
+      assert(schema).toGenerateItself()
+    })
+    test('cuid', () => {
+      const schema = z.string().cuid()
+      assert(schema).toGenerateItself()
+    })
+    test('cuid2', () => {
+      const schema = z.string().cuid2()
+      assert(schema).toGenerateItself()
+    })
+    test('ulid', () => {
+      const schema = z.string().ulid()
+      assert(schema).toGenerateItself()
+    })
+    test('includes', () => {
+      const schema = z.string().includes('banana')
+      assert(schema).toGenerateItself()
+    })
+    test('startsWith', () => {
+      const schema = z.string().startsWith('banana')
+      assert(schema).toGenerateItself()
+    })
+    test('endsWith', () => {
+      const schema = z.string().endsWith('banana')
+      assert(schema).toGenerateItself()
+    })
+    test('regex', () => {
+      const schema = z.string().regex(/banana/g)
+      assert(schema).toGenerateItself()
+    })
+    test('trim', () => {
+      const schema = z.string().trim()
+      assert(schema).toGenerateItself()
+    })
+    test('toLowerCase', () => {
+      const schema = z.string().toLowerCase()
+      assert(schema).toGenerateItself()
+    })
+    test('toUpperCase', () => {
+      const schema = z.string().toUpperCase()
+      assert(schema).toGenerateItself()
+    })
+    test('datetime', () => {
+      const schema = z.string().datetime()
+      assert(schema).toGenerateItself()
+    })
+    test('ip', () => {
+      const schema = z.string().ip()
+      assert(schema).toGenerateItself()
+    })
   })
-  test('number', () => {
-    const schema = z.number()
-    assert(schema).toGenerateItself()
+  describe.concurrent('number', () => {
+    test('no checks', () => {
+      const schema = z.number()
+      assert(schema).toGenerateItself()
+    })
+    test('min', () => {
+      const schema = z.number().min(42)
+      assert(schema).toGenerateItself()
+    })
+    test('max', () => {
+      const schema = z.number().max(42)
+      assert(schema).toGenerateItself()
+    })
+    test('int', () => {
+      const schema = z.number().int()
+      assert(schema).toGenerateItself()
+    })
+    test('multipleOf', () => {
+      const schema = z.number().multipleOf(42)
+      assert(schema).toGenerateItself()
+    })
+    test('finite', () => {
+      const schema = z.number().finite()
+      assert(schema).toGenerateItself()
+    })
   })
   test('nan', () => {
     const schema = z.nan()
     assert(schema).toGenerateItself()
   })
-  test('bigint', () => {
-    const schema = z.bigint()
-    assert(schema).toGenerateItself()
+  describe.concurrent('bigint', () => {
+    test('no checks', () => {
+      const schema = z.bigint()
+      assert(schema).toGenerateItself()
+    })
+    test('min', () => {
+      const schema = z.bigint().min(BigInt(42))
+      assert(schema).toGenerateItself()
+    })
+    test('max', () => {
+      const schema = z.bigint().min(BigInt(42))
+      assert(schema).toGenerateItself()
+    })
+    test('multipleOf', () => {
+      const schema = z.bigint().min(BigInt(42))
+      assert(schema).toGenerateItself()
+    })
   })
   test('boolean', () => {
     const schema = z.boolean()
     assert(schema).toGenerateItself()
   })
-  test('date', () => {
-    const schema = z.date()
-    assert(schema).toGenerateItself()
+  describe.concurrent('date', () => {
+    test('no checks', () => {
+      const schema = z.date()
+      assert(schema).toGenerateItself()
+    })
+
+    test('min', () => {
+      const schema = z.date().min(new Date())
+      assert(schema).toGenerateItself()
+    })
+
+    test('max', () => {
+      const schema = z.date().max(new Date())
+      assert(schema).toGenerateItself()
+    })
   })
   test('undefined', () => {
     const schema = z.undefined()
@@ -74,9 +204,26 @@ describe.concurrent('toTypescriptZuiString', () => {
     const schema = z.void()
     assert(schema).toGenerateItself()
   })
-  test('array', () => {
-    const schema = z.array(z.string())
-    assert(schema).toGenerateItself()
+  describe.concurrent('array', () => {
+    test('no checks', () => {
+      const schema = z.array(z.string())
+      assert(schema).toGenerateItself()
+    })
+
+    test('min', () => {
+      const schema = z.array(z.string()).min(42)
+      assert(schema).toGenerateItself()
+    })
+
+    test('max', () => {
+      const schema = z.array(z.string()).max(42)
+      assert(schema).toGenerateItself()
+    })
+
+    test('length', () => {
+      const schema = z.array(z.string()).length(42)
+      assert(schema).toGenerateItself()
+    })
   })
   test('object', () => {
     const schema = z.object({
@@ -112,9 +259,21 @@ describe.concurrent('toTypescriptZuiString', () => {
     const schema = z.map(z.string(), z.number())
     assert(schema).toGenerateItself()
   })
-  test('set', () => {
-    const schema = z.set(z.string())
-    assert(schema).toGenerateItself()
+  describe.concurrent('set', () => {
+    test('no checks', () => {
+      const schema = z.set(z.string())
+      assert(schema).toGenerateItself()
+    })
+
+    test('min', () => {
+      const schema = z.set(z.string()).min(42)
+      assert(schema).toGenerateItself()
+    })
+
+    test('max', () => {
+      const schema = z.set(z.string()).max(42)
+      assert(schema).toGenerateItself()
+    })
   })
   test('function with no argument', () => {
     const schema = z.function().returns(z.void())

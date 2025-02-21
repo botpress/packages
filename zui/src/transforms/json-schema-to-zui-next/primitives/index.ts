@@ -1,6 +1,7 @@
 import { JSONSchema7, JSONSchema7Type } from 'json-schema'
-import * as errs from '../common/errors'
-import z from '../../z'
+import * as errs from '../../common/errors'
+import z from '../../../z'
+import { stringJSONSchemaToZuiString } from './string'
 
 type ZuiPrimitive = keyof ZuiPrimitiveSchemas
 type ZuiPrimitiveSchemas = {
@@ -34,7 +35,7 @@ export const toZuiPrimitive = <T extends ZuiPrimitive>(type: T, schema: JSONSche
   const [first] = primitiveValues
   if (!first) {
     if (type === 'string') {
-      return z.string() as ZuiPrimitiveSchemas[T]
+      return stringJSONSchemaToZuiString(schema) as ZuiPrimitiveSchemas[T]
     }
     if (type === 'number') {
       return z.number() as ZuiPrimitiveSchemas[T]

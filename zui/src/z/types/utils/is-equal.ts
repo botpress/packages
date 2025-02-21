@@ -14,18 +14,26 @@ export const isEqual = (a: any, b: any): boolean => lodash.isEqualWith(a, b, _cu
 
 const _alreadyChecked = Symbol('infinite recursion prevention')
 
-const _customizer: IsEqualCustomizer = (value, other) => {
-  if (
-    lodash.isPlainObject(value) &&
-    !value[_alreadyChecked] &&
-    lodash.isPlainObject(other) &&
-    !other[_alreadyChecked]
-  ) {
-    // Prevent infinite recursion: mark objects as already checked:
-    value[_alreadyChecked] = true
-    other[_alreadyChecked] = true
+const _customizer: IsEqualCustomizer = (a, b) => {
+  if (lodash.isPlainObject(a) && !a[_alreadyChecked] && lodash.isPlainObject(b) && !b[_alreadyChecked]) {
+    const cleanedA = lodash.omitBy(a, lodash.isUndefined)
+    const cleanedB = lodash.omitBy(b, lodash.isUndefined)
 
-    return isEqual(lodash.omitBy(value, lodash.isUndefined), lodash.omitBy(other, lodash.isUndefined))
+    // Prevent infinite recursion: mark objects as already checked:
+    Object.defineProperty(cleanedA, _alreadyChecked, {
+      value: true,
+      enumerable: false,
+      configurable: false,
+      writable: false,
+    })
+    Object.defineProperty(cleanedB, _alreadyChecked, {
+      value: true,
+      enumerable: false,
+      configurable: false,
+      writable: false,
+    })
+
+    return isEqual(cleanedA, cleanedB)
   }
 
   return undefined // Offload to default lodash isEqual comparison

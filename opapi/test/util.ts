@@ -6,7 +6,14 @@ const host: tsc.FormatDiagnosticsHost = {
   getNewLine: () => '\n',
 }
 
-export function validateTypescriptFile(filename: string, options: tsc.CompilerOptions = {}): void {
+const DEFAULT_OPTIONS: tsc.CompilerOptions = {
+  resolveJsonModule: true,
+  strict: true,
+  esModuleInterop: true,
+}
+
+export function validateTypescriptFile(filename: string, opts: tsc.CompilerOptions = {}): void {
+  const options = { ...DEFAULT_OPTIONS, ...opts }
   const program = tsc.createProgram([filename], options)
   const diags = program.getSyntacticDiagnostics() // TODO: run all diagnostics
 
@@ -17,7 +24,8 @@ export function validateTypescriptFile(filename: string, options: tsc.CompilerOp
   }
 }
 
-export function getTypescriptErrors(filename: string, options: tsc.CompilerOptions = {}): string[] {
+export function getTypescriptErrors(filename: string, opts: tsc.CompilerOptions = {}): string[] {
+  const options = { ...DEFAULT_OPTIONS, ...opts }
   const program = tsc.createProgram([filename], options)
   const diagnostics = tsc.getPreEmitDiagnostics(program)
 

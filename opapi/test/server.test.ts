@@ -71,11 +71,7 @@ describe('server generator', () => {
       const filename = join(genServerFolder, file)
       expect(existsSync(filename), `${filename} should exist`).toBe(true)
 
-      const errors = getTypescriptErrors(filename, {
-        resolveJsonModule: true,
-        strict: true,
-        esModuleInterop: true,
-      })
+      const errors = getTypescriptErrors(filename)
       expect(errors, `${filename} should contain no typescript errors`).toEqual([])
     }
 

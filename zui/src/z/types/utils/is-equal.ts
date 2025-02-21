@@ -10,31 +10,25 @@ type IsEqualCustomizer = (
   stack: any,
 ) => boolean | undefined
 
-export const isEqual = (a: any, b: any): boolean => lodash.isEqualWith(a, b, _customizer)
-
-const _alreadyChecked = Symbol('infinite recursion prevention')
-
-const _customizer: IsEqualCustomizer = (a, b) => {
-  if (lodash.isPlainObject(a) && !a[_alreadyChecked] && lodash.isPlainObject(b) && !b[_alreadyChecked]) {
-    const cleanedA = lodash.omitBy(a, lodash.isUndefined)
-    const cleanedB = lodash.omitBy(b, lodash.isUndefined)
-
-    // Prevent infinite recursion: mark objects as already checked:
-    Object.defineProperty(cleanedA, _alreadyChecked, {
-      value: true,
-      enumerable: false,
-      configurable: false,
-      writable: false,
-    })
-    Object.defineProperty(cleanedB, _alreadyChecked, {
-      value: true,
-      enumerable: false,
-      configurable: false,
-      writable: false,
-    })
-
-    return isEqual(cleanedA, cleanedB)
-  }
-
-  return undefined // Offload to default lodash isEqual comparison
+export const isEqual = (a: any, b: any): boolean => {
+  return _isEqualWithVisitedTracking(a, b, new WeakSet())
 }
+
+const _isEqualWithVisitedTracking = (a: any, b: any, visited: WeakSet<any>): boolean =>
+  lodash.isEqualWith(a, b, _customizerWithVisitedTracking(visited))
+
+const _customizerWithVisitedTracking =
+  (visited: WeakSet<any>): IsEqualCustomizer =>
+  (a, b) => {
+    if (lodash.isPlainObject(a) && !visited.has(a) && lodash.isPlainObject(b) && !visited.has(b)) {
+      const cleanedA = lodash.omitBy(a, lodash.isUndefined)
+      const cleanedB = lodash.omitBy(b, lodash.isUndefined)
+
+      // Prevent infinite recursion: mark objects as already checked:
+      visited.add(cleanedA).add(cleanedB).add(a).add(b)
+
+      return _isEqualWithVisitedTracking(cleanedA, cleanedB, visited)
+    }
+
+    return undefined // Offload to default lodash isEqual comparison
+  }

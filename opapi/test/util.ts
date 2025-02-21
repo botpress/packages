@@ -24,7 +24,7 @@ export function validateTypescriptFile(filename: string, opts: tsc.CompilerOptio
   const [diag] = diags
   if (diag) {
     const message = tsc.formatDiagnostic(diag, host)
-    throw new Error(`Error while parsing ${filename}:\n${message}`)
+    throw new Error(`Error while parsing ${path.basename(diag.file.fileName)}:\n${message}`)
   }
 }
 

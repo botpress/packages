@@ -19,6 +19,11 @@ const serverFiles = [
 const GEN_DIR = join(__dirname, 'gen/server')
 
 describe('server generator', () => {
+  afterEach(() => {
+    const genServerFolder = GEN_DIR
+    rmdirSync(genServerFolder, { recursive: true })
+  })
+
   it('should be able to generate a server', async () => {
     const genServerFolder = GEN_DIR
 
@@ -39,8 +44,7 @@ describe('server generator', () => {
     expect(files.length).toBe(serverFiles.length)
   })
 
-  // TODO: enable this test
-  it.skip('should correctly handle empty request body', async () => {
+  it('should correctly handle empty request body', async () => {
     const genServerFolder = GEN_DIR
 
     const api = getMockApi()
@@ -63,20 +67,19 @@ describe('server generator', () => {
 
     await api.exportServer(genServerFolder, true)
 
-    serverFiles.forEach((file) => {
+    for (const file of serverFiles) {
       const filename = join(genServerFolder, file)
       expect(existsSync(filename), `${filename} should exist`).toBe(true)
 
-      const errors = getTypescriptErrors(filename, { strict: true })
+      const errors = getTypescriptErrors(filename, {
+        resolveJsonModule: true,
+        strict: true,
+        esModuleInterop: true,
+      })
       expect(errors, `${filename} should contain no typescript errors`).toEqual([])
-    })
+    }
 
     const files = getFiles(genServerFolder)
     expect(files.length).toBe(serverFiles.length)
-  })
-
-  afterEach(() => {
-    const genServerFolder = GEN_DIR
-    rmdirSync(genServerFolder, { recursive: true })
   })
 })

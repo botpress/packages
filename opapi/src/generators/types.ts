@@ -20,7 +20,7 @@ type GetParameters<T> = T extends Parameters
       GetQueryParameters<NonNullable<T['parameters']>>
   : {}
 
-type HandleEmptyObject<T extends object> = T extends Record<string, never> ? {} : T
+type HandleEmptyObject<T> = T extends Record<string, never> ? {} : T
 type GetOperationInput<T> = GetParameters<T> & HandleEmptyObject<GetRequestBody<T>>
 type GetOperationOutput<T extends Responses> = T['responses']['default']['content']['application/json']
 

@@ -1,3 +1,4 @@
+import path from 'path'
 import * as tsc from 'typescript'
 
 const host: tsc.FormatDiagnosticsHost = {
@@ -6,10 +7,13 @@ const host: tsc.FormatDiagnosticsHost = {
   getNewLine: () => '\n',
 }
 
+const ROOT_DIR = path.join(__dirname, '..')
 const DEFAULT_OPTIONS: tsc.CompilerOptions = {
   resolveJsonModule: true,
   strict: true,
   esModuleInterop: true,
+  baseUrl: ROOT_DIR,
+  noEmit: true,
 }
 
 export function validateTypescriptFile(filename: string, opts: tsc.CompilerOptions = {}): void {

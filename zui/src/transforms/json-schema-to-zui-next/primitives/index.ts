@@ -34,8 +34,8 @@ export const toZuiPrimitive = <T extends ZuiPrimitive>(type: T, schema: JSONSche
   const primitiveValues = values.filter((value): value is ZuiPrimitiveTypes[T] => typeof value === type)
   const [first] = primitiveValues
   if (!first) {
-    if (type === 'string') {
-      return stringJSONSchemaToZuiString(schema) as ZuiPrimitiveSchemas[T]
+    if (type === 'string' && schema.type === 'string') {
+      return stringJSONSchemaToZuiString(schema as JSONSchema7 & { type: 'string' }) as ZuiPrimitiveSchemas[T]
     }
     if (type === 'number') {
       return z.number() as ZuiPrimitiveSchemas[T]

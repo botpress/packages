@@ -3,17 +3,13 @@ import { zodPatterns } from '../../zui-to-json-schema/parsers/string'
 import z from '../../../z'
 import * as datetime from '../../../z/types/string/datetime'
 
-const stringSchema = z.object({
-  type: z.literal('string'),
-  format: z.enum(['cuid', 'cuid2', 'emoji', 'ulid', 'date-time', 'email', 'ipv4', 'ipv6', 'uri', 'uuid']).optional(),
-  pattern: z.string().optional(),
-  minLength: z.number().optional(),
-  maxLength: z.number().optional(),
-})
-
-export const stringJSONSchemaToZuiString = (schema: JSONSchema7): z.ZodString => {
+export const stringJSONSchemaToZuiString = ({
+  format,
+  pattern,
+  minLength,
+  maxLength,
+}: JSONSchema7 & { type: 'string' }): z.ZodString => {
   let zodString = z.string()
-  const { format, pattern, minLength, maxLength } = stringSchema.parse(schema)
 
   if (minLength && maxLength && minLength === maxLength) {
     zodString = zodString.length(minLength)

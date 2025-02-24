@@ -126,27 +126,6 @@ describe.concurrent('transformPipeline', () => {
       // Act & Assert
       assert(srcSchema).toTransformBackToItself()
     })
-    it.skip('should map a string with includes to itself', async () => {
-      // Arrange
-      const srcSchema = z.string().includes('foo')
-
-      // Act & Assert
-      assert(srcSchema).toTransformBackToItself()
-    })
-    it.skip('should map a string with startsWith to itself', async () => {
-      // Arrange
-      const srcSchema = z.string().startsWith('foo')
-
-      // Act & Assert
-      assert(srcSchema).toTransformBackToItself()
-    })
-    it.skip('should map a string with endsWith to itself', async () => {
-      // Arrange
-      const srcSchema = z.string().endsWith('foo')
-
-      // Act & Assert
-      assert(srcSchema).toTransformBackToItself()
-    })
     it('should map a string with includes to a matching regex', async () => {
       // Arrange
       const srcSchema = z.string().includes('foo')

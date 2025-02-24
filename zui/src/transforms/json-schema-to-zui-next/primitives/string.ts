@@ -1,6 +1,7 @@
 import { JSONSchema7 } from 'json-schema'
 import { zodPatterns } from '../../zui-to-json-schema/parsers/string'
 import z from '../../../z'
+import * as datetime from '../../../z/types/string/datetime'
 
 const stringSchema = z.object({
   type: z.literal('string'),
@@ -34,8 +35,8 @@ export const stringJSONSchemaToZuiString = (schema: JSONSchema7): z.ZodString =>
   } else if (format === 'ulid' || pattern === zodPatterns.ulid) {
     zodString = zodString.ulid()
   } else if (format === 'date-time') {
-    // TODO: extract precision and offset from the regex
-    zodString = zodString.datetime()
+    const { precision, offset } = pattern ? datetime.extractPrecisionAndOffset(pattern) : {}
+    zodString = zodString.datetime({ precision, offset })
   } else if (format === 'email' || pattern === zodPatterns.email) {
     zodString = zodString.email()
   } else if (format === 'ipv4' || pattern === zodPatterns.ipv4) {

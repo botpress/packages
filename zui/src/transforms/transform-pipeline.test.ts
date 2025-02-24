@@ -112,6 +112,13 @@ describe.concurrent('transformPipeline', () => {
       // Act & Assert
       assert(srcSchema).toTransformBackToItself()
     })
+    it('should map a string with datetime and precision/offset to itself', async () => {
+      // Arrange
+      const srcSchema = z.string().datetime({ offset: true, precision: 2 })
+
+      // Act & Assert
+      assert(srcSchema).toTransformBackToItself()
+    })
     it('should map a string with ip to itself', async () => {
       // Arrange
       const srcSchema = z.string().ip()

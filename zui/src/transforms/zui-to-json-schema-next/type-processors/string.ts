@@ -1,4 +1,6 @@
-import z, { datetimeRegex } from '../../../z'
+import { zuiKey } from '../../../ui/constants'
+import z from '../../../z'
+import { generateDatetimeRegex } from '../../../z/types/string/datetime'
 import * as errors from '../../common/errors'
 import * as json from '../../common/json-schema'
 import { zodPatterns } from '../../zui-to-json-schema/parsers/string'
@@ -8,8 +10,8 @@ export const zodStringToJsonString = (zodString: z.ZodString): json.StringSchema
     type: 'string',
   }
 
-  if (zodString._def['x-zui']) {
-    schema['x-zui'] = zodString._def['x-zui']
+  if (zodString._def[zuiKey]) {
+    schema[zuiKey] = zodString._def[zuiKey]
   }
 
   for (const check of zodString._def.checks) {
@@ -44,7 +46,8 @@ export const zodStringToJsonString = (zodString: z.ZodString): json.StringSchema
         break
       case 'datetime':
         schema.format = 'date-time'
-        schema.pattern = datetimeRegex(check).source
+        schema.pattern = generateDatetimeRegex(check).source
+        schema[zuiKey] = { ...schema[zuiKey], precision: check.precision, offset: check.offset }
         break
       case 'url':
         schema.format = 'uri'

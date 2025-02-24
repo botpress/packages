@@ -37,13 +37,14 @@ type BaseZuiJsonSchema<Def extends Partial<z.ZodDef> = {}> = util.Satisfies<
   JSONSchema7
 >
 
-type _StringFormat = 'date-time' | 'email' | 'idn-email' | 'ipv4' | 'ipv6' | 'uri' | 'uuid'
+// From the JSON Schema spec: "Format is not limited to a specific set of valid values or types. Users may define their own custom keywords"
+type _ZodSpecificStringFormat = 'cuid' | 'cuid2' | 'emoji' | 'ulid'
+type _JsonSchemaStringFormat = 'date-time' | 'email' | 'ipv4' | 'ipv6' | 'uri' | 'uuid'
 type _StringSchema = util.Satisfies<
   {
     type: 'string'
     pattern?: string
-    format?: _StringFormat
-    anyOf?: { format: _StringFormat }[]
+    format?: _JsonSchemaStringFormat | _ZodSpecificStringFormat
     minLength?: number
     maxLength?: number
   },

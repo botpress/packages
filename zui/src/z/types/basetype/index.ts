@@ -652,6 +652,10 @@ export abstract class ZodType<Output = any, Def extends ZodTypeDef = ZodTypeDef,
       return this.innerType.naked() as this
     }
 
+    if ('schema' in this && this.schema instanceof ZodType) {
+      return this.schema.naked() as this
+    }
+
     return this
   }
 }

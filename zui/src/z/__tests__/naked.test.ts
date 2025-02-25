@@ -25,6 +25,44 @@ test('naked object', () => {
       .naked(),
     ZodObject,
   )
+
+  assert.instanceOf(z.object({ name: z.string() }).readonly().naked(), ZodObject)
+})
+
+test('lazy', () => {
+  assert.instanceOf(z.lazy(() => z.string()).naked(), ZodString)
+  assert.instanceOf(
+    z
+      .lazy(() => z.string())
+      .nullable()
+      .naked(),
+    ZodString,
+  )
+  assert.instanceOf(
+    z
+      .lazy(() => z.string())
+      .optional()
+      .nullable()
+      .naked(),
+    ZodString,
+  )
+  assert.instanceOf(
+    z
+      .lazy(() => z.string())
+      .promise()
+      .nullable()
+      .naked(),
+    ZodString,
+  )
+
+  assert.instanceOf(z.lazy(() => z.object({ name: z.string() })).naked(), ZodObject)
+  assert.instanceOf(
+    z
+      .lazy(() => z.object({ name: z.string() }))
+      .nullable()
+      .naked(),
+    ZodObject,
+  )
 })
 
 test('naked array', () => {

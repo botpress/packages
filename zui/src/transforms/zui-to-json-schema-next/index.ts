@@ -2,6 +2,7 @@ import { ZuiExtensionObject } from '../../ui/types'
 import z from '../../z'
 import * as json from '../common/json-schema'
 import * as err from '../common/errors'
+import { zodNumberToJsonNumber } from './type-processors/number'
 import { zodStringToJsonString } from './type-processors/string'
 
 /**
@@ -20,33 +21,23 @@ export function toJsonSchema(schema: z.Schema): json.ZuiJsonSchema {
       return zodStringToJsonString(schemaTyped as z.ZodString) satisfies json.StringSchema
 
     case z.ZodFirstPartyTypeKind.ZodNumber:
-      const type = def.checks.some((check) => check.kind === 'int') ? 'integer' : 'number'
-      return { type, 'x-zui': def['x-zui'] } satisfies json.NumberSchema
+      return zodNumberToJsonNumber(schemaTyped as z.ZodNumber) satisfies json.NumberSchema
 
     case z.ZodFirstPartyTypeKind.ZodNaN:
       throw new err.UnsupportedZuiToJsonSchemaError(z.ZodFirstPartyTypeKind.ZodNaN)
 
     case z.ZodFirstPartyTypeKind.ZodBigInt:
-      return {
-        type: 'integer',
-        'x-zui': {
-          ...def['x-zui'],
-          def: { typeName: z.ZodFirstPartyTypeKind.ZodBigInt },
-        },
-      } satisfies json.BigIntSchema
+      throw new err.UnsupportedZuiToJsonSchemaError(z.ZodFirstPartyTypeKind.ZodBigInt, {
+        suggestedAlternative: 'serialize bigint to string',
+      })
 
     case z.ZodFirstPartyTypeKind.ZodBoolean:
       return { type: 'boolean', 'x-zui': def['x-zui'] } satisfies json.BooleanSchema
 
     case z.ZodFirstPartyTypeKind.ZodDate:
-      return {
-        type: 'string',
-        format: 'date-time',
-        'x-zui': {
-          ...def['x-zui'],
-          def: { typeName: z.ZodFirstPartyTypeKind.ZodDate },
-        },
-      } satisfies json.DateSchema
+      throw new err.UnsupportedZuiToJsonSchemaError(z.ZodFirstPartyTypeKind.ZodDate, {
+        suggestedAlternative: 'use z.string().datetime() instead',
+      })
 
     case z.ZodFirstPartyTypeKind.ZodUndefined:
       return undefinedSchema(def['x-zui'])

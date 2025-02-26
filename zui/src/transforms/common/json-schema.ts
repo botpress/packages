@@ -9,8 +9,6 @@ import { ZuiExtensionObject } from '../../ui/types'
  * Mutiple zui schemas map to the same JSON schema; undefined/never, any/unknown, union/discriminated-union
  * Adding some ZodDef to the ZuiExtension allows us to differentiate between them
  */
-type BigIntDef = util.Satisfies<{ typeName: z.ZodFirstPartyTypeKind.ZodBigInt }, Partial<z.ZodBigIntDef>>
-type DateDef = util.Satisfies<{ typeName: z.ZodFirstPartyTypeKind.ZodDate }, Partial<z.ZodDateDef>>
 type DiscriminatedUnionDef = util.Satisfies<
   { typeName: z.ZodFirstPartyTypeKind.ZodDiscriminatedUnion; discriminator: string },
   Partial<z.ZodDiscriminatedUnionDef>
@@ -50,7 +48,19 @@ type _StringSchema = util.Satisfies<
   },
   JSONSchema7
 >
-type _NumberSchema = util.Satisfies<{ type: 'number' | 'integer' }, JSONSchema7> // TODO: support all number checks
+type _ZodSpecificNumberFormat = 'finite'
+type _NumberSchema = util.Satisfies<
+  {
+    type: 'number' | 'integer'
+    minimum?: number
+    exclusiveMinimum?: number
+    maximum?: number
+    exclusiveMaximum?: number
+    multipleOf?: number
+    format?: _ZodSpecificNumberFormat
+  },
+  JSONSchema7
+>
 type _BigIntSchema = util.Satisfies<{ type: 'integer' }, JSONSchema7> // TODO: support all bigint checks
 type _BooleanSchema = util.Satisfies<{ type: 'boolean' }, JSONSchema7>
 type _DateSchema = util.Satisfies<{ type: 'string'; format: 'date-time' }, JSONSchema7> // TODO: support all date checks
@@ -85,9 +95,7 @@ type _NullableSchema = util.Satisfies<{ anyOf: [ZuiJsonSchema, NullSchema] }, JS
 
 export type StringSchema = _StringSchema & BaseZuiJsonSchema
 export type NumberSchema = _NumberSchema & BaseZuiJsonSchema
-export type BigIntSchema = _BigIntSchema & BaseZuiJsonSchema<BigIntDef>
 export type BooleanSchema = _BooleanSchema & BaseZuiJsonSchema
-export type DateSchema = _DateSchema & BaseZuiJsonSchema<DateDef>
 export type NullSchema = _NullSchema & BaseZuiJsonSchema
 export type UndefinedSchema = _UndefinedSchema & BaseZuiJsonSchema<UndefinedDef>
 export type NeverSchema = _NeverSchema & BaseZuiJsonSchema
@@ -114,9 +122,7 @@ export type LiteralSchema = LiteralStringSchema | LiteralNumberSchema | LiteralB
 export type ZuiJsonSchema =
   | StringSchema
   | NumberSchema
-  | BigIntSchema
   | BooleanSchema
-  | DateSchema
   | UndefinedSchema
   | NullSchema
   | AnySchema

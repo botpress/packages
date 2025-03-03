@@ -27,9 +27,11 @@ const checker =
           `Package ${pkg.name} is public and cannot depend on local package ${name}. To keep reference on local package, make ${pkg.name} private.`
         )
       }
-      if (!isLocal && currentVersion !== version) {
+      const currentLowerBound = utils.semver.getLowerBound(currentVersion)
+      const targetLowerBound = utils.semver.getLowerBound(version)
+      if (!isLocal && currentLowerBound !== targetLowerBound) {
         throw new errors.DepSynkyError(
-          `Dependency ${name} is out of sync in ${pkg.name}: ${currentVersion} != ${version}`
+          `Dependency ${name} is out of sync in ${pkg.name}: ${currentVersion} < ${version}`
         )
       }
     }

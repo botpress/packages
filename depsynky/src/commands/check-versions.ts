@@ -15,7 +15,7 @@ const checker =
       return
     }
 
-    for (const [name, version] of utils.objects.entries(target)) {
+    for (const [name, targetVersion] of utils.objects.entries(target)) {
       const currentVersion = current[name]
       if (!currentVersion) {
         continue
@@ -27,9 +27,13 @@ const checker =
           `Package ${pkg.name} is public and cannot depend on local package ${name}. To keep reference on local package, make ${pkg.name} private.`
         )
       }
-      if (!isLocal && currentVersion !== version) {
+      const currentLowerBound = utils.semver.getLowerBound(currentVersion)
+      if (!isLocal && currentLowerBound === null) {
+        throw new errors.DepSynkyError(`Invalid version ${currentVersion} for ${name} in ${pkg.name}`)
+      }
+      if (!isLocal && currentLowerBound !== targetVersion) {
         throw new errors.DepSynkyError(
-          `Dependency ${name} is out of sync in ${pkg.name}: ${currentVersion} != ${version}`
+          `Dependency ${name} is out of sync in ${pkg.name}: ${currentVersion} < ${targetVersion}`
         )
       }
     }

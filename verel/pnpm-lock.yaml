@@ -12,13 +12,13 @@ dependencies:
 devDependencies:
   '@types/lodash':
     specifier: ^4.14.200
-    version: 4.17.15
+    version: 4.17.16
   '@types/node':
     specifier: ^20.8.9
     version: 20.8.9
   '@vitest/browser':
     specifier: ^2.1.1
-    version: 2.1.8(@types/node@20.8.9)(playwright@1.50.1)(typescript@5.7.3)(vitest@2.1.8)
+    version: 2.1.8(@types/node@20.8.9)(playwright@1.51.0)(typescript@5.7.3)(vitest@2.1.8)
   esbuild:
     specifier: ^0.24.0
     version: 0.24.2
@@ -27,7 +27,7 @@ devDependencies:
     version: 4.17.21
   playwright:
     specifier: ^1.47.2
-    version: 1.50.1
+    version: 1.51.0
   ts-node:
     specifier: ^10.9.1
     version: 10.9.2(@types/node@20.8.9)(typescript@5.7.3)
@@ -814,8 +814,8 @@ packages:
     resolution: {integrity: sha512-AYnb1nQyY49te+VRAVgmzfcgjYS91mY5P0TKUDCLEM+gNnA+3T6rWITXRLYCpahpqSQbN5cE+gHpnPyXjHWxcw==}
     dev: true
 
-  /@types/lodash@4.17.15:
-    resolution: {integrity: sha512-w/P33JFeySuhN6JLkysYUK2gEmy9kHHFN7E8ro0tkfmlDOgxBDzWEZ/J8cWA+fHqFevpswDTFZnDx+R9lbL6xw==}
+  /@types/lodash@4.17.16:
+    resolution: {integrity: sha512-HX7Em5NYQAXKW+1T+FiuG27NGwzJfCX3s1GjOa7ujxZa52kjJLOr4FUxT+giF6Tgxv1e+/czV/iTtBw27WTU9g==}
     dev: true
 
   /@types/node@20.8.9:
@@ -832,7 +832,7 @@ packages:
     resolution: {integrity: sha512-/Ad8+nIOV7Rl++6f1BdKxFSMgmoqEoYbHRpPcx3JEfv8VRsQe9Z4mCXeJBzxs7mbHY/XOZZuXlRNfhpVPbs6ZA==}
     dev: true
 
-  /@vitest/browser@2.1.8(@types/node@20.8.9)(playwright@1.50.1)(typescript@5.7.3)(vitest@2.1.8):
+  /@vitest/browser@2.1.8(@types/node@20.8.9)(playwright@1.51.0)(typescript@5.7.3)(vitest@2.1.8):
     resolution: {integrity: sha512-OWVvEJThRgxlNMYNVLEK/9qVkpRcLvyuKLngIV3Hob01P56NjPHprVBYn+rx4xAJudbM9yrCrywPIEuA3Xyo8A==}
     peerDependencies:
       playwright: '*'
@@ -853,7 +853,7 @@ packages:
       '@vitest/utils': 2.1.8
       magic-string: 0.30.17
       msw: 2.7.0(@types/node@20.8.9)(typescript@5.7.3)
-      playwright: 1.50.1
+      playwright: 1.51.0
       sirv: 3.0.0
       tinyrainbow: 1.2.0
       vitest: 2.1.8(@types/node@20.8.9)(@vitest/browser@2.1.8)
@@ -1455,18 +1455,18 @@ packages:
     resolution: {integrity: sha512-xceH2snhtb5M9liqDsmEw56le376mTZkEX/jEb/RxNFyegNul7eNslCXP9FDj/Lcu0X8KEyMceP2ntpaHrDEVA==}
     dev: true
 
-  /playwright-core@1.50.1:
-    resolution: {integrity: sha512-ra9fsNWayuYumt+NiM069M6OkcRb1FZSK8bgi66AtpFoWkg2+y0bJSNmkFrWhMbEBbVKC/EruAHH3g0zmtwGmQ==}
+  /playwright-core@1.51.0:
+    resolution: {integrity: sha512-x47yPE3Zwhlil7wlNU/iktF7t2r/URR3VLbH6EknJd/04Qc/PSJ0EY3CMXipmglLG+zyRxW6HNo2EGbKLHPWMg==}
     engines: {node: '>=18'}
     hasBin: true
     dev: true
 
-  /playwright@1.50.1:
-    resolution: {integrity: sha512-G8rwsOQJ63XG6BbKj2w5rHeavFjy5zynBA9zsJMMtBoe/Uf757oG12NXz6e6OirF7RCrTVAKFXbLmn1RbL7Qaw==}
+  /playwright@1.51.0:
+    resolution: {integrity: sha512-442pTfGM0xxfCYxuBa/Pu6B2OqxqqaYq39JS8QDMGThUvIOCd6s0ANDog3uwA0cHavVlnTQzGCN7Id2YekDSXA==}
     engines: {node: '>=18'}
     hasBin: true
     dependencies:
-      playwright-core: 1.50.1
+      playwright-core: 1.51.0
     optionalDependencies:
       fsevents: 2.3.2
     dev: true
@@ -1825,7 +1825,7 @@ packages:
         optional: true
     dependencies:
       '@types/node': 20.8.9
-      '@vitest/browser': 2.1.8(@types/node@20.8.9)(playwright@1.50.1)(typescript@5.7.3)(vitest@2.1.8)
+      '@vitest/browser': 2.1.8(@types/node@20.8.9)(playwright@1.51.0)(typescript@5.7.3)(vitest@2.1.8)
       '@vitest/expect': 2.1.8
       '@vitest/mocker': 2.1.8(vite@5.4.11)
       '@vitest/pretty-format': 2.1.8

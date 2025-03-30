@@ -1,4 +1,3 @@
-src/
 src/__tests/
 node_modules/
 *.test.ts

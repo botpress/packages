@@ -7,18 +7,16 @@ import { json as requestSchemas } from './requests'
 import { JSONSchema7 } from 'json-schema'
 import Ajv from 'ajv'
 
-const ajv = new Ajv()
-
 `
 
 const PARSE_OPERATION_REQUEST = `type OperationName = keyof types.Requests
-const parseOperationRequest =
+const createOperationRequestParser =
+  (ajv: Ajv) =>
   <Op extends OperationName, OperationProps extends object>(
     op: types.Operations<OperationProps>[Op],
-    requestSchema: JSONSchema7
+    requestSchema: JSONSchema7,
   ) =>
   async (props: OperationProps, req: unknown): Promise<types.Response> => {
-
     const validate = ajv.compile<unknown>(requestSchema)
     const isValid = validate(req)
     if (!isValid) {
@@ -30,25 +28,28 @@ const parseOperationRequest =
         },
       }
     }
-    
+
     const response: types.Responses[Op] = await op(props, req as types.Requests[Op])
     return response
   }
 
 `
 
-const PARSE_OPERATIONS_REQUEST_HEAD = `const parseOperationsRequest = <Tools extends object>(operations: types.Operations<Tools>) =>
-({
+const PARSE_OPERATIONS_REQUEST_HEAD = `const parseOperationsRequest = <Tools extends object>(operations: types.Operations<Tools>, ajv: Ajv) => {
+  const parseOperationRequest = createOperationRequestParser(ajv)
+  return {
 `
 
-const PARSE_OPERATIONS_REQUEST_FOOT = `} satisfies types.Routes<Tools>)
+const PARSE_OPERATIONS_REQUEST_FOOT = `  } satisfies types.Routes<Tools>
+}
 
 `
 
 const CREATE_ROUTE_TREE_HEAD = `export const createRouteTree = <T extends object>(
-  operations: types.Operations<T>
+  operations: types.Operations<T>,
+  ajv: Ajv = new Ajv(),
 ): types.RouteTree<T> => {
-  const parsedOperations = parseOperationsRequest(operations)
+  const parsedOperations = parseOperationsRequest(operations, ajv)
   return {
 `
 
@@ -64,7 +65,7 @@ export const exportRouteTree =
 
     content += PARSE_OPERATIONS_REQUEST_HEAD
     for (const [_, { name }] of Object.entries(operations)) {
-      content += `  ${name}: parseOperationRequest(operations.${name}, requestSchemas.${name}),\n`
+      content += `    ${name}: parseOperationRequest(operations.${name}, requestSchemas.${name}),\n`
     }
     content += PARSE_OPERATIONS_REQUEST_FOOT
 

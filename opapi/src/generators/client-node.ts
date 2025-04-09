@@ -46,7 +46,7 @@ const HEADER = `// this file was automatically generated, do not edit
 `
 
 const GET_ERROR_FUNCTION = `// maps axios error to api error type
-function getError(err: Error) {
+function toApiError(err: unknown): Error {
   if (axios.isAxiosError(err) && err.response?.data) {
     return errorFrom(err.response.data)
   }
@@ -266,6 +266,7 @@ export const generateIndex = async (state: State<string, string, string>, indexF
   indexCode += [
     'export type ClientProps = {',
     '  toAxiosRequest: typeof toAxiosRequest', // allows to override the toAxiosRequest function
+    '  toApiError: typeof toApiError', // allows to override the toApiError function
     '}',
   ].join('\n')
   indexCode += '\n\n'
@@ -278,8 +279,11 @@ export const generateIndex = async (state: State<string, string, string>, indexF
     indexCode += [
       `  public readonly ${name} = async (input: ${name}.${inputName}): Promise<${name}.${resName}> => {`,
       `    const { path, headers, query, body } = ${name}.parseReq(input)`,
-      `    const mapper = this.props.toAxiosRequest ?? toAxiosRequest`,
-      `    const axiosReq = mapper({`,
+      '',
+      `    const mapRequest = this.props.toAxiosRequest ?? toAxiosRequest`,
+      `    const mapErrorResponse = this.props.toApiError ?? toApiError`,
+      '',
+      `    const axiosReq = mapRequest({`,
       `        method: "${operation.method}",`,
       '        path,',
       '        headers: { ...headers },',
@@ -288,7 +292,7 @@ export const generateIndex = async (state: State<string, string, string>, indexF
       '    })',
       `    return this.axiosInstance.request<${name}.${resName}>(axiosReq)`,
       `      .then((res) => res.data)`,
-      `      .catch((e) => { throw getError(e) })`,
+      `      .catch((e) => { throw mapErrorResponse(e) })`,
       '  }\n\n',
     ].join('\n')
   }

@@ -84,7 +84,7 @@ export type AdditionalProperties<T extends UnknownKeysParam> = T extends ZodType
 export type deoptional<T extends ZodTypeAny> =
   T extends ZodOptional<infer U> ? deoptional<U> : T extends ZodNullable<infer U> ? ZodNullable<deoptional<U>> : T
 
-export type SomeZodObject = ZodObject<ZodRawShape, UnknownKeysParam, ZodTypeAny>
+export type SomeZodObject = ZodObject<ZodRawShape, UnknownKeysParam>
 
 export type noUnrecognized<Obj extends object, Shape extends object> = {
   [k in keyof Obj]: k extends keyof Shape ? Obj[k] : never
@@ -120,7 +120,6 @@ function deepPartialify(schema: ZodTypeAny): any {
 export class ZodObject<
   T extends ZodRawShape = ZodRawShape,
   UnknownKeys extends UnknownKeysParam = UnknownKeysParam,
-  _Catchall extends ZodTypeAny = ZodTypeAny, // TODO: remove
   Output = objectOutputType<T, UnknownKeys>,
   Input = objectInputType<T, UnknownKeys>,
 > extends ZodType<Output, ZodObjectDef<T, UnknownKeys>, Input> {
@@ -644,4 +643,4 @@ export class ZodObject<
   }
 }
 
-export type AnyZodObject = ZodObject<any, any, any>
+export type AnyZodObject = ZodObject<any, any>

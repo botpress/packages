@@ -357,8 +357,8 @@ test('unknownkeys merging', () => {
   const mergedSchema = schemaA.merge(schemaB)
   type mergedSchema = typeof mergedSchema
 
-  util.assertEqual<mergedSchema['_def']['catchall'], z.ZodString>(true)
-  expect(mergedSchema._def.catchall instanceof z.ZodString).toEqual(true)
+  util.assertEqual<mergedSchema['_def']['unknownKeys'], z.ZodString>(true)
+  expect(mergedSchema._def.unknownKeys instanceof z.ZodString).toEqual(true)
 })
 
 const personToExtend = z.object({

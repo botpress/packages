@@ -75,12 +75,6 @@ export type UnknownKeysOutputType<T extends UnknownKeysParam> = T extends ZodTyp
     ? { [k: string]: unknown }
     : {}
 
-export type AdditionalProperties<T extends UnknownKeysParam> = T extends ZodTypeAny
-  ? T
-  : T extends 'passthrough'
-    ? ZodUnknown
-    : ZodNever
-
 export type deoptional<T extends ZodTypeAny> =
   T extends ZodOptional<infer U> ? deoptional<U> : T extends ZodNullable<infer U> ? ZodNullable<deoptional<U>> : T
 
@@ -284,16 +278,6 @@ export class ZodObject<
       ...this._def,
       unknownKeys: 'passthrough',
     })
-  }
-
-  additionalProperties(): AdditionalProperties<UnknownKeys> {
-    if (this._def.unknownKeys instanceof ZodType) {
-      return this._def.unknownKeys as AdditionalProperties<UnknownKeys>
-    }
-    if (this._def.unknownKeys === 'passthrough') {
-      return ZodUnknown.create() as AdditionalProperties<UnknownKeys>
-    }
-    return ZodNever.create() as AdditionalProperties<UnknownKeys>
   }
 
   /**

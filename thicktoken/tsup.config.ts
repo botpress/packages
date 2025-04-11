@@ -8,6 +8,7 @@ export default defineConfig({
   platform: 'neutral',
   clean: true,
   bundle: true,
+  dts: true,
   shims: true,
   cjsInterop: true,
   esbuildPlugins: [

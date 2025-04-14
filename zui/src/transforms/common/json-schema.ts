@@ -28,6 +28,7 @@ type ZuiExtension<Def extends Partial<z.ZodDef> = {}> = { def?: Def } & ZuiExten
 type JsonData = string | number | boolean | null | JsonData[] | { [key: string]: JsonData }
 type BaseZuiJsonSchema<Def extends Partial<z.ZodDef> = {}> = util.Satisfies<
   {
+    description?: string
     readOnly?: boolean
     default?: JsonData
     ['x-zui']?: ZuiExtension<Def>

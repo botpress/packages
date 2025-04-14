@@ -125,6 +125,25 @@ describe('zuiToJsonSchemaNext', () => {
     })
   })
 
+  test('should preserve ZodObject nested properties descriptions', () => {
+    const description = 'The ID or Name of the table (e.g. tblFnqcm4zLVKn85A or articles)'
+    const schema = toJsonSchema(
+      z.object({
+        tableIdOrName: z.string().describe(description),
+      }),
+    )
+    expect(schema).toEqual({
+      type: 'object',
+      properties: {
+        tableIdOrName: {
+          type: 'string',
+          description,
+        },
+      },
+      required: ['tableIdOrName'],
+    })
+  })
+
   test('should map ZodUnion to UnionSchema', () => {
     const schema = toJsonSchema(z.union([z.string(), z.number()]))
     expect(schema).toEqual({

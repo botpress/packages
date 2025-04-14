@@ -458,11 +458,9 @@ export abstract class ZodType<Output = any, Def extends ZodTypeDef = ZodTypeDef,
   }
 
   describe(description: string): this {
-    const This = (this as any).constructor
-    return new This({
-      ...this._def,
-      description,
-    })
+    const root = this._metadataRoot
+    root._def.description = description
+    return this
   }
 
   pipe<T extends ZodTypeAny>(target: T): ZodPipeline<this, T> {

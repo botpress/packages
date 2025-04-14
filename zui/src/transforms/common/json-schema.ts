@@ -83,8 +83,8 @@ type _ObjectSchema = util.Satisfies<
   {
     type: 'object'
     properties: { [key: string]: ZuiJsonSchema }
-    additionalProperties?: ZuiJsonSchema
-    required: string[]
+    additionalProperties?: ZuiJsonSchema | boolean
+    required?: string[]
   },
   JSONSchema7
 >

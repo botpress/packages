@@ -78,13 +78,21 @@ export function toJsonSchema(schema: z.Schema): json.ZuiJsonSchema {
 
     case z.ZodFirstPartyTypeKind.ZodObject:
       const shape = Object.entries(def.shape())
-      const required = shape.filter(([_, value]) => !value.isOptional()).map(([key]) => key)
+      const requiredProperties = shape.filter(([_, value]) => !value.isOptional())
+      const required = requiredProperties.length ? requiredProperties.map(([key]) => key) : undefined
       const properties = shape
         .map(([key, value]) => [key, _toRequired(value)] satisfies [string, z.ZodType])
         .map(([key, value]) => [key, toJsonSchema(value)] satisfies [string, json.ZuiJsonSchema])
 
-      const zAdditionalProperties = (schema as z.ZodObject).additionalProperties()
-      const additionalProperties = zAdditionalProperties ? toJsonSchema(zAdditionalProperties) : undefined
+      let additionalProperties: json.ObjectSchema['additionalProperties'] = false
+      if (def.unknownKeys instanceof z.ZodType) {
+        additionalProperties = toJsonSchema(def.unknownKeys)
+      } else if (def.unknownKeys === 'passthrough') {
+        additionalProperties = true
+      } else {
+        def.unknownKeys satisfies 'strip' | 'strict'
+        additionalProperties = false
+      }
 
       return {
         type: 'object',
@@ -287,5 +295,5 @@ const undefinedSchema = (zSchema?: z.ZodTypeDef): json.UndefinedSchema => ({
 const nullSchema = (zSchema?: z.ZodTypeDef): json.NullSchema => ({
   type: 'null',
   description: zSchema?.description,
-  'x-zui': zSchema?.['x-zui'],
+  'x-zui': { ...zSchema?.['x-zui'] },
 })

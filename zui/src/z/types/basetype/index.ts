@@ -458,9 +458,17 @@ export abstract class ZodType<Output = any, Def extends ZodTypeDef = ZodTypeDef,
   }
 
   describe(description: string): this {
-    const root = this._metadataRoot
+    const clone = this.clone()
+    const root = clone._metadataRoot
     root._def.description = description
     return this
+  }
+
+  clone(): ZodType<Output, Def, Input> {
+    const This = (this as any).constructor
+    return new This({
+      ...this._def,
+    })
   }
 
   pipe<T extends ZodTypeAny>(target: T): ZodPipeline<this, T> {

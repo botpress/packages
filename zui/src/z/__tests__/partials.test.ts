@@ -128,7 +128,7 @@ test('required', () => {
     nullishField: z.string().nullish(),
   })
 
-  const requiredObject = object.mandatory()
+  const requiredObject = object.required()
   expect(requiredObject.shape.name).toBeInstanceOf(z.ZodString)
   expect(requiredObject.shape.age).toBeInstanceOf(z.ZodNumber)
   expect(requiredObject.shape.field).toBeInstanceOf(z.ZodDefault)
@@ -145,7 +145,7 @@ test('required inference', () => {
     nullishField: z.string().nullish(),
   })
 
-  const requiredObject = object.mandatory()
+  const requiredObject = object.required()
 
   type required = z.infer<typeof requiredObject>
   type expected = {
@@ -166,7 +166,7 @@ test('required with mask', () => {
     country: z.string().optional(),
   })
 
-  const requiredObject = object.mandatory({ age: true })
+  const requiredObject = object.required({ age: true })
   expect(requiredObject.shape.name).toBeInstanceOf(z.ZodString)
   expect(requiredObject.shape.age).toBeInstanceOf(z.ZodNumber)
   expect(requiredObject.shape.field).toBeInstanceOf(z.ZodDefault)
@@ -182,7 +182,7 @@ test('required with mask -- ignore falsy values', () => {
   })
 
   // @ts-expect-error
-  const requiredObject = object.mandatory({ age: true, country: false })
+  const requiredObject = object.required({ age: true, country: false })
   expect(requiredObject.shape.name).toBeInstanceOf(z.ZodString)
   expect(requiredObject.shape.age).toBeInstanceOf(z.ZodNumber)
   expect(requiredObject.shape.field).toBeInstanceOf(z.ZodDefault)

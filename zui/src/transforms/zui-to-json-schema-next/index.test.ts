@@ -80,6 +80,7 @@ describe('zuiToJsonSchemaNext', () => {
         name: z.string(),
         age: z.number().optional(),
         data: z.union([z.string(), z.null(), z.undefined()]),
+        email: z.string().optional().readonly(),
       }),
     )
     expect(schema).toEqual({
@@ -90,6 +91,7 @@ describe('zuiToJsonSchemaNext', () => {
         data: {
           anyOf: [{ type: 'string' }, { type: 'null' }],
         },
+        email: { type: 'string', readOnly: true },
       },
       required: ['name'],
     })

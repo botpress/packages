@@ -63,10 +63,10 @@ export class ZodNullable<T extends ZodTypeAny = ZodTypeAny> extends ZodType<
     return this._def.innerType.naked()
   }
 
-  required(): ZodNullable<ZodTypeAny> {
+  mandatory(): ZodNullable<ZodTypeAny> {
     return new ZodNullable({
       ...this._def,
-      innerType: this._def.innerType.required(),
+      innerType: this._def.innerType.mandatory(),
     })
   }
 }

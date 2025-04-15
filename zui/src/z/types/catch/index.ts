@@ -106,10 +106,10 @@ export class ZodCatch<T extends ZodTypeAny = ZodTypeAny> extends ZodType<
     return this._def.innerType.naked()
   }
 
-  required(): ZodCatch<ZodTypeAny> {
+  mandatory(): ZodCatch<ZodTypeAny> {
     return new ZodCatch({
       ...this._def,
-      innerType: this._def.innerType.required(),
+      innerType: this._def.innerType.mandatory(),
     })
   }
 }

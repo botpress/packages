@@ -42,10 +42,10 @@ export class ZodBranded<T extends ZodTypeAny = ZodTypeAny, B extends Key = Key> 
     return this._def.type.naked()
   }
 
-  required(): ZodBranded<ZodTypeAny, B> {
+  mandatory(): ZodBranded<ZodTypeAny, B> {
     return new ZodBranded({
       ...this._def,
-      type: this._def.type.required(),
+      type: this._def.type.mandatory(),
     })
   }
 }

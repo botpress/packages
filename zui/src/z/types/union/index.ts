@@ -173,8 +173,8 @@ export class ZodUnion<T extends ZodUnionOptions = DefaultZodUnionOptions> extend
     return thisOptions.isEqual(thatOptions)
   }
 
-  required(): ZodType {
-    const options = this._def.options.filter((o) => !(o instanceof ZodUndefined)).map((option) => option.required())
+  mandatory(): ZodType {
+    const options = this._def.options.filter((o) => !(o instanceof ZodUndefined)).map((option) => option.mandatory())
     const [first, second, ...others] = options
     if (!first) {
       return ZodNever.create({

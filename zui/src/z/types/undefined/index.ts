@@ -45,7 +45,7 @@ export class ZodUndefined extends ZodType<undefined, ZodUndefinedDef> {
     return schema instanceof ZodUndefined
   }
 
-  required(): ZodNever {
+  mandatory(): ZodNever {
     return ZodNever.create({
       ...this._def,
     })

@@ -63,7 +63,7 @@ export class ZodOptional<T extends ZodTypeAny = ZodTypeAny> extends ZodType<
     return this._def.innerType.naked()
   }
 
-  required(): ZodTypeAny {
-    return this._def.innerType.required()
+  mandatory(): ZodTypeAny {
+    return this._def.innerType.mandatory()
   }
 }

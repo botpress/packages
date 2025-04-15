@@ -44,10 +44,10 @@ export class ZodLazy<T extends ZodTypeAny = ZodTypeAny> extends ZodType<output<T
     return this._def.getter().naked()
   }
 
-  required(): ZodLazy<ZodTypeAny> {
+  mandatory(): ZodLazy<ZodTypeAny> {
     return new ZodLazy({
       ...this._def,
-      getter: () => this._def.getter().required(),
+      getter: () => this._def.getter().mandatory(),
     })
   }
 }

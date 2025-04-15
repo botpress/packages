@@ -81,7 +81,7 @@ export function toJsonSchema(schema: z.Schema): json.ZuiJsonSchema {
       const requiredProperties = shape.filter(([_, value]) => !value.isOptional())
       const required = requiredProperties.length ? requiredProperties.map(([key]) => key) : undefined
       const properties = shape
-        .map(([key, value]) => [key, value.required()] satisfies [string, z.ZodType])
+        .map(([key, value]) => [key, value.mandatory()] satisfies [string, z.ZodType])
         .map(([key, value]) => [key, toJsonSchema(value)] satisfies [string, json.ZuiJsonSchema])
 
       let additionalProperties: json.ObjectSchema['additionalProperties'] = undefined

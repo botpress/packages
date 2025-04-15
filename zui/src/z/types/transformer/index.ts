@@ -243,10 +243,10 @@ export class ZodEffects<T extends ZodTypeAny = ZodTypeAny, Output = output<T>, I
     return this._def.schema.naked()
   }
 
-  required(): ZodEffects<ZodTypeAny> {
+  mandatory(): ZodEffects<ZodTypeAny> {
     return new ZodEffects({
       ...this._def,
-      schema: this._def.schema.required(),
+      schema: this._def.schema.mandatory(),
     })
   }
 }

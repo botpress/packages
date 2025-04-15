@@ -128,10 +128,14 @@ describe('zuiToJsonSchemaNext', () => {
   })
 
   test('should preserve ZodObject nested properties descriptions', () => {
-    const description = 'The ID or Name of the table (e.g. tblFnqcm4zLVKn85A or articles)'
+    const description1 = 'The ID or Name of the table'
+    const description2 = 'Notes about the task'
+    const description3 = 'The ID of the user who will be assigned to the task'
     const schema = toJsonSchema(
       z.object({
-        tableIdOrName: z.string().describe(description),
+        tableIdOrName: z.string().describe(description1),
+        notes: z.string().optional().describe(description2),
+        assignee: z.string().optional().default('me').describe(description3),
       }),
     )
     expect(schema).toEqual({
@@ -139,7 +143,18 @@ describe('zuiToJsonSchemaNext', () => {
       properties: {
         tableIdOrName: {
           type: 'string',
-          description,
+          description: description1,
+        },
+        notes: {
+          type: 'string',
+          // FIXME: this should be preserved
+          // description: description2,
+        },
+        assignee: {
+          type: 'string',
+          // FIXME: this should be preserved
+          // description: description2,
+          default: 'me',
         },
       },
       required: ['tableIdOrName'],

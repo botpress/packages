@@ -78,11 +78,4 @@ export class ZodPromise<T extends ZodTypeAny = ZodTypeAny> extends ZodType<
   naked() {
     return this._def.type.naked()
   }
-
-  required(): ZodPromise<ZodTypeAny> {
-    return new ZodPromise({
-      ...this._def,
-      type: this._def.type.required(),
-    })
-  }
 }

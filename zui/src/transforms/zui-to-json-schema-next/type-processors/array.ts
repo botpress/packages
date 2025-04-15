@@ -10,7 +10,7 @@ export const zodArrayToJsonArray = (
     type: 'array',
     description: zodArray.description,
     items: toSchema(zodArray._def.type),
-    'x-zui': { ...zodArray._def['x-zui'] },
+    'x-zui': zodArray._def['x-zui'],
   }
 
   if (zodArray._def[zuiKey]) {

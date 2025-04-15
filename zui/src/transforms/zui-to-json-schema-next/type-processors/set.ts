@@ -11,7 +11,7 @@ export const zodSetToJsonSet = (
     description: zodSet.description,
     uniqueItems: true,
     items: toSchema(zodSet._def.valueType),
-    'x-zui': { ...zodSet._def['x-zui'] },
+    'x-zui': zodSet._def['x-zui'],
   }
 
   if (zodSet._def[zuiKey]) {

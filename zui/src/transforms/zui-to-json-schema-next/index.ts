@@ -37,7 +37,7 @@ export function toJsonSchema(schema: z.Schema): json.ZuiJsonSchema {
       return {
         type: 'boolean',
         description: def.description,
-        'x-zui': { ...def['x-zui'] },
+        'x-zui': def['x-zui'],
       } satisfies json.BooleanSchema
 
     case z.ZodFirstPartyTypeKind.ZodDate:
@@ -54,7 +54,7 @@ export function toJsonSchema(schema: z.Schema): json.ZuiJsonSchema {
     case z.ZodFirstPartyTypeKind.ZodAny:
       return {
         description: def.description,
-        'x-zui': { ...def['x-zui'] },
+        'x-zui': def['x-zui'],
       } satisfies json.AnySchema
 
     case z.ZodFirstPartyTypeKind.ZodUnknown:
@@ -67,7 +67,7 @@ export function toJsonSchema(schema: z.Schema): json.ZuiJsonSchema {
       return {
         not: true,
         description: def.description,
-        'x-zui': { ...def['x-zui'] },
+        'x-zui': def['x-zui'],
       } satisfies json.NeverSchema
 
     case z.ZodFirstPartyTypeKind.ZodVoid:
@@ -99,14 +99,14 @@ export function toJsonSchema(schema: z.Schema): json.ZuiJsonSchema {
         properties: Object.fromEntries(properties),
         required,
         additionalProperties,
-        'x-zui': { ...def['x-zui'] },
+        'x-zui': def['x-zui'],
       } satisfies json.ObjectSchema
 
     case z.ZodFirstPartyTypeKind.ZodUnion:
       return {
         description: def.description,
         anyOf: def.options.map((option) => toJsonSchema(option)),
-        'x-zui': { ...def['x-zui'] },
+        'x-zui': def['x-zui'],
       } satisfies json.UnionSchema
 
     case z.ZodFirstPartyTypeKind.ZodDiscriminatedUnion:
@@ -123,7 +123,7 @@ export function toJsonSchema(schema: z.Schema): json.ZuiJsonSchema {
       return {
         description: def.description,
         allOf: [toJsonSchema(def.left), toJsonSchema(def.right)],
-        'x-zui': { ...def['x-zui'] },
+        'x-zui': def['x-zui'],
       } satisfies json.IntersectionSchema
 
     case z.ZodFirstPartyTypeKind.ZodTuple:
@@ -134,7 +134,7 @@ export function toJsonSchema(schema: z.Schema): json.ZuiJsonSchema {
         type: 'object',
         description: def.description,
         additionalProperties: toJsonSchema(def.valueType),
-        'x-zui': { ...def['x-zui'] },
+        'x-zui': def['x-zui'],
       } satisfies json.RecordSchema
 
     case z.ZodFirstPartyTypeKind.ZodMap:
@@ -155,21 +155,21 @@ export function toJsonSchema(schema: z.Schema): json.ZuiJsonSchema {
           type: 'string',
           description: def.description,
           const: def.value,
-          'x-zui': { ...def['x-zui'] },
+          'x-zui': def['x-zui'],
         } satisfies json.LiteralStringSchema
       } else if (typeof def.value === 'number') {
         return {
           type: 'number',
           description: def.description,
           const: def.value,
-          'x-zui': { ...def['x-zui'] },
+          'x-zui': def['x-zui'],
         } satisfies json.LiteralNumberSchema
       } else if (typeof def.value === 'boolean') {
         return {
           type: 'boolean',
           description: def.description,
           const: def.value,
-          'x-zui': { ...def['x-zui'] },
+          'x-zui': def['x-zui'],
         } satisfies json.LiteralBooleanSchema
       } else if (def.value === null) {
         return nullSchema(def)
@@ -186,7 +186,7 @@ export function toJsonSchema(schema: z.Schema): json.ZuiJsonSchema {
         type: 'string',
         description: def.description,
         enum: def.values,
-        'x-zui': { ...def['x-zui'] },
+        'x-zui': def['x-zui'],
       } satisfies json.EnumSchema
 
     case z.ZodFirstPartyTypeKind.ZodEffects:
@@ -248,7 +248,7 @@ export function toJsonSchema(schema: z.Schema): json.ZuiJsonSchema {
       return {
         $ref: def.uri,
         description: def.description,
-        'x-zui': { ...def['x-zui'] },
+        'x-zui': def['x-zui'],
       }
 
     default:
@@ -285,14 +285,14 @@ const _toRequired = (schema: z.ZodType): z.ZodType => {
   return newSchema
 }
 
-const undefinedSchema = (zSchema?: z.ZodTypeDef): json.UndefinedSchema => ({
+const undefinedSchema = (def?: z.ZodTypeDef): json.UndefinedSchema => ({
   not: true,
-  description: zSchema?.description,
-  'x-zui': { ...zSchema?.['x-zui'], def: { typeName: z.ZodFirstPartyTypeKind.ZodUndefined } },
+  description: def?.description,
+  'x-zui': { ...def?.['x-zui'], def: { typeName: z.ZodFirstPartyTypeKind.ZodUndefined } },
 })
 
-const nullSchema = (zSchema?: z.ZodTypeDef): json.NullSchema => ({
+const nullSchema = (def?: z.ZodTypeDef): json.NullSchema => ({
   type: 'null',
-  description: zSchema?.description,
-  'x-zui': { ...zSchema?.['x-zui'] },
+  description: def?.description,
+  'x-zui': def?.['x-zui'],
 })

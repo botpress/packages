@@ -458,16 +458,11 @@ export abstract class ZodType<Output = any, Def extends ZodTypeDef = ZodTypeDef,
   }
 
   describe(description: string): this {
-    const clone = this.clone()
-    const root = clone._metadataRoot
-    root._def.description = description
-    return this
-  }
-
-  clone(): ZodType<Output, Def, Input> {
+    // should set the description on the _metadataRoot
     const This = (this as any).constructor
     return new This({
       ...this._def,
+      description,
     })
   }
 

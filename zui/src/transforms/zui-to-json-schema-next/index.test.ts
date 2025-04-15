@@ -101,7 +101,7 @@ describe('zuiToJsonSchemaNext', () => {
       type: 'object',
       properties: { name: { type: 'string' } },
       required: ['name'],
-      additionalProperties: { not: true },
+      additionalProperties: false,
     })
   })
 
@@ -111,7 +111,7 @@ describe('zuiToJsonSchemaNext', () => {
       type: 'object',
       properties: { name: { type: 'string' } },
       required: ['name'],
-      additionalProperties: {},
+      additionalProperties: true,
     })
   })
 

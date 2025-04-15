@@ -22,7 +22,7 @@ const expectZui = (actual: z.Schema) => ({
   },
 })
 
-describe('required', () => {
+describe('mandatory', () => {
   test('undefined', () => {
     const schema = z.undefined()
     const requiredSchema = schema.mandatory()

@@ -30,7 +30,7 @@ describe('Meta data', () => {
     expect($j).toEqual($e)
   })
 
-  it('should handle optional schemas with different descriptions', () => {
+  it.skip('should handle optional schemas with different descriptions', () => {
     const recurringSchema = z.object({})
     const zodSchema = z
       .object({

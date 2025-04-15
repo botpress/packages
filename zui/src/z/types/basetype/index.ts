@@ -474,12 +474,17 @@ export abstract class ZodType<Output = any, Def extends ZodTypeDef = ZodTypeDef,
     })
   }
 
-  describe(description: string): this {
-    // FIXME: should set the description on the _metadataRoot
+  describe(description: string): ZodType<Output, Def, Input> {
+    const clone = this.clone()
+    const root = clone._metadataRoot
+    root._def.description = description
+    return clone
+  }
+
+  clone(): this {
     const This = (this as any).constructor
     return new This({
       ...this._def,
-      description,
     })
   }
 

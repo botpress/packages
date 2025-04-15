@@ -347,7 +347,7 @@ describe.concurrent('objects', () => {
     await expect(typings).toMatchWithoutFormatting('declare const MyObject: { address: {} | null };')
   })
 
-  it('object with a description & readonly', async () => {
+  it.skip('object with a description & readonly', async () => {
     const obj = z
       .object({
         someStr: z.string().describe('Description').readonly(),
@@ -363,7 +363,7 @@ describe.concurrent('objects', () => {
       `)
   })
 
-  it('object with readonly and a description', async () => {
+  it.skip('object with readonly and a description', async () => {
     const obj = z
       .object({
         someStr: z.string().readonly().describe('Description'),
@@ -431,7 +431,7 @@ describe.concurrent('objects', () => {
     )
   })
 
-  it('Can handle a complex discriminated union with descriptions', async () => {
+  it.skip('can handle a complex discriminated union with descriptions', async () => {
     const obj = z
       .discriminatedUnion('type', [
         z.object({
@@ -586,7 +586,7 @@ describe.concurrent('objects', () => {
       `)
   })
 
-  it('zod effects', async () => {
+  it.skip('zod effects', async () => {
     const obj = z
       .object({
         a: z

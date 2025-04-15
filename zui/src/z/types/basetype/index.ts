@@ -405,6 +405,10 @@ export abstract class ZodType<Output = any, Def extends ZodTypeDef = ZodTypeDef,
     return ZodPromise.create(this, this._def)
   }
   /**
+   * # \#\#\# Experimental \#\#\#
+   *
+   * @experimental This function is experimental and is subject to breaking changes in the future.
+   *
    * Would have been named `required` but a method with that name already exists in ZodObject.
    * Makes the schema required; i.e. not optional or undefined. If the schema is already required than it returns itself.
    * Null is not considered optional and remains unchanged.

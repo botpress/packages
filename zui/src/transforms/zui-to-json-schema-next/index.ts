@@ -84,13 +84,12 @@ export function toJsonSchema(schema: z.Schema): json.ZuiJsonSchema {
         .map(([key, value]) => [key, _toRequired(value)] satisfies [string, z.ZodType])
         .map(([key, value]) => [key, toJsonSchema(value)] satisfies [string, json.ZuiJsonSchema])
 
-      let additionalProperties: json.ObjectSchema['additionalProperties'] = false
+      let additionalProperties: json.ObjectSchema['additionalProperties'] = undefined
       if (def.unknownKeys instanceof z.ZodType) {
         additionalProperties = toJsonSchema(def.unknownKeys)
       } else if (def.unknownKeys === 'passthrough') {
         additionalProperties = true
-      } else {
-        def.unknownKeys satisfies 'strip' | 'strict'
+      } else if (def.unknownKeys === 'strict') {
         additionalProperties = false
       }
 

@@ -1,3 +1,4 @@
+import * as _ from 'lodash-es'
 import type {
   BaseType,
   UIComponentDefinitions,
@@ -165,6 +166,13 @@ export abstract class ZodType<Output = any, Def extends ZodTypeDef = ZodTypeDef,
   /** deeply scans the schema to check if it contains references */
   getReferences(): string[] {
     return []
+  }
+
+  clone(): ZodType<Output, Def, Input> {
+    const This = (this as any).constructor
+    return new This({
+      ...this._def,
+    })
   }
 
   /** checks if a schema is equal to another */
@@ -479,13 +487,6 @@ export abstract class ZodType<Output = any, Def extends ZodTypeDef = ZodTypeDef,
     const root = clone._metadataRoot
     root._def.description = description
     return clone
-  }
-
-  clone(): this {
-    const This = (this as any).constructor
-    return new This({
-      ...this._def,
-    })
   }
 
   pipe<T extends ZodTypeAny>(target: T): ZodPipeline<this, T> {

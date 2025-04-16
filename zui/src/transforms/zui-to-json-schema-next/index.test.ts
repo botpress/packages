@@ -127,7 +127,7 @@ describe('zuiToJsonSchemaNext', () => {
     })
   })
 
-  test.skip('should preserve ZodObject nested properties descriptions', () => {
+  test('should preserve ZodObject nested properties descriptions', () => {
     const description1 = 'The ID or Name of the table'
     const description2 = 'Notes about the task'
     const description3 = 'The ID of the user who will be assigned to the task'
@@ -151,7 +151,7 @@ describe('zuiToJsonSchemaNext', () => {
         },
         assignee: {
           type: 'string',
-          description: description2,
+          description: description3,
           default: 'me',
         },
       },

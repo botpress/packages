@@ -347,7 +347,7 @@ describe.concurrent('objects', () => {
     await expect(typings).toMatchWithoutFormatting('declare const MyObject: { address: {} | null };')
   })
 
-  it.skip('object with a description & readonly', async () => {
+  it('object with a description & readonly', async () => {
     const obj = z
       .object({
         someStr: z.string().describe('Description').readonly(),
@@ -358,12 +358,12 @@ describe.concurrent('objects', () => {
 
     await expect(typings).toMatchWithoutFormatting(`
         declare const MyObject: {
-          someStr: Readonly</** Description */ string>
+          /** Description */ someStr: Readonly<string>
         };
       `)
   })
 
-  it.skip('object with readonly and a description', async () => {
+  it('object with readonly and a description', async () => {
     const obj = z
       .object({
         someStr: z.string().readonly().describe('Description'),
@@ -431,7 +431,7 @@ describe.concurrent('objects', () => {
     )
   })
 
-  it.skip('can handle a complex discriminated union with descriptions', async () => {
+  it('can handle a complex discriminated union with descriptions', async () => {
     const obj = z
       .discriminatedUnion('type', [
         z.object({
@@ -555,7 +555,7 @@ describe.concurrent('objects', () => {
 
     await expect(typings).toMatchWithoutFormatting(`
         declare const MyObject: {
-          address: /** This is a record */ {
+          /** This is a record */ address: /** This is a record */ {
             [key: number]: { street: string; number: number }
           }
         };
@@ -586,7 +586,7 @@ describe.concurrent('objects', () => {
       `)
   })
 
-  it.skip('zod effects', async () => {
+  it('zod effects', async () => {
     const obj = z
       .object({
         a: z
@@ -602,8 +602,7 @@ describe.concurrent('objects', () => {
     await expect(typings).toMatchWithoutFormatting(`
         declare const MyObject: {
           /** This is A */
-          a: /** This is A */
-          string
+          a: string
         };
       `)
   })

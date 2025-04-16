@@ -152,8 +152,8 @@ export abstract class ZodType<Output = any, Def extends ZodTypeDef = ZodTypeDef,
   readonly _input!: Input
   readonly _def!: Def
 
-  get description() {
-    return this._def.description
+  get description(): string | undefined {
+    return this._metadataRoot._def.description
   }
 
   abstract _parse(input: ParseInput): ParseReturnType<Output>
@@ -485,6 +485,7 @@ export abstract class ZodType<Output = any, Def extends ZodTypeDef = ZodTypeDef,
   describe(description: string): ZodType<Output, Def, Input> {
     const clone = this.clone()
     const root = clone._metadataRoot
+    // FIXME: this doesn't work for nested schemas with getters in their definition like ZodLazy
     root._def.description = description
     return clone
   }

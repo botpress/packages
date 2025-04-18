@@ -84,13 +84,11 @@ export function toJsonSchema(schema: z.Schema): json.ZuiJsonSchema {
         .map(([key, value]) => [key, value.mandatory()] satisfies [string, z.ZodType])
         .map(([key, value]) => [key, toJsonSchema(value)] satisfies [string, json.ZuiJsonSchema])
 
-      let additionalProperties: json.ObjectSchema['additionalProperties'] = undefined
+      let additionalProperties: json.ObjectSchema['additionalProperties'] = false
       if (def.unknownKeys instanceof z.ZodType) {
         additionalProperties = toJsonSchema(def.unknownKeys)
       } else if (def.unknownKeys === 'passthrough') {
         additionalProperties = true
-      } else if (def.unknownKeys === 'strict') {
-        additionalProperties = false
       }
 
       return {
@@ -117,9 +115,17 @@ export function toJsonSchema(schema: z.Schema): json.ZuiJsonSchema {
       } satisfies json.UnionSchema
 
     case z.ZodFirstPartyTypeKind.ZodIntersection:
+      const left = toJsonSchema(def.left)
+      const right = toJsonSchema(def.right)
+      if ('additionalProperties' in left && !left.additionalProperties) {
+        delete left.additionalProperties
+      }
+      if ('additionalProperties' in right && !right.additionalProperties) {
+        delete right.additionalProperties
+      }
       return {
         description: def.description,
-        allOf: [toJsonSchema(def.left), toJsonSchema(def.right)],
+        allOf: [left, right],
         'x-zui': def['x-zui'],
       } satisfies json.IntersectionSchema
 

@@ -26,7 +26,7 @@ export const limitConfigs = {
     unit: 'bytes'
   },
   bot_recurring_event_count: {
-    value: 20,
+    value: 40,
     unit: 'count'
   },
   bot_recurring_event_payload_bytes: {

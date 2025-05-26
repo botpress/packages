@@ -49,7 +49,7 @@ export type mergeTypes<A, B> = {
 export type objectOutputType<
   Shape extends ZodRawShape,
   UnknownKeys extends UnknownKeysParam = UnknownKeysParam,
-> = objectUtil.flatten<objectUtil.addQuestionMarks<baseObjectOutputType<Shape>>> & UnknownKeysOutputType<UnknownKeys>
+> = UnknownKeysOutputType<UnknownKeys> & objectUtil.flatten<objectUtil.addQuestionMarks<baseObjectOutputType<Shape>>>
 
 export type baseObjectOutputType<Shape extends ZodRawShape> = {
   [k in keyof Shape]: Shape[k]['_output']
@@ -64,13 +64,13 @@ export type baseObjectInputType<Shape extends ZodRawShape> = objectUtil.addQuest
 }>
 
 export type UnknownKeysInputType<T extends UnknownKeysParam> = T extends ZodTypeAny
-  ? { [k: string]: T['_input'] }
+  ? { [k: string]: unknown | T['_input'] } // T['_input'] alone doesn't work well because it swallows the known keys
   : T extends 'passthrough'
     ? { [k: string]: unknown }
     : {}
 
 export type UnknownKeysOutputType<T extends UnknownKeysParam> = T extends ZodTypeAny
-  ? { [k: string]: T['_output'] }
+  ? { [k: string]: T['_output'] | unknown } // T['_output'] alone doesn't work well because it swallows the known keys
   : T extends 'passthrough'
     ? { [k: string]: unknown }
     : {}

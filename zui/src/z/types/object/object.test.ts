@@ -120,8 +120,11 @@ test('catchall inference', () => {
   fnInput({ first: 'asdf', num: 1243 })
   fnOutput({ first: 'asdf', num: 1243 })
 
-  util.assertEqual<unknown, (typeof d1)['asdf']>(true)
-  util.assertEqual<string, (typeof d1)['first']>(true)
+  const prop1 = d1.first
+  const prop2 = d1.num
+
+  util.assertEqual<string, typeof prop1>(true)
+  util.assertEqual<string | number | undefined, typeof prop2>(true)
 })
 
 test('catchall overrides strict', () => {

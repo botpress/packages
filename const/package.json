@@ -1,6 +1,6 @@
 {
   "name": "@bpinternal/const",
-  "version": "0.1.2",
+  "version": "0.2.2",
   "description": "Constant utilities for Botpress",
   "main": "./dist/index.cjs",
   "browser": "./dist/index.mjs",

@@ -117,12 +117,23 @@ export function toJsonSchema(schema: z.Schema): json.ZuiJsonSchema {
     case z.ZodFirstPartyTypeKind.ZodIntersection:
       const left = toJsonSchema(def.left)
       const right = toJsonSchema(def.right)
-      if ('additionalProperties' in left && !left.additionalProperties) {
+
+      /**
+       * TODO: Potential conflict between `additionalProperties` in the left and right schemas.
+       * To avoid this, we currently strip `additionalProperties` from both sides.
+       * This is a workaround and results in lost schema information.
+       * A proper fix would involve using `unevaluatedProperties`.
+       * See: https://json-schema.org/understanding-json-schema/reference/object#unevaluatedproperties
+       *
+       * – fleur
+       */
+      if ('additionalProperties' in left) {
         delete left.additionalProperties
       }
-      if ('additionalProperties' in right && !right.additionalProperties) {
+      if ('additionalProperties' in right) {
         delete right.additionalProperties
       }
+
       return {
         description: def.description,
         allOf: [left, right],

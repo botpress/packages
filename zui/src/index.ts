@@ -7,7 +7,6 @@ import { toJsonSchema as _experimentalToJsonSchemaNext } from './transforms/zui-
 import { fromJsonSchema as _experimentalFromJsonSchemaNext } from './transforms/json-schema-to-zui-next'
 import * as transformErrors from './transforms/common/errors'
 
-export * from './ui'
 export * from './z'
 
 export const transforms = {

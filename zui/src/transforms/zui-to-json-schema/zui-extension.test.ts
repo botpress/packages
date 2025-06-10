@@ -2,7 +2,6 @@ import { describe, test, expect } from 'vitest'
 import { zuiToJsonSchema } from './zui-extension'
 import { z } from '../../z/index'
 import { zuiKey } from '../../ui/constants'
-import { testComponentDefinitions } from '../../ui/ui.test'
 
 describe('zuiToJsonSchema', () => {
   test('should work', () => {
@@ -66,7 +65,7 @@ describe('zuiToJsonSchema', () => {
       testExample: z
         .string()
         .nullable()
-        .displayAs<typeof testComponentDefinitions>({ id: 'customstringcomponent', params: { multiline: true } }),
+        .displayAs({ id: 'customstringcomponent', params: { multiline: true } }),
     })
 
     const jsonSchema = zuiToJsonSchema(schema)

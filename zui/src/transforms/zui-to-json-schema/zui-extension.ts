@@ -1,7 +1,7 @@
-import { JSONSchema } from '../../ui/types'
 import { z } from '../../z/index'
 import { zodToJsonSchema } from './zodToJsonSchema'
 import { Options } from './Options'
+import { JSONSchema7 } from 'json-schema'
 
 export type ZuiSchemaOptions = {
   /**
@@ -17,7 +17,10 @@ export type ZuiSchemaOptions = {
   target?: 'jsonSchema7' | 'openApi3'
 } & Partial<Pick<Options, 'unionStrategy' | 'discriminator'>>
 
-export const zuiToJsonSchema = (zuiType: z.ZodTypeAny, opts: ZuiSchemaOptions = { target: 'openApi3' }): JSONSchema => {
+export const zuiToJsonSchema = (
+  zuiType: z.ZodTypeAny,
+  opts: ZuiSchemaOptions = { target: 'openApi3' },
+): JSONSchema7 => {
   const jsonSchema = zodToJsonSchema(zuiType as z.ZodType, opts)
   if (opts.$schemaUrl === false) {
     delete jsonSchema.$schema
@@ -25,5 +28,5 @@ export const zuiToJsonSchema = (zuiType: z.ZodTypeAny, opts: ZuiSchemaOptions = 
     jsonSchema.$schema = opts.$schemaUrl
   }
 
-  return jsonSchema as JSONSchema
+  return jsonSchema as JSONSchema7
 }

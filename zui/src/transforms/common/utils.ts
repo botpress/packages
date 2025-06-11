@@ -1,12 +1,6 @@
 // oxlint-disable no-control-regex
 import { Primitive } from '../../z'
-import { Path } from '../../ui/types'
 import { JSONSchema7 } from 'json-schema'
-
-export function pathMatches(path1: Path, path2: Path): boolean {
-  if (path1.length !== path2.length) return false
-  return path1.every((part, index) => part === path2[index])
-}
 
 export function formatTitle(title: string, separator?: RegExp): string {
   if (!separator) separator = new RegExp('/s|-|_| ', 'g')

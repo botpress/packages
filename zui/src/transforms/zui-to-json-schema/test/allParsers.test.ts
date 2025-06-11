@@ -1,3 +1,4 @@
+import { describe, it, expect } from 'vitest'
 import { zodToJsonSchema } from '../zodToJsonSchema'
 import { z } from '../../../z/index'
 

@@ -1,4 +1,4 @@
-import { describe, test, expect } from 'vitest'
+import { describe, test, expect, it } from 'vitest'
 import { zuiToJsonSchema } from './zui-extension'
 import { z } from '../../z/index'
 import { zuiKey } from '../../ui/constants'

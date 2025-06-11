@@ -1,8 +1,8 @@
 import { describe, expect, test } from 'vitest'
 import { fromObject } from '.'
-import { zuiToJsonSchema } from '../zui-to-json-schema'
+import { toJsonSchemaLegacy } from '../zui-to-json-schema'
 import { JSONSchema7, JSONSchema7Definition } from 'json-schema'
-import { fromJsonSchema } from '../json-schema-to-zui-next'
+import { fromJsonSchemaLegacy } from '../json-schema-to-zui'
 
 function asSchema(s: JSONSchema7Definition | undefined): JSONSchema7 | undefined {
   if (s === undefined) {
@@ -13,7 +13,7 @@ function asSchema(s: JSONSchema7Definition | undefined): JSONSchema7 | undefined
 
 describe('object-to-zui', () => {
   test('validate object to json', async () => {
-    const schema: JSONSchema7 = zuiToJsonSchema(
+    const schema: JSONSchema7 = toJsonSchemaLegacy(
       fromObject({ name: 'Bob', age: 20, birthDate: '1988-11-29', isAdmin: true }, { optional: true }),
     )
 
@@ -39,8 +39,8 @@ describe('object-to-zui', () => {
       address: { street: '123 Main St', city: 'New York', state: 'NY' },
     }
 
-    const schema = zuiToJsonSchema(fromObject(obj, { optional: true }))
-    fromJsonSchema(schema).parse(obj)
+    const schema = toJsonSchemaLegacy(fromObject(obj, { optional: true }))
+    fromJsonSchemaLegacy(schema).parse(obj)
 
     expect(schema).toEqual({
       additionalProperties: false,
@@ -88,7 +88,7 @@ describe('object-to-zui', () => {
   })
 
   test('should handle null values correctly', () => {
-    const schema: JSONSchema7 = zuiToJsonSchema(
+    const schema: JSONSchema7 = toJsonSchemaLegacy(
       fromObject(
         {
           test: null,
@@ -107,7 +107,7 @@ describe('object-to-zui', () => {
   })
 
   test('should handle nested objects correctly', () => {
-    const schema: JSONSchema7 = zuiToJsonSchema(
+    const schema: JSONSchema7 = toJsonSchemaLegacy(
       fromObject(
         {
           user: {
@@ -134,7 +134,7 @@ describe('object-to-zui', () => {
   })
 
   test('should handle arrays correctly', () => {
-    const schema: JSONSchema7 = zuiToJsonSchema(
+    const schema: JSONSchema7 = toJsonSchemaLegacy(
       fromObject(
         {
           tags: ['tag1', 'tag2'],
@@ -158,14 +158,14 @@ describe('object-to-zui', () => {
   })
 
   test('should handle empty objects correctly', () => {
-    const schema: JSONSchema7 = zuiToJsonSchema(fromObject({}))
+    const schema: JSONSchema7 = toJsonSchemaLegacy(fromObject({}))
     expect(schema).toHaveProperty('type', 'object')
     expect(schema).toHaveProperty('properties')
     expect(Object.keys(schema.properties || {})).toHaveLength(0)
   })
 
   test('should handle datetime with timezone correctly', () => {
-    const schema: JSONSchema7 = zuiToJsonSchema(
+    const schema: JSONSchema7 = toJsonSchemaLegacy(
       fromObject({
         eventTime: '2023-03-15T14:00:00+01:00',
       }),
@@ -180,7 +180,9 @@ describe('object-to-zui', () => {
   })
 
   test('empty objects are considered passtrough, other are strict', () => {
-    const schema: JSONSchema7 = zuiToJsonSchema(fromObject({ input: {}, test: { output: {} }, fixed: { value: true } }))
+    const schema: JSONSchema7 = toJsonSchemaLegacy(
+      fromObject({ input: {}, test: { output: {} }, fixed: { value: true } }),
+    )
 
     const testSchema = asSchema(schema.properties?.test)
     const fixedSchema = asSchema(schema.properties?.fixed)
@@ -197,7 +199,7 @@ describe('object-to-zui', () => {
   })
 
   test('when passtrough is set to true, they are all passtrough', () => {
-    const schema: JSONSchema7 = zuiToJsonSchema(
+    const schema: JSONSchema7 = toJsonSchemaLegacy(
       fromObject({ input: {}, test: { output: {} }, fixed: { value: true } }, { passtrough: true }),
     )
 

@@ -1,5 +1,5 @@
 import { describe, test, expect } from 'vitest'
-import { z } from './z/index'
+import { z } from './index'
 
 const foo = z.ref('foo')
 const bar = z.ref('bar')

@@ -2,8 +2,7 @@ import { ZodEnumDef, z } from '../z'
 
 export type ZuiMetadata = string | number | boolean | null | undefined | ZuiMetadata[] | { [key: string]: ZuiMetadata }
 
-export type SerializedFunction = string
-
+type SerializedFunction = string
 export type ZuiExtensionObject = {
   tooltip?: boolean
   displayAs?: [string, any]
@@ -18,8 +17,7 @@ export type ZuiExtensionObject = {
 
 export type BaseType = 'number' | 'string' | 'boolean' | 'object' | 'array' | 'discriminatedUnion'
 
-export const containerTypes = ['object', 'array', 'discriminatedUnion'] as const
-export type ContainerType = (typeof containerTypes)[number]
+export type ContainerType = 'object' | 'array' | 'discriminatedUnion'
 
 export type UIComponentDefinitions = {
   [T in BaseType]: {
@@ -59,8 +57,6 @@ export type ZodKindToBaseType<T extends z.ZodTypeDef> = T extends infer U
                         : never
   : never
 
-export type AsBaseType<T> = T extends BaseType ? T : never
-
 export type ParseSchema<I> = I extends infer U
   ? U extends { id: string; params: z.AnyZodObject }
     ? {
@@ -69,5 +65,3 @@ export type ParseSchema<I> = I extends infer U
       }
     : object
   : never
-
-export type Path = (string | number)[]

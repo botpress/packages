@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest'
 import z from '../z'
-import { toJSONSchema } from './zui-to-json-schema-next'
-import { fromJSONSchema } from './json-schema-to-zui-next'
+import { toJSONSchema } from './zui-to-json-schema'
+import { fromJSONSchema } from './zui-from-json-schema'
 import * as errors from './common/errors'
 
 const assert = (src: z.Schema) => ({

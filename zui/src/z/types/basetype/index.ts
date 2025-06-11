@@ -44,7 +44,7 @@ import {
 import { CatchFn } from '../catch'
 import { toTypescriptType, TypescriptGenerationOptions } from '../../../transforms/zui-to-typescript-type'
 import { toTypescriptSchema } from '../../../transforms/zui-to-typescript-schema'
-import { toJSONSchema } from '../../../transforms/zui-to-json-schema-next'
+import { toJSONSchema } from '../../../transforms/zui-to-json-schema'
 import { ZuiJSONSchema } from '../../../transforms/common/json-schema'
 
 /**

@@ -2,7 +2,7 @@ import { describe, expect, test, it } from 'vitest'
 import { ZodTypeAny, z } from '../../z/index'
 import { zuiKey } from '../../ui/constants'
 import { jsonSchemaToZodStr, fromJSONSchemaLegacy, traverseZodDefinitions } from '.'
-import { toJSONSchemaLegacy } from '../zui-to-json-schema/zui-extension'
+import { toJSONSchemaLegacy } from '../zui-to-json-schema-legacy/zui-extension'
 import { JSONSchema7 } from 'json-schema'
 
 const testZuiConversion = (zuiObject: ZodTypeAny) => {

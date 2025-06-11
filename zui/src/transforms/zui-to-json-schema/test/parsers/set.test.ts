@@ -1,3 +1,4 @@
+import { describe, it, expect } from 'vitest'
 import { JSONSchema7Type } from 'json-schema'
 import { z } from '../../../../z/index'
 import { parseSetDef } from '../../parsers/set'

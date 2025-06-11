@@ -1,3 +1,4 @@
+import { describe, it, expect } from 'vitest'
 import { parseNumber } from './parseNumber'
 
 describe('parseNumber', () => {

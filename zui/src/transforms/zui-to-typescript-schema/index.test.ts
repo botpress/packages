@@ -564,7 +564,7 @@ describe.concurrent('toTypescriptZuiString', () => {
       // Act & Assert
       const evaluated = evalZui(toTypescript(schema))
       assert(schema).toGenerateItself()
-      expect(evaluated.getMetadata().disabled).toBe('()=>true')
+      expect(evaluated.getMetadata().disabled).toBe('() => true')
     })
 
     test('hidden', () => {
@@ -594,7 +594,7 @@ describe.concurrent('toTypescriptZuiString', () => {
       // Act & Assert
       const evaluated = evalZui(toTypescript(schema))
       assert(schema).toGenerateItself()
-      expect(evaluated.getMetadata().hidden).toBe('()=>true')
+      expect(evaluated.getMetadata().hidden).toBe('() => true')
     })
 
     test('placeholder', () => {

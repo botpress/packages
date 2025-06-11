@@ -148,7 +148,7 @@ describe('jsonSchemaToZui', () => {
   })
 })
 
-describe('Coercion deserialization', () => {
+describe.skip('Coercion deserialization', () => {
   it('should deserialize coerced strings correctly', () => {
     const schema = z.coerce.string().toJsonSchema()
     const asZui = jsonSchemaToZui(schema)

@@ -308,7 +308,8 @@ describe('zuiToJsonSchema', () => {
       }),
     )
 
-    expect(schema.toJsonSchema()).toEqual({
+    const zSchema = zuiToJsonSchema(schema)
+    expect(zSchema).toEqual({
       additionalProperties: false,
       properties: {
         type: {
@@ -391,7 +392,7 @@ describe('coercion serialization', () => {
   {
     it('serializes coerced dates correctly', () => {
       const schema = z.coerce.date().displayAs({ id: 'doood', params: {} } as never)
-      const serialized = schema.toJsonSchema()
+      const serialized = zuiToJsonSchema(schema)
       expect(serialized).toEqual({
         format: 'date-time',
         type: 'string',
@@ -404,7 +405,7 @@ describe('coercion serialization', () => {
 
     it('serializes coerced strings correctly', () => {
       const schema = z.coerce.string()
-      const serialized = schema.toJsonSchema()
+      const serialized = zuiToJsonSchema(schema)
       expect(serialized).toEqual({
         type: 'string',
         [zuiKey]: {
@@ -415,7 +416,7 @@ describe('coercion serialization', () => {
 
     it('serializes coerced bigints correctly', () => {
       const schema = z.coerce.bigint()
-      const serialized = schema.toJsonSchema()
+      const serialized = zuiToJsonSchema(schema)
       expect(serialized).toEqual({
         format: 'int64',
         type: 'integer',
@@ -427,7 +428,7 @@ describe('coercion serialization', () => {
 
     it('serializes coerced booleans correctly', () => {
       const schema = z.coerce.boolean()
-      const serialized = schema.toJsonSchema()
+      const serialized = zuiToJsonSchema(schema)
       expect(serialized).toEqual({
         type: 'boolean',
         [zuiKey]: {
@@ -438,7 +439,7 @@ describe('coercion serialization', () => {
 
     it('serializes coerced numbers correctly', () => {
       const schema = z.coerce.number()
-      const serialized = schema.toJsonSchema()
+      const serialized = zuiToJsonSchema(schema)
       expect(serialized).toEqual({
         type: 'number',
         [zuiKey]: {

@@ -7,7 +7,14 @@ const dateTimeRegex =
 
 export type ObjectToZuiOptions = { optional?: boolean; nullable?: boolean; passtrough?: boolean }
 
-export const objectToZui = (obj: object, opts?: ObjectToZuiOptions, isRoot = true): ZodTypeAny => {
+/**
+ * Converts a plain object to a Zod schema, by inferring the types of its properties.
+ *
+ * @param obj - The object to convert.
+ * @param opts - Options to customize the Zod schema:
+ * @returns A Zod schema representing the object.
+ */
+export const fromObject = (obj: object, opts?: ObjectToZuiOptions, isRoot = true): ZodTypeAny => {
   if (typeof obj !== 'object') {
     throw new errors.ObjectToZuiError('Input must be an object')
   }
@@ -45,12 +52,12 @@ export const objectToZui = (obj: object, opts?: ObjectToZuiOptions, isRoot = tru
             if (value.length === 0) {
               acc[key] = applyOptions(z.array(z.unknown()))
             } else if (typeof value[0] === 'object') {
-              acc[key] = applyOptions(z.array(objectToZui(value[0], opts, false)))
+              acc[key] = applyOptions(z.array(fromObject(value[0], opts, false)))
             } else if (['string', 'number', 'boolean'].includes(typeof value[0])) {
               acc[key] = applyOptions(z.array((z as any)[typeof value[0] as any]()))
             }
           } else {
-            acc[key] = applyOptions(objectToZui(value, opts, false))
+            acc[key] = applyOptions(fromObject(value, opts, false))
           }
           break
         default:

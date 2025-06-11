@@ -42,13 +42,10 @@ import {
   ZodUnion,
 } from '../index'
 import { CatchFn } from '../catch'
-import { objectToZui, type ObjectToZuiOptions } from '../../../transforms/object-to-zui'
-import { TypescriptGenerationOptions, toTypescriptType } from '../../../transforms/zui-to-typescript-type'
+import { toTypescriptType, TypescriptGenerationOptions } from '../../../transforms/zui-to-typescript-type'
 import { toTypescriptSchema } from '../../../transforms/zui-to-typescript-schema'
-import { JSONSchema7 } from 'json-schema'
 import { toJsonSchema } from '../../../transforms/zui-to-json-schema-next'
 import { ZuiJsonSchema } from '../../../transforms/common/json-schema'
-import { fromJsonSchema } from '../../../transforms/json-schema-to-zui-next'
 
 /**
  * This type is not part of the original Zod library, it's been added in Zui to:
@@ -647,25 +644,6 @@ export abstract class ZodType<Output = any, Def extends ZodTypeDef = ZodTypeDef,
    */
   toTypescriptSchema(): string {
     return toTypescriptSchema(this)
-  }
-
-  /**
-   * Converts a plain object to a Zui schema
-   * @param obj the object to convert
-   * @param opts options for the conversion
-   * @returns a Zui schema equivalent to the object
-   */
-  static fromObject(obj: object, opts?: ObjectToZuiOptions) {
-    return objectToZui(obj, opts)
-  }
-
-  /**
-   *
-   * @param schema JSON Schema to convert to a Zui schema
-   * @returns a Zui schema equivalent to the JSON Schema
-   */
-  static fromJsonSchema(schema: JSONSchema7) {
-    return fromJsonSchema(schema)
   }
 
   /**

@@ -2,6 +2,7 @@ import { describe, it, expect } from 'vitest'
 import { parseString } from './parseString'
 
 describe('parseString', () => {
+  // TODO: this is error prone since the test now depends on the build artefact
   const run = (output: string, data: unknown) =>
     eval(
       `console.log(process.cwd()); const {z} = require("@bpinternal/zui"); ${output}.safeParse(${JSON.stringify(data)})`,

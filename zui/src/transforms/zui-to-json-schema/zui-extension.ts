@@ -17,6 +17,11 @@ export type ZuiSchemaOptions = {
   target?: 'jsonSchema7' | 'openApi3'
 } & Partial<Pick<Options, 'unionStrategy' | 'discriminator'>>
 
+/**
+ * Converts a Zod schema to a JSON Schema.
+ *
+ * @deprecated Use the new toJsonSchema function instead.
+ */
 export const zuiToJsonSchema = (
   zuiType: z.ZodTypeAny,
   opts: ZuiSchemaOptions = { target: 'openApi3' },

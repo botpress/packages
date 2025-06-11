@@ -8,9 +8,7 @@ import { zodSetToJsonSet } from './type-processors/set'
 import { zodTupleToJsonTuple } from './type-processors/tuple'
 
 /**
- * # \#\#\# Experimental \#\#\#
- *
- * @experimental This function is experimental and is subject to breaking changes in the future.
+ * Converts a Zui schema to a ZUI flavored JSON schema.
  * @param schema zui schema
  * @returns ZUI flavored JSON schema
  */

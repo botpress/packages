@@ -235,7 +235,12 @@ export const traverseZodDefinitions = (
   }
 }
 
-export const jsonSchemaToZui = (schema: JsonSchema7Type | any): ZodTypeAny => {
+/**
+ * Converts a JSONSchema to a Zui schema.
+ *
+ * @deprecated Use the new fromJsonSchema function instead.
+ */
+export const jsonSchemaToZui = (schema: JsonSchema7Type): ZodTypeAny => {
   const zodSchema = jsonSchemaToZod(schema)
   applyZuiPropsRecursively(zodSchema, schema)
   return zodSchema as unknown as ZodTypeAny

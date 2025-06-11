@@ -256,6 +256,7 @@ describe('parseObject', () => {
     )
   })
 
+  // TODO: this is error prone since the test now depends on the build artefact
   const run = (output: string, data: unknown) =>
     eval(`const {z} = require("@bpinternal/zui"); ${output}.safeParse(${JSON.stringify(data)})`)
 

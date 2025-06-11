@@ -1,14 +1,14 @@
 import { describe, expect, test, it } from 'vitest'
 import { ZodTypeAny, z } from '../../z/index'
 import { zuiKey } from '../../ui/constants'
-import { jsonSchemaToZodStr, fromJsonSchemaLegacy, traverseZodDefinitions } from '.'
-import { toJsonSchemaLegacy } from '../zui-to-json-schema/zui-extension'
+import { jsonSchemaToZodStr, fromJSONSchemaLegacy, traverseZodDefinitions } from '.'
+import { toJSONSchemaLegacy } from '../zui-to-json-schema/zui-extension'
 import { JSONSchema7 } from 'json-schema'
 
 const testZuiConversion = (zuiObject: ZodTypeAny) => {
-  const jsonSchema = toJsonSchemaLegacy(zuiObject)
-  const asZui = fromJsonSchemaLegacy(jsonSchema)
-  const convertedJsonSchema = toJsonSchemaLegacy(asZui)
+  const jsonSchema = toJSONSchemaLegacy(zuiObject)
+  const asZui = fromJSONSchemaLegacy(jsonSchema)
+  const convertedJsonSchema = toJSONSchemaLegacy(asZui)
 
   expect(jsonSchema).toEqual(convertedJsonSchema)
 
@@ -30,7 +30,7 @@ describe('jsonSchemaToZui', () => {
   test('convert record', () => {
     const inner = [z.string().title('Name'), z.number().title('Age')] as const
 
-    expect(toJsonSchemaLegacy(z.record(inner[0], inner[1]))).toMatchObject({
+    expect(toJSONSchemaLegacy(z.record(inner[0], inner[1]))).toMatchObject({
       type: 'object',
       additionalProperties: {
         type: 'number',
@@ -91,14 +91,14 @@ describe('jsonSchemaToZui', () => {
     ])
     const strategy = { discriminator: true, unionStrategy: 'oneOf' } as const
 
-    const jsonSchema = toJsonSchemaLegacy(zuiSchema, strategy)
-    const converted = toJsonSchemaLegacy(fromJsonSchemaLegacy(jsonSchema), strategy)
+    const jsonSchema = toJSONSchemaLegacy(zuiSchema, strategy)
+    const converted = toJSONSchemaLegacy(fromJSONSchemaLegacy(jsonSchema), strategy)
 
     expect(jsonSchema).toEqual(converted)
   })
 
   test('convert object with nested', () => {
-    const zuiSchema = fromJsonSchemaLegacy({
+    const zuiSchema = fromJSONSchemaLegacy({
       type: 'object',
       properties: {
         name: { type: 'string', description: 'Name of person', [zuiKey]: { title: 'title' } },
@@ -150,32 +150,32 @@ describe('jsonSchemaToZui', () => {
 
 describe('Coercion deserialization', () => {
   it('should deserialize coerced strings correctly', () => {
-    const schema = toJsonSchemaLegacy(z.coerce.string())
-    const asZui = fromJsonSchemaLegacy(schema)
+    const schema = toJSONSchemaLegacy(z.coerce.string())
+    const asZui = fromJSONSchemaLegacy(schema)
     expect(asZui._def[zuiKey]?.coerce).toStrictEqual(true)
   })
 
   it('should deserialize coerced numbers correctly', () => {
-    const schema = toJsonSchemaLegacy(z.coerce.number())
-    const asZui = fromJsonSchemaLegacy(schema)
+    const schema = toJSONSchemaLegacy(z.coerce.number())
+    const asZui = fromJSONSchemaLegacy(schema)
     expect(asZui._def[zuiKey]?.coerce).toStrictEqual(true)
   })
 
   it('should deserialize coerced booleans correctly', () => {
-    const schema = toJsonSchemaLegacy(z.coerce.boolean())
-    const asZui = fromJsonSchemaLegacy(schema)
+    const schema = toJSONSchemaLegacy(z.coerce.boolean())
+    const asZui = fromJSONSchemaLegacy(schema)
     expect(asZui._def[zuiKey]?.coerce).toStrictEqual(true)
   })
 
   it('should deserialize coerced dates correctly', () => {
-    const schema = toJsonSchemaLegacy(z.coerce.date())
-    const asZui = fromJsonSchemaLegacy(schema)
+    const schema = toJSONSchemaLegacy(z.coerce.date())
+    const asZui = fromJSONSchemaLegacy(schema)
     expect(asZui._def[zuiKey]?.coerce).toStrictEqual(true)
   })
 
   it('should deserialize coerced bigints correctly', () => {
-    const schema = toJsonSchemaLegacy(z.coerce.bigint())
-    const asZui = fromJsonSchemaLegacy(schema)
+    const schema = toJSONSchemaLegacy(z.coerce.bigint())
+    const asZui = fromJSONSchemaLegacy(schema)
     expect(asZui._def[zuiKey]?.coerce).toStrictEqual(true)
   })
 

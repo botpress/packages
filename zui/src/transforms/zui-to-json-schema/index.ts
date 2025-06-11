@@ -1,1 +1,1 @@
-export { toJsonSchemaLegacy } from './zui-extension'
+export { toJSONSchemaLegacy } from './zui-extension'

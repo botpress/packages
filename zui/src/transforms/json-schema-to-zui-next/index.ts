@@ -13,11 +13,11 @@ const DEFAULT_TYPE = z.any()
  * @param schema json schema
  * @returns ZUI Schema
  */
-export function fromJsonSchema(schema: JSONSchema7): z.ZodType {
-  return _fromJsonSchema(schema)
+export function fromJSONSchema(schema: JSONSchema7): z.ZodType {
+  return _fromJSONSchema(schema)
 }
 
-function _fromJsonSchema(schema: JSONSchema7Definition | undefined): z.ZodType {
+function _fromJSONSchema(schema: JSONSchema7Definition | undefined): z.ZodType {
   if (schema === undefined) {
     return DEFAULT_TYPE
   }
@@ -31,11 +31,11 @@ function _fromJsonSchema(schema: JSONSchema7Definition | undefined): z.ZodType {
   }
 
   if (schema.default !== undefined) {
-    const inner = _fromJsonSchema({ ...schema, default: undefined })
+    const inner = _fromJSONSchema({ ...schema, default: undefined })
     return inner.default(schema.default)
   }
   if (schema.readOnly) {
-    const inner = _fromJsonSchema({ ...schema, readOnly: undefined })
+    const inner = _fromJSONSchema({ ...schema, readOnly: undefined })
     return inner.readonly()
   }
 
@@ -83,10 +83,10 @@ function _fromJsonSchema(schema: JSONSchema7Definition | undefined): z.ZodType {
       return DEFAULT_TYPE
     }
     if (schema.type.length === 1) {
-      return _fromJsonSchema({ ...schema, type: schema.type[0] })
+      return _fromJSONSchema({ ...schema, type: schema.type[0] })
     }
     const { type: _, ...tmp } = schema
-    const types = schema.type.map((t) => _fromJsonSchema({ ...tmp, type: t })) as [z.ZodType, z.ZodType, ...z.ZodType[]]
+    const types = schema.type.map((t) => _fromJSONSchema({ ...tmp, type: t })) as [z.ZodType, z.ZodType, ...z.ZodType[]]
     return z.union(types)
   }
 
@@ -119,20 +119,20 @@ function _fromJsonSchema(schema: JSONSchema7Definition | undefined): z.ZodType {
   }
 
   if (schema.type === 'array') {
-    return arrayJSONSchemaToZuiArray(schema as ArraySchema | TupleSchema | SetSchema, _fromJsonSchema)
+    return arrayJSONSchemaToZuiArray(schema as ArraySchema | TupleSchema | SetSchema, _fromJSONSchema)
   }
 
   if (schema.type === 'object') {
     if (schema.additionalProperties !== undefined && schema.properties !== undefined) {
-      const catchAll = _fromJsonSchema(schema.additionalProperties)
-      const inner = _fromJsonSchema({ ...schema, additionalProperties: undefined }) as z.ZodObject
+      const catchAll = _fromJSONSchema(schema.additionalProperties)
+      const inner = _fromJSONSchema({ ...schema, additionalProperties: undefined }) as z.ZodObject
       return inner.catchall(catchAll)
     }
 
     if (schema.properties !== undefined) {
       const properties: Record<string, z.ZodType> = {}
       for (const [key, value] of Object.entries(schema.properties)) {
-        const mapped: z.ZodType = _fromJsonSchema(value)
+        const mapped: z.ZodType = _fromJSONSchema(value)
         const required: string[] = schema.required ?? []
         properties[key] = required.includes(key) ? mapped : mapped.optional()
       }
@@ -140,7 +140,7 @@ function _fromJsonSchema(schema: JSONSchema7Definition | undefined): z.ZodType {
     }
 
     if (schema.additionalProperties !== undefined) {
-      const inner = _fromJsonSchema(schema.additionalProperties)
+      const inner = _fromJSONSchema(schema.additionalProperties)
       return z.record(inner)
     }
 
@@ -152,20 +152,20 @@ function _fromJsonSchema(schema: JSONSchema7Definition | undefined): z.ZodType {
       return DEFAULT_TYPE
     }
     if (schema.anyOf.length === 1) {
-      return _fromJsonSchema(schema.anyOf[0])
+      return _fromJSONSchema(schema.anyOf[0])
     }
 
     if (guards.isOptionalSchema(schema)) {
-      const inner = _fromJsonSchema(schema.anyOf[0])
+      const inner = _fromJSONSchema(schema.anyOf[0])
       return inner.optional()
     }
 
     if (guards.isNullableSchema(schema)) {
-      const inner = _fromJsonSchema(schema.anyOf[0])
+      const inner = _fromJSONSchema(schema.anyOf[0])
       return inner.nullable()
     }
 
-    const options = schema.anyOf.map(_fromJsonSchema) as [z.ZodType, z.ZodType, ...z.ZodType[]]
+    const options = schema.anyOf.map(_fromJSONSchema) as [z.ZodType, z.ZodType, ...z.ZodType[]]
     return z.union(options)
   }
 
@@ -174,11 +174,11 @@ function _fromJsonSchema(schema: JSONSchema7Definition | undefined): z.ZodType {
       return DEFAULT_TYPE
     }
     if (schema.allOf.length === 1) {
-      return _fromJsonSchema(schema.allOf[0])
+      return _fromJSONSchema(schema.allOf[0])
     }
     const [left, ...right] = schema.allOf as [JSONSchema7, ...JSONSchema7[]]
-    const zLeft = _fromJsonSchema(left)
-    const zRight = _fromJsonSchema({ allOf: right })
+    const zLeft = _fromJSONSchema(left)
+    const zRight = _fromJSONSchema({ allOf: right })
     return z.intersection(zLeft, zRight)
   }
 

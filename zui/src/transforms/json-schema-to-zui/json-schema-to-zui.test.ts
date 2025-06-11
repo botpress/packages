@@ -1,4 +1,4 @@
-import { describe, expect, test } from 'vitest'
+import { describe, expect, test, it } from 'vitest'
 import { ZodTypeAny, z } from '../../z/index'
 import { zuiKey } from '../../ui/constants'
 import { jsonSchemaToZodStr, jsonSchemaToZui, traverseZodDefinitions } from '.'

@@ -7,7 +7,7 @@ const dateTimeRegex =
 
 export type ObjectToZuiOptions = { optional?: boolean; nullable?: boolean; passtrough?: boolean }
 
-export const objectToZui = (obj: any, opts?: ObjectToZuiOptions, isRoot = true): ZodTypeAny => {
+export const objectToZui = (obj: object, opts?: ObjectToZuiOptions, isRoot = true): ZodTypeAny => {
   if (typeof obj !== 'object') {
     throw new errors.ObjectToZuiError('Input must be an object')
   }

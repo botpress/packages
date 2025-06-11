@@ -1,6 +1,6 @@
 import * as errs from '../common/errors'
 import z from '../../z'
-import { test, expect } from 'vitest'
+import { describe, test, expect } from 'vitest'
 import { toJsonSchema } from './index'
 
 describe('zuiToJsonSchemaNext', () => {

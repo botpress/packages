@@ -1,4 +1,4 @@
-import { describe, test } from 'vitest'
+import { describe, test, expect } from 'vitest'
 import { z } from './z/index'
 
 const foo = z.ref('foo')

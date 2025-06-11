@@ -1,3 +1,4 @@
+import { describe, it, expect } from 'vitest'
 import { parseDiscriminator } from './parseDiscriminator'
 
 describe('parseDiscriminator', () => {

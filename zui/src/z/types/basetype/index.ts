@@ -2,7 +2,6 @@ import type {
   BaseType,
   UIComponentDefinitions,
   ZodKindToBaseType,
-  JSONSchema,
   ParseSchema,
   ZuiExtensionObject,
   ZuiMetadata,
@@ -50,6 +49,7 @@ import type { ZuiSchemaOptions } from '../../../transforms/zui-to-json-schema/zu
 import type { ObjectToZuiOptions } from '../../../transforms/object-to-zui'
 import { TypescriptGenerationOptions, toTypescript } from '../../../transforms/zui-to-typescript-type'
 import { toTypescriptSchema } from '../../../transforms/zui-to-typescript-schema'
+import { JSONSchema7 } from 'json-schema'
 
 /**
  * This type is not part of the original Zod library, it's been added in Zui to:
@@ -624,7 +624,7 @@ export abstract class ZodType<Output = any, Def extends ZodTypeDef = ZodTypeDef,
     return this.metadata({ placeholder })
   }
 
-  toJsonSchema(opts?: ZuiSchemaOptions): JSONSchema {
+  toJsonSchema(opts?: ZuiSchemaOptions): JSONSchema7 {
     return zuiToJsonSchema(this, opts)
   }
 
@@ -658,11 +658,11 @@ export abstract class ZodType<Output = any, Def extends ZodTypeDef = ZodTypeDef,
     return result
   }
 
-  static fromObject(obj: any, opts?: ObjectToZuiOptions) {
+  static fromObject(obj: object, opts?: ObjectToZuiOptions) {
     return objectToZui(obj, opts)
   }
 
-  static fromJsonSchema(schema: JSONSchema | any) {
+  static fromJsonSchema(schema: JSONSchema7) {
     return jsonSchemaToZui(schema)
   }
 

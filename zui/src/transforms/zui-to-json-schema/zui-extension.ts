@@ -22,7 +22,7 @@ export type ZuiSchemaOptions = {
  *
  * @deprecated Use the new toJsonSchema function instead.
  */
-export const zuiToJsonSchema = (
+export const toJsonSchemaLegacy = (
   zuiType: z.ZodTypeAny,
   opts: ZuiSchemaOptions = { target: 'openApi3' },
 ): JSONSchema7 => {

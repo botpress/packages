@@ -81,7 +81,7 @@ export const zodStringToJsonString = (zodString: z.ZodString): json.StringSchema
         schema.maxLength = Math.max(0, check.value)
         break
       default:
-        throw new errors.UnsupportedZuiCheckToJsonSchemaError({
+        throw new errors.UnsupportedZuiCheckToJSONSchemaError({
           zodType: z.ZodFirstPartyTypeKind.ZodString,
           checkKind: check.kind,
         })

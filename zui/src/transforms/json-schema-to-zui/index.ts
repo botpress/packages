@@ -39,7 +39,7 @@ const jsonSchemaToZod = (schema: any): ZodTypeAny => {
   code = code.replaceAll('errors: z.ZodError[]', 'errors')
   const evaluationResult = evalZuiString(code)
   if (!evaluationResult.sucess) {
-    throw new errors.JsonSchemaToZuiError(evaluationResult.error)
+    throw new errors.JSONSchemaToZuiError(evaluationResult.error)
   }
   return evaluationResult.value
 }
@@ -231,16 +231,16 @@ export const traverseZodDefinitions = (
       cb(ZodFirstPartyTypeKind.ZodDefault, def, path)
       break
     default:
-      throw new errors.JsonSchemaToZuiError(`Unknown Zod type: ${(def as any).typeName}`)
+      throw new errors.JSONSchemaToZuiError(`Unknown Zod type: ${(def as any).typeName}`)
   }
 }
 
 /**
  * Converts a JSONSchema to a Zui schema.
  *
- * @deprecated Use the new fromJsonSchema function instead.
+ * @deprecated Use the new fromJSONSchema function instead.
  */
-export const jsonSchemaToZui = (schema: JsonSchema7Type): ZodTypeAny => {
+export const fromJSONSchemaLegacy = (schema: JsonSchema7Type): ZodTypeAny => {
   const zodSchema = jsonSchemaToZod(schema)
   applyZuiPropsRecursively(zodSchema, schema)
   return zodSchema as unknown as ZodTypeAny

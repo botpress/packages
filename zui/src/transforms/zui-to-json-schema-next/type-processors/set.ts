@@ -4,7 +4,7 @@ import * as json from '../../common/json-schema'
 
 export const zodSetToJsonSet = (
   zodSet: z.ZodSet,
-  toSchema: (x: z.ZodTypeAny) => json.ZuiJsonSchema,
+  toSchema: (x: z.ZodTypeAny) => json.ZuiJSONSchema,
 ): json.SetSchema => {
   const schema: json.SetSchema = {
     type: 'array',

@@ -20,9 +20,9 @@ export type ZuiSchemaOptions = {
 /**
  * Converts a Zod schema to a JSON Schema.
  *
- * @deprecated Use the new toJsonSchema function instead.
+ * @deprecated Use the new toJSONSchema function instead.
  */
-export const zuiToJsonSchema = (
+export const toJSONSchemaLegacy = (
   zuiType: z.ZodTypeAny,
   opts: ZuiSchemaOptions = { target: 'openApi3' },
 ): JSONSchema7 => {

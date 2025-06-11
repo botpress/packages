@@ -12,7 +12,7 @@ import { zodTupleToJsonTuple } from './type-processors/tuple'
  * @param schema zui schema
  * @returns ZUI flavored JSON schema
  */
-export function toJsonSchema(schema: z.Schema): json.ZuiJsonSchema {
+export function toJSONSchema(schema: z.Schema): json.ZuiJSONSchema {
   const schemaTyped = schema as z.ZodFirstPartySchemaTypes
   const def = schemaTyped._def
 
@@ -24,10 +24,10 @@ export function toJsonSchema(schema: z.Schema): json.ZuiJsonSchema {
       return zodNumberToJsonNumber(schemaTyped as z.ZodNumber) satisfies json.NumberSchema
 
     case z.ZodFirstPartyTypeKind.ZodNaN:
-      throw new err.UnsupportedZuiToJsonSchemaError(z.ZodFirstPartyTypeKind.ZodNaN)
+      throw new err.UnsupportedZuiToJSONSchemaError(z.ZodFirstPartyTypeKind.ZodNaN)
 
     case z.ZodFirstPartyTypeKind.ZodBigInt:
-      throw new err.UnsupportedZuiToJsonSchemaError(z.ZodFirstPartyTypeKind.ZodBigInt, {
+      throw new err.UnsupportedZuiToJSONSchemaError(z.ZodFirstPartyTypeKind.ZodBigInt, {
         suggestedAlternative: 'serialize bigint to string',
       })
 
@@ -39,7 +39,7 @@ export function toJsonSchema(schema: z.Schema): json.ZuiJsonSchema {
       } satisfies json.BooleanSchema
 
     case z.ZodFirstPartyTypeKind.ZodDate:
-      throw new err.UnsupportedZuiToJsonSchemaError(z.ZodFirstPartyTypeKind.ZodDate, {
+      throw new err.UnsupportedZuiToJSONSchemaError(z.ZodFirstPartyTypeKind.ZodDate, {
         suggestedAlternative: 'use z.string().datetime() instead',
       })
 
@@ -69,10 +69,10 @@ export function toJsonSchema(schema: z.Schema): json.ZuiJsonSchema {
       } satisfies json.NeverSchema
 
     case z.ZodFirstPartyTypeKind.ZodVoid:
-      throw new err.UnsupportedZuiToJsonSchemaError(z.ZodFirstPartyTypeKind.ZodVoid)
+      throw new err.UnsupportedZuiToJSONSchemaError(z.ZodFirstPartyTypeKind.ZodVoid)
 
     case z.ZodFirstPartyTypeKind.ZodArray:
-      return zodArrayToJsonArray(schemaTyped as z.ZodArray, toJsonSchema) satisfies json.ArraySchema
+      return zodArrayToJsonArray(schemaTyped as z.ZodArray, toJSONSchema) satisfies json.ArraySchema
 
     case z.ZodFirstPartyTypeKind.ZodObject:
       const shape = Object.entries(def.shape())
@@ -80,11 +80,11 @@ export function toJsonSchema(schema: z.Schema): json.ZuiJsonSchema {
       const required = requiredProperties.length ? requiredProperties.map(([key]) => key) : undefined
       const properties = shape
         .map(([key, value]) => [key, value.mandatory()] satisfies [string, z.ZodType])
-        .map(([key, value]) => [key, toJsonSchema(value)] satisfies [string, json.ZuiJsonSchema])
+        .map(([key, value]) => [key, toJSONSchema(value)] satisfies [string, json.ZuiJSONSchema])
 
       let additionalProperties: json.ObjectSchema['additionalProperties'] = false
       if (def.unknownKeys instanceof z.ZodType) {
-        additionalProperties = toJsonSchema(def.unknownKeys)
+        additionalProperties = toJSONSchema(def.unknownKeys)
       } else if (def.unknownKeys === 'passthrough') {
         additionalProperties = true
       }
@@ -101,20 +101,20 @@ export function toJsonSchema(schema: z.Schema): json.ZuiJsonSchema {
     case z.ZodFirstPartyTypeKind.ZodUnion:
       return {
         description: def.description,
-        anyOf: def.options.map((option) => toJsonSchema(option)),
+        anyOf: def.options.map((option) => toJSONSchema(option)),
         'x-zui': def['x-zui'],
       } satisfies json.UnionSchema
 
     case z.ZodFirstPartyTypeKind.ZodDiscriminatedUnion:
       return {
         description: def.description,
-        anyOf: def.options.map((option) => toJsonSchema(option)),
+        anyOf: def.options.map((option) => toJSONSchema(option)),
         'x-zui': def['x-zui'],
       } satisfies json.UnionSchema
 
     case z.ZodFirstPartyTypeKind.ZodIntersection:
-      const left = toJsonSchema(def.left)
-      const right = toJsonSchema(def.right)
+      const left = toJSONSchema(def.left)
+      const right = toJSONSchema(def.right)
 
       /**
        * TODO: Potential conflict between `additionalProperties` in the left and right schemas.
@@ -139,27 +139,27 @@ export function toJsonSchema(schema: z.Schema): json.ZuiJsonSchema {
       } satisfies json.IntersectionSchema
 
     case z.ZodFirstPartyTypeKind.ZodTuple:
-      return zodTupleToJsonTuple(schemaTyped as z.ZodTuple, toJsonSchema) satisfies json.TupleSchema
+      return zodTupleToJsonTuple(schemaTyped as z.ZodTuple, toJSONSchema) satisfies json.TupleSchema
 
     case z.ZodFirstPartyTypeKind.ZodRecord:
       return {
         type: 'object',
         description: def.description,
-        additionalProperties: toJsonSchema(def.valueType),
+        additionalProperties: toJSONSchema(def.valueType),
         'x-zui': def['x-zui'],
       } satisfies json.RecordSchema
 
     case z.ZodFirstPartyTypeKind.ZodMap:
-      throw new err.UnsupportedZuiToJsonSchemaError(z.ZodFirstPartyTypeKind.ZodMap)
+      throw new err.UnsupportedZuiToJSONSchemaError(z.ZodFirstPartyTypeKind.ZodMap)
 
     case z.ZodFirstPartyTypeKind.ZodSet:
-      return zodSetToJsonSet(schemaTyped as z.ZodSet, toJsonSchema) satisfies json.SetSchema
+      return zodSetToJsonSet(schemaTyped as z.ZodSet, toJSONSchema) satisfies json.SetSchema
 
     case z.ZodFirstPartyTypeKind.ZodFunction:
-      throw new err.UnsupportedZuiToJsonSchemaError(z.ZodFirstPartyTypeKind.ZodFunction)
+      throw new err.UnsupportedZuiToJSONSchemaError(z.ZodFirstPartyTypeKind.ZodFunction)
 
     case z.ZodFirstPartyTypeKind.ZodLazy:
-      throw new err.UnsupportedZuiToJsonSchemaError(z.ZodFirstPartyTypeKind.ZodLazy)
+      throw new err.UnsupportedZuiToJSONSchemaError(z.ZodFirstPartyTypeKind.ZodLazy)
 
     case z.ZodFirstPartyTypeKind.ZodLiteral:
       if (typeof def.value === 'string') {
@@ -190,7 +190,7 @@ export function toJsonSchema(schema: z.Schema): json.ZuiJsonSchema {
       } else {
         z.util.assertEqual<bigint | symbol, typeof def.value>(true)
         const unsupportedLiteral = typeof def.value
-        throw new err.ZuiToJsonSchemaError(`Unsupported literal type: "${unsupportedLiteral}"`)
+        throw new err.ZuiToJSONSchemaError(`Unsupported literal type: "${unsupportedLiteral}"`)
       }
 
     case z.ZodFirstPartyTypeKind.ZodEnum:
@@ -202,15 +202,15 @@ export function toJsonSchema(schema: z.Schema): json.ZuiJsonSchema {
       } satisfies json.EnumSchema
 
     case z.ZodFirstPartyTypeKind.ZodEffects:
-      throw new err.UnsupportedZuiToJsonSchemaError(z.ZodFirstPartyTypeKind.ZodEffects)
+      throw new err.UnsupportedZuiToJSONSchemaError(z.ZodFirstPartyTypeKind.ZodEffects)
 
     case z.ZodFirstPartyTypeKind.ZodNativeEnum:
-      throw new err.UnsupportedZuiToJsonSchemaError(z.ZodFirstPartyTypeKind.ZodNativeEnum)
+      throw new err.UnsupportedZuiToJSONSchemaError(z.ZodFirstPartyTypeKind.ZodNativeEnum)
 
     case z.ZodFirstPartyTypeKind.ZodOptional:
       return {
         description: def.description,
-        anyOf: [toJsonSchema(def.innerType), undefinedSchema()],
+        anyOf: [toJSONSchema(def.innerType), undefinedSchema()],
         'x-zui': {
           ...def['x-zui'],
           def: { typeName: z.ZodFirstPartyTypeKind.ZodOptional },
@@ -219,7 +219,7 @@ export function toJsonSchema(schema: z.Schema): json.ZuiJsonSchema {
 
     case z.ZodFirstPartyTypeKind.ZodNullable:
       return {
-        anyOf: [toJsonSchema(def.innerType), nullSchema()],
+        anyOf: [toJSONSchema(def.innerType), nullSchema()],
         'x-zui': {
           ...def['x-zui'],
           def: { typeName: z.ZodFirstPartyTypeKind.ZodNullable },
@@ -229,30 +229,30 @@ export function toJsonSchema(schema: z.Schema): json.ZuiJsonSchema {
     case z.ZodFirstPartyTypeKind.ZodDefault:
       // ZodDefault is not treated as a metadata root so we don't need to preserve x-zui
       return {
-        ...toJsonSchema(def.innerType),
+        ...toJSONSchema(def.innerType),
         default: def.defaultValue(),
       }
 
     case z.ZodFirstPartyTypeKind.ZodCatch:
       // TODO: could be supported using if-else json schema
-      throw new err.UnsupportedZuiToJsonSchemaError(z.ZodFirstPartyTypeKind.ZodCatch)
+      throw new err.UnsupportedZuiToJSONSchemaError(z.ZodFirstPartyTypeKind.ZodCatch)
 
     case z.ZodFirstPartyTypeKind.ZodPromise:
-      throw new err.UnsupportedZuiToJsonSchemaError(z.ZodFirstPartyTypeKind.ZodPromise)
+      throw new err.UnsupportedZuiToJSONSchemaError(z.ZodFirstPartyTypeKind.ZodPromise)
 
     case z.ZodFirstPartyTypeKind.ZodBranded:
-      throw new err.UnsupportedZuiToJsonSchemaError(z.ZodFirstPartyTypeKind.ZodBranded)
+      throw new err.UnsupportedZuiToJSONSchemaError(z.ZodFirstPartyTypeKind.ZodBranded)
 
     case z.ZodFirstPartyTypeKind.ZodPipeline:
-      throw new err.UnsupportedZuiToJsonSchemaError(z.ZodFirstPartyTypeKind.ZodPipeline)
+      throw new err.UnsupportedZuiToJSONSchemaError(z.ZodFirstPartyTypeKind.ZodPipeline)
 
     case z.ZodFirstPartyTypeKind.ZodSymbol:
-      throw new err.UnsupportedZuiToJsonSchemaError(z.ZodFirstPartyTypeKind.ZodPipeline)
+      throw new err.UnsupportedZuiToJSONSchemaError(z.ZodFirstPartyTypeKind.ZodPipeline)
 
     case z.ZodFirstPartyTypeKind.ZodReadonly:
       // ZodReadonly is not treated as a metadata root so we don't need to preserve x-zui
       return {
-        ...toJsonSchema(def.innerType),
+        ...toJSONSchema(def.innerType),
         readOnly: true,
       }
 

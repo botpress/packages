@@ -1,5 +1,5 @@
 import { describe, test, expect, it } from 'vitest'
-import { zuiToJsonSchema } from './zui-extension'
+import { toJSONSchemaLegacy } from './zui-extension'
 import { z } from '../../z/index'
 import { zuiKey } from '../../ui/constants'
 
@@ -10,7 +10,7 @@ describe('zuiToJsonSchema', () => {
       age: z.number().max(100).min(0).title('Age').describe('Age in years').default(20),
     })
 
-    const jsonSchema = zuiToJsonSchema(schema)
+    const jsonSchema = toJSONSchemaLegacy(schema)
 
     expect(jsonSchema).toEqual({
       additionalProperties: false,
@@ -40,7 +40,7 @@ describe('zuiToJsonSchema', () => {
 
   test('enums', () => {
     expect(
-      zuiToJsonSchema(
+      toJSONSchemaLegacy(
         z.object({
           fruit: z.enum(['Apple', 'Banana', 'Orange']),
         }),
@@ -68,7 +68,7 @@ describe('zuiToJsonSchema', () => {
         .displayAs({ id: 'customstringcomponent', params: { multiline: true } }),
     })
 
-    const jsonSchema = zuiToJsonSchema(schema)
+    const jsonSchema = toJSONSchemaLegacy(schema)
     expect(jsonSchema).toEqual({
       additionalProperties: false,
       properties: {
@@ -94,7 +94,7 @@ describe('zuiToJsonSchema', () => {
   test('examples are available on json schema', () => {
     const schema = z.string()
 
-    const jsonSchema = zuiToJsonSchema(schema, { $schemaUrl: false })
+    const jsonSchema = toJSONSchemaLegacy(schema, { $schemaUrl: false })
     expect(jsonSchema).toEqual({
       type: 'string',
       [zuiKey]: {},
@@ -104,7 +104,7 @@ describe('zuiToJsonSchema', () => {
   test('record with a value works', () => {
     const schema = z.record(z.string().max(30)).describe('hello')
 
-    const jsonSchema = zuiToJsonSchema(schema, { $schemaUrl: false })
+    const jsonSchema = toJSONSchemaLegacy(schema, { $schemaUrl: false })
     expect(jsonSchema).toEqual({
       additionalProperties: {
         maxLength: 30,
@@ -120,7 +120,7 @@ describe('zuiToJsonSchema', () => {
   test('record with second parameter', () => {
     const schema = z.record(z.string(), z.number().max(30), {}).describe('hello')
 
-    const jsonSchema = zuiToJsonSchema(schema, { $schemaUrl: false })
+    const jsonSchema = toJSONSchemaLegacy(schema, { $schemaUrl: false })
     expect(jsonSchema).toEqual({
       additionalProperties: {
         maximum: 30,
@@ -136,7 +136,7 @@ describe('zuiToJsonSchema', () => {
   test('record with second parameter', () => {
     const schema = z.object({})
 
-    const jsonSchema = zuiToJsonSchema(schema, { $schemaUrl: 'http://schema.com' })
+    const jsonSchema = toJSONSchemaLegacy(schema, { $schemaUrl: 'http://schema.com' })
     expect(jsonSchema).toEqual({
       $schema: 'http://schema.com',
       additionalProperties: false,
@@ -149,7 +149,7 @@ describe('zuiToJsonSchema', () => {
   test('record with second parameter', () => {
     const schema = z.object({ multipleTypes: z.union([z.string(), z.number()]) })
 
-    const jsonSchema = zuiToJsonSchema(schema, { $schemaUrl: false })
+    const jsonSchema = toJSONSchemaLegacy(schema, { $schemaUrl: false })
     expect(jsonSchema).toEqual({
       additionalProperties: false,
       properties: {
@@ -175,7 +175,7 @@ describe('zuiToJsonSchema', () => {
       .min(1)
       .describe('Array of objects with validation')
 
-    const jsonSchema = zuiToJsonSchema(arrayWithObjects, { target: 'openApi3' })
+    const jsonSchema = toJSONSchemaLegacy(arrayWithObjects, { target: 'openApi3' })
     expect(jsonSchema).toEqual({
       description: 'Array of objects with validation',
       items: {
@@ -207,7 +207,7 @@ describe('zuiToJsonSchema', () => {
       z.object({ kek: z.literal('B'), lel: z.number() }),
     ])
 
-    const jsonSchema = zuiToJsonSchema(schema)
+    const jsonSchema = toJSONSchemaLegacy(schema)
     expect(jsonSchema).toEqual({
       anyOf: [
         {
@@ -255,7 +255,7 @@ describe('zuiToJsonSchema', () => {
       z.object({ kek: z.literal('B'), lel: z.number() }),
     ])
 
-    const jsonSchema = zuiToJsonSchema(schema, { target: 'openApi3', discriminator: true, unionStrategy: 'oneOf' })
+    const jsonSchema = toJSONSchemaLegacy(schema, { target: 'openApi3', discriminator: true, unionStrategy: 'oneOf' })
     expect(jsonSchema).toEqual({
       discriminator: {
         propertyName: 'kek',
@@ -308,7 +308,7 @@ describe('zuiToJsonSchema', () => {
       }),
     )
 
-    const zSchema = zuiToJsonSchema(schema)
+    const zSchema = toJSONSchemaLegacy(schema)
     expect(zSchema).toEqual({
       additionalProperties: false,
       properties: {
@@ -334,7 +334,7 @@ describe('zuiToJsonSchema', () => {
   test('array of array', () => {
     const schema = z.array(z.array(z.string().disabled()))
 
-    const jsonSchema = zuiToJsonSchema(schema)
+    const jsonSchema = toJSONSchemaLegacy(schema)
     expect(jsonSchema).toEqual({
       items: {
         items: {
@@ -353,7 +353,7 @@ describe('zuiToJsonSchema', () => {
 
   test('generic is transformed to a ref', () => {
     const T = z.ref('T').disabled()
-    const TJsonSchema = zuiToJsonSchema(T)
+    const TJsonSchema = toJSONSchemaLegacy(T)
     expect(TJsonSchema).toEqual({
       $ref: 'T',
       [zuiKey]: {
@@ -366,7 +366,7 @@ describe('zuiToJsonSchema', () => {
       data: T,
     })
 
-    const jsonSchema = zuiToJsonSchema(schema)
+    const jsonSchema = toJSONSchemaLegacy(schema)
     expect(jsonSchema).toEqual({
       additionalProperties: false,
       properties: {
@@ -392,7 +392,7 @@ describe('coercion serialization', () => {
   {
     it('serializes coerced dates correctly', () => {
       const schema = z.coerce.date().displayAs({ id: 'doood', params: {} } as never)
-      const serialized = zuiToJsonSchema(schema)
+      const serialized = toJSONSchemaLegacy(schema)
       expect(serialized).toEqual({
         format: 'date-time',
         type: 'string',
@@ -405,7 +405,7 @@ describe('coercion serialization', () => {
 
     it('serializes coerced strings correctly', () => {
       const schema = z.coerce.string()
-      const serialized = zuiToJsonSchema(schema)
+      const serialized = toJSONSchemaLegacy(schema)
       expect(serialized).toEqual({
         type: 'string',
         [zuiKey]: {
@@ -416,7 +416,7 @@ describe('coercion serialization', () => {
 
     it('serializes coerced bigints correctly', () => {
       const schema = z.coerce.bigint()
-      const serialized = zuiToJsonSchema(schema)
+      const serialized = toJSONSchemaLegacy(schema)
       expect(serialized).toEqual({
         format: 'int64',
         type: 'integer',
@@ -428,7 +428,7 @@ describe('coercion serialization', () => {
 
     it('serializes coerced booleans correctly', () => {
       const schema = z.coerce.boolean()
-      const serialized = zuiToJsonSchema(schema)
+      const serialized = toJSONSchemaLegacy(schema)
       expect(serialized).toEqual({
         type: 'boolean',
         [zuiKey]: {
@@ -439,7 +439,7 @@ describe('coercion serialization', () => {
 
     it('serializes coerced numbers correctly', () => {
       const schema = z.coerce.number()
-      const serialized = zuiToJsonSchema(schema)
+      const serialized = toJSONSchemaLegacy(schema)
       expect(serialized).toEqual({
         type: 'number',
         [zuiKey]: {

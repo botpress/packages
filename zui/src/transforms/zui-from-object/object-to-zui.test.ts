@@ -1,8 +1,8 @@
 import { describe, expect, test } from 'vitest'
 import { fromObject } from '.'
-import { toJSONSchemaLegacy } from '../zui-to-json-schema'
+import { toJSONSchemaLegacy } from '../zui-to-json-schema-legacy'
 import { JSONSchema7, JSONSchema7Definition } from 'json-schema'
-import { fromJSONSchemaLegacy } from '../json-schema-to-zui'
+import { fromJSONSchemaLegacy } from '../zui-from-json-schema-legacy'
 
 function asSchema(s: JSONSchema7Definition | undefined): JSONSchema7 | undefined {
   if (s === undefined) {

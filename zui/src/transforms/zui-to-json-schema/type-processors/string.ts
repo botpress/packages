@@ -4,7 +4,7 @@ import { generateDatetimeRegex } from '../../../z/types/string/datetime'
 import { regexUtils } from '../../common'
 import * as errors from '../../common/errors'
 import * as json from '../../common/json-schema'
-import { zodPatterns } from '../../zui-to-json-schema/parsers/string'
+import { zodPatterns } from '../../zui-to-json-schema-legacy/parsers/string'
 
 export const zodStringToJsonString = (zodString: z.ZodString): json.StringSchema => {
   const schema: json.StringSchema = {

@@ -20,7 +20,7 @@ import {
   z,
 } from '../../z/index'
 import { zuiKey } from '../../ui/constants'
-import { JsonSchema7Type } from '../zui-to-json-schema/parseDef'
+import { JsonSchema7Type } from '../zui-to-json-schema-legacy/parseDef'
 import { parseSchema } from './parsers/parseSchema'
 import { ZuiExtensionObject } from '../../ui/types'
 import { JSONSchemaExtended } from './types'

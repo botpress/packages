@@ -9,9 +9,7 @@ import { ArraySchema, SetSchema, TupleSchema } from '../common/json-schema'
 const DEFAULT_TYPE = z.any()
 
 /**
- * # \#\#\# Experimental \#\#\#
- *
- * @experimental This function is experimental and is subject to breaking changes in the future.
+ * Converts a JSON Schema to a ZUI Schema.
  * @param schema json schema
  * @returns ZUI Schema
  */

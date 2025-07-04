@@ -4,7 +4,7 @@
   "description": "Retry with exponential backoff for the command line.",
   "main": "dist/index.js",
   "bin": {
-    "retry": "./cli.js"
+    "retry": "./bin.js"
   },
   "scripts": {
     "build": "tsc",

@@ -1,0 +1,31 @@
+{
+  "$schema": "./node_modules/oxlint/configuration_schema.json",
+  "plugins": ["unicorn", "typescript", "oxc", "import", "promise", "vitest"],
+  "env": {
+    "browser": true,
+    "es2024": true
+  },
+  "globals": {},
+  "settings": {},
+  "rules": {
+    "import/max-dependencies": "off",
+    "eslint/max-classes-per-file": "off",
+    "unicorn/no-negated-condition": "off",
+    "eslint/max-lines": "off",
+    "unicorn/consistent-function-scoping": "off"
+  },
+  "overrides": [
+    {
+      "files": ["*.test.ts"],
+      "rules": {
+        "eslint/max-lines-per-function": "off"
+      }
+    }
+  ],
+  "categories": {
+    "correctness": "error",
+    "pedantic": "error",
+    "perf": "error",
+    "suspicious": "error"
+  }
+}

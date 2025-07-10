@@ -1,0 +1,39 @@
+name: Slackdown
+
+on:
+  push:
+    branches:
+      - master
+    paths:
+      - 'slackdown/**'
+
+  pull_request:
+    paths:
+      - 'slackdown/**'
+
+  workflow_dispatch: {}
+
+defaults:
+  run:
+    working-directory: ./slackdown
+
+jobs:
+  slackdown:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v3.0.0
+        with:
+          version: 8.6.2
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm build
+      - run: pnpm check:type
+      - run: pnpm check:format
+      - run: pnpm test
+      - name: Publish
+        if: github.ref == 'refs/heads/master' || github.event_name == 'workflow_dispatch'
+        uses: botpress/gh-actions/publish-if-not-exists@master
+        with:
+          path: './slackdown'
+          token: '${{ secrets.NPM_ACCESS_TOKEN }}'

@@ -1,17 +1,18 @@
-* @botpress/cloud-services
+* @botpress/engineering
 
-const @botpress/cloud-services
-entities @franklevasseur @botpress/cloud-services
-depsynky @franklevasseur @botpress/cloud-services
-es-node @franklevasseur @botpress/cloud-services
-jex @franklevasseur @botpress/cloud-services
-log4bot @franklevasseur @botpress/cloud-services
-opapi @michaelmass @franklevasseur @botpress/cloud-services
-promex @michaelmass @botpress/cloud-services
-ptb-schema @franklevasseur @botpress/cloud-services
-readiness @franklevasseur @botpress/cloud-services
-trail @michaelmass @botpress/cloud-services
-tunnel @franklevasseur @botpress/cloud-services
-verel @franklevasseur @botpress/cloud-services
-yargs-extra @franklevasseur @botpress/cloud-services
-zui @franklevasseur @botpress/cloud-services
+const @botpress/engineering
+entities @franklevasseur @botpress/engineering
+depsynky @franklevasseur @botpress/engineering
+es-node @franklevasseur @botpress/engineering
+jex @franklevasseur @botpress/engineering
+log4bot @franklevasseur @botpress/engineering
+opapi @michaelmass @franklevasseur @botpress/engineering
+promex @michaelmass @botpress/engineering
+ptb-schema @franklevasseur @botpress/engineering
+readiness @franklevasseur @botpress/engineering
+trail @michaelmass @botpress/engineering
+tunnel @franklevasseur @botpress/engineering
+verel @franklevasseur @botpress/engineering
+yargs-extra @franklevasseur @botpress/engineering
+zui @franklevasseur @botpress/engineering
+slackdown @pascal-botpress @botpress/engineering

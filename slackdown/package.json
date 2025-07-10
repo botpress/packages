@@ -1,56 +1,56 @@
 {
-	"name": "@bpinternal/slackdown",
-	"description": "A slack-to-markdown converter and formatter",
-	"version": "0.1.0",
-	"author": "Botpress Technologies, Inc.",
-	"license": "0BSD",
-	"repository": {
-		"type": "git",
-		"url": "https://github.com/botpress/slackdown"
-	},
-	"type": "module",
-	"engines": {
-		"node": ">=22.17.0"
-	},
-	"source": "./src/index.ts",
-	"main": "./dist/index.js",
-	"types": "./dist/index.d.ts",
-	"exports": {
-		".": {
-			"import": "./dist/index.js",
-			"require": "./dist/index.cjs"
-		}
-	},
-	"scripts": {
-		"test": "vitest run --bail 1",
-		"test:watch": "vitest",
-		"check:coverage": "vitest run --coverage",
-		"check:oxlint": "oxlint -c .oxlintrc.json",
-		"check:format": "prettier --check .",
-		"check:type": "tsc --noEmit",
-		"check:knip": "knip",
-		"check": "npm run check:oxlint && npm run check:type && npm run check:format",
-		"fix:oxlint": "oxlint -c .oxlintrc.json --fix --fix-suggestions",
-		"fix:format": "prettier --write .",
-		"fix": "npm run fix:oxlint && npm run fix:format",
-		"ci": "npm run check && npm run test",
-		"build": "tsup",
-		"watch": "tsup --watch"
-	},
-	"devDependencies": {
-		"@types/node": "^24.0.12",
-		"@vitest/coverage-v8": "^3.2.4",
-		"knip": "^5.61.3",
-		"oxlint": "^1.6.0",
-		"prettier": "3.6.2",
-		"tsup": "^8.5.0",
-		"typescript": "^5.8.3",
-		"vitest": "^3.2.4"
-	},
-	"files": [
-		"dist/**/*"
-	],
-	"dependencies": {
-		"ts-regex-builder": "^1.8.2"
-	}
+  "name": "@bpinternal/slackdown",
+  "description": "A slack-to-markdown converter and formatter",
+  "version": "0.1.0",
+  "author": "Botpress Technologies, Inc.",
+  "license": "0BSD",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/botpress/slackdown"
+  },
+  "type": "module",
+  "engines": {
+    "node": ">=22.17.0"
+  },
+  "source": "./src/index.ts",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    }
+  },
+  "scripts": {
+    "test": "vitest run --bail 1",
+    "test:watch": "vitest",
+    "check:coverage": "vitest run --coverage",
+    "check:oxlint": "oxlint -c .oxlintrc.json",
+    "check:format": "prettier --check .",
+    "check:type": "tsc --noEmit",
+    "check:knip": "knip",
+    "check": "npm run check:oxlint && npm run check:type && npm run check:format",
+    "fix:oxlint": "oxlint -c .oxlintrc.json --fix --fix-suggestions",
+    "fix:format": "prettier --write .",
+    "fix": "npm run fix:oxlint && npm run fix:format",
+    "ci": "npm run check && npm run test",
+    "build": "tsup",
+    "watch": "tsup --watch"
+  },
+  "devDependencies": {
+    "@types/node": "^24.0.12",
+    "@vitest/coverage-v8": "^3.2.4",
+    "knip": "^5.61.3",
+    "oxlint": "^1.6.0",
+    "prettier": "3.6.2",
+    "tsup": "^8.5.0",
+    "typescript": "^5.8.3",
+    "vitest": "^3.2.4"
+  },
+  "files": [
+    "dist/**/*"
+  ],
+  "dependencies": {
+    "ts-regex-builder": "^1.8.2"
+  }
 }

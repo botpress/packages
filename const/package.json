@@ -15,7 +15,6 @@
   },
   "dependencies": {},
   "devDependencies": {
-    "@tsconfig/node18-strictest": "^1.0.0",
     "esbuild": "^0.25.0",
     "ts-node": "^10.9.1",
     "typescript": "5.8.3",

@@ -10,6 +10,7 @@ on:
   pull_request:
     paths:
       - 'log4bot/**'
+      - .github/workflows/log4bot.yml
 
   workflow_dispatch: {}
 

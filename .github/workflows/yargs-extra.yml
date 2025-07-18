@@ -10,6 +10,7 @@ on:
   pull_request:
     paths:
       - 'yargs-extra/**'
+      - .github/workflows/yargs-extra.yml
 
   workflow_dispatch: {}
 

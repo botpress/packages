@@ -10,6 +10,7 @@ on:
   pull_request:
     paths:
       - 'const/**'
+      - .github/workflows/const.yml
 
   workflow_dispatch: {}
 

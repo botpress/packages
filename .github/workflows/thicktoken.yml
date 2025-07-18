@@ -10,6 +10,7 @@ on:
   pull_request:
     paths:
       - 'thicktoken/**'
+      - .github/workflows/thicktoken.yml
 
   workflow_dispatch: {}
 

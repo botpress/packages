@@ -10,6 +10,7 @@ on:
   pull_request:
     paths:
       - 'jex/**'
+      - .github/workflows/jex.yml
 
   workflow_dispatch: {}
 

@@ -10,6 +10,7 @@ on:
   pull_request:
     paths:
       - 'es-node/**'
+      - .github/workflows/es-node.yml
 
   workflow_dispatch: {}
 

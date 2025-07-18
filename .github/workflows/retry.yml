@@ -10,6 +10,7 @@ on:
   pull_request:
     paths:
       - 'retry/**'
+      - .github/workflows/retry.yml
 
   workflow_dispatch: {}
 

@@ -10,6 +10,7 @@ on:
   pull_request:
     paths:
       - 'entities/**'
+      - .github/workflows/entities.yml
 
   workflow_dispatch: {}
 

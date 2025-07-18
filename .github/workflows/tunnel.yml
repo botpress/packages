@@ -10,6 +10,7 @@ on:
   pull_request:
     paths:
       - 'tunnel/**'
+      - .github/workflows/tunnel.yml
 
   workflow_dispatch: {}
 

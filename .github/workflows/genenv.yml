@@ -10,6 +10,7 @@ on:
   pull_request:
     paths:
       - 'genenv/**'
+      - .github/workflows/genenv.yml
 
   workflow_dispatch: {}
 

@@ -10,6 +10,7 @@ on:
   pull_request:
     paths:
       - 'opapi/**'
+      - .github/workflows/opapi.yml
 
   workflow_dispatch: {}
 

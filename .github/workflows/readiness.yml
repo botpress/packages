@@ -10,6 +10,7 @@ on:
   pull_request:
     paths:
       - 'readiness/**'
+      - .github/workflows/readiness.yml
 
   workflow_dispatch: {}
 

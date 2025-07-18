@@ -10,6 +10,7 @@ on:
   pull_request:
     paths:
       - 'zui/**'
+      - .github/workflows/zui.yml
 
   workflow_dispatch: {}
 

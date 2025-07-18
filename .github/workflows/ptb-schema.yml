@@ -10,6 +10,7 @@ on:
   pull_request:
     paths:
       - 'ptb-schema/**'
+      - .github/workflows/ptb-schema.yml
 
   workflow_dispatch: {}
 

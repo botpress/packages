@@ -1,4 +1,4 @@
-import { describe, expect, test, beforeEach, afterEach, vi } from 'vitest'
+import { describe, expect, test, afterEach, vi } from 'vitest'
 import express, { Express } from 'express'
 import * as promex from './prometheus'
 import prom from 'prom-client'
@@ -14,10 +14,13 @@ const listen = (app: Express, port: number) => {
   })
 }
 
-describe('init function', () => {
+const sleep = (ms: number = 10) => new Promise<void>((resolve) => setTimeout(resolve, ms))
+
+describe.sequential('init function', () => {
   afterEach(async () => {
     await promex.reset()
     prom.register.clear()
+    await sleep()
   })
 
   test('initialize a middleware on an express app', async () => {
@@ -49,7 +52,7 @@ describe('init function', () => {
   })
 
   test('initialize a callback for each metric request', async () => {
-    const callbackErr = vi.fn(async () => { })
+    const callbackErr = vi.fn(async () => {})
     const callbackReq = vi.fn(async () => {
       throw new Error('test')
     })
@@ -58,7 +61,7 @@ describe('init function', () => {
     promex.init(app)
     await promex.start({ onRequest: callbackReq, onError: callbackErr })
 
-    await axios.get('http://127.0.0.1:9090/metrics').catch(() => { })
+    await axios.get('http://127.0.0.1:9090/metrics').catch(() => {})
 
     expect(callbackReq).toHaveBeenCalledTimes(1)
     expect(callbackErr).toHaveBeenCalledTimes(1)
@@ -101,7 +104,7 @@ describe('init function', () => {
 
     const appServer = await listen(app, 9091)
 
-    await axios.post('http://127.0.0.1:9091/randompath/that/doesnt/exist').catch(() => { })
+    await axios.post('http://127.0.0.1:9091/randompath/that/doesnt/exist').catch(() => {})
 
     const res = await axios.get('http://127.0.0.1:9090/metrics')
 
@@ -120,6 +123,7 @@ describe('init function', () => {
     await axios.get('http://127.0.0.1:9090/metrics')
 
     await promex.stop()
+    await sleep()
     await promex.start()
 
     await axios.get('http://127.0.0.1:9090/metrics')

@@ -25,5 +25,6 @@
     "noImplicitOverride": false,
     "checkJs": false
   },
+  "include": ["src/**/*"],
   "exclude": ["node_modules"]
 }

@@ -19,7 +19,7 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
-    "@types/node": "^22.14.1",
+    "@types/node": "^22.16.4",
     "dotenv": "^16.4.7",
     "tiktoken": "^1.0.17",
     "tsup": "^8.3.6",

@@ -1,6 +1,6 @@
 {
   "name": "@bpinternal/jex",
-  "version": "1.2.3",
+  "version": "1.2.4",
   "description": "JSON-Extends; JSON Schema type checking library",
   "main": "dist/index.cjs",
   "module": "./dist/index.mjs",

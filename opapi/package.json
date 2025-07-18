@@ -1,6 +1,6 @@
 {
   "name": "@bpinternal/opapi",
-  "version": "0.14.0",
+  "version": "0.14.1",
   "description": "Opapi is a highly opinionated library to generate server, client and documentation from OpenAPI specification using typescript.",
   "main": "./dist/index.js",
   "module": "./dist/index.mjs",

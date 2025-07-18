@@ -7,22 +7,22 @@ settings:
 dependencies:
   '@promster/express':
     specifier: 13.0.0
-    version: 13.0.0(prom-client@15.1.3)(typescript@5.7.2)
+    version: 13.0.0(prom-client@15.1.3)(typescript@5.8.3)
   '@promster/metrics':
     specifier: 13.0.0
-    version: 13.0.0(prom-client@15.1.3)(typescript@5.7.2)
+    version: 13.0.0(prom-client@15.1.3)(typescript@5.8.3)
   '@promster/server':
     specifier: 13.0.0
-    version: 13.0.0(prom-client@15.1.3)(typescript@5.7.2)
+    version: 13.0.0(prom-client@15.1.3)(typescript@5.8.3)
   '@promster/types':
     specifier: 13.0.0
-    version: 13.0.0(prom-client@15.1.3)(typescript@5.7.2)
+    version: 13.0.0(prom-client@15.1.3)(typescript@5.8.3)
   express:
     specifier: 4.21.1
     version: 4.21.1
   nanoid:
-    specifier: 3.3.8
-    version: 3.3.8
+    specifier: 3.3.11
+    version: 3.3.11
   prom-client:
     specifier: 15.1.3
     version: 15.1.3
@@ -35,11 +35,11 @@ devDependencies:
     specifier: ^22.16.4
     version: 22.16.4
   axios:
-    specifier: 1.7.8
-    version: 1.7.8
+    specifier: 1.10.0
+    version: 1.10.0
   typescript:
-    specifier: 5.7.2
-    version: 5.7.2
+    specifier: 5.8.3
+    version: 5.8.3
   vite:
     specifier: 7.0.5
     version: 7.0.5(@types/node@22.16.4)
@@ -428,12 +428,12 @@ packages:
     engines: {node: '>=8.0.0'}
     dev: false
 
-  /@promster/express@13.0.0(prom-client@15.1.3)(typescript@5.7.2):
+  /@promster/express@13.0.0(prom-client@15.1.3)(typescript@5.8.3):
     resolution: {integrity: sha512-MAVmZCSHk/v6ZRKTSLKB8GxmHm4H7JLkWcz6xzlfAYbBfjlKGZ4i8bbxkwXV18y2FAmZ4ynfTwnBVdI27Pdcqg==}
     engines: {node: '>=20', npm: '>=8'}
     dependencies:
-      '@promster/metrics': 13.0.0(prom-client@15.1.3)(typescript@5.7.2)
-      '@promster/types': 13.0.0(prom-client@15.1.3)(typescript@5.7.2)
+      '@promster/metrics': 13.0.0(prom-client@15.1.3)(typescript@5.8.3)
+      '@promster/types': 13.0.0(prom-client@15.1.3)(typescript@5.8.3)
       merge-options: 3.0.4
       tslib: 2.6.2
     transitivePeerDependencies:
@@ -443,14 +443,14 @@ packages:
       - typescript
     dev: false
 
-  /@promster/metrics@13.0.0(prom-client@15.1.3)(typescript@5.7.2):
+  /@promster/metrics@13.0.0(prom-client@15.1.3)(typescript@5.8.3):
     resolution: {integrity: sha512-t5J8CwkSLXGq1/W+MBYhq19cNPGRQDOH53gV/JPhFjXn4EnsDhIQywkVZdPjj+e9T6FI2cZdyp3vbX6Z4hYQrQ==}
     engines: {node: '>=20', npm: '>=8'}
     peerDependencies:
       prom-client: 13.x.x || 14.x || 15.x
     dependencies:
       optional: 0.1.4
-      '@promster/types': 13.0.0(prom-client@15.1.3)(typescript@5.7.2)
+      '@promster/types': 13.0.0(prom-client@15.1.3)(typescript@5.8.3)
       lodash.memoize: 4.1.2
       lodash.once: 4.1.1
       merge-options: 3.0.4
@@ -465,12 +465,12 @@ packages:
       - typescript
     dev: false
 
-  /@promster/server@13.0.0(prom-client@15.1.3)(typescript@5.7.2):
+  /@promster/server@13.0.0(prom-client@15.1.3)(typescript@5.8.3):
     resolution: {integrity: sha512-kAyYoexKi5MkCl40PaNibSYpXr7Ms33NFO9cxkoR8qWAazoisOq4jHky3eWklHSPgQvEQqo3Me7tpDuKvekQJg==}
     engines: {node: '>=20', npm: '>=8'}
     dependencies:
-      '@promster/metrics': 13.0.0(prom-client@15.1.3)(typescript@5.7.2)
-      '@promster/types': 13.0.0(prom-client@15.1.3)(typescript@5.7.2)
+      '@promster/metrics': 13.0.0(prom-client@15.1.3)(typescript@5.8.3)
+      '@promster/types': 13.0.0(prom-client@15.1.3)(typescript@5.8.3)
       tslib: 2.6.2
     transitivePeerDependencies:
       - encoding
@@ -479,14 +479,14 @@ packages:
       - typescript
     dev: false
 
-  /@promster/types@13.0.0(prom-client@15.1.3)(typescript@5.7.2):
+  /@promster/types@13.0.0(prom-client@15.1.3)(typescript@5.8.3):
     resolution: {integrity: sha512-cw8lhZkBsLWscViReDS7rS61NQi0ECkBO2Yj122IUMTVkOrU049vfJwzDApq+2NgYPAymNwtTKaGOZ8V6REYBQ==}
     engines: {node: '>=20', npm: '>=8'}
     peerDependencies:
       prom-client: 13.x.x || 14.x || 15.x
     dependencies:
       prom-client: 15.1.3
-      ts-essentials: 9.4.1(typescript@5.7.2)
+      ts-essentials: 9.4.1(typescript@5.8.3)
     transitivePeerDependencies:
       - typescript
     dev: false
@@ -969,8 +969,8 @@ packages:
     resolution: {integrity: sha512-Oei9OH4tRh0YqU3GxhX79dM/mwVgvbZJaSNaRk+bshkj0S5cfHcgYakreBjrHwatXKbz+IoIdYLxrKim2MjW0Q==}
     dev: true
 
-  /axios@1.7.8:
-    resolution: {integrity: sha512-Uu0wb7KNqK2t5K+YQyVCLM76prD5sRFjKHbJYCP1J7JFGEQ6nN7HWn9+04LAeiJ3ji54lgS/gZCH1oxyrf1SPw==}
+  /axios@1.10.0:
+    resolution: {integrity: sha512-/1xYAC4MP/HEG+3duIhFr4ZQXR4sQXOIe+o6sdqzeykGLx6Upp/1p8MHqhINOvGeP7xyNHe7tsiJByc4SSVUxw==}
     dependencies:
       follow-redirects: 1.15.9
       form-data: 4.0.0
@@ -2018,13 +2018,6 @@ packages:
     resolution: {integrity: sha512-N8SpfPUnUp1bK+PMYW8qSWdl9U+wwNWI4QKxOYDy9JAro3WMX7p2OeVRF9v+347pnakNevPmiHhNmZ2HbFA76w==}
     engines: {node: ^10 || ^12 || ^13.7 || ^14 || >=15.0.1}
     hasBin: true
-    dev: true
-
-  /nanoid@3.3.8:
-    resolution: {integrity: sha512-WNLf5Sd8oZxOm+TzppcYk8gVOgP+l58xNy58D0nbUnOxOWRWvlcCV4kUF7ltmI6PsrLl/BgKEyS4mqsGChFN0w==}
-    engines: {node: ^10 || ^12 || ^13.7 || ^14 || >=15.0.1}
-    hasBin: true
-    dev: false
 
   /negotiator@0.6.3:
     resolution: {integrity: sha512-+EUsqGPLsM+j/zdChZjsnX51g4XrHFOIXwfnCVPGlQk/k5giakcKsuxCObBRu6DSm9opw/O6slWbJdghQM4bBg==}
@@ -2184,7 +2177,7 @@ packages:
     resolution: {integrity: sha512-56rxCq7G/XfB4EkXq9Egn5GCqugWvDFjafDOThIdMBsI15iqPqR5r15TfSr1YPYeEI19YeaXMCbY6u88Y76GLQ==}
     engines: {node: ^10 || ^12 || >=14}
     dependencies:
-      nanoid: 3.3.8
+      nanoid: 3.3.11
       picocolors: 1.1.0
       source-map-js: 1.2.1
     dev: false
@@ -2580,7 +2573,7 @@ packages:
     dev: false
     optional: true
 
-  /ts-essentials@9.4.1(typescript@5.7.2):
+  /ts-essentials@9.4.1(typescript@5.8.3):
     resolution: {integrity: sha512-oke0rI2EN9pzHsesdmrOrnqv1eQODmJpd/noJjwj2ZPC3Z4N2wbjrOEqnsEgmvlO2+4fBb0a794DCna2elEVIQ==}
     peerDependencies:
       typescript: '>=4.1.0'
@@ -2588,7 +2581,7 @@ packages:
       typescript:
         optional: true
     dependencies:
-      typescript: 5.7.2
+      typescript: 5.8.3
     dev: false
 
   /tslib@2.6.2:
@@ -2603,8 +2596,8 @@ packages:
       mime-types: 2.1.35
     dev: false
 
-  /typescript@5.7.2:
-    resolution: {integrity: sha512-i5t66RHxDvVN40HfDd1PsEThGNnlMCMT3jMUuoh9/0TaqWevNontacunWyN02LA9/fIbEWlcHZcgTKb9QoaLfg==}
+  /typescript@5.8.3:
+    resolution: {integrity: sha512-p1diW6TqL9L07nNxvRMM7hMMw4c5XOo/1ibL4aAIGmSAt9slTE1Xgw5KWuof2uTOvCg9BY7ZRi+GaF+7sfgPeQ==}
     engines: {node: '>=14.17'}
     hasBin: true
 

@@ -24,9 +24,8 @@
   "devDependencies": {
     "@bpinternal/log4bot": "0.0.26",
     "@bpinternal/yargs-extra": "0.0.20",
-    "@tsconfig/node18-strictest": "^1.0.0",
     "@types/lodash": "^4.14.195",
-    "@types/node": "^18.11.17",
+    "@types/node": "^22.16.4",
     "@types/web": "^0.0.216",
     "esbuild": "^0.25.0",
     "puppeteer": "^22.0.0",

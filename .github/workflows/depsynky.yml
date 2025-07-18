@@ -10,6 +10,7 @@ on:
   pull_request:
     paths:
       - 'depsynky/**'
+      - .github/workflows/depsynky.yml
 
   workflow_dispatch: {}
 
@@ -26,6 +27,10 @@ jobs:
       - uses: pnpm/action-setup@v3.0.0
         with:
           version: 8.6.2
+      - uses: actions/setup-node@v3
+        with:
+          node-version: '22.17.0'
+          check-latest: true
       - run: pnpm install --frozen-lockfile
       - run: pnpm build
       - run: pnpm check:type

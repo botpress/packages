@@ -19,7 +19,7 @@
   },
   "devDependencies": {
     "@types/lodash": "4.17.16",
-    "@types/node": "18.19.86",
+    "@types/node": "^22.16.4",
     "tsup": "^8.0.1",
     "typescript": "5.8.2",
     "vitest": "1.6.0"

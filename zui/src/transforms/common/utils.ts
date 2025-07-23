@@ -31,6 +31,10 @@ export function primitiveToTypescriptValue(x: Primitive): string {
     const str = x.toString()
     return `BigInt(${str})`
   }
+  if (typeof x === 'string') {
+    return escapeString(x)
+  }
+
   return JSON.stringify(x)
 }
 
@@ -74,7 +78,7 @@ export const toPropertyKey = (key: string) => {
     return key
   }
 
-  return escapeString(key)
+  return primitiveToTypescriptValue(key)
 }
 
 const capitalize = (s: string): string => s.charAt(0).toUpperCase() + s.slice(1)

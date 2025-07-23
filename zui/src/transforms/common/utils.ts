@@ -74,7 +74,7 @@ export const toPropertyKey = (key: string) => {
     return key
   }
 
-  return primitiveToTypescriptValue(key)
+  return escapeString(key)
 }
 
 const capitalize = (s: string): string => s.charAt(0).toUpperCase() + s.slice(1)
@@ -88,11 +88,58 @@ export const toTypeArgumentName = (name: string) => {
   return tokens.join('')
 }
 
+const trimEmptyLines = (lines: string[]) => {
+  while (lines.length && !lines[0]?.trim()) {
+    lines.shift()
+  }
+
+  while (lines.length && !lines[lines.length - 1]!.trim()) {
+    lines.pop()
+  }
+}
+
 export const getMultilineComment = (description?: string) => {
-  const descLines = (description ?? '').split('\n').filter((l) => l.trim().length > 0)
+  // Remove too many empty lines (more than 2)
+  description = description?.replace(/(\n(\s*)?){3,}/g, '\n\n')
+
+  const ensureLineStartsWithAsterisk = (line: string) => (line.startsWith('* ') ? ` ${line}` : ` * ${line}`)
+  const escapeCommentEnd = (line: string) => line.replace(/\*\//g, '*\\/')
+
+  const descLines = (description ?? '').split('\n').map((line) => line.trim())
+
+  trimEmptyLines(descLines)
+
+  if (descLines.length) {
+    descLines[0] = descLines[0]!.replace(/^\/\*\*?/, '')
+    descLines[descLines.length - 1] = descLines[descLines.length - 1]!.replace(/\*\/$/, '')
+  }
+
+  trimEmptyLines(descLines)
+
   return descLines.length === 0
     ? ''
     : descLines.length === 1
-      ? `/** ${descLines[0]} */`
-      : `/**\n * ${descLines.join('\n * ')}\n */`
+      ? `/** ${escapeCommentEnd(descLines[0]!)} */`
+      : `/**\n${descLines.map(ensureLineStartsWithAsterisk).map(escapeCommentEnd).join('\n')}\n */`
+}
+
+export function escapeString(str: string): string {
+  if (typeof str !== 'string') {
+    return ''
+  }
+
+  // Use String.raw to get the raw string with escapes preserved
+  const rawStr = String.raw`${str}`
+
+  // Escape newlines and other special characters
+  const escapedStr = rawStr.replace(/\\/g, '\\\\').replace(/\n/g, '\\n').replace(/"/g, '\\"').replace(/'/g, "\\'")
+
+  // Determine the appropriate quote style
+  if (escapedStr.includes('`')) {
+    return `"${escapedStr}"`
+  } else if (escapedStr.includes("'")) {
+    return `"${escapedStr}"`
+  } else {
+    return `'${escapedStr}'`
+  }
 }

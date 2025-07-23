@@ -21,6 +21,25 @@ describe.concurrent('functions', () => {
     expect(() => toTs(fn, { declaration: true })).toThrowError(errors.ZuiToTypescriptTypeError)
   })
 
+  it('function with literals', async () => {
+    const fn = z
+      .function()
+      .args(z.literal('Hello, world!'))
+      .returns(z.number())
+      .title('greeting')
+      .describe('Add two numbers together.\nThis is a multiline description')
+
+    const typings = toTs(fn, { declaration: true })
+
+    await expect(typings).toMatchWithoutFormatting(`
+      /**
+       * Add two numbers together.
+       * This is a multiline description
+       */
+      declare const greeting: (arg0: "Hello, world!") => number
+    `)
+  })
+
   it('type delcaration works', async () => {
     const fn = z
       .function()
@@ -110,7 +129,7 @@ describe.concurrent('functions', () => {
         /** This is a number */
         arg1: number,
         arg2: [string, /** This is a number */ number]
-      ) => unknown;
+      ) => unknown; // end of fn
     `)
   })
 
@@ -271,6 +290,54 @@ describe.concurrent('objects', () => {
          */
         declare const MyObject: { a: number; b: string };
       `)
+  })
+
+  it('object with a function property that has object args', async () => {
+    const obj = z
+      .object({
+        a: z.number(),
+        b: z.string(),
+        c: z.function().args(
+          z.object({
+            d: z.string().describe('This is d'),
+            e: z
+              .object({
+                f: z.boolean().optional().default(true).describe('This is f'),
+                g: z.enum(['ga', 'gb']).default('ga').describe('This is g'),
+                h: z.array(z.string()).default([]).describe('This is h'),
+              })
+              .describe('The Knowledge Bases to Query'),
+          }),
+        ),
+      })
+      .title('MyObject')
+      .describe('This is my object.\nThis is a multiline description.\n\n\n')
+
+    const typings = toTypescript(obj)
+
+    await expect(typings).toMatchWithoutFormatting(`
+      /**
+       * This is my object.
+       * This is a multiline description.
+       */
+      declare const MyObject: {
+        a: number,
+        b: string,
+        c: (arg0: {
+          /** This is d */
+          d: string,
+          /** The Knowledge Bases to Query */
+          e: {
+            /** This is f */
+            f: boolean | undefined,
+            /** This is g */
+            g: "ga" | "gb",
+            /** This is h */
+            h: string[]
+          }
+        }) => unknown
+      } // end of MyObject
+    `)
   })
 
   it('nullable', async () => {
@@ -509,7 +576,7 @@ describe.concurrent('objects', () => {
             /** This is the expiration date */
             expirationDate: string;
             /** This is the brand of the card */
-            brand?: 'Visa' | 'Mastercard' | 'American Express' | null | undefined;
+            brand: 'Visa' | 'Mastercard' | 'American Express' | null | undefined;
           }
         | {
             type: 'PayPal';
@@ -530,7 +597,7 @@ describe.concurrent('objects', () => {
             type: 'Cash';
             /** This is the amount of cash */
             amount: number;
-          }
+          } // end of payment
     `)
   })
 
@@ -582,7 +649,7 @@ describe.concurrent('objects', () => {
         declare const MyObject: (
           /** This is an array of numbers */
           arg0: number[]
-        ) => unknown;
+        ) => unknown; // end of MyObject
       `)
   })
 
@@ -627,6 +694,94 @@ describe.concurrent('objects', () => {
       `)
   })
 
+  it('literals', async () => {
+    const obj = z
+      .object({
+        stringLiteral: z.literal('1'),
+        numberLiteral: z.literal(1),
+        booleanLiteral: z.literal(true),
+        arrayLiteral: z.array(z.literal('a')),
+        tupleLiteral: z.tuple([z.literal('a'), z.literal(1)]),
+        emptyTyple: z.tuple([]),
+        nested: z.object({
+          nestedLiteral: z.literal('nested'),
+        }),
+      })
+      .title('MyObject')
+
+    const typings = toTypescript(obj)
+
+    await expect(typings).toMatchWithoutFormatting(`
+      declare const MyObject: {
+        stringLiteral: "1";
+        numberLiteral: 1;
+        booleanLiteral: true;
+        arrayLiteral: Array<"a">;
+        tupleLiteral: ["a", 1];
+        emptyTyple: [];
+        nested: {    
+          nestedLiteral: "nested"       
+        };
+      };
+    `)
+  })
+
+  it('unions as fn args', async () => {
+    const fn1 = z
+      .function()
+      .args(z.union([z.number(), z.string()]))
+      .returns(z.union([z.number(), z.string()]))
+      .title('fn1')
+
+    const fn2 = z
+      .function()
+      .args(z.union([z.object({ id: z.array(z.number()) }), z.string()]))
+      .title('fn2')
+
+    const fn3 = z
+      .function()
+      .args(z.union([z.object({ id: z.array(z.number()) }), z.object({ name: z.string() })]))
+      .title('fn3')
+
+    const typings1 = toTypescript(fn1)
+    const typings2 = toTypescript(fn2)
+    const typings3 = toTypescript(fn3)
+
+    await expect(typings1).toMatchWithoutFormatting(`declare const fn1: (arg0: number | string) => number | string`)
+    await expect(typings2).toMatchWithoutFormatting(`declare const fn2: (arg0: { id: number[] } | string) => unknown`)
+    await expect(typings3).toMatchWithoutFormatting(
+      `declare const fn3: (arg0: { id: number[] } | { name: string }) => unknown`,
+    )
+  })
+
+  it('records', async () => {
+    const obj = z
+      .object({
+        Date: z.string().describe('Test\nHello').describe('Test2'),
+        'Hello World!': z.string().optional(),
+      })
+      .required({ Date: true })
+
+    const typings = toTypescript(obj)
+    await expect(typings).toMatchWithoutFormatting(`
+      declare const x: { 
+      /** Test2 */
+      Date: string
+      ; 'Hello World!'?: string }
+    `)
+  })
+
+  it('double optional', async () => {
+    const obj = z
+      .object({
+        Date: z.optional(z.string().optional().optional()),
+      })
+      .required({ Date: false } as any)
+
+    const typings = toTypescript(obj)
+    await expect(typings).toMatchWithoutFormatting(`declare const x: { Date?: string }`)
+  })
+
   it('chaining optionals only make properties optional once', async () => {
     const schema = z
       .object({
@@ -651,7 +806,7 @@ describe.concurrent('objects', () => {
     const typings = toTypescript(schema)
     const expected = `
           declare const x: {
-            foo?: string | undefined | null
+            foo: string | undefined | null
           }
         `
     await expect(typings).toMatchWithoutFormatting(expected)

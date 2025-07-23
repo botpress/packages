@@ -36,11 +36,11 @@ describe.concurrent('functions', () => {
        * Add two numbers together.
        * This is a multiline description
        */
-      declare const greeting: (arg0: "Hello, world!") => number
+      declare function greeting(arg0: "Hello, world!"): number
     `)
   })
 
-  it('type delcaration works', async () => {
+  it('type declaration works', async () => {
     const fn = z
       .function()
       .args(z.object({ a: z.number(), b: z.number() }))
@@ -73,7 +73,7 @@ describe.concurrent('functions', () => {
        * Add two numbers together.
        * This is a multiline description
        */
-      declare const add: (arg0: { a: number; b: number }) => number;
+      declare function add(arg0: { a: number; b: number }): number;
     `)
   })
 
@@ -82,7 +82,7 @@ describe.concurrent('functions', () => {
 
     const typings = toTypescript(fn)
 
-    await expect(typings).toMatchWithoutFormatting('declare const fn: () => unknown;')
+    await expect(typings).toMatchWithoutFormatting('declare function fn(): unknown;')
   })
 
   it('function with no args and void return', async () => {
@@ -90,7 +90,7 @@ describe.concurrent('functions', () => {
 
     const typings = toTypescript(fn)
 
-    await expect(typings).toMatchWithoutFormatting('declare const fn: () => void;')
+    await expect(typings).toMatchWithoutFormatting('declare function fn(): void;')
   })
 
   it('async function returning union', async () => {
@@ -101,7 +101,7 @@ describe.concurrent('functions', () => {
 
     const typings = toTypescript(fn)
 
-    await expect(typings).toMatchWithoutFormatting('declare const fn: () => Promise<number | string>;')
+    await expect(typings).toMatchWithoutFormatting('declare function fn(): Promise<number | string>;')
   })
 
   it('function with multiple args', async () => {
@@ -120,7 +120,7 @@ describe.concurrent('functions', () => {
     const typings = toTypescript(fn)
 
     await expect(typings).toMatchWithoutFormatting(`
-      declare const fn: (
+      declare function fn(
         arg0: {
           a?: number;
           /** This is B parameter */
@@ -129,26 +129,26 @@ describe.concurrent('functions', () => {
         /** This is a number */
         arg1: number,
         arg2: [string, /** This is a number */ number]
-      ) => unknown; // end of fn
+      ): unknown; // end of fn
     `)
   })
 
   it('function with optional args', async () => {
     const fn = z.function().title('fn').args(z.string().optional())
     const typings = toTypescript(fn)
-    await expect(typings).toMatchWithoutFormatting('declare const fn: (arg0?: string) => unknown;')
+    await expect(typings).toMatchWithoutFormatting('declare function fn(arg0?: string): unknown;')
   })
 
   it('function with readonly args', async () => {
     const fn = z.function().title('fn').args(z.string().readonly())
     const typings = toTypescript(fn)
-    await expect(typings).toMatchWithoutFormatting('declare const fn: (arg0: Readonly<string>) => unknown;')
+    await expect(typings).toMatchWithoutFormatting('declare function fn(arg0: Readonly<string>): unknown;')
   })
 
   it('function with readonly enumerable args', async () => {
     const fn = z.function().title('fn').args(z.array(z.string()).readonly())
     const typings = toTypescript(fn)
-    await expect(typings).toMatchWithoutFormatting('declare const fn: (arg0: Readonly<string[]>) => unknown;')
+    await expect(typings).toMatchWithoutFormatting('declare function fn(arg0: Readonly<string[]>): unknown;')
   })
 
   it('string literals', async () => {
@@ -218,7 +218,7 @@ describe.concurrent('functions', () => {
   it('function with named args', async () => {
     const fn = z.function().title('fn').args(z.string().title('firstName').optional())
     const typings = toTypescript(fn)
-    await expect(typings).toMatchWithoutFormatting('declare const fn: (firstName?: string) => unknown;')
+    await expect(typings).toMatchWithoutFormatting('declare function fn(firstName?: string): unknown;')
   })
 
   it('mix of named and unnammed params', async () => {
@@ -228,11 +228,11 @@ describe.concurrent('functions', () => {
       .args(z.string().title('firstName').optional(), z.number(), z.object({ a: z.string() }).title('obj'))
     const typings = toTypescript(fn)
     await expect(typings).toMatchWithoutFormatting(`
-        declare const fn: (
+        declare function fn(
           firstName?: string,
           arg1: number,
           obj: { a: string }
-        ) => unknown;
+        ): unknown;
       `)
   })
 
@@ -245,10 +245,10 @@ describe.concurrent('functions', () => {
 
     const typings = toTypescript(fn)
     await expect(typings).toMatchWithoutFormatting(`
-      declare const fn: (
+      declare function fn(
         arg0?: string | null,
         arg1?: number
-      ) => string | null | undefined;
+      ): string | null | undefined;
     `)
   })
 })
@@ -637,7 +637,7 @@ describe.concurrent('objects', () => {
     const typings = toTypescript(fn)
 
     await expect(typings).toMatchWithoutFormatting(
-      'declare const MyObject: (arg0: Array<{ a: number; b: string }>) => unknown;',
+      'declare function MyObject(arg0: Array<{ a: number; b: string }>): unknown;',
     )
   })
 
@@ -646,10 +646,10 @@ describe.concurrent('objects', () => {
     const typings = toTypescript(fn)
 
     await expect(typings).toMatchWithoutFormatting(`
-        declare const MyObject: (
+        declare function MyObject(
           /** This is an array of numbers */
           arg0: number[]
-        ) => unknown; // end of MyObject
+        ): unknown; // end of MyObject
       `)
   })
 
@@ -747,10 +747,10 @@ describe.concurrent('objects', () => {
     const typings2 = toTypescript(fn2)
     const typings3 = toTypescript(fn3)
 
-    await expect(typings1).toMatchWithoutFormatting(`declare const fn1: (arg0: number | string) => number | string`)
-    await expect(typings2).toMatchWithoutFormatting(`declare const fn2: (arg0: { id: number[] } | string) => unknown`)
+    await expect(typings1).toMatchWithoutFormatting(`declare function fn1(arg0: number | string): number | string`)
+    await expect(typings2).toMatchWithoutFormatting(`declare function fn2(arg0: { id: number[] } | string): unknown`)
     await expect(typings3).toMatchWithoutFormatting(
-      `declare const fn3: (arg0: { id: number[] } | { name: string }) => unknown`,
+      `declare function fn3(arg0: { id: number[] } | { name: string }): unknown`,
     )
   })
 

@@ -129,7 +129,7 @@ describe.concurrent('functions', () => {
         /** This is a number */
         arg1: number,
         arg2: [string, /** This is a number */ number]
-      ): unknown; // end of fn
+      ): unknown;
     `)
   })
 
@@ -313,7 +313,7 @@ describe.concurrent('objects', () => {
       .title('MyObject')
       .describe('This is my object.\nThis is a multiline description.\n\n\n')
 
-    const typings = toTypescript(obj)
+    const typings = toTs(obj, { declaration: true, includeClosingTags: true })
 
     await expect(typings).toMatchWithoutFormatting(`
       /**
@@ -597,7 +597,7 @@ describe.concurrent('objects', () => {
             type: 'Cash';
             /** This is the amount of cash */
             amount: number;
-          } // end of payment
+          }
     `)
   })
 
@@ -649,7 +649,7 @@ describe.concurrent('objects', () => {
         declare function MyObject(
           /** This is an array of numbers */
           arg0: number[]
-        ): unknown; // end of MyObject
+        ): unknown;
       `)
   })
 
@@ -834,5 +834,64 @@ describe.concurrent('generics', () => {
     const typings = toTs(schema, { declaration: 'type' })
 
     await expect(typings).toMatchWithoutFormatting('type MyObject<DefsT> = { a: string; b: DefsT };')
+  })
+})
+
+describe.concurrent('closing tags', () => {
+  it('should not include closing tags by default for large declarations', async () => {
+    const largeSchema = z
+      .object({
+        prop1: z.string(),
+        prop2: z.number(),
+        prop3: z.boolean(),
+        prop4: z.string(),
+        prop5: z.number(),
+        prop6: z.boolean(),
+      })
+      .title('LargeObject')
+
+    const typings = toTs(largeSchema, { declaration: 'type' })
+
+    expect(typings).not.toContain('// end of LargeObject')
+  })
+
+  it('should not include closing tags for small declarations even when includeClosingTags is enabled', async () => {
+    const smallSchema = z
+      .object({
+        prop1: z.string(),
+        prop2: z.number(),
+      })
+      .title('SmallObject')
+
+    const typings = toTs(smallSchema, { declaration: 'type', includeClosingTags: true })
+
+    expect(typings).not.toContain('// end of SmallObject')
+  })
+
+  it('should include closing tags for large function declarations when enabled', async () => {
+    const largeFn = z
+      .function()
+      .describe('This is a large function with many parameters and a complex return type.')
+      .args(
+        z.object({
+          param1: z.string().describe('This is the first parameter'),
+          param2: z.number(),
+          param3: z.boolean(),
+          param4: z.string(),
+          param5: z.number(),
+        }),
+      )
+      .returns(
+        z.object({
+          result1: z.string(),
+          result2: z.number(),
+          result3: z.boolean(),
+        }),
+      )
+      .title('LargeFunction')
+
+    const typings = toTs(largeFn, { declaration: 'variable', includeClosingTags: true })
+
+    expect(typings).toContain('// end of LargeFunction')
   })
 })

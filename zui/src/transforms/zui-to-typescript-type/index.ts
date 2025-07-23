@@ -70,8 +70,12 @@ type DeclarationProps =
 export type TypescriptDeclarationType = DeclarationProps['type']
 export type TypescriptGenerationOptions = {
   formatter?: (typing: string) => string
-} & {
   declaration?: boolean | TypescriptDeclarationType
+  /**
+   * Whether to include closing tags in the generated TypeScript declarations when they exceed 5 lines.
+   * This improves readability for large type declarations by adding comments like "// end of TypeName".
+   */
+  includeClosingTags?: boolean
 }
 
 type SchemaTypes = z.Schema | KeyValue | FnParameters | Declaration | null
@@ -79,6 +83,7 @@ type SchemaTypes = z.Schema | KeyValue | FnParameters | Declaration | null
 type InternalOptions = {
   parent?: SchemaTypes
   declaration?: boolean | TypescriptDeclarationType
+  includeClosingTags?: boolean
 }
 
 /**
@@ -90,7 +95,7 @@ type InternalOptions = {
 export function toTypescriptType(schema: z.Schema, options: TypescriptGenerationOptions = {}): string {
   const wrappedSchema: Declaration = getDeclarationProps(schema, options)
 
-  let dts = sUnwrapZod(wrappedSchema, {})
+  let dts = sUnwrapZod(wrappedSchema, options)
 
   if (options.formatter) {
     dts = options.formatter(dts)
@@ -338,7 +343,7 @@ const unwrapDeclaration = (declaration: Declaration, options: InternalOptions): 
   const typings = sUnwrapZod(withoutDesc, { ...options, declaration: true })
 
   const isLargeDeclaration = typings.split('\n').length >= LARGE_DECLARATION_LINES
-  const closingTag = isLargeDeclaration ? `// end of ${identifier}` : ''
+  const closingTag = isLargeDeclaration && options.includeClosingTags ? `// end of ${identifier}` : ''
 
   if (declaration.props.type !== 'type' && schema instanceof z.ZodFunction) {
     return stripSpaces(`${description}
@@ -351,7 +356,7 @@ declare function ${identifier}${typings};${closingTag}`)
 
   const generics =
     declaration.props.args.length > 0 ? `<${declaration.props.args.map(toTypeArgumentName).join(', ')}>` : ''
-  return stripSpaces(`${description}type ${declaration.props.identifier}${generics} = ${typings};`)
+  return stripSpaces(`${description}type ${declaration.props.identifier}${generics} = ${typings};${closingTag}`)
 }
 
 const getDeclarationType = (options: TypescriptGenerationOptions): TypescriptDeclarationType => {

@@ -102,6 +102,7 @@ export function toTypescriptType(schema: z.Schema, options: TypescriptGeneration
 function sUnwrapZod(schema: z.Schema | KeyValue | FnParameters | Declaration | null, config: InternalOptions): string {
   const newConfig: InternalOptions = {
     ...config,
+    declaration: false,
     parent: schema,
   }
 
@@ -263,6 +264,12 @@ ${opts.join(' | ')}`
     case z.ZodFirstPartyTypeKind.ZodFunction:
       const input = sUnwrapZod(new FnParameters(def.args), newConfig)
       const output = sUnwrapZod(new FnReturn(def.returns), newConfig)
+      const parentIsType = config?.parent instanceof Declaration && config?.parent.props.type === 'type'
+
+      if (config?.declaration && !parentIsType) {
+        return `${getMultilineComment(schemaTyped.description)}
+(${input}): ${output}`
+      }
 
       return `${getMultilineComment(schemaTyped.description)}
 (${input}) => ${output}`
@@ -332,6 +339,11 @@ const unwrapDeclaration = (declaration: Declaration, options: InternalOptions): 
 
   const isLargeDeclaration = typings.split('\n').length >= LARGE_DECLARATION_LINES
   const closingTag = isLargeDeclaration ? `// end of ${identifier}` : ''
+
+  if (declaration.props.type !== 'type' && schema instanceof z.ZodFunction) {
+    return stripSpaces(`${description}
+declare function ${identifier}${typings};${closingTag}`)
+  }
 
   if (declaration.props.type === 'variable') {
     return stripSpaces(`${description}declare const ${identifier}: ${typings};${closingTag}`)

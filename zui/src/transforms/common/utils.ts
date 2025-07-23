@@ -92,7 +92,7 @@ export const toTypeArgumentName = (name: string) => {
   return tokens.join('')
 }
 
-const trimEmptyLines = (lines: string[]) => {
+const trimEmptyLinesInPlace = (lines: string[]) => {
   while (lines.length && !lines[0]?.trim()) {
     lines.shift()
   }
@@ -111,14 +111,14 @@ export const getMultilineComment = (description?: string) => {
 
   const descLines = (description ?? '').split('\n').map((line) => line.trim())
 
-  trimEmptyLines(descLines)
+  trimEmptyLinesInPlace(descLines)
 
   if (descLines.length) {
     descLines[0] = descLines[0]!.replace(/^\/\*\*?/, '')
     descLines[descLines.length - 1] = descLines[descLines.length - 1]!.replace(/\*\/$/, '')
   }
 
-  trimEmptyLines(descLines)
+  trimEmptyLinesInPlace(descLines)
 
   return descLines.length === 0
     ? ''

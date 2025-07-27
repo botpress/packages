@@ -1,12 +1,11 @@
 {
   "name": "@bpinternal/verel",
-  "version": "0.1.5",
+  "version": "0.2.0",
   "description": "Vector Remap Language for JavaScript",
   "main": "./dist/node/index.js",
   "module": "./dist/web/index.js",
   "types": "./dist/types/index.d.ts",
   "scripts": {
-    "postinstall": "pnpm exec playwright install",
     "check": "pnpm run check:type",
     "check:type": "tsc --noEmit",
     "build": "pnpm run build:node && pnpm run build:web && pnpm run build:type",

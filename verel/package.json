@@ -14,7 +14,7 @@
     "build:web": "ts-node -T ./build.ts web",
     "test": "pnpm run test:node",
     "test:node": "vitest --browser.enabled false --run",
-    "test:browser": "pnpm exec playwright install && vitest --browser.enabled true --run"
+    "test:browser": "vitest --browser.enabled true --run"
   },
   "author": "Botpress, Inc.",
   "license": "MIT",

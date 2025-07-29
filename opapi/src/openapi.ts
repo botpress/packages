@@ -43,10 +43,12 @@ export const createOpenapi = <
     const responseName = formatResponseName(operationName)
     const bodyName = formatBodyName(operationName)
 
+    const responseContentType = response.contentType ?? 'application/json'
+
     openapi.addResponse(responseName, {
       description: response.description,
       content: {
-        'application/json': {
+        [responseContentType]: {
           schema: response.schema,
         },
       },

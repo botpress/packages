@@ -215,7 +215,8 @@ type BaseOperationProps<
     status?: 200 | 201 | 418 | 302
     description: string
     schema: SchemaOfType<S>
-    format?: 'binary'
+    format?: 'binary' | 'stream'
+    contentType?: 'application/json' | 'application/octet-stream' | 'text/plain' | 'text/event-stream' | '*/*'
   }
 }
 

@@ -49,6 +49,8 @@ export const addOperation = <
   const response = {
     description: operationProps.response.description,
     status: operationProps.response.status,
+    contentType: operationProps.response.contentType,
+    format: operationProps.response.format,
     schema: generateSchemaFromZod(
       extendApi(operationProps.response.schema, { title: responseName, format: operationProps.response.format }),
       state.options,

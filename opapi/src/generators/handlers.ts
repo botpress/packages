@@ -58,9 +58,37 @@ const generateRequestResponseTypes = (useExpressTypes: boolean) => {
   }
 }
 
-const generateHandler = (props: GenerateHandlerProps) => `const ${
-  props.operationName
-}Handler = (operation: Operations['${props.operationName}']) => async (req: Request, res: Response) => {
+const generateHandler = (props: GenerateHandlerProps) => {
+  const responseFormat = props.operation.response?.format
+  const responseContentType = props.operation.response?.contentType || 'application/json'
+
+  // For streaming responses, use a different response pattern
+  if (responseFormat === 'stream' || responseContentType === 'text/event-stream') {
+    return `const ${props.operationName}Handler = (operation: Operations['${props.operationName}']) => async (req: Request, res: Response) => {
+  const input = {
+${generateParameterFields(props)}
+  }
+
+  const output = await operation(input, req)
+
+  // For streaming responses, the operation should return the response handling
+  // The operation is responsible for setting headers and writing to the response
+  if (typeof output === 'object' && output && 'pipe' in output) {
+    // Handle readable stream
+    res.setHeader('Content-Type', '${responseContentType}')
+    output.pipe(res)
+  } else if (typeof output === 'function') {
+    // Handle custom response function
+    await output(res)
+  } else {
+    // Fallback to regular response
+    res.status(${props.status}).setHeader('Content-Type', '${responseContentType}').send(output)
+  }
+}
+`
+  } else {
+    // Regular JSON response
+    return `const ${props.operationName}Handler = (operation: Operations['${props.operationName}']) => async (req: Request, res: Response) => {
   const input = {
 ${generateParameterFields(props)}
   }
@@ -70,6 +98,8 @@ ${generateParameterFields(props)}
   res.status(${props.status}).json(output)
 }
 `
+  }
+}
 
 const generateBodyField = (operationName: string, contentType: string) =>
   `\t\t...req.body as NonNullable<components['requestBodies']['${operationName}Body']>['content']['${contentType}'],`

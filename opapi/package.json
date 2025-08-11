@@ -16,10 +16,11 @@
     "test": "vitest run",
     "build": "tsup src/index.ts --dts --format cjs,esm --clean",
     "check:type": "tsc --noEmit",
-    "check:format": "prettier --check .",
-    "fix:format": "prettier --write ."
+    "check:format": "biome format .",
+    "fix:format": "biome format --write ."
   },
   "devDependencies": {
+    "@biomejs/biome": "2.1.4",
     "@swc/core": "1.9.3",
     "@swc/helpers": "0.5.15",
     "@types/decompress": "4.2.7",

@@ -177,6 +177,7 @@ export function isOperationWithBodyProps<
   } else return false
 }
 
+/** TODO get rid of use of typescript enum */
 export enum ComponentType {
   SCHEMAS = 'schemas',
   RESPONSES = 'responses',

@@ -35,7 +35,7 @@
     "typescript": "5.7.2",
     "vite": "5.4.11",
     "vite-node": "1.6.0",
-    "vitest": "1.6.0"
+    "vitest": "3.2.4"
   },
   "dependencies": {
     "@anatine/zod-openapi": "1.12.1",

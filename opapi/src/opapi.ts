@@ -1,16 +1,26 @@
-import { extendApi, OpenApiZodAny } from '@anatine/zod-openapi'
+import { extendApi, type OpenApiZodAny } from '@anatine/zod-openapi'
 import {
-  generateClientWithOpenapiGenerator,
   generateClientWithOpapi,
+  generateClientWithOpenapiGenerator,
   generateErrorsFile,
   generateOpenapi,
   generateServer,
   generateTypesBySection,
 } from './generator'
-import { addOperation } from './operation'
-import { ApiError, ComponentType, createState, getRef, Metadata, Operation, Options, Parameter, State } from './state'
-import { exportStateAsTypescript, ExportStateAsTypescriptOptions } from './generators/ts-state'
+import { exportStateAsTypescript, type ExportStateAsTypescriptOptions } from './generators/ts-state'
 import { generateHandler } from './handler-generator'
+import { addOperation } from './operation'
+import {
+  type ApiError,
+  ComponentType,
+  createState,
+  getRef,
+  type Metadata,
+  type Operation,
+  type Options,
+  type Parameter,
+  type State,
+} from './state'
 export { Operation, Parameter } from './state'
 
 type AnatineSchemaObject = NonNullable<Parameters<typeof extendApi>[1]>
@@ -121,13 +131,16 @@ export namespace OpenApi {
   ) => createOpapiFromState(state as State<SchemaName, DefaultParameterName, SectionName>)
 }
 
-export type SchemaOf<O extends OpenApi<any, any, any>> =
-  O extends OpenApi<infer Skema, infer _Param, infer _Sexion> ? Skema : never
+export type SchemaOf<O extends OpenApi<any, any, any>> = O extends OpenApi<infer Skema, infer _Param, infer _Sexion>
+  ? Skema
+  : never
 
-export type ParameterOf<O extends OpenApi<any, any, any>> =
-  O extends OpenApi<infer _Skema, infer Param, infer _Sexion> ? Param : never
+export type ParameterOf<O extends OpenApi<any, any, any>> = O extends OpenApi<infer _Skema, infer Param, infer _Sexion>
+  ? Param
+  : never
 
-export type SectionOf<O extends OpenApi<any, any, any>> =
-  O extends OpenApi<infer _Skema, infer _Param, infer Sexion> ? Sexion : never
+export type SectionOf<O extends OpenApi<any, any, any>> = O extends OpenApi<infer _Skema, infer _Param, infer Sexion>
+  ? Sexion
+  : never
 
 export { exportJsonSchemas, exportZodSchemas } from './handler-generator/export-schemas'

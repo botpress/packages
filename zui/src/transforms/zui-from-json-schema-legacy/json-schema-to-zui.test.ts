@@ -193,7 +193,7 @@ describe('Coercion deserialization', () => {
     `)
   })
 
-  // TODO: decide if we want to support dereferencing; if not, remove this test, otherwise fix it
+  // TODO: decide if we want to support dereferencing; if not, remove this test; otherwise, fix it
   it.skip('should resolve local refs', async () => {
     const schema: JSONSchema7 = {
       $defs: {

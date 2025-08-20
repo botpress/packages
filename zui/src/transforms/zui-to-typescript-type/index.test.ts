@@ -221,7 +221,7 @@ describe.concurrent('functions', () => {
     await expect(typings).toMatchWithoutFormatting('declare function fn(firstName?: string): unknown;')
   })
 
-  it('mix of named and unnammed params', async () => {
+  it('mix of named and unnamed params', async () => {
     const fn = z
       .function()
       .title('fn')

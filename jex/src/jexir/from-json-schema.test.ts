@@ -32,7 +32,7 @@ const expectJsonSchema = (jsonSchema: JSONSchema7) => ({
   }
 })
 
-test('JexIR should throw an error when the JSON schema is unsuported', () => {
+test('JexIR should throw an error when the JSON schema is unsupported', () => {
   const foo = (schema: JSONSchema7) => $.object({ foo: schema })
   const path: PropertyPath = [
     { type: 'key', value: 'properties' },

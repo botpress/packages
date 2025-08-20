@@ -112,7 +112,7 @@ test('test', () => {
 //   const fishArray = z.array(fish);
 //   const fail = () =>
 //     fishArray.omit({
-//       whateve: true,
+//       whatever_: true,
 //     } as any);
 //   expect(fail).toThrow();
 // });

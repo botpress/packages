@@ -53,7 +53,7 @@ test('retry-cli retry of a successful command should run successfully once', asy
   expect(exitCode).toBe(0)
 })
 
-test('retry-cli retry of an unsuccessfull command should retry n + 1 times', async () => {
+test('retry-cli retry of an unsuccessful command should retry n + 1 times', async () => {
   const { stderr, exitCode } = await runCommand(
     `${RETRY} -n 5 -f 0 -- node -e "console.error('### ERROR'); process.exit(42)"`
   )

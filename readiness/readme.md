@@ -1,6 +1,6 @@
 # Readiness
 
-Offers a readiness probe for docker ressources like Postgres, Redis, etc.
+Offers a readiness probe for docker resources like Postgres, Redis, etc.
 
 ## Usage
 

@@ -95,7 +95,7 @@ describe.each(['wasm', 'javascript'] satisfies ListEntityEngine[])('%s list enti
     )
   })
 
-  test('same occurence in multiple entities extracts multiple entities', () => {
+  test('same occurrence in multiple entities extracts multiple entities', () => {
     // arrange
     const testEntities: ListEntityDef[] = [
       ...listEntities,

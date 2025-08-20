@@ -829,7 +829,7 @@ describe.concurrent('generics', () => {
     await expect(typings).toMatchWithoutFormatting('type MyObject<T> = { a: string; b: T };')
   })
 
-  it('can generate a generic type by formating ref Uri', async () => {
+  it('can generate a generic type by formating ref URI', async () => {
     const schema = z.object({ a: z.string(), b: z.ref('#/$defs/T') }).title('MyObject')
     const typings = toTs(schema, { declaration: 'type' })
 

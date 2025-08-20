@@ -91,7 +91,7 @@ export namespace util {
      * The only proper way to deeply compare functions would be to ensure they return the same value for the same input.
      * This is impossible to do unless the domain of the function is known and the function is pure.
      *
-     * Comparing source code is not ideal since 2 function could be equivalent but have different source code,
+     * Comparing source code is not ideal since two functions could be equivalent but have different source code,
      * but that's our best option.
      */
     return a.toString() === b.toString()

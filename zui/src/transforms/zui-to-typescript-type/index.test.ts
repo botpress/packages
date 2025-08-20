@@ -702,7 +702,7 @@ describe.concurrent('objects', () => {
         booleanLiteral: z.literal(true),
         arrayLiteral: z.array(z.literal('a')),
         tupleLiteral: z.tuple([z.literal('a'), z.literal(1)]),
-        emptyTyple: z.tuple([]),
+        emptyType: z.tuple([]),
         nested: z.object({
           nestedLiteral: z.literal('nested'),
         }),
@@ -718,7 +718,7 @@ describe.concurrent('objects', () => {
         booleanLiteral: true;
         arrayLiteral: Array<"a">;
         tupleLiteral: ["a", 1];
-        emptyTyple: [];
+        emptyType: [];
         nested: {    
           nestedLiteral: "nested"       
         };

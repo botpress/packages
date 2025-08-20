@@ -46,7 +46,7 @@ const api = OpenApi({
     {
       status: 403,
       type: 'Forbidden',
-      description: "The requested action can't be peform by this resource.",
+      description: "The requested action can't be perform by this resource.",
     },
     {
       status: 400,

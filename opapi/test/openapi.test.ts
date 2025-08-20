@@ -7,7 +7,7 @@ import { existsSync } from 'fs'
 const openapiFiles = ['metadata.json', 'openapi.json']
 
 describe('openapi generator', () => {
-  it('should be able to generate a openapi', async () => {
+  it('should be able to generate an openapi', async () => {
     const genOpenapiFolder = join(__dirname, 'gen/openapi')
 
     const api = getMockApi()

@@ -10,7 +10,7 @@ import { Logger } from '@bpinternal/log4bot'
 const logger = new Logger('main', { prefix: 'MYAPP', level: 'debug' })
 logger.info('I love Botpress.', { afield: '42' })
 
-logger.attachError(new Error('Precondition Failed')).error('An error occured')
+logger.attachError(new Error('Precondition Failed')).error('An error occurred')
 ```
 
 ## Disclaimer ⚠️

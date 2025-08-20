@@ -1,6 +1,6 @@
 # Protobuf Schema
 
-Small wrapper above [protobufjs](https://github.com/protobufjs/protobuf.js) that allows infering a TypeScript type directly from a protobuf schema in a [zod](https://github.com/colinhacks/zod)-like fashion.
+Small wrapper above [protobufjs](https://github.com/protobufjs/protobuf.js) that allows inferring a TypeScript type directly from a protobuf schema in a [zod](https://github.com/colinhacks/zod)-like fashion.
 
 Defining a `PTBMessage` allows both to decode/encode data structures and to define types.
 

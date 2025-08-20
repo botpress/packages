@@ -51,7 +51,7 @@ let cryptoLib: CryptoLib =
     : crypto
 
 if (!cryptoLib.getRandomValues) {
-  // Use a polyfill in older environments that have a crypto implementaton missing getRandomValues()
+  // Use a polyfill in older environments that have a crypto implementation missing getRandomValues()
   cryptoLib = cryptoLibPolyfill
 }
 

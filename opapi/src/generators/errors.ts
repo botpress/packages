@@ -38,7 +38,7 @@ declare const window: any
 type CryptoLib = { getRandomValues(array: Uint8Array): Uint8Array }
 
 const cryptoLibPolyfill: CryptoLib = {
-  // Fallback in case crypto isn't available.
+  // Fallback when crypto isn't available.
   getRandomValues: (array: Uint8Array) => new Uint8Array(array.map(() => Math.floor(Math.random() * 256))),
 }
 

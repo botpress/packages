@@ -46,7 +46,7 @@ test('retry-cli help should run successfully', async () => {
   expect(exitCode).toBe(0)
 })
 
-test('retry-cli retry of a successfull command should run successfully once', async () => {
+test('retry-cli retry of a successful command should run successfully once', async () => {
   const { stderr, stdout, exitCode } = await runCommand(`${RETRY} -n 20 -- echo "HELLO WORLD"`)
   expect(stderr).toBe('')
   expect(parseStd(stdout)).toEqual(['HELLO WORLD'])

@@ -6,7 +6,7 @@ import { ErrorMessages, setResponseValueAndErrors } from '../errorMessages'
 import { Refs } from '../Refs'
 
 /**
- * Generated from the .source property of regular expressins found here:
+ * Generated from the .source property of regular expressions found here:
  * https://github.com/colinhacks/zod/blob/master/src/types.ts.
  *
  * Escapes have been doubled, and expressions with /i flag have been changed accordingly

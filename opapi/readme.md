@@ -21,7 +21,7 @@ const api = OpenApi({
   // This is metadata to be used in the documentation
   section: {
     User: {
-      tilte: 'User',
+      title: 'User',
       description: 'User related endpoints',
     },
   },

@@ -125,7 +125,7 @@ describe.each(['wasm', 'javascript'] satisfies ListEntityEngine[])('%s list enti
     describe('loose fuzzy', () => {
       entityTest('[Qebec citty] is a city within [QC], a province.', { qty: 1, value: 'YQB' }, { qty: 0 })
       entityTest(
-        'A quaterback is also called a [QB] and [sn francisco] used to have one',
+        'A quarterback is also called a [QB] and [sn francisco] used to have one',
         { qty: 0 },
         { qty: 1, value: 'SFO' }
       )

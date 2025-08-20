@@ -187,7 +187,7 @@ test('JexIR should model map types', () => {
   })
 })
 
-test('JexIR should model a object type with both properties and additionalProperties', () => {
+test('JexIR should model an object type with both properties and additionalProperties', () => {
   expectJsonSchema({
     type: 'object',
     properties: {

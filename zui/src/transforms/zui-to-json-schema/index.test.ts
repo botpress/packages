@@ -334,7 +334,7 @@ describe('zuiToJSONSchemaNext', () => {
     })
   })
 
-  test('should map ZodDefault to ZuiJSONSchema with default anotation', () => {
+  test('should map ZodDefault to ZuiJSONSchema with default annotation', () => {
     const schema = toJSONSchema(z.string().default('hello'))
     expect(schema).toEqual({
       type: 'string',
@@ -362,7 +362,7 @@ describe('zuiToJSONSchemaNext', () => {
     expect(() => toJSONSchema(z.symbol())).toThrowError(errs.UnsupportedZuiToJSONSchemaError)
   })
 
-  test('should map ZodReadonly to ZuiJSONSchema with readOnly anotation', () => {
+  test('should map ZodReadonly to ZuiJSONSchema with readOnly annotation', () => {
     const schema = toJSONSchema(z.string().readonly())
     expect(schema).toEqual({
       type: 'string',

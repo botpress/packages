@@ -1,6 +1,6 @@
 # DepSynky
 
-CLI to synchronize dependencies accross a pnpm mono-repo
+CLI to synchronize dependencies across a pnpm mono-repo
 
 ## Disclaimer ⚠️
 

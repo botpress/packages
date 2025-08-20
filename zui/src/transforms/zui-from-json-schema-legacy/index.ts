@@ -38,7 +38,7 @@ const jsonSchemaToZod = (schema: any): ZodTypeAny => {
   let code = jsonSchemaToZodStr(schema)
   code = code.replaceAll('errors: z.ZodError[]', 'errors')
   const evaluationResult = evalZuiString(code)
-  if (!evaluationResult.sucess) {
+  if (!evaluationResult.success) {
     throw new errors.JSONSchemaToZuiError(evaluationResult.error)
   }
   return evaluationResult.value

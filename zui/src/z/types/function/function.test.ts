@@ -237,7 +237,7 @@ test('inference with transforms', () => {
   util.assertEqual<typeof myFunc, (arg: string, ...args_1: unknown[]) => { val: number; extra: string }>(true)
 })
 
-test('fallback to OuterTypeOfFunction', () => {
+test('fall back to OuterTypeOfFunction', () => {
   const funcSchema = z
     .function()
     .args(z.string().transform((val) => val.length))

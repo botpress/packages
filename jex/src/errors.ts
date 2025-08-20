@@ -36,7 +36,7 @@ export class JexUnresolvedReferenceError extends JexInvalidJsonSchemaError {
   }
 }
 
-export class JexUnsuportedJsonSchemaError extends JexInvalidJsonSchemaError {
+export class JexUnsupportedJsonSchemaError extends JexInvalidJsonSchemaError {
   public constructor(path: PropertyPath, schema: JSONSchema7Definition) {
     const pathString = pathToString(path)
     super(path, `Unsupported JSON schema at ${pathString}: ${JSON.stringify(schema)}`)

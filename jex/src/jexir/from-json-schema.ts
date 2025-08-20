@@ -73,7 +73,7 @@ const _toInternalRep = (path: JSONSchemaPropertyPath, schema: JSONSchema7Definit
   }
 
   if (schema.oneOf !== undefined) {
-    throw new errors.JexUnsuportedJsonSchemaError(path.path, { oneOf: schema.oneOf })
+    throw new errors.JexUnsupportedJsonSchemaError(path.path, { oneOf: schema.oneOf })
   }
 
   if (schema.$ref !== undefined) {
@@ -81,23 +81,23 @@ const _toInternalRep = (path: JSONSchemaPropertyPath, schema: JSONSchema7Definit
   }
 
   if (schema.patternProperties !== undefined) {
-    throw new errors.JexUnsuportedJsonSchemaError(path.path, { patternProperties: schema.patternProperties })
+    throw new errors.JexUnsupportedJsonSchemaError(path.path, { patternProperties: schema.patternProperties })
   }
 
   if (schema.propertyNames !== undefined) {
-    throw new errors.JexUnsuportedJsonSchemaError(path.path, { propertyNames: schema.propertyNames })
+    throw new errors.JexUnsupportedJsonSchemaError(path.path, { propertyNames: schema.propertyNames })
   }
 
   if (schema.if !== undefined) {
-    throw new errors.JexUnsuportedJsonSchemaError(path.path, { if: schema.if })
+    throw new errors.JexUnsupportedJsonSchemaError(path.path, { if: schema.if })
   }
 
   if (schema.then !== undefined) {
-    throw new errors.JexUnsuportedJsonSchemaError(path.path, { then: schema.then })
+    throw new errors.JexUnsupportedJsonSchemaError(path.path, { then: schema.then })
   }
 
   if (schema.else !== undefined) {
-    throw new errors.JexUnsuportedJsonSchemaError(path.path, { else: schema.else })
+    throw new errors.JexUnsupportedJsonSchemaError(path.path, { else: schema.else })
   }
 
   if (schema.not !== undefined) {
@@ -114,7 +114,7 @@ const _toInternalRep = (path: JSONSchemaPropertyPath, schema: JSONSchema7Definit
       }
     }
 
-    throw new errors.JexUnsuportedJsonSchemaError(path.path, { not: schema.not })
+    throw new errors.JexUnsupportedJsonSchemaError(path.path, { not: schema.not })
   }
 
   if (Array.isArray(schema.type)) {

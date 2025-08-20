@@ -133,7 +133,7 @@ export const errorFrom = (err: unknown): ApiError => {
 }
 
 function getApiErrorFromObject(err: any) {
-  // Check if it's an deserialized API error object
+  // Check if it's a deserialized API error object
   if (typeof err === 'object' && 'code' in err && 'type' in err && 'id' in err && 'message' in err && typeof err.type === 'string' && typeof err.message === 'string') {
     const ErrorClass = errorTypes[err.type]
     if (!ErrorClass) {

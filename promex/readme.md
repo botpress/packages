@@ -24,7 +24,7 @@ promex.start() // Starts a metrics server on port 9090
 
 ```
 
-Promex can also be used with an handler on an express app
+Promex can also be used with a handler on an express app
 
 ```ts
 import * as promex from '@bpinternal/promex';

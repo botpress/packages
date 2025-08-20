@@ -4,7 +4,7 @@ import {
   getMultilineComment,
   toPropertyKey,
   toTypeArgumentName,
-  primitiveToTypscriptLiteralType,
+  primitiveToTypeScriptLiteralType,
 } from '../common/utils'
 import * as errors from '../common/errors'
 
@@ -283,7 +283,7 @@ ${opts.join(' | ')}`
       return sUnwrapZod(def.getter(), newConfig)
 
     case z.ZodFirstPartyTypeKind.ZodLiteral:
-      const value: string = primitiveToTypscriptLiteralType(def.value)
+      const value: string = primitiveToTypeScriptLiteralType(def.value)
       return `${getMultilineComment(schemaTyped.description)}
 ${value}`.trim()
 

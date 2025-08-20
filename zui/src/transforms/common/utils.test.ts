@@ -7,7 +7,7 @@ import {
   escapeString,
 } from './utils'
 
-describe.concurrent('primitiveToTypscriptLiteral', () => {
+describe.concurrent('primitiveToTypeScriptLiteral', () => {
   it('converts a string to a valid typescript string value', () => {
     const input: string = 'hello'
     const tsValue: string = primitiveToTypescriptValue(input)

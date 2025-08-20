@@ -3,7 +3,7 @@ import { Primitive } from '../../z'
 /**
  * @returns a valid typescript literal type usable in `type MyType = ${x}`
  */
-export function primitiveToTypscriptLiteralType(x: Primitive): string {
+export function primitiveToTypeScriptLiteralType(x: Primitive): string {
   if (typeof x === 'symbol') {
     return 'symbol' // there's no way to represent a symbol literal in a single line with typescript
   }

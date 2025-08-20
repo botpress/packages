@@ -142,7 +142,7 @@ describe('api', () => {
       await expect(generateIntegrationWithConfig({ outputDir: './output' })).rejects.toThrow('mcpServerUrl is required')
     })
 
-    it('should fallback to http transport when config has no type', async () => {
+    it('should fall back to http transport when config has no type', async () => {
       mockLoad.mockResolvedValue({ name: 'test', url: 'http://localhost:3000' } as any)
       mockGenerate.mockResolvedValue(undefined)
 

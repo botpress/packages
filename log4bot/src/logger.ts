@@ -33,7 +33,7 @@ export class Logger implements types.Logger {
       this._filters = _.mapValues(config.filters, regexParser) as any as { [level: string]: RegExp }
     }
 
-    // logger configures all childs
+    // logger configures all children
     for (const logger of this._loggers.values()) {
       logger.configure(config)
     }

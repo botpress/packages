@@ -1,5 +1,5 @@
 import type { SchemaObject } from 'openapi3-ts/oas31'
-import { VError } from 'verror'
+import VError from 'verror'
 import { z } from 'zod'
 import { schema } from './opapi'
 import type { PathParams } from './path-params'

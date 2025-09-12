@@ -2,7 +2,7 @@ import pathlib from 'path'
 import fslib from 'fs'
 import chalk from 'chalk'
 import _ from 'lodash'
-import { VError } from 'verror'
+import VError from 'verror'
 import { defaultResponseStatus, invalidLine, tsFileHeader } from './const'
 import { appendHeaders, initDirectory, removeLineFromFiles, saveFile } from './file'
 import {
@@ -12,7 +12,7 @@ import {
   generateHandlers,
   generateTypes,
   runOpenApiCodeGenerator,
-  clientNode,
+  clientNode
 } from './generators'
 import { generateErrors } from './generators/errors'
 import { generateOpenapiTypescript } from './generators/openapi-typescript'
@@ -26,7 +26,7 @@ import {
   executeOperationParsers,
   executeSectionParsers,
   operationParsers,
-  sectionParsers,
+  sectionParsers
 } from './section-types-generator'
 import { Block } from './section-types-generator/types'
 import { ApiError, isOperationWithBodyProps, type Operation, type State } from './state'
@@ -41,7 +41,7 @@ export async function generateTypesBySection(state: DefaultState, targetDirector
   for (const section of state.sections) {
     const [sectionBlocks, operationBlocks] = await Promise.all([
       executeSectionParsers(sectionParsers, section, state),
-      executeOperationParsers(operationParsers, section, state),
+      executeOperationParsers(operationParsers, section, state)
     ])
     const blocks = [...sectionBlocks, ...operationBlocks]
     allBlocks.push(...blocks)
@@ -73,9 +73,9 @@ export const generateServer = async (state: State<string, string, string>, dir: 
   log.info('Generating handlers code')
   const handlersCode = generateHandlers({
     operations: Object.entries(state.operations).map(([name, operation]) =>
-      mapOperationPropsToHandlerProps(name, operation),
+      mapOperationPropsToHandlerProps(name, operation)
     ),
-    useExpressTypes,
+    useExpressTypes
   })
   log.info('')
 
@@ -106,7 +106,7 @@ export const generateClientWithOpenapiGenerator = async (
   state: State<string, string, string>,
   dir = '.',
   openApiGeneratorEndpoint: string,
-  postProcessors?: OpenApiPostProcessors,
+  postProcessors?: OpenApiPostProcessors
 ) => {
   initDirectory(dir)
 
@@ -123,8 +123,8 @@ export const generateClientWithOpenapiGenerator = async (
   log.info('Generating client code')
   const clientCode = generateClientCode({
     operations: Object.entries(state.operations).map(([name, operation]) =>
-      mapOperationPropsToHandlerProps(name, operation),
-    ),
+      mapOperationPropsToHandlerProps(name, operation)
+    )
   })
   log.info('')
 
@@ -219,7 +219,7 @@ export function generateOpenapi(state: State<string, string, string>, dir = '.')
 
 function mapOperationPropsToHandlerProps(
   operationName: string,
-  operation: Operation<string, string, string, 'json-schema'>,
+  operation: Operation<string, string, string, 'json-schema'>
 ) {
   const generateHandlerProps: GenerateHandlerProps = {
     operationName,
@@ -233,7 +233,7 @@ function mapOperationPropsToHandlerProps(
     isEmptyBody: isOperationWithBodyProps(operation) ? schemaIsEmptyObject(operation.requestBody.schema) : true,
     contentType: isOperationWithBodyProps(operation)
       ? (operation.contentType ?? 'application/json')
-      : 'application/json',
+      : 'application/json'
   }
 
   if (operation.parameters) {

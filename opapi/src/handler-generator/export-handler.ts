@@ -1,5 +1,4 @@
 import fs from 'fs/promises'
-import * as ts from 'typescript'
 
 const CONTENT = `import qs from 'qs'
 import { isAxiosError } from 'axios'
@@ -207,14 +206,5 @@ export const handleRequest = async <T extends { req: PlainRequest }>(routes: Rec
 `
 
 export const exportHandler = async (outFile: string) => {
-  const printer = ts.createPrinter()
-  const y = ts.factory.createAdd(ts.factory.createNumericLiteral(1), ts.factory.createNumericLiteral(2))
-  const z = ts.factory.createImport
-  const output = printer.printNode(
-    ts.EmitHint.Unspecified,
-    y,
-    ts.createSourceFile('source.ts', '', ts.ScriptTarget.ES2015)
-  )
-
-  await fs.writeFile(outFile, output)
+  await fs.writeFile(outFile, CONTENT)
 }

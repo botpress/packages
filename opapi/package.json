@@ -14,7 +14,7 @@
   },
   "scripts": {
     "test": "vitest run",
-    "build": "tsup src/index.ts --dts --format cjs,esm --clean",
+    "build": "tsup src/index.ts --dts --format cjs,esm --clean --sourcemap",
     "check:type": "tsc --noEmit",
     "check:format": "biome format .",
     "fix:format": "biome format --write ."

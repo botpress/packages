@@ -1,6 +1,6 @@
 import { OpenApiZodAny, generateSchema as generateJsonSchema } from '@anatine/zod-openapi'
 import { JSONSchema7, JSONSchema7Definition } from 'json-schema'
-import type { SchemaObject } from 'openapi3-ts'
+import type { SchemaObject } from 'openapi3-ts/oas31'
 import { removeFromArray } from './util'
 import _ from 'lodash'
 
@@ -37,7 +37,7 @@ export const formatJsonSchema = (jsonSchema: SchemaObject, allowUnions: boolean)
     }
 
     Object.entries(jsonSchema.properties ?? {}).forEach(([_, value]) =>
-      formatJsonSchema(value as SchemaObject, allowUnions),
+      formatJsonSchema(value as SchemaObject, allowUnions)
     )
   }
 
@@ -101,7 +101,7 @@ export const exploreJsonSchema =
       if (Array.isArray(mappedSchema.items)) {
         return {
           ...mappedSchema,
-          items: mappedSchema.items.map(exploreJsonSchemaDef(cb)),
+          items: mappedSchema.items.map(exploreJsonSchemaDef(cb))
         }
       }
       return { ...mappedSchema, items: exploreJsonSchemaDef(cb)(mappedSchema.items) }
@@ -110,21 +110,21 @@ export const exploreJsonSchema =
     if (mappedSchema.anyOf) {
       return {
         ...mappedSchema,
-        anyOf: mappedSchema.anyOf.map(exploreJsonSchemaDef(cb)),
+        anyOf: mappedSchema.anyOf.map(exploreJsonSchemaDef(cb))
       }
     }
 
     if (mappedSchema.allOf) {
       return {
         ...mappedSchema,
-        allOf: mappedSchema.allOf.map(exploreJsonSchemaDef(cb)),
+        allOf: mappedSchema.allOf.map(exploreJsonSchemaDef(cb))
       }
     }
 
     if (mappedSchema.oneOf) {
       return {
         ...mappedSchema,
-        oneOf: mappedSchema.oneOf.map(exploreJsonSchemaDef(cb)),
+        oneOf: mappedSchema.oneOf.map(exploreJsonSchemaDef(cb))
       }
     }
 
@@ -170,7 +170,7 @@ const _setDefaultAdditionalPropertiesInPlace = (schema: JsonSchema, additionalPr
     schema.additionalProperties ??= additionalProperties
 
     Object.values(schema.properties ?? {}).forEach(
-      (s) => typeof s === 'object' && _setDefaultAdditionalPropertiesInPlace(s, additionalProperties),
+      (s) => typeof s === 'object' && _setDefaultAdditionalPropertiesInPlace(s, additionalProperties)
     )
 
     if (typeof schema.additionalProperties === 'object') {
@@ -187,7 +187,7 @@ const _setDefaultAdditionalPropertiesInPlace = (schema: JsonSchema, additionalPr
 
     if (Array.isArray(schema.items)) {
       schema.items.forEach(
-        (s) => typeof s === 'object' && _setDefaultAdditionalPropertiesInPlace(s, additionalProperties),
+        (s) => typeof s === 'object' && _setDefaultAdditionalPropertiesInPlace(s, additionalProperties)
       )
       return
     }

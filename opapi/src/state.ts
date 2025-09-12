@@ -7,7 +7,7 @@ import { isAlphanumeric, isCapitalAlphabetical } from './util'
 import { generateSchemaFromZod } from './jsonschema'
 import { OpenApiZodAny } from '@anatine/zod-openapi'
 import { objects } from './objects'
-import { uniqBy, prop } from 'ramda'
+import { uniqBy, prop, map } from 'ramda'
 
 type SchemaType = 'zod-schema' | 'json-schema'
 type SchemaOfType<T extends SchemaType> = T extends 'zod-schema' ? OpenApiZodAny : SchemaObject
@@ -297,12 +297,7 @@ export function createState<SchemaName extends string, DefaultParameterName exte
     }
   })
 
-  const defaultParameters = props.defaultParameters
-    ? (objects.mapValues(props.defaultParameters, mapParameter) satisfies Record<
-        DefaultParameterName,
-        Parameter<'json-schema'>
-      >)
-    : undefined
+  const defaultParameters = props.defaultParameters ? map(mapParameter, props.defaultParameters) : undefined
 
   return {
     operations: {},

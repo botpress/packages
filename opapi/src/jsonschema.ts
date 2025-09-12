@@ -1,6 +1,6 @@
 import { OpenApiZodAny, generateSchema as generateJsonSchema } from '@anatine/zod-openapi'
 import { JSONSchema7, JSONSchema7Definition } from 'json-schema'
-import type { SchemaObject } from 'openapi3-ts/oas31'
+import { isReferenceObject, type SchemaObject } from 'openapi3-ts/oas31'
 import { removeFromArray } from './util'
 import _ from 'lodash'
 
@@ -13,7 +13,7 @@ export type JsonSchema = JSONSchema7
 export type NullableJsonSchema = JSONSchema7 & { nullable?: boolean }
 
 export const generateSchemaFromZod = (zodRef: OpenApiZodAny, opts?: GenerateSchemaFromZodOpts) => {
-  const jsonSchema = generateJsonSchema(zodRef, opts?.useOutput) as SchemaObject
+  const jsonSchema = generateJsonSchema(zodRef, opts?.useOutput)
   formatJsonSchema(jsonSchema, opts?.allowUnions ?? false)
   return jsonSchema
 }
@@ -33,12 +33,20 @@ export const formatJsonSchema = (jsonSchema: SchemaObject, allowUnions: boolean)
     }
 
     if (typeof jsonSchema.additionalProperties === 'object') {
-      formatJsonSchema(jsonSchema.additionalProperties as SchemaObject, allowUnions)
+      if (isReferenceObject(jsonSchema.additionalProperties)) {
+        throw new Error('Expected additionalProperties to be a SchemaObject')
+      }
+      formatJsonSchema(jsonSchema.additionalProperties, allowUnions)
     }
 
-    Object.entries(jsonSchema.properties ?? {}).forEach(([_, value]) =>
-      formatJsonSchema(value as SchemaObject, allowUnions)
-    )
+    if (jsonSchema.properties) {
+      for (const schemaObject of Object.values(jsonSchema.properties)) {
+        if (isReferenceObject(schemaObject)) {
+          throw new Error('Expected entries in properties to be of type SchemaObject')
+        }
+        formatJsonSchema(schemaObject, allowUnions)
+      }
+    }
   }
 
   if (!allowUnions && (jsonSchema.allOf || jsonSchema.anyOf || jsonSchema.oneOf)) {

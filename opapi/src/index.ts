@@ -1,4 +1,5 @@
-export { OpenApiZodAny } from '@anatine/zod-openapi'
+export type { OpenApiZodAny } from '@anatine/zod-openapi'
+
 export {
   schema,
   type OpenApiProps,
@@ -10,7 +11,7 @@ export {
   ParameterOf,
   SectionOf,
   exportJsonSchemas,
-  exportZodSchemas,
+  exportZodSchemas
 } from './opapi'
 export {
   type Options,
@@ -36,5 +37,5 @@ export {
   type ParametersMap,
   createState,
   getRef,
-  mapParameter,
+  mapParameter
 } from './state'

@@ -1,7 +1,7 @@
 import { OpenApiZodAny, generateSchema as generateJsonSchema } from '@anatine/zod-openapi'
 import { JSONSchema7, JSONSchema7Definition } from 'json-schema'
 import { isReferenceObject, type SchemaObject } from 'openapi3-ts/oas31'
-import _ from 'lodash'
+import * as R from 'ramda'
 
 export type GenerateSchemaFromZodOpts = {
   useOutput?: boolean
@@ -83,7 +83,7 @@ export const exploreJsonSchema = (cb: (s: JsonSchema) => JsonSchema, inputSchema
 
   if (mappedSchema.type === 'object') {
     const properties = mappedSchema.properties
-      ? _.mapValues(mappedSchema.properties, (schema: JsonSchema) => exploreJsonSchema(cb, schema))
+      ? R.map((schema: JSONSchema7Definition) => exploreJsonSchemaDef(cb, schema), mappedSchema.properties)
       : undefined
     const additionalProperties =
       typeof mappedSchema.additionalProperties === 'object'
@@ -201,7 +201,7 @@ const _setDefaultAdditionalPropertiesInPlace = (schema: JsonSchema, additionalPr
 }
 
 export const setDefaultAdditionalProperties = (schema: JsonSchema, additionalProperties: boolean): JsonSchema => {
-  const copy = _.cloneDeep(schema)
+  const copy = R.clone(schema)
   _setDefaultAdditionalPropertiesInPlace(copy, additionalProperties)
   return copy
 }

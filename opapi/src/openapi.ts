@@ -52,6 +52,7 @@ export const createOpenapi = <
       }
     })
 
+    // TODO generateSchemaFromZod returns SchemaObject but we expect a ReferenceObject here
     const responseRefSchema = generateSchemaFromZod(
       getRef(state, ComponentType.RESPONSES, responseName)
     ) as unknown as ReferenceObject
@@ -61,8 +62,8 @@ export const createOpenapi = <
       description: operationObject.description,
       parameters: [],
       responses: {
-        default: responseRefSchema as ReferenceObject,
-        [response.status ?? defaultResponseStatus]: responseRefSchema as ReferenceObject
+        default: responseRefSchema,
+        [response.status ?? defaultResponseStatus]: responseRefSchema
       }
     }
 
@@ -79,82 +80,76 @@ export const createOpenapi = <
         }
       })
 
-      const bodyRefSchema = generateSchemaFromZod(
-        getRef(state, ComponentType.REQUESTS, bodyName)
-      ) as unknown as ReferenceObject
+      // TODO we expect this to be a ReferenceObject but generateSchemaFromZod returns SchemaObject only.
+      const bodyRefSchema = generateSchemaFromZod(getRef(state, ComponentType.REQUESTS, bodyName))
 
-      operation.requestBody = bodyRefSchema
+      // TODO this expects a RequestBodyObject or ReferenceObject but generateSchemaFromZod returns SchemaObject only.
+      operation.requestBody = bodyRefSchema as unknown as ReferenceObject
     }
 
-    if (operationObject.parameters) {
-      objects.entries(operationObject.parameters).forEach(([parameterName, parameter]) => {
-        const parameterType = parameter.type
+    if (operationObject.parameters && operation.parameters) {
+      for (const [parameterName, parameterSpec] of Object.entries(operationObject.parameters)) {
+        const parameterType = parameterSpec.type
+
+        const parameter = {
+          name: parameterName,
+          in: parameterSpec.in,
+          description: parameterSpec.description
+        }
 
         switch (parameterType) {
           case 'string':
-            operation.parameters?.push({
-              name: parameterName,
-              in: parameter.in,
-              description: parameter.description,
-              required: parameter.in === 'path' ? true : parameter.required,
+            operation.parameters.push({
+              ...parameter,
+              required: parameterSpec.in === 'path' ? true : parameterSpec.required,
               schema: {
                 type: 'string',
-                enum: parameter.enum as string[]
+                enum: parameterSpec.enum as string[]
               }
             })
             break
           case 'string[]':
-            operation.parameters?.push({
-              name: parameterName,
-              in: parameter.in,
-              description: parameter.description,
-              required: parameter.required,
+            operation.parameters.push({
+              ...parameter,
+              required: parameterSpec.required,
               schema: {
                 type: 'array',
                 items: {
                   type: 'string',
-                  enum: parameter.enum
+                  enum: parameterSpec.enum
                 }
               }
             })
             break
           case 'object':
-            operation.parameters?.push({
-              name: parameterName,
-              in: parameter.in,
-              description: parameter.description,
-              required: parameter.required,
-              schema: parameter.schema
+            operation.parameters.push({
+              ...parameter,
+              required: parameterSpec.required,
+              schema: parameterSpec.schema
             })
             break
           case 'boolean':
-            operation.parameters?.push({
-              name: parameterName,
-              in: parameter.in,
-              description: parameter.description,
-              required: parameter.required,
+            operation.parameters.push({
+              ...parameter,
+              required: parameterSpec.required,
               schema: {
                 type: 'boolean'
               }
             })
             break
           case 'integer':
-            operation.parameters?.push({
-              name: parameterName,
-              in: parameter.in,
-              description: parameter.description,
-              required: parameter.required,
+            operation.parameters.push({
+              ...parameter,
+              required: parameterSpec.required,
               schema: {
                 type: 'integer'
               }
             })
             break
           case 'number':
-            operation.parameters?.push({
-              name: parameterName,
-              in: parameter.in,
-              description: parameter.description,
-              required: parameter.required,
+            operation.parameters.push({
+              ...parameter,
+              required: parameterSpec.required,
               schema: {
                 type: 'number'
               }
@@ -163,7 +158,7 @@ export const createOpenapi = <
           default:
             throw new VError(`Parameter type ${parameterType} is not supported`)
         }
-      })
+      }
     }
 
     if (!openapi.rootDoc.paths) {

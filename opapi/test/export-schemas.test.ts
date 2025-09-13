@@ -1,4 +1,4 @@
-import fs from 'fs'
+import * as fs from 'fs'
 import { describe, expect, it } from 'vitest'
 import { join, basename } from 'path'
 import { exportJsonSchemas, exportZodSchemas } from '../src'

@@ -12,25 +12,25 @@ const metadata = {
   description: 'Test API',
   server: 'http://localhost:3000',
   version: '1.0.0',
-  prefix: '/v1'
+  prefix: '/v1',
 } satisfies AnyProps['metadata']
 
 const sections = {
   trees: {
     title: 'Trees',
-    description: 'Trees section'
-  }
+    description: 'Trees section',
+  },
 } satisfies AnyProps['sections']
 
 const leaf: z.ZodType = z.object({
   type: z.literal('leaf'),
   name: z.string(),
-  data: z.string()
+  data: z.string(),
 })
 const node: z.ZodType = z.object({
   type: z.literal('node'),
   name: z.string(),
-  children: z.array(z.lazy(() => tree))
+  children: z.array(z.lazy(() => tree)),
 })
 const tree: z.ZodType = z.union([leaf, node])
 
@@ -46,9 +46,9 @@ describe('openapi generator with unions not allowed', () => {
         schemas: {
           Tree: {
             section: 'trees',
-            schema: tree
-          }
-        }
+            schema: tree,
+          },
+        },
       })
     }).toThrowError(expectedErrorMessage)
   })
@@ -65,13 +65,13 @@ describe('openapi generator with unions not allowed', () => {
           id: {
             description: 'Tree id',
             in: 'path',
-            type: 'string'
-          }
+            type: 'string',
+          },
         },
         response: {
           description: 'Tree information',
-          schema: tree
-        }
+          schema: tree,
+        },
       })
     }).toThrowError(expectedErrorMessage)
   })
@@ -86,12 +86,12 @@ describe('openapi generator with unions not allowed', () => {
         path: '/trees',
         requestBody: {
           description: 'Tree information',
-          schema: tree
+          schema: tree,
         },
         response: {
           description: 'Tree information',
-          schema: z.object({})
-        }
+          schema: z.object({}),
+        },
       })
     }).toThrowError(expectedErrorMessage)
   })
@@ -107,11 +107,11 @@ describe('openapi generator with unions allowed', () => {
         schemas: {
           Tree: {
             section: 'trees',
-            schema: tree
-          }
-        }
+            schema: tree,
+          },
+        },
       },
-      opts
+      opts,
     )
   })
 
@@ -126,13 +126,13 @@ describe('openapi generator with unions allowed', () => {
         id: {
           description: 'Tree id',
           in: 'path',
-          type: 'string'
-        }
+          type: 'string',
+        },
       },
       response: {
         description: 'Tree information',
-        schema: tree
-      }
+        schema: tree,
+      },
     })
   })
 
@@ -145,12 +145,12 @@ describe('openapi generator with unions allowed', () => {
       path: '/trees',
       requestBody: {
         description: 'Tree information',
-        schema: tree
+        schema: tree,
       },
       response: {
         description: 'Tree information',
-        schema: z.object({})
-      }
+        schema: z.object({}),
+      },
     })
   })
 })
@@ -164,11 +164,11 @@ describe('openapi state generator', () => {
         schemas: {
           Tree: {
             section: 'trees',
-            schema: tree
-          }
-        }
+            schema: tree,
+          },
+        },
       },
-      { allowUnions: true }
+      { allowUnions: true },
     )
 
     const genStateFolder = join(__dirname, 'gen/state')

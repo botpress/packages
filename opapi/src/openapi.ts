@@ -9,9 +9,9 @@ import { formatBodyName, formatResponseName } from './util'
 export const createOpenapi = <
   SchemaName extends string,
   DefaultParameterName extends string,
-  SectionName extends string
+  SectionName extends string,
 >(
-  state: State<SchemaName, DefaultParameterName, SectionName>
+  state: State<SchemaName, DefaultParameterName, SectionName>,
 ) => {
   const { metadata, schemas, operations } = state
   const { description, server, title, version } = metadata
@@ -22,15 +22,15 @@ export const createOpenapi = <
     info: {
       title,
       description,
-      version
+      version,
     },
     paths: {},
     components: {
       schemas: {},
       responses: {},
       requestBodies: {},
-      parameters: {}
-    }
+      parameters: {},
+    },
   })
 
   objects.entries(schemas).forEach(([schemaName, { schema }]) => {
@@ -47,14 +47,14 @@ export const createOpenapi = <
       description: response.description,
       content: {
         'application/json': {
-          schema: response.schema
-        }
-      }
+          schema: response.schema,
+        },
+      },
     })
 
     // TODO generateSchemaFromZod returns SchemaObject but we expect a ReferenceObject here
     const responseRefSchema = generateSchemaFromZod(
-      getRef(state, ComponentType.RESPONSES, responseName)
+      getRef(state, ComponentType.RESPONSES, responseName),
     ) as unknown as ReferenceObject
 
     const operation: OperationObject = {
@@ -63,8 +63,8 @@ export const createOpenapi = <
       parameters: [],
       responses: {
         default: responseRefSchema,
-        [response.status ?? defaultResponseStatus]: responseRefSchema
-      }
+        [response.status ?? defaultResponseStatus]: responseRefSchema,
+      },
     }
 
     if (isOperationWithBodyProps(operationObject)) {
@@ -75,9 +75,9 @@ export const createOpenapi = <
         description: requestBody.description,
         content: {
           [contentType]: {
-            schema: requestBody.schema
-          }
-        }
+            schema: requestBody.schema,
+          },
+        },
       })
 
       // TODO we expect this to be a ReferenceObject but generateSchemaFromZod returns SchemaObject only.
@@ -94,7 +94,7 @@ export const createOpenapi = <
         const parameter = {
           name: parameterName,
           in: parameterSpec.in,
-          description: parameterSpec.description
+          description: parameterSpec.description,
         }
 
         switch (parameterType) {
@@ -104,8 +104,8 @@ export const createOpenapi = <
               required: parameterSpec.in === 'path' ? true : parameterSpec.required,
               schema: {
                 type: 'string',
-                enum: parameterSpec.enum as string[]
-              }
+                enum: parameterSpec.enum as string[],
+              },
             })
             break
           case 'string[]':
@@ -116,16 +116,16 @@ export const createOpenapi = <
                 type: 'array',
                 items: {
                   type: 'string',
-                  enum: parameterSpec.enum
-                }
-              }
+                  enum: parameterSpec.enum,
+                },
+              },
             })
             break
           case 'object':
             operation.parameters.push({
               ...parameter,
               required: parameterSpec.required,
-              schema: parameterSpec.schema
+              schema: parameterSpec.schema,
             })
             break
           case 'boolean':
@@ -133,8 +133,8 @@ export const createOpenapi = <
               ...parameter,
               required: parameterSpec.required,
               schema: {
-                type: 'boolean'
-              }
+                type: 'boolean',
+              },
             })
             break
           case 'integer':
@@ -142,8 +142,8 @@ export const createOpenapi = <
               ...parameter,
               required: parameterSpec.required,
               schema: {
-                type: 'integer'
-              }
+                type: 'integer',
+              },
             })
             break
           case 'number':
@@ -151,8 +151,8 @@ export const createOpenapi = <
               ...parameter,
               required: parameterSpec.required,
               schema: {
-                type: 'number'
-              }
+                type: 'number',
+              },
             })
             break
           default:

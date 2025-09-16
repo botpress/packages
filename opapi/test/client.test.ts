@@ -29,7 +29,7 @@ describe('client generator', () => {
     const api = getMockApi()
 
     await api.exportClient(genClientFolder, {
-      generator: 'opapi'
+      generator: 'opapi',
     })
 
     const files = getFiles(genClientFolder)

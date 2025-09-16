@@ -13,7 +13,7 @@ const serverFiles = [
   'type.ts',
   'metadata.json',
   'openapi.json',
-  'errors.ts'
+  'errors.ts',
 ]
 
 const GEN_DIR = join(__dirname, 'gen/server')
@@ -61,9 +61,9 @@ describe('server generator', () => {
         id: {
           in: 'path',
           description: 'Baz id',
-          type: 'string'
-        }
-      }
+          type: 'string',
+        },
+      },
     })
 
     await api.exportServer(genServerFolder, true)

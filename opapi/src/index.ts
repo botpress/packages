@@ -11,7 +11,7 @@ export {
   ParameterOf,
   SectionOf,
   exportJsonSchemas,
-  exportZodSchemas
+  exportZodSchemas,
 } from './opapi'
 export {
   type Options,
@@ -37,5 +37,5 @@ export {
   type ParametersMap,
   createState,
   getRef,
-  mapParameter
+  mapParameter,
 } from './state'

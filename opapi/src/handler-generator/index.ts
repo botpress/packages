@@ -1,6 +1,7 @@
 import fs from 'fs'
 import pathlib from 'path'
 import _ from 'lodash'
+import R from 'ramda'
 import { State } from '../state'
 import { toRequestSchema, toResponseSchema } from './map-operation'
 import { exportErrors } from './export-errors'
@@ -15,18 +16,21 @@ type JsonSchemaMap = Record<string, JSONSchema7>
 type ExportableSchema = { exportSchemas: (outDir: string) => Promise<void> }
 
 const toExportableSchema = (schemas: JsonSchemaMap): ExportableSchema => ({
-  exportSchemas: (outDir: string) => exportJsonSchemas(schemas)(outDir, { includeZodSchemas: false }),
+  exportSchemas: (outDir: string) => exportJsonSchemas(schemas)(outDir, { includeZodSchemas: false })
 })
 
 export const generateHandler = async <Schema extends string, Param extends string, Section extends string>(
   state: State<Schema, Param, Section>,
-  outDir: string,
+  outDir: string
 ) => {
-  const operationsByName = _.mapKeys(state.operations, (v) => v.name)
+  const operationsByName = Object.fromEntries(Object.values(state.operations).map((v) => [v.name, v]))
 
-  const requestSchemas: JsonSchemaMap = _.mapValues(operationsByName, (o) => toRequestSchema(state, o))
-  const responseSchemas: JsonSchemaMap = _.mapValues(operationsByName, (o) => toResponseSchema(state, o))
-  const modelSchemas: JsonSchemaMap = _.mapValues(state.schemas, (s) => s.schema as JSONSchema7)
+  const requestSchemas = R.map((o) => toRequestSchema(state, o), operationsByName)
+  const responseSchemas = R.map((o) => toResponseSchema(state, o), operationsByName)
+  const modelSchemas = _.mapValues(state.schemas, (s) => s.schema)
+  for (const k in state.schemas) {
+    const x = state.schemas[k]
+  }
 
   const models: ExportableSchema = toExportableSchema(modelSchemas)
   const requests: ExportableSchema = toExportableSchema(requestSchemas)

@@ -1,7 +1,7 @@
 import fs from 'fs'
 import pathlib from 'path'
 import _ from 'lodash'
-import R from 'ramda'
+import * as R from 'ramda'
 import { State } from '../state'
 import { toRequestSchema, toResponseSchema } from './map-operation'
 import { exportErrors } from './export-errors'

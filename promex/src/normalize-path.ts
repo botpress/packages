@@ -1,4 +1,4 @@
-import type { Express, Request, Response } from 'express'
+import type { Express, Request } from 'express'
 import { nanoid } from 'nanoid'
 
 type Route = {
@@ -27,8 +27,8 @@ let appRoutes: AppRoute = {}
  * @returns A normalized path for the given request using the app routes
  */
 export const normalizePath =
-  () =>
-  (path: string, { req }: { req: Request; res: Response }) => {
+  (): ((path: string, ctx: { req: Request }) => string) =>
+  (path, { req }) => {
     const appId = (req.app as any).promexId
 
     const appRoute = appRoutes[appId]

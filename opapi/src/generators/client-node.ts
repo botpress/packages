@@ -11,7 +11,7 @@ import { replaceNullableWithUnion, NullableJsonSchema, setDefaultAdditionalPrope
 type ObjectBuilder = utils.JsonSchemaBuilder['object']
 const objectBuilder: ObjectBuilder = (...args) => ({
   ...utils.jsonSchemaBuilder.object(...args),
-  additionalProperties: false,
+  additionalProperties: false
 })
 const s = { ...utils.jsonSchemaBuilder, object: objectBuilder }
 
@@ -120,7 +120,7 @@ const toTs = async (originalSchema: JSONSchema7, name: string): Promise<string> 
     unknownAny: false,
     bannerComment: '',
     additionalProperties: false,
-    ignoreMinAndMaxItems: true,
+    ignoreMinAndMaxItems: true
   })
 
   return `${typeCode}\n`
@@ -200,7 +200,7 @@ export const generateOperations = async (state: State<string, string, string>, o
       `  query: ${queryName};`,
       `  params: ${paramsName};`,
       `  body: ${reqBodyName};`,
-      `}\n\n`,
+      `}\n\n`
     ].join('\n')
 
     const getKey = (variable: string, key: string) => `${variable}['${key}']`
@@ -223,7 +223,7 @@ export const generateOperations = async (state: State<string, string, string>, o
       `    params: ${toObject(paramsKeys)},`,
       `    body: ${toObject(reqBodyKeys)},`,
       `  }`,
-      `}\n`,
+      `}\n`
     ].join('\n')
 
     let responseCode = ''
@@ -245,19 +245,19 @@ export const generateIndex = async (state: State<string, string, string>, indexF
   let indexCode = [
     `${HEADER}`,
     "import axios, { AxiosInstance } from 'axios'",
-    "import { errorFrom } from './errors'",
-    "import { toAxiosRequest } from './to-axios'",
-    '',
+    "import { errorFrom } from './errors.js'",
+    "import { toAxiosRequest } from './to-axios.js'",
+    ''
   ].join('\n')
 
   for (const [name] of Object.entries(operationsByName)) {
-    indexCode += `import * as ${name} from './operations/${name}'\n`
+    indexCode += `import * as ${name} from './operations/${name}.js'\n`
   }
   indexCode += '\n'
 
-  indexCode += "export * from './models'\n\n"
+  indexCode += "export * from './models.js'\n\n"
   for (const [name] of Object.entries(operationsByName)) {
-    indexCode += `export * as ${name} from './operations/${name}'\n`
+    indexCode += `export * as ${name} from './operations/${name}.js'\n`
   }
   indexCode += '\n'
 
@@ -267,7 +267,7 @@ export const generateIndex = async (state: State<string, string, string>, indexF
     'export type ClientProps = {',
     '  toAxiosRequest: typeof toAxiosRequest', // allows to override the toAxiosRequest function
     '  toApiError: typeof toApiError', // allows to override the toApiError function
-    '}',
+    '}'
   ].join('\n')
   indexCode += '\n\n'
 
@@ -293,7 +293,7 @@ export const generateIndex = async (state: State<string, string, string>, indexF
       `    return this.axiosInstance.request<${name}.${resName}>(axiosReq)`,
       `      .then((res) => res.data)`,
       `      .catch((e) => { throw mapErrorResponse(e) })`,
-      '  }\n\n',
+      '  }\n\n'
     ].join('\n')
   }
   indexCode += '}\n\n'

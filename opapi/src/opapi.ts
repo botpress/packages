@@ -34,7 +34,9 @@ type NewOpapiState = {}
  */
 export class NewOpapi {
   private state: NewOpapiState
-  constructor() {}
+  constructor() {
+    this.state = {}
+  }
 }
 
 export const schema = <T extends OpenApiZodAny>(

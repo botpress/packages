@@ -71,7 +71,7 @@ export type GenerateClientProps =
       generator: 'opapi'
     }
 
-function exportClient(state: State<string, string, string>) {
+function createExportClient(state: State<string, string, string>) {
   function _exportClient(
     dir: string,
     openapiGeneratorEndpoint: string,
@@ -159,7 +159,7 @@ const createOpapiFromState = <
     addOperation: <Path extends string>(
       operationProps: Operation<DefaultParameterName, SectionName, Path, 'zod-schema'>,
     ) => addOperation(state, operationProps),
-    exportClient: exportClient(state),
+    exportClient: createExportClient(state),
     exportTypesBySection: (dir = '.') => generateTypesBySection(state, dir),
     exportServer: (dir = '.', useExpressTypes: boolean) => generateServer(state, dir, useExpressTypes),
     exportOpenapi: (dir = '.') => generateOpenapi(state, dir),

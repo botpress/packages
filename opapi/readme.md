@@ -77,7 +77,7 @@ api.addOperation({
   response: {
     description: 'Returns a list of User objects.',
     schema: z.object({
-      users: openapi.getModelRef('User')
+      users: api.getModelRef('User')
     })
   }
 })

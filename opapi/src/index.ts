@@ -1,6 +1,7 @@
 export type { OpenApiZodAny } from '@anatine/zod-openapi'
 
 export {
+  NewOpapi,
   schema,
   type OpenApiProps,
   type CodePostProcessor,

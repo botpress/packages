@@ -27,6 +27,16 @@ export { Operation, Parameter } from './state'
 
 type AnatineSchemaObject = NonNullable<Parameters<typeof extendApi>[1]>
 
+type NewOpapiState = {}
+
+/**
+ * This Opapi is a class-centric approach.
+ */
+export class NewOpapi {
+  private state: NewOpapiState
+  constructor() {}
+}
+
 export const schema = <T extends OpenApiZodAny>(
   schema: T,
   schemaObject?: AnatineSchemaObject & { $ref?: string },

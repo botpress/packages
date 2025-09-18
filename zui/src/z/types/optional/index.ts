@@ -6,6 +6,7 @@ import {
   ZodType,
   ZodTypeAny,
   ZodTypeDef,
+  ZodString,
   OK,
   ParseInput,
   ParseReturnType,
@@ -72,5 +73,10 @@ export class ZodOptional<T extends ZodTypeAny = ZodTypeAny> extends ZodType<
 
   mandatory(): ZodTypeAny {
     return this._def.innerType.mandatory()
+  }
+
+  secret(this: ZodOptional<ZodString>) {
+    this._def.innerType.secret()
+    return this
   }
 }

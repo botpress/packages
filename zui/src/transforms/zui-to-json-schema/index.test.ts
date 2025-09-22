@@ -374,4 +374,13 @@ describe('zuiToJSONSchemaNext', () => {
     const schema = toJSONSchema(z.ref('foo'))
     expect(schema).toEqual({ $ref: 'foo' })
   })
+
+  test('additionalProperties should be false by default in objects', () => {
+    const schema = toJSONSchema(z.object({}))
+    expect(schema).toEqual({
+      type: "object",
+      properties: {},
+      additionalProperties: false,
+    })
+  })
 })

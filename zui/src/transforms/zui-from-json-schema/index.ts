@@ -5,6 +5,7 @@ import z from '../../z'
 import { toZuiPrimitive } from './primitives'
 import { arrayJSONSchemaToZuiArray } from './iterables/array'
 import { ArraySchema, SetSchema, TupleSchema } from '../common/json-schema'
+import { zuiKey } from '../../ui/constants'
 
 const DEFAULT_TYPE = z.any()
 
@@ -14,7 +15,9 @@ const DEFAULT_TYPE = z.any()
  * @returns ZUI Schema
  */
 export function fromJSONSchema(schema: JSONSchema7): z.ZodType {
-  return _fromJSONSchema(schema)
+  const zuiSchema = _fromJSONSchema(schema)
+  applyZuiPropsRecursively(zuiSchema, schema)
+  return zuiSchema
 }
 
 function _fromJSONSchema(schema: JSONSchema7Definition | undefined): z.ZodType {
@@ -189,3 +192,60 @@ function _fromJSONSchema(schema: JSONSchema7Definition | undefined): z.ZodType {
   }
   return DEFAULT_TYPE
 }
+
+function applyZuiPropsRecursively(zodField: z.ZodTypeAny, jsonSchemaField: any) {
+  if (jsonSchemaField[zuiKey] && zodField._def) {
+    if (zodField._def.typeName === 'ZodOptional') {
+      zodField._def.innerType._def[zuiKey] = jsonSchemaField[zuiKey]
+    } else {
+      zodField._def[zuiKey] = jsonSchemaField[zuiKey]
+    }
+  }
+
+  if (jsonSchemaField.description && zodField._def) {
+    if (zodField._def.typeName === 'ZodOptional') {
+      zodField._def.innerType._def.description = jsonSchemaField.description
+    } else {
+      zodField._def.description = jsonSchemaField.description
+    }
+  }
+
+  if (zodField._def?.typeName === 'ZodObject' && jsonSchemaField.type === 'object' && jsonSchemaField.properties) {
+    Object.entries(jsonSchemaField.properties).forEach(([key, nestedField]) => {
+      const shape = typeof zodField._def.shape === 'function' ? zodField._def.shape() : zodField._def.shape
+
+      if (shape[key]) {
+        applyZuiPropsRecursively(shape[key], nestedField)
+      }
+    })
+  }
+
+  if (
+    zodField._def?.typeName === 'ZodRecord' &&
+    jsonSchemaField.type === 'object' &&
+    jsonSchemaField.additionalProperties
+  ) {
+    applyZuiPropsRecursively(zodField._def.valueType, jsonSchemaField.additionalProperties)
+  }
+
+  if (jsonSchemaField.type === 'array' && jsonSchemaField.items) {
+    const items = jsonSchemaField.items
+
+    if (typeof items === 'object' && !Array.isArray(items)) {
+      const arrayShape = zodField._def.type
+
+      if (arrayShape) {
+        applyZuiPropsRecursively(arrayShape, items)
+      }
+    } else if (Array.isArray(items)) {
+      items.forEach((item, index) => {
+        const def: z.ZodDef = zodField._def
+
+        if (def.typeName === z.ZodFirstPartyTypeKind.ZodTuple) {
+          applyZuiPropsRecursively(def.items[index]!, item)
+        }
+      })
+    }
+  }
+}
+

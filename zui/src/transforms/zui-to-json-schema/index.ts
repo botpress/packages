@@ -83,7 +83,7 @@ export function toJSONSchema(schema: z.Schema): json.Schema {
         .map(([key, value]) => [key, toJSONSchema(value)] satisfies [string, json.Schema])
 
       let additionalProperties: json.ObjectSchema['additionalProperties'] = false
-      if (def.unknownKeys instanceof z.ZodType) {
+      if (def.unknownKeys instanceof z.ZodType && !(def.unknownKeys instanceof z.ZodNever)) {
         additionalProperties = toJSONSchema(def.unknownKeys)
       } else if (def.unknownKeys === 'passthrough') {
         additionalProperties = true

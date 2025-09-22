@@ -325,4 +325,117 @@ describe.concurrent('zuifromJSONSchemaNext', () => {
     const expected = z.ref('foo')
     assert(zSchema).toEqual(expected)
   })
+
+  test('should map extensions (x-zui) to zod schema', () => {
+    const jSchema = buildSchema({ type: 'string' }, { secret: true })
+    const zSchema = fromJSONSchema(jSchema)
+    const expected = z.string().secret()
+    assert(zSchema).toEqual(expected)
+    // Will never fail, tested at the previous line
+    if (zSchema instanceof z.ZodString) {
+      expect(zSchema._def['x-zui']?.secret, 'Expected secret to be true').toBe(true)
+    }
+  })
+
+  test('should map extensions (x-zui) to zod schema for ZodOptional', () => {
+    const jSchema = buildSchema({
+      type: 'object',
+      properties: {
+        optional: {
+          type: 'string',
+          'x-zui': {
+            secret: true
+          }
+        }
+      }
+    } as JSONSchema7)
+    const zSchema = fromJSONSchema(jSchema)
+    const expected = z.object({
+      optional: z.optional(z.string().secret())
+    })
+    assert(zSchema).toEqual(expected)
+    // Will never fail, tested at the previous line
+    if (zSchema instanceof z.ZodObject) {
+      const field = zSchema._def.shape().optional as z.ZodOptional<z.ZodString>
+      expect(field._def.innerType._def['x-zui']?.secret, 'Expected secret to be true').toBe(true)
+    }
+  })
+
+  test('should map title in ZuiJSONSchema to zod schema', () => {
+    const jSchema = buildSchema({
+      type: 'object',
+      properties: {
+        stringWithTitle: {
+          type: 'string',
+          'x-zui': {
+            title: 'This is a title',
+          },
+        },
+        objectWithTitle: {
+          type: 'object',
+          properties: {
+            propertyWithTitle: {
+              type: 'number',
+              'x-zui': {
+                title: 'Title number',
+              },
+            },
+          },
+          'x-zui': {
+            title: 'This object has a title',
+          },
+          required: [
+            'propertyWithTitle',
+          ],
+        },
+      },
+      required: [
+        'stringWithTitle', 'objectWithTitle'
+      ],
+    } as JSONSchema7)
+    const expected = z.object({
+      stringWithTitle: z.string().title('This is a title'),
+      objectWithTitle: z.object({
+        propertyWithTitle: z.number().title('Title number'),
+      }).title('This object has a title'),
+    })
+    const zSchema = fromJSONSchema(jSchema)
+    assert(zSchema).toEqual(expected)
+  })
+
+  test('should map desciptions in ZuiJSONSchema to zod schema', () => {
+    const jSchema = buildSchema({
+      type: 'object',
+      properties: {
+        stringWithDescription: {
+          type: 'string',
+          description: 'This is a description',
+        },
+        objectWithDescription: {
+          type: 'object',
+          properties: {
+            propertyWithDescription: {
+              type: 'number',
+              description: 'description number',
+            },
+          },
+          description: 'This object has a description',
+          required: [
+            'propertyWithDescription',
+          ],
+        },
+      },
+      required: [
+        'stringWithDescription', 'objectWithDescription'
+      ],
+    } as JSONSchema7)
+    const expected = z.object({
+      stringWithDescription: z.string().describe('This is a description'),
+      objectWithDescription: z.object({
+        propertyWithDescription: z.number().describe('description number'),
+      }).describe('This object has a description'),
+    })
+    const zSchema = fromJSONSchema(jSchema)
+    assert(zSchema).toEqual(expected)
+  })
 })

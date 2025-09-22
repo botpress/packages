@@ -344,14 +344,14 @@ describe.concurrent('zuifromJSONSchemaNext', () => {
         optional: {
           type: 'string',
           'x-zui': {
-            secret: true
-          }
-        }
-      }
+            secret: true,
+          },
+        },
+      },
     } as JSONSchema7)
     const zSchema = fromJSONSchema(jSchema)
     const expected = z.object({
-      optional: z.optional(z.string().secret())
+      optional: z.optional(z.string().secret()),
     })
     assert(zSchema).toEqual(expected)
     // Will never fail, tested at the previous line
@@ -384,20 +384,18 @@ describe.concurrent('zuifromJSONSchemaNext', () => {
           'x-zui': {
             title: 'This object has a title',
           },
-          required: [
-            'propertyWithTitle',
-          ],
+          required: ['propertyWithTitle'],
         },
       },
-      required: [
-        'stringWithTitle', 'objectWithTitle'
-      ],
+      required: ['stringWithTitle', 'objectWithTitle'],
     } as JSONSchema7)
     const expected = z.object({
       stringWithTitle: z.string().title('This is a title'),
-      objectWithTitle: z.object({
-        propertyWithTitle: z.number().title('Title number'),
-      }).title('This object has a title'),
+      objectWithTitle: z
+        .object({
+          propertyWithTitle: z.number().title('Title number'),
+        })
+        .title('This object has a title'),
     })
     const zSchema = fromJSONSchema(jSchema)
     assert(zSchema).toEqual(expected)
@@ -420,20 +418,18 @@ describe.concurrent('zuifromJSONSchemaNext', () => {
             },
           },
           description: 'This object has a description',
-          required: [
-            'propertyWithDescription',
-          ],
+          required: ['propertyWithDescription'],
         },
       },
-      required: [
-        'stringWithDescription', 'objectWithDescription'
-      ],
+      required: ['stringWithDescription', 'objectWithDescription'],
     } as JSONSchema7)
     const expected = z.object({
       stringWithDescription: z.string().describe('This is a description'),
-      objectWithDescription: z.object({
-        propertyWithDescription: z.number().describe('description number'),
-      }).describe('This object has a description'),
+      objectWithDescription: z
+        .object({
+          propertyWithDescription: z.number().describe('description number'),
+        })
+        .describe('This object has a description'),
     })
     const zSchema = fromJSONSchema(jSchema)
     assert(zSchema).toEqual(expected)

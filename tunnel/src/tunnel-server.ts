@@ -90,15 +90,16 @@ export class TunnelServer {
       ws.close(code, reason)
       return
     }
-    const { tunnelId } = parseResult
-    const tunnel = new TunnelHead(tunnelId, ws)
-    tunnel.events.once('close', () => this._handleDisconnection(tunnelId))
-    this.events.emit('connection', tunnel)
 
+    const { tunnelId } = parseResult
     if (this._tunnels[tunnelId]) {
       ws.close(errors.CLOSE_CODES.TUNNEL_ID_CONFLICT, 'tunnel ID already in use')
       return
     }
+
+    const tunnel = new TunnelHead(tunnelId, ws)
+    tunnel.events.once('close', () => this._handleDisconnection(tunnelId))
+    this.events.emit('connection', tunnel)
 
     this._tunnels[tunnelId] = tunnel
   }

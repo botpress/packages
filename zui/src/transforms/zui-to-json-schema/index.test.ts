@@ -99,7 +99,7 @@ describe('zuiToJSONSchemaNext', () => {
     })
   })
 
-  test('should map strict ZodObject to ObjectSchema with addtionalProperties never', () => {
+  test('should map strict ZodObject to ObjectSchema with additionalProperties never', () => {
     const schema = toJSONSchema(z.object({ name: z.string() }).strict())
     expect(schema).toEqual({
       type: 'object',
@@ -109,7 +109,7 @@ describe('zuiToJSONSchemaNext', () => {
     })
   })
 
-  test('should map passthrough ZodObject to ObjectSchema with addtionalProperties any', () => {
+  test('should map passthrough ZodObject to ObjectSchema with additionalProperties any', () => {
     const schema = toJSONSchema(z.object({ name: z.string() }).passthrough())
     expect(schema).toEqual({
       type: 'object',
@@ -119,7 +119,7 @@ describe('zuiToJSONSchemaNext', () => {
     })
   })
 
-  test('should map ZodObject with catchall ZodNumber to ObjectSchema with addtionalProperties number', () => {
+  test('should map ZodObject with catchall ZodNumber to ObjectSchema with additionalProperties number', () => {
     const schema = toJSONSchema(z.object({ name: z.string() }).catchall(z.number()))
     expect(schema).toEqual({
       type: 'object',
@@ -334,7 +334,7 @@ describe('zuiToJSONSchemaNext', () => {
     })
   })
 
-  test('should map ZodDefault to ZuiJSONSchema with default anotation', () => {
+  test('should map ZodDefault to ZuiJSONSchema with default annotation', () => {
     const schema = toJSONSchema(z.string().default('hello'))
     expect(schema).toEqual({
       type: 'string',
@@ -362,7 +362,7 @@ describe('zuiToJSONSchemaNext', () => {
     expect(() => toJSONSchema(z.symbol())).toThrowError(errs.UnsupportedZuiToJSONSchemaError)
   })
 
-  test('should map ZodReadonly to ZuiJSONSchema with readOnly anotation', () => {
+  test('should map ZodReadonly to ZuiJSONSchema with readOnly annotation', () => {
     const schema = toJSONSchema(z.string().readonly())
     expect(schema).toEqual({
       type: 'string',

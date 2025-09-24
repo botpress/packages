@@ -7,7 +7,7 @@ import {
   escapeString,
 } from './utils'
 
-describe.concurrent('primitiveToTypscriptLiteral', () => {
+describe.concurrent('primitiveToTypeScriptLiteral', () => {
   it('converts a string to a valid typescript string value', () => {
     const input: string = 'hello'
     const tsValue: string = primitiveToTypescriptValue(input)
@@ -50,7 +50,7 @@ describe.concurrent('primitiveToTypscriptLiteral', () => {
     expect(typeof actual).toEqual('symbol')
     expect(actual.description).toEqual(input.description)
   })
-  it('converts a undefined to a valid typescript undefined value', () => {
+  it('converts an undefined to a valid typescript undefined value', () => {
     const input: undefined = undefined
     const tsValue: string = primitiveToTypescriptValue(input)
     const actual = eval(tsValue)

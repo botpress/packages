@@ -305,14 +305,14 @@ describe.concurrent('zuifromJSONSchemaNext', () => {
     assert(zSchema).toEqual(expected)
   })
 
-  test('should map ZuiJSONSchema to ZodDefault if it contains default anotation', () => {
+  test('should map ZuiJSONSchema to ZodDefault if it contains default annotation', () => {
     const jSchema = buildSchema({ type: 'string', default: 'hello' })
     const zSchema = fromJSONSchema(jSchema)
     const expected = z.string().default('hello')
     assert(zSchema).toEqual(expected)
   })
 
-  test('should map ZuiJSONSchema to ZodReadonly if it contains readOnly anotation', () => {
+  test('should map ZuiJSONSchema to ZodReadonly if it contains readOnly annotation', () => {
     const jSchema = buildSchema({ type: 'string', readOnly: true })
     const zSchema = fromJSONSchema(jSchema)
     const expected = z.string().readonly()

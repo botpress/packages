@@ -3,7 +3,7 @@ import { parseDiscriminator } from './parseDiscriminator'
 
 describe('parseDiscriminator', () => {
   it('should create a discriminated union from two or more schemas', () => {
-    const male = `z.object({ "gender": z.literal("male"), "strenght": z.number() })`
+    const male = `z.object({ "gender": z.literal("male"), "strength": z.number() })`
     const female = `z.object({ "gender": z.literal("female"), "wisdom": z.number() })`
 
     expect(
@@ -17,11 +17,11 @@ describe('parseDiscriminator', () => {
                   type: 'string',
                   const: 'male',
                 },
-                strenght: {
+                strength: {
                   type: 'number',
                 },
               },
-              required: ['gender', 'strenght'],
+              required: ['gender', 'strength'],
             },
             {
               type: 'object',

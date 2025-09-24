@@ -149,10 +149,10 @@ pub fn levenshtein_distance(a: &str, b: &str) -> usize {
             let bj = b_chars[j - 1];
             let ai = a_chars[i - 1];
 
-            let substitition_cost = if bj == ai { 0 } else { 1 };
+            let substitution_cost = if bj == ai { 0 } else { 1 };
 
             res = lodash::min(&[
-                tmp + substitition_cost, // substitution
+                tmp + substitution_cost, // substitution
                 res + 1,                 // insertion
                 row[i] + 1,              // deletion
             ])

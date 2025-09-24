@@ -46,14 +46,14 @@ test('retry-cli help should run successfully', async () => {
   expect(exitCode).toBe(0)
 })
 
-test('retry-cli retry of a successfull command should run successfully once', async () => {
+test('retry-cli retry of a successful command should run successfully once', async () => {
   const { stderr, stdout, exitCode } = await runCommand(`${RETRY} -n 20 -- echo "HELLO WORLD"`)
   expect(stderr).toBe('')
   expect(parseStd(stdout)).toEqual(['HELLO WORLD'])
   expect(exitCode).toBe(0)
 })
 
-test('retry-cli retry of an unsuccessfull command should retry n + 1 times', async () => {
+test('retry-cli retry of an unsuccessful command should retry n + 1 times', async () => {
   const { stderr, exitCode } = await runCommand(
     `${RETRY} -n 5 -f 0 -- node -e "console.error('### ERROR'); process.exit(42)"`
   )

@@ -355,7 +355,7 @@ describe('String validations', () => {
     expect(jsonSchemaParse).toEqual(jsonSchema)
   })
 
-  it('should include include the pattern error message in the top level with other messages if there is only one pattern', () => {
+  it('should include the pattern error message in the top level with other messages if there is only one pattern', () => {
     const formatMessage = 'not a uuid'
     const regex = /cool/
     const regexErrorMessage = "doesn't match regex " + regex.source

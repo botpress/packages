@@ -6,7 +6,7 @@ import { ZuiExtensionObject } from '../../ui/types'
 /**
  * Definitions:
  *
- * Mutiple zui schemas map to the same JSON schema; undefined/never, any/unknown, union/discriminated-union
+ * Multiple zui schemas map to the same JSON schema; undefined/never, any/unknown, union/discriminated-union
  * Adding some ZodDef to the ZuiExtension allows us to differentiate between them
  */
 type NullableDef = util.Satisfies<{ typeName: z.ZodFirstPartyTypeKind.ZodNullable }, Partial<z.ZodNullableDef>>

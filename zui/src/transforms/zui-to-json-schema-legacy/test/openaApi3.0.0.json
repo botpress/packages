@@ -1439,7 +1439,7 @@
       },
       "additionalProperties": false,
       "not": {
-        "description": "Operation Id and Operation Ref are mutually exclusive",
+        "description": "Operation ID and Operation Ref are mutually exclusive",
         "required": ["operationId", "operationRef"]
       }
     },

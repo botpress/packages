@@ -7,7 +7,7 @@ import { UIComponentDefinitions } from '../../ui/types'
 
 const evalZui = (source: string): ZodSchema => {
   const evalResult = evalZuiString(source)
-  if (!evalResult.sucess) {
+  if (!evalResult.success) {
     throw new Error(`${evalResult.error}: ${source}`)
   }
   return evalResult.value

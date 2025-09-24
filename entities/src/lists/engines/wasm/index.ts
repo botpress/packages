@@ -21,7 +21,7 @@ const maybeInitialize = () => {
  *   It seems that, someone in the process is responsible for freeing them, but I don't know who.
  *   It is not really clear in the wasm-bindgen documentation, and the generated code is not easy to read.
  *
- *   However, outputs of wasm functions must be freed, otherwise there will be memory leaks.
+ *   However, outputs of wasm functions must be freed; otherwise, there will be memory leaks.
  */
 
 type Model = ListEntityModel

@@ -113,12 +113,9 @@ describe('jsonSchemaToZui', () => {
     const expected = z.object({
       optional: z.optional(z.string().secret()),
     })
-    expect(JSON.stringify(zSchema)).toEqual(JSON.stringify(expected))
-    // Will never fail, tested at the previous line
-    if (zSchema instanceof z.ZodObject) {
-      const field = zSchema._def.shape().optional as z.ZodOptional<z.ZodString>
-      expect(field._def.innerType._def['x-zui']?.secret, 'Expected secret to be true').toBe(true)
-    }
+    expect(zSchema.isEqual(expected)).toBe(true)
+    const field = (zSchema as z.ZodObject)._def.shape().optional as z.ZodOptional<z.ZodString>
+    expect(field._def.innerType._def['x-zui']?.secret, 'Expected secret to be true').toBe(true)
   })
 
   test('convert object with nested', () => {

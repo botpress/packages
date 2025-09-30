@@ -7,6 +7,7 @@ describe('Root schema result after parsing', () => {
   it('should return the schema directly in the root if no name is passed', () => {
     expect(zodToJsonSchema(z.any())).toEqual({
       $schema: 'http://json-schema.org/draft-07/schema#',
+      type: 'any',
       [zuiKey]: {},
     })
   })
@@ -15,7 +16,7 @@ describe('Root schema result after parsing', () => {
       $schema: 'http://json-schema.org/draft-07/schema#',
       $ref: `#/definitions/MySchema`,
       definitions: {
-        MySchema: { [zuiKey]: {} },
+        MySchema: { type: 'any', [zuiKey]: {} },
       },
     })
   })
@@ -25,7 +26,7 @@ describe('Root schema result after parsing', () => {
       $schema: 'http://json-schema.org/draft-07/schema#',
       $ref: `#/$defs/MySchema`,
       $defs: {
-        MySchema: { [zuiKey]: {} },
+        MySchema: { type: 'any', [zuiKey]: {} },
       },
     })
   })
@@ -35,7 +36,12 @@ describe('Root schema result after parsing', () => {
       zodToJsonSchema(z.union([z.any(), z.instanceof(String), z.string(), z.number()]), { strictUnions: false }),
     ).toEqual({
       $schema: 'http://json-schema.org/draft-07/schema#',
-      anyOf: [{ [zuiKey]: {} }, { [zuiKey]: {} }, { type: 'string', [zuiKey]: {} }, { type: 'number', [zuiKey]: {} }],
+      anyOf: [
+        { type: 'any', [zuiKey]: {} },
+        { type: 'any', [zuiKey]: {} },
+        { type: 'string', [zuiKey]: {} },
+        { type: 'number', [zuiKey]: {} },
+      ],
       [zuiKey]: {},
     })
   })
@@ -45,7 +51,12 @@ describe('Root schema result after parsing', () => {
       zodToJsonSchema(z.union([z.any(), z.instanceof(String), z.string(), z.number()]), { strictUnions: true }),
     ).toEqual({
       $schema: 'http://json-schema.org/draft-07/schema#',
-      anyOf: [{ [zuiKey]: {} }, { [zuiKey]: {} }, { type: 'string', [zuiKey]: {} }, { type: 'number', [zuiKey]: {} }],
+      anyOf: [
+        { type: 'any', [zuiKey]: {} },
+        { type: 'any', [zuiKey]: {} },
+        { type: 'string', [zuiKey]: {} },
+        { type: 'number', [zuiKey]: {} },
+      ],
       [zuiKey]: {},
     })
   })
@@ -64,8 +75,8 @@ describe('Root schema result after parsing', () => {
       properties: {
         field: {
           anyOf: [
-            { [zuiKey]: {} },
-            { [zuiKey]: {} },
+            { type: 'any', [zuiKey]: {} },
+            { type: 'any', [zuiKey]: {} },
             { type: 'string', [zuiKey]: {} },
             { type: 'number', [zuiKey]: {} },
           ],

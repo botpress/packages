@@ -20,7 +20,7 @@ describe('set', () => {
       maxItems: 10,
       errorMessage: errs,
       uniqueItems: true,
-      items: { [zuiKey]: {} },
+      items: { [zuiKey]: {}, type: 'any' },
     }
     const zodSchema = z.set(z.any()).min(5, minSizeError).max(10, maxSizeError)
     const jsonParsedSchema = parseSetDef(zodSchema._def, errorReferences())
@@ -33,7 +33,7 @@ describe('set', () => {
       minItems: 5,
       maxItems: 10,
       uniqueItems: true,
-      items: { [zuiKey]: {} },
+      items: { [zuiKey]: {}, type: 'any' },
     }
     const zodSchema = z.set(z.any()).min(5).max(10)
     const jsonParsedSchema = parseSetDef(zodSchema._def, errorReferences())

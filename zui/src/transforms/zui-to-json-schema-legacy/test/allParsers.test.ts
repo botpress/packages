@@ -101,26 +101,43 @@ describe('All Parsers tests', () => {
       description: 'watup',
       properties: {
         any: {
+          type: 'any',
           'x-zui': {},
         },
         array: {
           type: 'array',
+          items: {
+            type: 'any',
+            'x-zui': {},
+          },
           'x-zui': {},
         },
         arrayMax: {
           maxItems: 1,
           type: 'array',
+          items: {
+            type: 'any',
+            'x-zui': {},
+          },
           'x-zui': {},
         },
         arrayMin: {
           minItems: 1,
           type: 'array',
+          items: {
+            type: 'any',
+            'x-zui': {},
+          },
           'x-zui': {},
         },
         arrayMinMax: {
           maxItems: 1,
           minItems: 1,
           type: 'array',
+          items: {
+            type: 'any',
+            'x-zui': {},
+          },
           'x-zui': {},
         },
         bigInt: {
@@ -139,6 +156,7 @@ describe('All Parsers tests', () => {
         },
         default: {
           default: 42,
+          type: 'any',
           'x-zui': {},
         },
         effectPreprocess: {
@@ -508,25 +526,42 @@ describe('All Parsers tests', () => {
       description: 'watup',
       properties: {
         any: {
+          type: 'any',
           'x-zui': {},
         },
         array: {
           type: 'array',
+          items: {
+            type: 'any',
+            'x-zui': {},
+          },
           'x-zui': {},
         },
         arrayMax: {
           maxItems: 1,
           type: 'array',
+          items: {
+            type: 'any',
+            'x-zui': {},
+          },
           'x-zui': {},
         },
         arrayMin: {
           minItems: 1,
           type: 'array',
+          items: {
+            type: 'any',
+            'x-zui': {},
+          },
           'x-zui': {},
         },
         arrayMinMax: {
           maxItems: 1,
           minItems: 1,
+          items: {
+            type: 'any',
+            'x-zui': {},
+          },
           type: 'array',
           'x-zui': {},
         },
@@ -546,6 +581,7 @@ describe('All Parsers tests', () => {
         },
         default: {
           default: 42,
+          type: 'any',
           'x-zui': {},
         },
         effectPreprocess: {

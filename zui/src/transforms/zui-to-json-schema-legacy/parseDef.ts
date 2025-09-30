@@ -190,7 +190,7 @@ const selectParser = (def: any, typeName: ZodFirstPartyTypeKind, refs: Refs): Js
     case ZodFirstPartyTypeKind.ZodEffects:
       return parseEffectsDef(def, refs)
     case ZodFirstPartyTypeKind.ZodAny:
-      return parseAnyDef()
+      return parseAnyDef(def)
     case ZodFirstPartyTypeKind.ZodUnknown:
       return parseUnknownDef()
     case ZodFirstPartyTypeKind.ZodDefault:

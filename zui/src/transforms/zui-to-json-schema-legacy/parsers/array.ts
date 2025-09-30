@@ -2,7 +2,7 @@ import { zuiKey } from '../../../ui/constants'
 import { ZuiExtensionObject } from '../../../ui/types'
 import { ZodArrayDef, ZodFirstPartyTypeKind } from '../../../z/index'
 import { ErrorMessages, setResponseValueAndErrors } from '../errorMessages'
-import { JsonSchema7Type, parseDef } from '../parseDef'
+import { addMeta, JsonSchema7Type, parseDef } from '../parseDef'
 import { Refs } from '../Refs'
 
 export type JsonSchema7ArrayType = {
@@ -19,12 +19,10 @@ export function parseArrayDef(def: ZodArrayDef, refs: Refs) {
     type: 'array',
   }
 
-  if (def.type?._def?.typeName !== ZodFirstPartyTypeKind.ZodAny) {
-    res.items = parseDef(def.type._def, {
-      ...refs,
-      currentPath: [...refs.currentPath, 'items'],
-    })
-  }
+  res.items = parseDef(def.type._def, {
+    ...refs,
+    currentPath: [...refs.currentPath, 'items'],
+  })
 
   if (def.minLength) {
     setResponseValueAndErrors(res, 'minItems', def.minLength.value, def.minLength.message, refs)

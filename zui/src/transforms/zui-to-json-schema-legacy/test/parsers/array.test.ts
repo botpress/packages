@@ -23,6 +23,10 @@ describe('Arrays and array validations', () => {
     const parsedSchema = parseArrayDef(z.array(z.any())._def, getRefs())
     const jsonSchema: JSONSchema7Type = {
       type: 'array',
+      items: {
+        type: 'any',
+        [zuiKey]: {},
+      },
     }
     expect(parsedSchema).toEqual(jsonSchema)
   })
@@ -57,6 +61,10 @@ describe('Arrays and array validations', () => {
     const jsonSchema: JSONSchema7Type = {
       type: 'array',
       minItems: 1,
+      items: {
+        type: 'any',
+        [zuiKey]: {},
+      },
     }
     expect(parsedSchema).toEqual(jsonSchema)
   })
@@ -80,6 +88,10 @@ describe('Arrays and array validations', () => {
       type: 'array',
       minItems: 5,
       maxItems: 10,
+      items: {
+        type: 'any',
+        [zuiKey]: {},
+      },
       errorMessage: {
         minItems: minLengthMessage,
         maxItems: maxLengthMessage,
@@ -96,6 +108,10 @@ describe('Arrays and array validations', () => {
       type: 'array',
       minItems: 5,
       maxItems: 5,
+      items: {
+        type: 'any',
+        [zuiKey]: {},
+      },
       errorMessage: {
         minItems: exactLengthMessage,
         maxItems: exactLengthMessage,
@@ -112,12 +128,17 @@ describe('Arrays and array validations', () => {
       type: 'array',
       minItems: 5,
       maxItems: 10,
+      items: {
+        type: 'any',
+        [zuiKey]: {},
+      },
     }
     const zodArraySchema = z.array(z.any()).min(5).max(10)
     const jsonParsedSchema = parseArrayDef(zodArraySchema._def, errorReferences())
 
     expect(jsonSchema).toEqual(jsonParsedSchema)
   })
+
   it("should not include error messages if it isn't explicitly set to true in References constructor", () => {
     const zodSchemas = [z.array(z.any()).min(1, 'bad'), z.array(z.any()).max(1, 'bad')]
     for (const schema of zodSchemas) {

@@ -18,6 +18,10 @@ defaults:
   run:
     working-directory: ./yargs-extra
 
+permissions:
+  id-token: write
+  contents: read
+
 jobs:
   yargs-extra:
     runs-on: ubuntu-latest
@@ -35,9 +39,13 @@ jobs:
       - run: pnpm build
       - run: pnpm check:type
       - run: pnpm test
+
+      - name: update npm
+        shell: bash
+        run: npm install -g npm@^11.5.1 # Required for OIDC login
+
       - name: Publish
         if: github.ref == 'refs/heads/master' || github.event_name == 'workflow_dispatch'
         uses: botpress/gh-actions/publish-if-not-exists@master
         with:
           path: './yargs-extra'
-          token: '${{ secrets.NPM_ACCESS_TOKEN }}'

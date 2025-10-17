@@ -1,8 +1,11 @@
 {
   "name": "@bpinternal/depsynky",
   "version": "0.2.3",
-  "description": "CLI to synchronize dependencies accross a pnpm mono-repo",
+  "description": "CLI to synchronize dependencies across a pnpm mono-repo",
   "main": "dist/index.js",
+  "repository": {
+    "url": "https://github.com/botpress/packages"
+  },
   "scripts": {
     "check:type": "tsc --noEmit",
     "build": "esbuild --bundle --platform=node --outdir=dist src/index.ts",

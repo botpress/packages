@@ -3,6 +3,9 @@
   "version": "0.0.13",
   "description": "",
   "main": "dist/index.js",
+  "repository": {
+    "url": "https://github.com/botpress/packages"
+  },
   "bin": {
     "es-node": "bin.js"
   },

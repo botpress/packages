@@ -5,6 +5,9 @@
   "main": "./dist/index.js",
   "module": "./dist/index.mjs",
   "types": "./dist/index.d.ts",
+  "repository": {
+    "url": "https://github.com/botpress/packages"
+  },
   "exports": {
     ".": {
       "require": "./dist/index.js",

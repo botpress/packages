@@ -18,6 +18,10 @@ defaults:
   run:
     working-directory: ./tunnel
 
+permissions:
+  id-token: write
+  contents: read
+
 jobs:
   tunnel:
     runs-on: ubuntu-22.04
@@ -40,4 +44,3 @@ jobs:
         uses: botpress/gh-actions/publish-if-not-exists@master
         with:
           path: './tunnel'
-          token: '${{ secrets.NPM_ACCESS_TOKEN }}'

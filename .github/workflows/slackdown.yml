@@ -18,6 +18,10 @@ defaults:
   run:
     working-directory: ./slackdown
 
+permissions:
+  id-token: write
+  contents: read
+
 jobs:
   slackdown:
     runs-on: ubuntu-latest
@@ -41,4 +45,3 @@ jobs:
         uses: botpress/gh-actions/publish-if-not-exists@master
         with:
           path: './slackdown'
-          token: '${{ secrets.NPM_ACCESS_TOKEN }}'

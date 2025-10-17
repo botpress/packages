@@ -6,7 +6,7 @@
   "license": "0BSD",
   "repository": {
     "type": "git",
-    "url": "https://github.com/botpress/slackdown"
+    "url": "https://github.com/botpress/packages"
   },
   "type": "module",
   "source": "./src/index.ts",

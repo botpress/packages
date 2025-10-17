@@ -5,6 +5,9 @@
   "main": "./dist/node/index.js",
   "module": "./dist/web/index.js",
   "types": "./dist/types/index.d.ts",
+  "repository": {
+    "url": "https://github.com/botpress/packages"
+  },
   "scripts": {
     "check": "pnpm run check:type",
     "check:type": "tsc --noEmit",

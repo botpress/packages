@@ -1,6 +1,9 @@
 {
   "name": "@bpinternal/readiness",
   "version": "0.0.17",
+  "repository": {
+    "url": "https://github.com/botpress/packages"
+  },
   "scripts": {
     "build": "pnpm run check:type && esbuild --bundle --platform=node --outdir=dist src/index.ts",
     "start": "node dist/index.js",

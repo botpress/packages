@@ -18,6 +18,10 @@ defaults:
   run:
     working-directory: ./es-node
 
+permissions:
+  id-token: write
+  contents: read
+
 jobs:
   es-node:
     runs-on: ubuntu-latest
@@ -39,4 +43,3 @@ jobs:
         uses: botpress/gh-actions/publish-if-not-exists@master
         with:
           path: './es-node'
-          token: '${{ secrets.NPM_ACCESS_TOKEN }}'

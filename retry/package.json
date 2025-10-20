@@ -3,6 +3,9 @@
   "version": "0.1.2",
   "description": "Retry with exponential backoff for the command line.",
   "main": "dist/index.js",
+  "repository": {
+    "url": "https://github.com/botpress/packages"
+  },
   "bin": {
     "retry": "./bin.js"
   },

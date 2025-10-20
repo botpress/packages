@@ -5,6 +5,9 @@
   "main": "dist/index.cjs",
   "module": "./dist/index.mjs",
   "types": "dist/src/index.d.ts",
+  "repository": {
+    "url": "https://github.com/botpress/packages"
+  },
   "scripts": {
     "build:node": "node build-node.js",
     "build:browser": "node build-browser.js",

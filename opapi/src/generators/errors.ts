@@ -9,6 +9,7 @@ const codes = {
   HTTP_STATUS_METHOD_NOT_ALLOWED: 405,
   HTTP_STATUS_REQUEST_TIMEOUT: 408,
   HTTP_STATUS_CONFLICT: 409,
+  HTTP_STATUS_GONE: 410,
   HTTP_STATUS_PAYLOAD_TOO_LARGE: 413,
   HTTP_STATUS_UNSUPPORTED_MEDIA_TYPE: 415,
   HTTP_STATUS_DEPENDENCY_FAILED: 424,
@@ -19,6 +20,8 @@ const codes = {
   HTTP_STATUS_SERVICE_UNAVAILABLE: 503,
   HTTP_STATUS_GATEWAY_TIMEOUT: 504,
 } as const satisfies Record<string, ApiError['status']>
+type _AssertExtends<_A extends B, B> = true
+type _AssertCodesDictIsExhaustive = _AssertExtends<ApiError['status'], (typeof codes)[keyof typeof codes]>
 
 export function generateErrors(errors: ApiError[]) {
   const types = errors.map((error) => error.type)

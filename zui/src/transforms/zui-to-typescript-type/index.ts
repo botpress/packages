@@ -76,6 +76,7 @@ export type TypescriptGenerationOptions = {
    * This improves readability for large type declarations by adding comments like "// end of TypeName".
    */
   includeClosingTags?: boolean
+  treatDefaultAsOptional?: boolean
 }
 
 type SchemaTypes = z.Schema | KeyValue | FnParameters | Declaration | null
@@ -84,6 +85,7 @@ type InternalOptions = {
   parent?: SchemaTypes
   declaration?: boolean | TypescriptDeclarationType
   includeClosingTags?: boolean
+  treatDefaultAsOptional?: boolean
 }
 
 /**
@@ -304,7 +306,8 @@ ${value}`.trim()
       return `${sUnwrapZod(def.innerType, newConfig)} | null`
 
     case z.ZodFirstPartyTypeKind.ZodDefault:
-      return sUnwrapZod(def.innerType, newConfig)
+      const defaultInnerType = config.treatDefaultAsOptional ? def.innerType.optional() : def.innerType
+      return sUnwrapZod(defaultInnerType, newConfig)
 
     case z.ZodFirstPartyTypeKind.ZodCatch:
       return sUnwrapZod(def.innerType, newConfig)

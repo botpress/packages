@@ -811,6 +811,36 @@ describe.concurrent('objects', () => {
         `
     await expect(typings).toMatchWithoutFormatting(expected)
   })
+
+  it('should not treat default property as optional by default', async () => {
+    const schema = z.object({
+      foo: z.string().default('hello'),
+    })
+
+    const typings = toTypescript(schema)
+    const expected = `
+        declare const x: {
+          foo: string
+        }
+      `
+    await expect(typings).toMatchWithoutFormatting(expected)
+  })
+
+  it('should treat default property as optional when treatDefaultAsOptional is true', async () => {
+    const schema = z
+      .object({
+        foo: z.string().default('hello'),
+      })
+      .title('x')
+
+    const typings = toTs(schema, { declaration: true, treatDefaultAsOptional: true })
+    const expected = `
+        declare const x: {
+          foo: string | undefined
+        }
+      `
+    await expect(typings).toMatchWithoutFormatting(expected)
+  })
 })
 
 describe.concurrent('generics', () => {

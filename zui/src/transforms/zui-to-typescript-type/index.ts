@@ -122,10 +122,17 @@ function sUnwrapZod(schema: z.Schema | KeyValue | FnParameters | Declaration | n
   }
 
   if (schema instanceof KeyValue) {
+    let optionalValue: z.ZodOptional | undefined = undefined
     if (schema.value instanceof z.ZodOptional) {
-      let innerType = schema.value._def.innerType as z.Schema
-      if (innerType instanceof z.Schema && !innerType.description && schema.value.description) {
-        innerType = innerType?.describe(schema.value.description)
+      optionalValue = schema.value
+    } else if (schema.value instanceof z.ZodDefault && config.treatDefaultAsOptional) {
+      optionalValue = schema.value._def.innerType.optional()
+    }
+
+    if (optionalValue) {
+      let innerType = optionalValue._def.innerType as z.Schema
+      if (innerType instanceof z.Schema && !innerType.description && optionalValue.description) {
+        innerType = innerType?.describe(optionalValue.description)
       }
 
       const optionalToken = schema.key.endsWith('?') ? '' : '?'

@@ -36,7 +36,10 @@ export const findReferences = (rootDir: string, pkgName: string) => {
   if (!dependency) {
     throw new errors.DepSynkyError(`Could not find package "${pkgName}"`)
   }
-  const dependents = workspaces.filter((w) => w.content.dependencies?.[pkgName] || w.content.devDependencies?.[pkgName])
+  const dependents = workspaces.filter(
+    (w) =>
+      w.content.dependencies?.[pkgName] || w.content.devDependencies?.[pkgName] || w.content.peerDependencies?.[pkgName]
+  )
   return { dependency, dependents }
 }
 

@@ -45,7 +45,7 @@ export const syncVersions = (argv: YargsConfig<typeof config.syncSchema>, opts: 
     const update = updater(content)
 
     const updatedDeps = update(dependencies, targetVersions)
-    const updatedPeerDeps = update(peerDependencies, targetVersions)
+    const updatedPeerDeps = argv.ignorePeers ? peerDependencies : update(peerDependencies, targetVersions)
     const updatedDevDeps = argv.ignoreDev ? devDependencies : update(devDependencies, targetVersions)
 
     utils.pkgjson.update(pkgPath, {

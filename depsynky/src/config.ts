@@ -9,6 +9,11 @@ const defaultOptions = {
     type: 'boolean',
     description: 'Ignore dev dependencies',
     default: false
+  },
+  ignorePeers: {
+    type: 'boolean',
+    description: 'Ignore peer dependencies',
+    default: false
   }
 } satisfies YargsSchema
 

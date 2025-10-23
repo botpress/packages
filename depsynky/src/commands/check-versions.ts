@@ -48,8 +48,8 @@ export const checkVersions = (argv: YargsConfig<typeof config.checkSchema>, opts
 
     const check = checker(content)
     check(dependencies, targetVersions)
-    check(peerDependencies, targetVersions)
-    !argv.ignoreDev && check(devDependencies, targetVersions)
+    if (!argv.ignorePeers) check(peerDependencies, targetVersions)
+    if (!argv.ignoreDev) check(devDependencies, targetVersions)
   }
 
   logger.info('All versions are in sync')

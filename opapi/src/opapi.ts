@@ -8,7 +8,18 @@ import {
   generateTypesBySection,
 } from './generator'
 import { addOperation } from './operation'
-import { ApiError, ComponentType, createState, getRef, Metadata, Operation, Options, Parameter, State } from './state'
+import {
+  ApiError,
+  ComponentType,
+  createState,
+  getRef,
+  Metadata,
+  Operation,
+  Options,
+  Parameter,
+  State,
+  Security,
+} from './state'
 import { exportStateAsTypescript, ExportStateAsTypescriptOptions } from './generators/ts-state'
 import { generateHandler } from './handler-generator'
 export { Operation, Parameter } from './state'
@@ -41,6 +52,8 @@ export type OpenApiProps<SchemaName extends string, DefaultParameterName extends
   sections?: Record<SectionName, { title: string; description: string }>
   // add the openapi errors
   errors?: readonly ApiError[]
+  // add security schemes
+  security?: Security[]
 }
 
 export type CodePostProcessor = (code: string) => Promise<string> | string

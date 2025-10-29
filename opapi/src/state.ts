@@ -29,7 +29,7 @@ export type State<SchemaName extends string, DefaultParameterName extends string
   errors?: ApiError[]
   operations: { [name: string]: Operation<DefaultParameterName, SectionName, string, 'json-schema'> }
   options?: Options
-  securitySchemes?: ('bearer' | 'basic')[]
+  security?: Security[]
 }
 
 const unknownError: ApiError = {
@@ -43,6 +43,8 @@ const internalError: ApiError = {
   type: 'Internal',
   description: 'An internal error occurred',
 }
+
+export type Security = 'BearerAuth' | 'BasicAuth'
 
 export type ApiError = {
   status: 400 | 401 | 402 | 403 | 404 | 405 | 408 | 409 | 410 | 413 | 415 | 424 | 429 | 500 | 501 | 502 | 503 | 504
@@ -226,6 +228,7 @@ type CreateStateProps<SchemaName extends string, DefaultParameterName extends st
   schemas?: Record<SchemaName, { schema: OpenApiZodAny; section: SectionName }>
   sections?: Record<SectionName, { title: string; description: string }>
   errors?: readonly ApiError[]
+  security?: Security[]
 }
 
 export function createState<SchemaName extends string, DefaultParameterName extends string, SectionName extends string>(
@@ -314,6 +317,7 @@ export function createState<SchemaName extends string, DefaultParameterName exte
     schemas,
     sections,
     options,
+    security: props.security,
   }
 }
 

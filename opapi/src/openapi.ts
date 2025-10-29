@@ -13,7 +13,7 @@ export const createOpenapi = <
 >(
   state: State<SchemaName, DefaultParameterName, SectionName>,
 ) => {
-  const { metadata, schemas, operations, securitySchemes } = state
+  const { metadata, schemas, operations, security } = state
   const { description, server, title, version } = metadata
 
   const openapi = OpenApiBuilder.create({
@@ -32,6 +32,7 @@ export const createOpenapi = <
       parameters: {},
       securitySchemes: {}
     },
+    security: security ? [Object.fromEntries(security.map((name) => [name, []]))] : undefined,
   })
 
   objects.entries(schemas).forEach(([schemaName, { schema }]) => {
@@ -61,6 +62,7 @@ export const createOpenapi = <
       operationId: operationName,
       description: operationObject.description,
       parameters: [],
+      security: operationObject.security ? [Object.fromEntries(operationObject.security.map((name) => [name, []]))] : undefined,
       responses: {
         default: responseRefSchema as ReferenceObject,
         [response.status ?? defaultResponseStatus]: responseRefSchema as ReferenceObject,
@@ -183,20 +185,19 @@ export const createOpenapi = <
   })
 
 
-  securitySchemes?.forEach((securityScheme) => {
-    if (securityScheme === 'bearer')  {
-      openapi.addSecurityScheme('bearerAuth', {
-        type: 'http',
-        scheme: 'bearer',
-        bearerFormat: 'JWT'
-      })
-    } else if (securityScheme === 'basic') {
-      openapi.addSecurityScheme('basicAuth', {
-        type: 'http',
-        scheme: 'basic',
-      })
-    }
+  openapi.addSecurityScheme('BearerAuth', {
+    type: 'http',
+    scheme: 'bearer',
   })
+  openapi.addSecurityScheme('BasicAuth', {
+    type: 'http',
+    scheme: 'basic',
+  })
+  // security?.forEach((name) => {
+  //   if (name === 'BearerAuth')  {
+  //   } else if (name === 'BasicAuth') {
+  //   }
+  // })
 
   return openapi
 }

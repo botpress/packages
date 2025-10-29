@@ -30,7 +30,7 @@ export const createOpenapi = <
       responses: {},
       requestBodies: {},
       parameters: {},
-      securitySchemes: {}
+      securitySchemes: {},
     },
     security: security ? [Object.fromEntries(security.map((name) => [name, []]))] : undefined,
   })
@@ -62,7 +62,9 @@ export const createOpenapi = <
       operationId: operationName,
       description: operationObject.description,
       parameters: [],
-      security: operationObject.security ? [Object.fromEntries(operationObject.security.map((name) => [name, []]))] : undefined,
+      security: operationObject.security
+        ? [Object.fromEntries(operationObject.security.map((name) => [name, []]))]
+        : undefined,
       responses: {
         default: responseRefSchema as ReferenceObject,
         [response.status ?? defaultResponseStatus]: responseRefSchema as ReferenceObject,

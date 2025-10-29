@@ -18,7 +18,7 @@ import {
   Options,
   Parameter,
   State,
-  Security
+  Security,
 } from './state'
 import { exportStateAsTypescript, ExportStateAsTypescriptOptions } from './generators/ts-state'
 import { generateHandler } from './handler-generator'

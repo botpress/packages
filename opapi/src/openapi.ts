@@ -184,7 +184,6 @@ export const createOpenapi = <
     openapi.rootDoc.paths[path]![method] = operation
   })
 
-
   openapi.addSecurityScheme('BearerAuth', {
     type: 'http',
     scheme: 'bearer',
@@ -193,11 +192,6 @@ export const createOpenapi = <
     type: 'http',
     scheme: 'basic',
   })
-  // security?.forEach((name) => {
-  //   if (name === 'BearerAuth')  {
-  //   } else if (name === 'BasicAuth') {
-  //   }
-  // })
 
   return openapi
 }

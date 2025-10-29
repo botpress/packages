@@ -29,6 +29,7 @@ export type State<SchemaName extends string, DefaultParameterName extends string
   errors?: ApiError[]
   operations: { [name: string]: Operation<DefaultParameterName, SectionName, string, 'json-schema'> }
   options?: Options
+  securitySchemes?: ('bearer' | 'basic')[]
 }
 
 const unknownError: ApiError = {

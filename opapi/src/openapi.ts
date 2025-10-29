@@ -13,7 +13,7 @@ export const createOpenapi = <
 >(
   state: State<SchemaName, DefaultParameterName, SectionName>,
 ) => {
-  const { metadata, schemas, operations } = state
+  const { metadata, schemas, operations, securitySchemes } = state
   const { description, server, title, version } = metadata
 
   const openapi = OpenApiBuilder.create({
@@ -30,6 +30,7 @@ export const createOpenapi = <
       responses: {},
       requestBodies: {},
       parameters: {},
+      securitySchemes: {}
     },
   })
 
@@ -179,6 +180,22 @@ export const createOpenapi = <
     }
 
     openapi.rootDoc.paths[path]![method] = operation
+  })
+
+
+  securitySchemes?.forEach((securityScheme) => {
+    if (securityScheme === 'bearer')  {
+      openapi.addSecurityScheme('bearerAuth', {
+        type: 'http',
+        scheme: 'bearer',
+        bearerFormat: 'JWT'
+      })
+    } else if (securityScheme === 'basic') {
+      openapi.addSecurityScheme('basicAuth', {
+        type: 'http',
+        scheme: 'basic',
+      })
+    }
   })
 
   return openapi

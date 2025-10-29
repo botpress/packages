@@ -221,7 +221,7 @@ export function toJSONSchema(schema: z.Schema): json.Schema {
       return {
         anyOf: [toJSONSchema(def.innerType), nullSchema()],
         'x-zui': {
-          ...def['x-zui'],
+          // ...def['x-zui'],
           def: { typeName: z.ZodFirstPartyTypeKind.ZodNullable },
         },
       } satisfies json.NullableSchema

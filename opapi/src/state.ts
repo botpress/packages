@@ -211,6 +211,8 @@ type BaseOperationProps<
     [name in DefaultParameterName]?: boolean
   }
   section?: SectionName
+  // Security of the operation
+  security?: Security[]
   // Response body of the operation
   response: {
     // Status code of the response

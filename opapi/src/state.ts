@@ -11,8 +11,21 @@ import { objects } from './objects'
 type SchemaType = 'zod-schema' | 'json-schema'
 type SchemaOfType<T extends SchemaType> = T extends 'zod-schema' ? OpenApiZodAny : SchemaObject
 
-export type Options = { allowUnions: boolean }
-const DEFAULT_OPTIONS: Options = { allowUnions: false }
+export type Tags = {
+  documented?: boolean
+  experimental?: boolean
+  deprecated?: boolean
+}
+
+export type Options = {
+  allowUnions: boolean
+  filterOperationsByTags?: Tags
+}
+
+const DEFAULT_OPTIONS: Options = {
+  allowUnions: false,
+  filterOperationsByTags: {},
+}
 
 export type State<SchemaName extends string, DefaultParameterName extends string, SectionName extends string> = {
   metadata: Metadata
@@ -222,6 +235,8 @@ type BaseOperationProps<
     schema: SchemaOfType<S>
     format?: 'binary'
   }
+  // Add tags to each operations
+  tags?: Tags
 }
 
 type CreateStateProps<SchemaName extends string, DefaultParameterName extends string, SectionName extends string> = {

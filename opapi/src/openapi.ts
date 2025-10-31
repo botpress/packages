@@ -3,10 +3,12 @@ import VError from 'verror'
 import { defaultResponseStatus } from './const'
 import { generateSchemaFromZod } from './jsonschema'
 import { objects } from './objects'
-import { ComponentType, Security, State, getRef, isOperationWithBodyProps } from './state'
+import { ComponentType, Security, Operation, State, getRef, isOperationWithBodyProps, Tags } from './state'
 import { formatBodyName, formatResponseName } from './util'
 
-const X_MINT = 'x-mint'
+const TAG_MINTLIFY = 'x-mint'
+const TAG_EXCLUDED = 'x-excluded'
+const TAG_EXPERIMENTAL = 'x-experimental'
 
 export const createOpenapi = <
   SchemaName extends string,
@@ -66,11 +68,14 @@ export const createOpenapi = <
     operationObject.security?.forEach((name) => securitySchemes.add(name))
 
     const operation: OperationObject = {
-      [X_MINT]: {
+      [TAG_EXCLUDED]: !isOperationIncluded(operationObject, state.options?.filterOperationsByTags ?? {}),
+      [TAG_EXPERIMENTAL]: operationObject.tags?.experimental,
+      [TAG_MINTLIFY]: {
         metadata: {
           title: operationName,
         },
       },
+      deprecated: operationObject.tags?.deprecated,
       operationId: operationName,
       description: operationObject.description,
       parameters: [],
@@ -212,4 +217,14 @@ export const createOpenapi = <
   }
 
   return openapi
+}
+
+const isOperationIncluded = <SchemaName extends string, DefaultParameterName extends string>(
+  operation: Operation<DefaultParameterName, SchemaName, string, 'json-schema'>,
+  filterTags: Tags,
+) => {
+  const includedByDocumentation = (filterTags.documented && operation.tags?.documented) || !filterTags.documented
+  const includedByExperimental = (filterTags.experimental && operation.tags?.experimental) || !filterTags.experimental
+  const includedByDeprecated = (filterTags.deprecated && operation.tags?.deprecated) || !filterTags.deprecated
+  return includedByDocumentation && includedByDeprecated && includedByExperimental
 }

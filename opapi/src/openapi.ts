@@ -204,10 +204,10 @@ export const createOpenapi = <
   return openapi
 }
 
-const isOperationIncluded = <
-  SchemaName extends string,
-  DefaultParameterName extends string,
->(operation: Operation<DefaultParameterName, SchemaName, string, "json-schema">, filterTags: Tags) => {
+const isOperationIncluded = <SchemaName extends string, DefaultParameterName extends string>(
+  operation: Operation<DefaultParameterName, SchemaName, string, 'json-schema'>,
+  filterTags: Tags,
+) => {
   const includedByDocumentation = (filterTags.documented && operation.tags?.documented) || !filterTags.documented
   const includedByExperimental = (filterTags.experimental && operation.tags?.experimental) || !filterTags.experimental
   const includedByDeprecated = (filterTags.deprecated && operation.tags?.deprecated) || !filterTags.deprecated

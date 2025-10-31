@@ -24,7 +24,7 @@ export type Options = {
 
 const DEFAULT_OPTIONS: Options = {
   allowUnions: false,
-  filterOperationsByTags: {}
+  filterOperationsByTags: {},
 }
 
 export type State<SchemaName extends string, DefaultParameterName extends string, SectionName extends string> = {

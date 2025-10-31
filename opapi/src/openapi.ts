@@ -3,7 +3,7 @@ import VError from 'verror'
 import { defaultResponseStatus } from './const'
 import { generateSchemaFromZod } from './jsonschema'
 import { objects } from './objects'
-import { ComponentType, Operation, State, getRef, isOperationWithBodyProps, Tags } from './state'
+import { ComponentType, Security, Operation, State, getRef, isOperationWithBodyProps, Tags } from './state'
 import { formatBodyName, formatResponseName } from './util'
 
 const TAG_EXCLUDED = 'x-excluded'
@@ -18,6 +18,9 @@ export const createOpenapi = <
 ) => {
   const { metadata, schemas, operations, security } = state
   const { description, server, title, version } = metadata
+
+  const securitySchemes: Set<Security> = new Set()
+  security?.forEach((name) => securitySchemes.add(name))
 
   const openapi = OpenApiBuilder.create({
     openapi: '3.0.0',
@@ -60,6 +63,8 @@ export const createOpenapi = <
     const responseRefSchema = generateSchemaFromZod(
       getRef(state, ComponentType.RESPONSES, responseName),
     ) as unknown as ReferenceObject
+
+    operationObject.security?.forEach((name) => securitySchemes.add(name))
 
     const operation: OperationObject = {
       [TAG_EXCLUDED]: !isOperationIncluded(operationObject, state.options?.filterOperationsByTags ?? {}),
@@ -192,14 +197,18 @@ export const createOpenapi = <
     openapi.rootDoc.paths[path]![method] = operation
   })
 
-  openapi.addSecurityScheme('BearerAuth', {
-    type: 'http',
-    scheme: 'bearer',
-  })
-  openapi.addSecurityScheme('BasicAuth', {
-    type: 'http',
-    scheme: 'basic',
-  })
+  if (securitySchemes.has('BearerAuth')) {
+    openapi.addSecurityScheme('BearerAuth', {
+      type: 'http',
+      scheme: 'bearer',
+    })
+  }
+  if (securitySchemes.has('BasicAuth')) {
+    openapi.addSecurityScheme('BasicAuth', {
+      type: 'http',
+      scheme: 'basic',
+    })
+  }
 
   return openapi
 }

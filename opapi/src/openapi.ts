@@ -6,6 +6,8 @@ import { objects } from './objects'
 import { ComponentType, Security, State, getRef, isOperationWithBodyProps } from './state'
 import { formatBodyName, formatResponseName } from './util'
 
+const X_MINT = 'x-mint'
+
 export const createOpenapi = <
   SchemaName extends string,
   DefaultParameterName extends string,
@@ -64,6 +66,11 @@ export const createOpenapi = <
     operationObject.security?.forEach((name) => securitySchemes.add(name))
 
     const operation: OperationObject = {
+      [X_MINT]: {
+        metadata: {
+          title: operationName,
+        },
+      },
       operationId: operationName,
       description: operationObject.description,
       parameters: [],

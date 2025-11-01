@@ -1,6 +1,6 @@
 {
   "name": "@bpinternal/es-node",
-  "version": "0.0.13",
+  "version": "0.0.14",
   "description": "",
   "main": "dist/index.js",
   "repository": {
@@ -21,7 +21,7 @@
   },
   "devDependencies": {
     "@types/node": "^22.16.4",
-    "typescript": "5.8.3"
+    "typescript": "5.9.3"
   },
   "engines": {
     "node": ">=16.0.0",

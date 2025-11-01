@@ -788,10 +788,7 @@ describe.concurrent('zuifromJSONSchemaNext', () => {
     })
 
     test('should preserve intersection types', () => {
-      const original = z.intersection(
-        z.object({ a: z.string() }),
-        z.object({ b: z.number() }),
-      )
+      const original = z.intersection(z.object({ a: z.string() }), z.object({ b: z.number() }))
       const restored = roundTrip(original)
 
       expect(getTypescriptType(original)).toBe(getTypescriptType(restored))
@@ -799,12 +796,16 @@ describe.concurrent('zuifromJSONSchemaNext', () => {
 
     test('should preserve complex intersection with descriptions', () => {
       const original = z.intersection(
-        z.object({
-          id: z.number().describe('Entity ID'),
-        }).describe('Base entity'),
-        z.object({
-          name: z.string().describe('Entity name'),
-        }).describe('Named entity'),
+        z
+          .object({
+            id: z.number().describe('Entity ID'),
+          })
+          .describe('Base entity'),
+        z
+          .object({
+            name: z.string().describe('Entity name'),
+          })
+          .describe('Named entity'),
       )
       const restored = roundTrip(original)
 
@@ -829,27 +830,33 @@ describe.concurrent('zuifromJSONSchemaNext', () => {
     })
 
     test('should preserve object with passthrough', () => {
-      const original = z.object({
-        name: z.string(),
-      }).passthrough()
+      const original = z
+        .object({
+          name: z.string(),
+        })
+        .passthrough()
       const restored = roundTrip(original)
 
       expect(getTypescriptType(original)).toBe(getTypescriptType(restored))
     })
 
     test('should preserve object with strict', () => {
-      const original = z.object({
-        name: z.string(),
-      }).strict()
+      const original = z
+        .object({
+          name: z.string(),
+        })
+        .strict()
       const restored = roundTrip(original)
 
       expect(getTypescriptType(original)).toBe(getTypescriptType(restored))
     })
 
     test('should preserve object with catchall', () => {
-      const original = z.object({
-        name: z.string(),
-      }).catchall(z.number())
+      const original = z
+        .object({
+          name: z.string(),
+        })
+        .catchall(z.number())
       const restored = roundTrip(original)
 
       expect(getTypescriptType(original)).toBe(getTypescriptType(restored))
@@ -858,10 +865,12 @@ describe.concurrent('zuifromJSONSchemaNext', () => {
     test('should preserve deeply nested optional fields', () => {
       const original = z.object({
         user: z.object({
-          profile: z.object({
-            bio: z.string().optional(),
-            avatar: z.string().url().optional(),
-          }).optional(),
+          profile: z
+            .object({
+              bio: z.string().optional(),
+              avatar: z.string().url().optional(),
+            })
+            .optional(),
         }),
       })
       const restored = roundTrip(original)
@@ -902,10 +911,12 @@ describe.concurrent('zuifromJSONSchemaNext', () => {
     })
 
     test('should preserve record with complex value types', () => {
-      const original = z.record(z.object({
-        value: z.number(),
-        label: z.string(),
-      }))
+      const original = z.record(
+        z.object({
+          value: z.number(),
+          label: z.string(),
+        }),
+      )
       const restored = roundTrip(original)
 
       expect(getTypescriptType(original)).toBe(getTypescriptType(restored))
@@ -965,10 +976,7 @@ describe.concurrent('zuifromJSONSchemaNext', () => {
     })
 
     test('should preserve tuple with optional elements', () => {
-      const original = z.tuple([
-        z.string(),
-        z.number().optional(),
-      ])
+      const original = z.tuple([z.string(), z.number().optional()])
       const restored = roundTrip(original)
 
       expect(getTypescriptType(original)).toBe(getTypescriptType(restored))
@@ -990,22 +998,14 @@ describe.concurrent('zuifromJSONSchemaNext', () => {
     })
 
     test('should preserve literal union (enum-like)', () => {
-      const original = z.union([
-        z.literal(1),
-        z.literal(2),
-        z.literal(3),
-      ])
+      const original = z.union([z.literal(1), z.literal(2), z.literal(3)])
       const restored = roundTrip(original)
 
       expect(getTypescriptType(original)).toBe(getTypescriptType(restored))
     })
 
     test('should preserve mixed type literal union', () => {
-      const original = z.union([
-        z.literal('string'),
-        z.literal(42),
-        z.literal(true),
-      ])
+      const original = z.union([z.literal('string'), z.literal(42), z.literal(true)])
       const restored = roundTrip(original)
 
       expect(getTypescriptType(original)).toBe(getTypescriptType(restored))
@@ -1014,10 +1014,14 @@ describe.concurrent('zuifromJSONSchemaNext', () => {
     test('should preserve recursive-like structure', () => {
       const original = z.object({
         value: z.string(),
-        children: z.array(z.object({
-          value: z.string(),
-          children: z.array(z.any()).optional(),
-        })).optional(),
+        children: z
+          .array(
+            z.object({
+              value: z.string(),
+              children: z.array(z.any()).optional(),
+            }),
+          )
+          .optional(),
       })
       const restored = roundTrip(original)
 
@@ -1025,10 +1029,7 @@ describe.concurrent('zuifromJSONSchemaNext', () => {
     })
 
     test('should preserve union with describe on each member', () => {
-      const original = z.union([
-        z.string().describe('Text input'),
-        z.number().describe('Numeric input'),
-      ])
+      const original = z.union([z.string().describe('Text input'), z.number().describe('Numeric input')])
       const restored = roundTrip(original)
 
       expect(getTypescriptType(original)).toBe(getTypescriptType(restored))

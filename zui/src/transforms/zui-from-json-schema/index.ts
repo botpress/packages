@@ -139,7 +139,7 @@ function _fromJSONSchema(schema: JSONSchema7Definition | undefined): z.ZodType {
         const mapped: z.ZodType = _fromJSONSchema(value)
         const required: string[] = schema.required ?? []
         // If the property is already optional (e.g., has a default value), don't wrap it again
-        properties[key] = required.includes(key) ? mapped : (mapped.isOptional() ? mapped : mapped.optional())
+        properties[key] = required.includes(key) ? mapped : mapped.isOptional() ? mapped : mapped.optional()
       }
       return z.object(properties)
     }

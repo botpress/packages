@@ -222,6 +222,10 @@ type BaseOperationProps<
     schema: SchemaOfType<S>
     format?: 'binary'
   }
+  // Tags of the operation
+  tags?: string[]
+  // If an operation is deprecated
+  deprecated?: boolean
 }
 
 type CreateStateProps<SchemaName extends string, DefaultParameterName extends string, SectionName extends string> = {

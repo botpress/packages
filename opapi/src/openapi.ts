@@ -3,14 +3,8 @@ import VError from 'verror'
 import { defaultResponseStatus } from './const'
 import { generateSchemaFromZod } from './jsonschema'
 import { objects } from './objects'
-import { ComponentType, Operation, Security, State, getRef, isOperationWithBodyProps } from './state'
+import { ComponentType, Security, State, getRef, isOperationWithBodyProps } from './state'
 import { formatBodyName, formatResponseName } from './util'
-export type { OperationObject } from 'openapi3-ts'
-
-export type OpenApiOperationTransformer<DefaultParameterName extends string, SectionName extends string> = (
-  opapiOp: Operation<DefaultParameterName, SectionName, string, 'json-schema'>,
-  openapiOp: OperationObject,
-) => OperationObject
 
 export const createOpenapi = <
   SchemaName extends string,
@@ -18,7 +12,6 @@ export const createOpenapi = <
   SectionName extends string,
 >(
   state: State<SchemaName, DefaultParameterName, SectionName>,
-  operationTransformer?: OpenApiOperationTransformer<DefaultParameterName, SectionName>,
 ) => {
   const { metadata, schemas, operations, security } = state
   const { description, server, title, version } = metadata
@@ -183,10 +176,6 @@ export const createOpenapi = <
             throw new VError(`Parameter type ${parameterType} is not supported`)
         }
       })
-    }
-
-    if (operationTransformer) {
-      operationTransformer(operationObject, operation)
     }
 
     if (!openapi.rootDoc.paths) {

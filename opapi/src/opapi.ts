@@ -22,8 +22,6 @@ import {
 } from './state'
 import { exportStateAsTypescript, ExportStateAsTypescriptOptions } from './generators/ts-state'
 import { generateHandler } from './handler-generator'
-import { OpenApiOperationTransformer } from './openapi'
-export { OperationObject } from './openapi'
 export { Operation, Parameter } from './state'
 
 type AnatineSchemaObject = NonNullable<Parameters<typeof extendApi>[1]>
@@ -114,10 +112,8 @@ const createOpapiFromState = <
     ) => addOperation(state, operationProps),
     exportClient: exportClient(state),
     exportTypesBySection: (dir = '.') => generateTypesBySection(state, dir),
-    exportServer: (dir = '.', useExpressTypes: boolean, transformer?: OpenApiOperationTransformer<string, string>) =>
-      generateServer(state, dir, useExpressTypes, transformer),
-    exportOpenapi: (dir = '.', transformer?: OpenApiOperationTransformer<string, string>) =>
-      generateOpenapi(state, dir, transformer),
+    exportServer: (dir = '.', useExpressTypes: boolean) => generateServer(state, dir, useExpressTypes),
+    exportOpenapi: (dir = '.') => generateOpenapi(state, dir),
     exportState: (dir = '.', opts?: ExportStateAsTypescriptOptions) => exportStateAsTypescript(state, dir, opts),
     exportErrors: (dir = '.') => generateErrorsFile(state.errors ?? [], dir),
     exportHandler: (dir = '.') => generateHandler(state, dir),

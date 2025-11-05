@@ -19,7 +19,7 @@ import { generateOpenapiTypescript } from './generators/openapi-typescript'
 import { schemaIsEmptyObject } from './jsonschema'
 import log from './log'
 import type { OpenApiPostProcessors } from './opapi'
-import { createOpenapi, OpenApiOperationTransformer } from './openapi'
+import { createOpenapi } from './openapi'
 import {
   DefaultState,
   composeFilesFromBlocks,
@@ -50,16 +50,11 @@ export async function generateTypesBySection(state: DefaultState, targetDirector
   generateSectionsFile(state, targetDirectory)
 }
 
-export const generateServer = async (
-  state: State<string, string, string>,
-  dir: string,
-  useExpressTypes: boolean,
-  openapiOperationTransformer?: OpenApiOperationTransformer<string, string>,
-) => {
+export const generateServer = async (state: State<string, string, string>, dir: string, useExpressTypes: boolean) => {
   initDirectory(dir)
 
   log.info('Generating OpenAPI content')
-  const openapi = createOpenapi(state, openapiOperationTransformer)
+  const openapi = createOpenapi(state)
   const openapiSpecString = openapi.getSpecAsJson()
   const openapiSpec = JSON.parse(openapiSpecString)
 
@@ -206,15 +201,11 @@ export function generateErrorsFile(errors: ApiError[], dir = '.') {
   log.info('')
 }
 
-export function generateOpenapi(
-  state: State<string, string, string>,
-  dir = '.',
-  openapiOperationTransformer?: OpenApiOperationTransformer<string, string>,
-) {
+export function generateOpenapi(state: State<string, string, string>, dir = '.') {
   initDirectory(dir)
 
   log.info('Generating openapi content')
-  const openapi = createOpenapi(state, openapiOperationTransformer)
+  const openapi = createOpenapi(state)
   const openapiSpecString = openapi.getSpecAsJson()
 
   log.info('Generating metadata content')

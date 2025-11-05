@@ -74,6 +74,8 @@ export const createOpenapi = <
         default: responseRefSchema as ReferenceObject,
         [response.status ?? defaultResponseStatus]: responseRefSchema as ReferenceObject,
       },
+      tags: operationObject.tags,
+      deprecated: operationObject.deprecated,
     }
 
     if (isOperationWithBodyProps(operationObject)) {

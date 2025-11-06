@@ -19,6 +19,8 @@ export const createOpenapi = <
   const securitySchemes: Set<Security> = new Set()
   security?.forEach((name) => securitySchemes.add(name))
 
+  const tags: Set<string> = new Set()
+
   const openapi = OpenApiBuilder.create({
     openapi: '3.0.0',
     servers: [{ url: server }],
@@ -36,6 +38,7 @@ export const createOpenapi = <
       securitySchemes: {},
     },
     security: security ? [Object.fromEntries(security.map((name) => [name, []]))] : undefined,
+    tags: [],
   })
 
   objects.entries(schemas).forEach(([schemaName, { schema }]) => {
@@ -62,6 +65,7 @@ export const createOpenapi = <
     ) as unknown as ReferenceObject
 
     operationObject.security?.forEach((name) => securitySchemes.add(name))
+    operationObject.tags?.forEach((name) => tags.add(name))
 
     const operation: OperationObject = {
       operationId: operationName,
@@ -193,6 +197,12 @@ export const createOpenapi = <
     openapi.rootDoc.paths[path]![method] = operation
   })
 
+  tags.forEach((name) => {
+    openapi
+    openapi.addTag({
+      name,
+    })
+  })
   if (securitySchemes.has('BearerAuth')) {
     openapi.addSecurityScheme('BearerAuth', {
       type: 'http',

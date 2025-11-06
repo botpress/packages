@@ -43,7 +43,7 @@ export function requireTsFile(filename: string) {
   const { outputText } = tsc.transpileModule(content, {
     compilerOptions: DEFAULT_OPTIONS,
     fileName: filename,
-  });
+  })
   return requireJsCode(outputText)
 }
 
@@ -60,5 +60,3 @@ export function requireJsCode(code: string) {
   m._compile(code, filename)
   return m.exports
 }
-
-

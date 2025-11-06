@@ -194,7 +194,7 @@ describe('openapi state generator', () => {
             description: 'Tree id',
             in: 'header',
             type: 'string',
-          }
+          },
         },
         schemas: {
           Tree: {
@@ -258,7 +258,7 @@ describe('openapi state generator', () => {
             description: 'Tree id',
             in: 'header',
             type: 'string',
-          }
+          },
         },
         schemas: {
           Tree: {

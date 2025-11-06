@@ -198,7 +198,6 @@ export const createOpenapi = <
   })
 
   tags.forEach((name) => {
-    openapi
     openapi.addTag({
       name,
     })

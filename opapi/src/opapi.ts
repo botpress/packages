@@ -62,7 +62,7 @@ export type OpenApiPostProcessors = {
   apiCode: CodePostProcessor
 }
 
-export type GenerateClientProps =
+export type GenerateClientProps = (
   | {
       generator: 'openapi-generator'
       endpoint: string
@@ -71,6 +71,8 @@ export type GenerateClientProps =
   | {
       generator: 'opapi'
     }
+) &
+  ExportStateOptions
 
 type ExportStateOptions = Partial<{
   ignoreDefaultParameters: boolean
@@ -103,48 +105,31 @@ const applyExportOptions = <SchemaName extends string, DefaultParameterName exte
   return state
 }
 
-function isOpenApiPostProcessors(input?: OpenApiPostProcessors | ExportStateOptions): input is OpenApiPostProcessors {
-  return input !== undefined && 'apiCode' in input
-}
-
-function isExportStateOptions(input?: OpenApiPostProcessors | ExportStateOptions): input is ExportStateOptions {
-  return input !== undefined && ('ignoreDefaultParameters' in input || 'ignoreSecurity' in input)
-}
-
 function exportClient(state: State<string, string, string>) {
-  function _exportClient(dir: string, props: GenerateClientProps, stateOpts?: ExportStateOptions): Promise<void>
+  function _exportClient(dir: string, props: GenerateClientProps): Promise<void>
   function _exportClient(
     dir: string,
     openapiGeneratorEndpoint: string,
-    postProcessors?: OpenApiPostProcessors,
-    stateOpts?: ExportStateOptions,
+    props?: OpenApiPostProcessors & ExportStateOptions,
   ): Promise<void>
   function _exportClient(
     dir = '.',
     propsOrEndpoint: GenerateClientProps | string,
-    postProcessorsOrStateOpts?: OpenApiPostProcessors | ExportStateOptions,
-    stateOpts?: ExportStateOptions,
+    postProcessorsOrStateOpts?: OpenApiPostProcessors & ExportStateOptions,
   ) {
-    let props: GenerateClientProps
+    let options: GenerateClientProps
     if (typeof propsOrEndpoint === 'string') {
-      if (!postProcessorsOrStateOpts || isOpenApiPostProcessors(postProcessorsOrStateOpts)) {
-        props = { generator: 'openapi-generator', endpoint: propsOrEndpoint, postProcessors: postProcessorsOrStateOpts }
-      } else {
-        throw new Error('This is a bug. `postProcessors` options does not have a valid type')
-      }
+      options = { generator: 'openapi-generator', endpoint: propsOrEndpoint, postProcessors: postProcessorsOrStateOpts }
     } else {
-      props = propsOrEndpoint
-      if (isExportStateOptions(postProcessorsOrStateOpts)) {
-        stateOpts = postProcessorsOrStateOpts
-      }
+      options = propsOrEndpoint
     }
 
-    state = applyExportOptions(state, stateOpts)
+    state = applyExportOptions(state, postProcessorsOrStateOpts)
 
-    if (props.generator === 'openapi-generator') {
-      return generateClientWithOpenapiGenerator(state, dir, props.endpoint, props.postProcessors)
+    if (options.generator === 'openapi-generator') {
+      return generateClientWithOpenapiGenerator(state, dir, options.endpoint, options.postProcessors)
     }
-    if (props.generator === 'opapi') {
+    if (options.generator === 'opapi') {
       return generateClientWithOpapi(state, dir)
     }
     throw new Error('Unknown generator')

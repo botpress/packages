@@ -109,11 +109,7 @@ function isExportStateOptions(input?: OpenApiPostProcessors | ExportStateOptions
 }
 
 function exportClient(state: State<string, string, string>) {
-  function _exportClient(
-    dir: string,
-    props: GenerateClientProps,
-    stateOpts?: ExportStateOptions,
-  ): Promise<void>
+  function _exportClient(dir: string, props: GenerateClientProps, stateOpts?: ExportStateOptions): Promise<void>
   function _exportClient(
     dir: string,
     openapiGeneratorEndpoint: string,

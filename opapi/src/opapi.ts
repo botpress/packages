@@ -96,6 +96,9 @@ const applyExportOptions = <SchemaName extends string, DefaultParameterName exte
   }
   if (options?.ignoreSecurity) {
     delete state.security
+    for (const operationId of Object.keys(state.operations)) {
+      delete state.operations[operationId]?.security
+    }
   }
   return state
 }

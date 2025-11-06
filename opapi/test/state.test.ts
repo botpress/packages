@@ -3,7 +3,7 @@ import z from 'zod'
 import { OpenApi, OpenApiProps } from '../src'
 import { join } from 'path'
 import { getFiles } from '../src/file'
-import { validateTypescriptFile } from './util'
+import { requireTsFile, validateTypescriptFile } from './util'
 
 type AnyProps = OpenApiProps<string, string, string>
 
@@ -177,6 +177,129 @@ describe('openapi state generator', () => {
     const files = getFiles(genStateFolder)
 
     files.forEach((file) => {
+      if (file.endsWith('.ts')) {
+        validateTypescriptFile(file)
+      }
+    })
+  })
+
+  it('should export state without defaultParameters when ignoreDefaultParameters is set', async () => {
+    const api = OpenApi(
+      {
+        security: ['BearerAuth'],
+        metadata,
+        sections,
+        defaultParameters: {
+          'x-tree': {
+            description: 'Tree id',
+            in: 'header',
+            type: 'string',
+          }
+        },
+        schemas: {
+          Tree: {
+            section: 'trees',
+            schema: tree,
+          },
+        },
+      },
+      { allowUnions: true },
+    )
+
+    api.addOperation({
+      security: ['BearerAuth'],
+      name: 'getTree',
+      description: 'Get a tree',
+      method: 'get',
+      path: '/trees/{id}',
+      parameters: {
+        id: {
+          description: 'Tree id',
+          in: 'path',
+          type: 'string',
+        },
+      },
+      response: {
+        description: 'Tree information',
+        schema: tree,
+      },
+    })
+
+    const genStateFolder = join(__dirname, 'gen/state')
+    api.exportState(genStateFolder, {
+      importPath: '../../../src',
+      ignoreDefaultParameters: true,
+      ignoreSecurity: true,
+    })
+
+    const files = getFiles(genStateFolder)
+
+    files.forEach((file) => {
+      if (file.endsWith('state.ts')) {
+        const state = requireTsFile(file)
+        expect(state.state.operations['getTree'].parameters['x-tree']).toBeUndefined()
+        expect(state.state.operations['getTree'].security).toBeUndefined()
+        expect(state.state.operations['getTree'].parameters['id']).toBeDefined()
+      }
+      if (file.endsWith('.ts')) {
+        validateTypescriptFile(file)
+      }
+    })
+  })
+
+  it('should export state defaultParameters', async () => {
+    const api = OpenApi(
+      {
+        security: ['BearerAuth'],
+        metadata,
+        sections,
+        defaultParameters: {
+          'x-tree': {
+            description: 'Tree id',
+            in: 'header',
+            type: 'string',
+          }
+        },
+        schemas: {
+          Tree: {
+            section: 'trees',
+            schema: tree,
+          },
+        },
+      },
+      { allowUnions: true },
+    )
+
+    api.addOperation({
+      security: ['BearerAuth'],
+      name: 'getTree',
+      description: 'Get a tree',
+      method: 'get',
+      path: '/trees/{id}',
+      parameters: {
+        id: {
+          description: 'Tree id',
+          in: 'path',
+          type: 'string',
+        },
+      },
+      response: {
+        description: 'Tree information',
+        schema: tree,
+      },
+    })
+
+    const genStateFolder = join(__dirname, 'gen/state')
+    api.exportState(genStateFolder, { importPath: '../../../src' })
+    const files = getFiles(genStateFolder)
+
+    files.forEach((file) => {
+      if (file.endsWith('state.ts')) {
+        const state = requireTsFile(file)
+        expect(state.state.operations['getTree'].parameters['x-tree']).toBeDefined()
+        expect(state.state.operations['getTree'].security).toBeDefined()
+        expect(state.state.operations['getTree'].parameters['id']).toBeDefined()
+      }
       if (file.endsWith('.ts')) {
         validateTypescriptFile(file)
       }

@@ -1,6 +1,6 @@
 {
   "name": "@bpinternal/opapi",
-  "version": "0.17.0",
+  "version": "0.19.0",
   "description": "Opapi is a highly opinionated library to generate server, client and documentation from OpenAPI specification using typescript.",
   "main": "./dist/index.js",
   "module": "./dist/index.mjs",
@@ -20,7 +20,8 @@
     "build": "tsup src/index.ts --dts --format cjs,esm --clean",
     "check:type": "tsc --noEmit",
     "check:format": "prettier --check .",
-    "fix:format": "prettier --write ."
+    "fix:format": "prettier --write .",
+    "check": "pnpm run check:type && pnpm run check:format"
   },
   "devDependencies": {
     "@swc/core": "1.9.3",

@@ -72,25 +72,80 @@ export type GenerateClientProps =
       generator: 'opapi'
     }
 
+type ExportStateOptions = Partial<{
+  ignoreDefaultParameters: boolean
+  ignoreSecurity: boolean
+}>
+
+const applyExportOptions = <SchemaName extends string, DefaultParameterName extends string, SectionName extends string>(
+  state: State<SchemaName, DefaultParameterName, SectionName>,
+  options?: ExportStateOptions,
+) => {
+  if (options?.ignoreDefaultParameters && state.defaultParameters) {
+    const defaultParametersName = Object.keys(state.defaultParameters)
+    for (const operationId of Object.keys(state.operations)) {
+      if (!state.operations[operationId]?.parameters) {
+        continue
+      }
+      state.operations[operationId].parameters = Object.fromEntries(
+        Object.entries(state.operations[operationId].parameters).filter(
+          ([parameterName]) => !defaultParametersName.includes(parameterName),
+        ),
+      )
+    }
+  }
+  if (options?.ignoreSecurity) {
+    delete state.security
+  }
+  return state
+}
+
+function isOpenApiPostProcessors(input?: OpenApiPostProcessors | ExportStateOptions): input is OpenApiPostProcessors {
+  return input !== undefined && 'apiCode' in input
+}
+
+function isExportStateOptions(input?: OpenApiPostProcessors | ExportStateOptions): input is ExportStateOptions {
+  return input !== undefined && ('ignoreDefaultParameters' in input || 'ignoreSecurity' in input)
+}
+
 function exportClient(state: State<string, string, string>) {
+  function _exportClient(
+    dir: string,
+    props: GenerateClientProps,
+    stateOpts?: ExportStateOptions,
+  ): Promise<void>
   function _exportClient(
     dir: string,
     openapiGeneratorEndpoint: string,
     postProcessors?: OpenApiPostProcessors,
+    stateOpts?: ExportStateOptions,
   ): Promise<void>
-  function _exportClient(dir: string, props: GenerateClientProps): Promise<void>
-  function _exportClient(dir = '.', props: GenerateClientProps | string, postProcessors?: OpenApiPostProcessors) {
-    let options: GenerateClientProps
-    if (typeof props === 'string') {
-      options = { generator: 'openapi-generator', endpoint: props, postProcessors }
+  function _exportClient(
+    dir = '.',
+    propsOrEndpoint: GenerateClientProps | string,
+    postProcessorsOrStateOpts?: OpenApiPostProcessors | ExportStateOptions,
+    stateOpts?: ExportStateOptions,
+  ) {
+    let props: GenerateClientProps
+    if (typeof propsOrEndpoint === 'string') {
+      if (!postProcessorsOrStateOpts || isOpenApiPostProcessors(postProcessorsOrStateOpts)) {
+        props = { generator: 'openapi-generator', endpoint: propsOrEndpoint, postProcessors: postProcessorsOrStateOpts }
+      } else {
+        throw new Error('This is a bug. `postProcessors` options does not have a valid type')
+      }
     } else {
-      options = props
+      props = propsOrEndpoint
+      if (isExportStateOptions(postProcessorsOrStateOpts)) {
+        stateOpts = postProcessorsOrStateOpts
+      }
     }
 
-    if (options.generator === 'openapi-generator') {
-      return generateClientWithOpenapiGenerator(state, dir, options.endpoint, options.postProcessors)
+    state = applyExportOptions(state, stateOpts)
+
+    if (props.generator === 'openapi-generator') {
+      return generateClientWithOpenapiGenerator(state, dir, props.endpoint, props.postProcessors)
     }
-    if (options.generator === 'opapi') {
+    if (props.generator === 'opapi') {
       return generateClientWithOpapi(state, dir)
     }
     throw new Error('Unknown generator')
@@ -111,12 +166,15 @@ const createOpapiFromState = <
       operationProps: Operation<DefaultParameterName, SectionName, Path, 'zod-schema'>,
     ) => addOperation(state, operationProps),
     exportClient: exportClient(state),
-    exportTypesBySection: (dir = '.') => generateTypesBySection(state, dir),
-    exportServer: (dir = '.', useExpressTypes: boolean) => generateServer(state, dir, useExpressTypes),
-    exportOpenapi: (dir = '.') => generateOpenapi(state, dir),
-    exportState: (dir = '.', opts?: ExportStateAsTypescriptOptions) => exportStateAsTypescript(state, dir, opts),
+    exportTypesBySection: (dir = '.', opts?: ExportStateOptions) =>
+      generateTypesBySection(applyExportOptions(state, opts), dir),
+    exportServer: (dir = '.', useExpressTypes: boolean, opts?: ExportStateOptions) =>
+      generateServer(applyExportOptions(state, opts), dir, useExpressTypes),
+    exportOpenapi: (dir = '.', opts?: ExportStateOptions) => generateOpenapi(applyExportOptions(state, opts), dir),
+    exportState: (dir = '.', opts?: ExportStateAsTypescriptOptions & ExportStateOptions) =>
+      exportStateAsTypescript(applyExportOptions(state, opts), dir, opts),
     exportErrors: (dir = '.') => generateErrorsFile(state.errors ?? [], dir),
-    exportHandler: (dir = '.') => generateHandler(state, dir),
+    exportHandler: (dir = '.', opts?: ExportStateOptions) => generateHandler(applyExportOptions(state, opts), dir),
   }
 }
 

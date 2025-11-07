@@ -20,7 +20,8 @@
     "build": "tsup src/index.ts --dts --format cjs,esm --clean",
     "check:type": "tsc --noEmit",
     "check:format": "prettier --check .",
-    "fix:format": "prettier --write ."
+    "fix:format": "prettier --write .",
+    "check": "pnpm run check:type && pnpm run check:format"
   },
   "devDependencies": {
     "@swc/core": "1.9.3",

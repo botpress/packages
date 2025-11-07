@@ -19,6 +19,7 @@ import {
 } from './state'
 import { exportStateAsTypescript, ExportStateAsTypescriptOptions } from './generators/ts-state'
 import { generateHandler } from './handler-generator'
+import { applyExportOptions, ExportStateOptions } from './export-options'
 export { Operation, Parameter } from './state'
 
 type AnatineSchemaObject = NonNullable<Parameters<typeof extendApi>[1]>
@@ -39,6 +40,14 @@ export class OpenApi<SchemaName extends string, DefaultParameterName extends str
     this._state = new State(props, options)
   }
 
+  static fromState<SchemaName extends string, DefaultParameterName extends string, SectionName extends string>(
+    state: State<SchemaName, DefaultParameterName, SectionName>
+  ) {
+    const openapi = new OpenApi({ metadata: state.metadata })
+    openapi._state = state
+    return openapi
+  }
+
   getState() {
     return this._state
   }
@@ -51,38 +60,38 @@ export class OpenApi<SchemaName extends string, DefaultParameterName extends str
     this._state.addOperation(operation)
   }
 
-  exportClient(dir: string, options: GenerateClientOptions) {
+  exportClient(dir: string, options: GenerateClientOptions & ExportStateOptions) {
     if (options.generator === 'openapi-generator') {
-      return generateClientWithOpenapiGenerator(this._state, dir, options.endpoint, options.postProcessors)
+      return generateClientWithOpenapiGenerator(applyExportOptions(this._state, options), dir, options.endpoint, options.postProcessors)
     }
     if (options.generator === 'opapi') {
-      return generateClientWithOpapi(this._state, dir)
+      return generateClientWithOpapi(applyExportOptions(this._state, options), dir)
     }
     throw new Error('Unknown generator')
   }
 
-  exportTypesBySection(dir = '.') {
-    generateTypesBySection(this._state, dir)
+  exportTypesBySection(dir = '.', options?: ExportStateOptions) {
+    generateTypesBySection(applyExportOptions(this._state, options), dir)
   }
 
-  exportServer(dir = '.', useExpressTypes: boolean) {
-    generateServer(this._state, dir, useExpressTypes)
+  exportServer(dir = '.', useExpressTypes: boolean, options?: ExportStateOptions) {
+    generateServer(applyExportOptions(this._state, options), dir, useExpressTypes)
   }
 
-  exportOpenapi(dir = '.') {
-    generateOpenapi(this._state, dir)
+  exportOpenapi(dir = '.', options?: ExportStateOptions) {
+    generateOpenapi(applyExportOptions(this._state, options), dir)
   }
 
-  exportState(dir = '.', options?: ExportStateAsTypescriptOptions) {
-    exportStateAsTypescript(this._state, dir, options)
+  exportState(dir = '.', options?: ExportStateAsTypescriptOptions & ExportStateOptions) {
+    exportStateAsTypescript(applyExportOptions(this._state, options), dir, options)
   }
 
   exportErrors(dir = '.') {
     generateErrorsFile(this._state.errors ?? [], dir)
   }
 
-  exportHandler(dir = '.') {
-    generateHandler(this._state, dir)
+  exportHandler(dir = '.', options?: ExportStateOptions) {
+    generateHandler(applyExportOptions(this._state, options), dir)
   }
 }
 
@@ -107,7 +116,7 @@ export type OpenApiPostProcessors = {
   apiCode: CodePostProcessor
 }
 
-export type GenerateClientOptions =
+export type GenerateClientOptions = (
   | {
       generator: 'openapi-generator'
       endpoint: string
@@ -116,6 +125,8 @@ export type GenerateClientOptions =
   | {
       generator: 'opapi'
     }
+) &
+  ExportStateOptions
 
 export type SchemaOf<O extends OpenApi<any, any, any>> =
   O extends OpenApi<infer Skema, infer _Param, infer _Sexion> ? Skema : never

@@ -10,7 +10,10 @@ describe('client generator', () => {
 
     const api = getMockApi()
 
-    await api.exportClient(genClientFolder, 'https://api.openapi-generator.tech')
+    await api.exportClient(genClientFolder, {
+      generator: 'openapi-generator',
+      endpoint: 'https://api.openapi-generator.tech',
+    })
 
     const files = getFiles(genClientFolder)
 

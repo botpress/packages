@@ -184,7 +184,7 @@ describe('openapi state generator', () => {
   })
 
   it('should export state without defaultParameters when ignoreDefaultParameters is set', async () => {
-    const api = OpenApi(
+    const api = new OpenApi(
       {
         security: ['BearerAuth'],
         metadata,
@@ -248,7 +248,7 @@ describe('openapi state generator', () => {
   })
 
   it('should export state defaultParameters', async () => {
-    const api = OpenApi(
+    const api = new OpenApi(
       {
         security: ['BearerAuth'],
         metadata,

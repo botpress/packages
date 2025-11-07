@@ -16,10 +16,13 @@ import {
   Parameter,
   State,
   Security,
+  createState,
+  getRef,
 } from './state'
 import { exportStateAsTypescript, ExportStateAsTypescriptOptions } from './generators/ts-state'
 import { generateHandler } from './handler-generator'
 import { applyExportOptions, ExportStateOptions } from './export-options'
+import { addOperation } from './operation'
 export { Operation, Parameter } from './state'
 
 type AnatineSchemaObject = NonNullable<Parameters<typeof extendApi>[1]>
@@ -37,11 +40,11 @@ export class OpenApi<SchemaName extends string, DefaultParameterName extends str
   private _state: State<SchemaName, DefaultParameterName, SectionName>
 
   constructor(props: OpenApiProps<SchemaName, DefaultParameterName, SectionName>, options: Partial<Options> = {}) {
-    this._state = new State(props, options)
+    this._state = createState(props, options)
   }
 
   static fromState<SchemaName extends string, DefaultParameterName extends string, SectionName extends string>(
-    state: State<SchemaName, DefaultParameterName, SectionName>
+    state: State<SchemaName, DefaultParameterName, SectionName>,
   ) {
     const openapi = new OpenApi({ metadata: state.metadata })
     openapi._state = state
@@ -53,16 +56,21 @@ export class OpenApi<SchemaName extends string, DefaultParameterName extends str
   }
 
   getModelRef(name: SchemaName): OpenApiZodAny {
-    return this._state.getRef(ComponentType.SCHEMAS, name)
+    return getRef(this._state, ComponentType.SCHEMAS, name)
   }
 
   addOperation<Path extends string>(operation: Operation<DefaultParameterName, SectionName, Path, 'zod-schema'>) {
-    this._state.addOperation(operation)
+    addOperation(this._state, operation)
   }
 
   exportClient(dir: string, options: GenerateClientOptions & ExportStateOptions) {
     if (options.generator === 'openapi-generator') {
-      return generateClientWithOpenapiGenerator(applyExportOptions(this._state, options), dir, options.endpoint, options.postProcessors)
+      return generateClientWithOpenapiGenerator(
+        applyExportOptions(this._state, options),
+        dir,
+        options.endpoint,
+        options.postProcessors,
+      )
     }
     if (options.generator === 'opapi') {
       return generateClientWithOpapi(applyExportOptions(this._state, options), dir)
@@ -71,11 +79,11 @@ export class OpenApi<SchemaName extends string, DefaultParameterName extends str
   }
 
   exportTypesBySection(dir = '.', options?: ExportStateOptions) {
-    generateTypesBySection(applyExportOptions(this._state, options), dir)
+    return generateTypesBySection(applyExportOptions(this._state, options), dir)
   }
 
   exportServer(dir = '.', useExpressTypes: boolean, options?: ExportStateOptions) {
-    generateServer(applyExportOptions(this._state, options), dir, useExpressTypes)
+    return generateServer(applyExportOptions(this._state, options), dir, useExpressTypes)
   }
 
   exportOpenapi(dir = '.', options?: ExportStateOptions) {
@@ -91,7 +99,7 @@ export class OpenApi<SchemaName extends string, DefaultParameterName extends str
   }
 
   exportHandler(dir = '.', options?: ExportStateOptions) {
-    generateHandler(applyExportOptions(this._state, options), dir)
+    return generateHandler(applyExportOptions(this._state, options), dir)
   }
 }
 

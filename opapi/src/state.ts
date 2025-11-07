@@ -9,6 +9,13 @@ import { OpenApiZodAny } from '@anatine/zod-openapi'
 import { objects } from './objects'
 import { addOperation } from './operation'
 
+type SchemaType = 'zod-schema' | 'json-schema'
+type SchemaOfType<T extends SchemaType> = T extends 'zod-schema' ? OpenApiZodAny : SchemaObject
+
+export type Options = { allowUnions: boolean }
+const DEFAULT_OPTIONS: Options = { allowUnions: false }
+
+
 export class State<SchemaName extends string, DefaultParameterName extends string, SectionName extends string> {
   metadata: Metadata
   refs: RefMap
@@ -114,12 +121,6 @@ export class State<SchemaName extends string, DefaultParameterName extends strin
     })
   }
 }
-
-type SchemaType = 'zod-schema' | 'json-schema'
-type SchemaOfType<T extends SchemaType> = T extends 'zod-schema' ? OpenApiZodAny : SchemaObject
-
-export type Options = { allowUnions: boolean }
-const DEFAULT_OPTIONS: Options = { allowUnions: false }
 
 const unknownError: ApiError = {
   status: 500,

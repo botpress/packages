@@ -22,6 +22,7 @@ import {
 } from './state'
 import { exportStateAsTypescript, ExportStateAsTypescriptOptions } from './generators/ts-state'
 import { generateHandler } from './handler-generator'
+import { applyExportOptions, ExportStateOptions } from './export-options'
 export { Operation, Parameter } from './state'
 
 type AnatineSchemaObject = NonNullable<Parameters<typeof extendApi>[1]>
@@ -62,7 +63,7 @@ export type OpenApiPostProcessors = {
   apiCode: CodePostProcessor
 }
 
-export type GenerateClientProps =
+export type GenerateClientProps = (
   | {
       generator: 'openapi-generator'
       endpoint: string
@@ -71,21 +72,33 @@ export type GenerateClientProps =
   | {
       generator: 'opapi'
     }
+) &
+  ExportStateOptions
 
 function exportClient(state: State<string, string, string>) {
+  function _exportClient(dir: string, props: GenerateClientProps): Promise<void>
   function _exportClient(
     dir: string,
     openapiGeneratorEndpoint: string,
-    postProcessors?: OpenApiPostProcessors,
+    props?: OpenApiPostProcessors & ExportStateOptions,
   ): Promise<void>
-  function _exportClient(dir: string, props: GenerateClientProps): Promise<void>
-  function _exportClient(dir = '.', props: GenerateClientProps | string, postProcessors?: OpenApiPostProcessors) {
+  function _exportClient(
+    dir = '.',
+    propsOrEndpoint: GenerateClientProps | string,
+    postProcessorsAndStateOpts?: OpenApiPostProcessors & ExportStateOptions,
+  ) {
     let options: GenerateClientProps
-    if (typeof props === 'string') {
-      options = { generator: 'openapi-generator', endpoint: props, postProcessors }
+    if (typeof propsOrEndpoint === 'string') {
+      options = {
+        generator: 'openapi-generator',
+        endpoint: propsOrEndpoint,
+        postProcessors: postProcessorsAndStateOpts,
+      }
     } else {
-      options = props
+      options = propsOrEndpoint
     }
+
+    state = applyExportOptions(state, postProcessorsAndStateOpts)
 
     if (options.generator === 'openapi-generator') {
       return generateClientWithOpenapiGenerator(state, dir, options.endpoint, options.postProcessors)
@@ -107,16 +120,20 @@ const createOpapiFromState = <
 ) => {
   return {
     getModelRef: (name: SchemaName): OpenApiZodAny => getRef(state, ComponentType.SCHEMAS, name),
+    getState: () => state,
     addOperation: <Path extends string>(
       operationProps: Operation<DefaultParameterName, SectionName, Path, 'zod-schema'>,
     ) => addOperation(state, operationProps),
     exportClient: exportClient(state),
-    exportTypesBySection: (dir = '.') => generateTypesBySection(state, dir),
-    exportServer: (dir = '.', useExpressTypes: boolean) => generateServer(state, dir, useExpressTypes),
-    exportOpenapi: (dir = '.') => generateOpenapi(state, dir),
-    exportState: (dir = '.', opts?: ExportStateAsTypescriptOptions) => exportStateAsTypescript(state, dir, opts),
+    exportTypesBySection: (dir = '.', opts?: ExportStateOptions) =>
+      generateTypesBySection(applyExportOptions(state, opts), dir),
+    exportServer: (dir = '.', useExpressTypes: boolean, opts?: ExportStateOptions) =>
+      generateServer(applyExportOptions(state, opts), dir, useExpressTypes),
+    exportOpenapi: (dir = '.', opts?: ExportStateOptions) => generateOpenapi(applyExportOptions(state, opts), dir),
+    exportState: (dir = '.', opts?: ExportStateAsTypescriptOptions & ExportStateOptions) =>
+      exportStateAsTypescript(applyExportOptions(state, opts), dir, opts),
     exportErrors: (dir = '.') => generateErrorsFile(state.errors ?? [], dir),
-    exportHandler: (dir = '.') => generateHandler(state, dir),
+    exportHandler: (dir = '.', opts?: ExportStateOptions) => generateHandler(applyExportOptions(state, opts), dir),
   }
 }
 

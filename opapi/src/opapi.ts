@@ -22,6 +22,7 @@ import {
 } from './state'
 import { exportStateAsTypescript, ExportStateAsTypescriptOptions } from './generators/ts-state'
 import { generateHandler } from './handler-generator'
+import { applyExportOptions, ExportStateOptions } from './export-options'
 export { Operation, Parameter } from './state'
 
 type AnatineSchemaObject = NonNullable<Parameters<typeof extendApi>[1]>
@@ -74,37 +75,6 @@ export type GenerateClientProps = (
 ) &
   ExportStateOptions
 
-type ExportStateOptions = Partial<{
-  ignoreDefaultParameters: boolean
-  ignoreSecurity: boolean
-}>
-
-const applyExportOptions = <SchemaName extends string, DefaultParameterName extends string, SectionName extends string>(
-  state: State<SchemaName, DefaultParameterName, SectionName>,
-  options?: ExportStateOptions,
-) => {
-  if (options?.ignoreDefaultParameters && state.defaultParameters) {
-    const defaultParametersName = Object.keys(state.defaultParameters)
-    for (const operationId of Object.keys(state.operations)) {
-      if (!state.operations[operationId]?.parameters) {
-        continue
-      }
-      state.operations[operationId].parameters = Object.fromEntries(
-        Object.entries(state.operations[operationId].parameters).filter(
-          ([parameterName]) => !defaultParametersName.includes(parameterName),
-        ),
-      )
-    }
-  }
-  if (options?.ignoreSecurity) {
-    delete state.security
-    for (const operationId of Object.keys(state.operations)) {
-      delete state.operations[operationId]?.security
-    }
-  }
-  return state
-}
-
 function exportClient(state: State<string, string, string>) {
   function _exportClient(dir: string, props: GenerateClientProps): Promise<void>
   function _exportClient(
@@ -146,6 +116,7 @@ const createOpapiFromState = <
 ) => {
   return {
     getModelRef: (name: SchemaName): OpenApiZodAny => getRef(state, ComponentType.SCHEMAS, name),
+    getState: () => state,
     addOperation: <Path extends string>(
       operationProps: Operation<DefaultParameterName, SectionName, Path, 'zod-schema'>,
     ) => addOperation(state, operationProps),

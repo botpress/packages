@@ -89,7 +89,11 @@ function exportClient(state: State<string, string, string>) {
   ) {
     let options: GenerateClientProps
     if (typeof propsOrEndpoint === 'string') {
-      options = { generator: 'openapi-generator', endpoint: propsOrEndpoint, postProcessors: postProcessorsAndStateOpts }
+      options = {
+        generator: 'openapi-generator',
+        endpoint: propsOrEndpoint,
+        postProcessors: postProcessorsAndStateOpts,
+      }
     } else {
       options = propsOrEndpoint
     }

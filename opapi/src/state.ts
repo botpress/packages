@@ -15,7 +15,6 @@ type SchemaOfType<T extends SchemaType> = T extends 'zod-schema' ? OpenApiZodAny
 export type Options = { allowUnions: boolean }
 const DEFAULT_OPTIONS: Options = { allowUnions: false }
 
-
 export class State<SchemaName extends string, DefaultParameterName extends string, SectionName extends string> {
   metadata: Metadata
   refs: RefMap

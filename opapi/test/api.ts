@@ -36,7 +36,7 @@ const nestedSchema = z.object({
 })
 
 export const getMockApi = () => {
-  const api = OpenApi.from({
+  const api = new OpenApi({
     errors: [
       {
         description: 'Foo not found',

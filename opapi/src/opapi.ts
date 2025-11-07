@@ -8,16 +8,13 @@ import {
   generateTypesBySection,
 } from './generator'
 import {
-  ApiError,
   ComponentType,
-  Metadata,
   Operation,
   Options,
-  Parameter,
   State,
-  Security,
   createState,
   getRef,
+  CreateStateProps,
 } from './state'
 import { exportStateAsTypescript, ExportStateAsTypescriptOptions } from './generators/ts-state'
 import { generateHandler } from './handler-generator'
@@ -39,7 +36,7 @@ export const schema = <T extends OpenApiZodAny>(
 export class OpenApi<SchemaName extends string, DefaultParameterName extends string, SectionName extends string> {
   private _state: State<SchemaName, DefaultParameterName, SectionName>
 
-  constructor(props: OpenApiProps<SchemaName, DefaultParameterName, SectionName>, options: Partial<Options> = {}) {
+  constructor(props: CreateStateProps<SchemaName, DefaultParameterName, SectionName>, options: Partial<Options> = {}) {
     this._state = createState(props, options)
   }
 
@@ -101,21 +98,6 @@ export class OpenApi<SchemaName extends string, DefaultParameterName extends str
   exportHandler(dir = '.', options?: ExportStateOptions) {
     return generateHandler(applyExportOptions(this._state, options), dir)
   }
-}
-
-// TODO: ensure type inference comes from field 'sections' not 'schemas'
-export type OpenApiProps<SchemaName extends string, DefaultParameterName extends string, SectionName extends string> = {
-  metadata: Metadata
-  // adds default parameters to all operations
-  defaultParameters?: Record<DefaultParameterName, Parameter<'zod-schema'>>
-  // adds the openapi schemas
-  schemas?: Record<SchemaName, { schema: OpenApiZodAny; section: SectionName }>
-  // adds the openapi tags
-  sections?: Record<SectionName, { title: string; description: string }>
-  // add the openapi errors
-  errors?: readonly ApiError[]
-  // add security schemes
-  security?: Security[]
 }
 
 export type CodePostProcessor = (code: string) => Promise<string> | string

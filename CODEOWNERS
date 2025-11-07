@@ -2,10 +2,10 @@
 
 const @botpress/engineering
 entities @franklevasseur @botpress/leads
-depsynky @franklevasseur @botpress/leads
-es-node @franklevasseur @botpress/leads
+depsynky @botpress/squid @botpress/leads
+es-node @botpress/squid @botpress/leads
 jex @botpress/squid @botpress/leads
-log4bot @franklevasseur @botpress/leads
+log4bot @botpress/squid @botpress/leads
 opapi @botpress/squid @botpress/leads
 promex @michaelmass @botpress/leads
 ptb-schema @franklevasseur @botpress/leads
@@ -13,6 +13,6 @@ readiness @botpress/squid @botpress/leads
 trail @michaelmass @botpress/leads
 tunnel @botpress/squid @botpress/leads
 verel @botpress/squid @botpress/leads
-yargs-extra @franklevasseur @botpress/leads
+yargs-extra @botpress/squid @botpress/leads
 zui @botpress/squid @botpress/leads
 slackdown @botpress/squid @botpress/leads

@@ -1,11 +1,12 @@
 import { describe, it, expect } from 'vitest'
-import { OpenApi, OpenApiProps } from '../src'
+import { createState } from './state'
 import { z } from 'zod'
-import { applyExportOptions } from '../src/export-options'
+import { applyExportOptions } from './export-options'
+import { addOperation } from './operation'
 
-type AnyProps = OpenApiProps<string, string, string>
+type AnyProps = Parameters<typeof createState>[0]
 
-function getApi() {
+function getApiState() {
   const metadata = {
     title: 'Test API',
     description: 'Test API',
@@ -33,7 +34,7 @@ function getApi() {
   })
   const tree: z.ZodType = z.union([leaf, node])
 
-  const api = OpenApi(
+  const state = createState(
     {
       metadata,
       sections,
@@ -55,7 +56,7 @@ function getApi() {
     { allowUnions: true },
   )
 
-  api.addOperation({
+  addOperation(state, {
     security: ['BearerAuth'],
     name: 'getTree',
     description: 'Get a tree',
@@ -74,67 +75,63 @@ function getApi() {
     },
   })
 
-  return api
+  return state
 }
 
 describe('Apply Export Options', () => {
   it('defaultParameters should be removed when ignoreDefaultParameters is true', async () => {
-    const api = getApi()
-    const initState = api.getState()
+    const initState = getApiState()
 
-    expect(initState.operations['getTree'].parameters!['x-tree']).toBeDefined()
-    expect(initState.operations['getTree'].parameters!['id']).toBeDefined()
+    expect(initState.operations['getTree']?.parameters!['x-tree']).toBeDefined()
+    expect(initState.operations['getTree']?.parameters!['id']).toBeDefined()
 
-    const updatedState = applyExportOptions(api.getState(), {
+    const updatedState = applyExportOptions(initState, {
       ignoreDefaultParameters: true,
     })
 
-    expect(updatedState.operations['getTree'].parameters!['x-tree']).toBeUndefined()
-    expect(updatedState.operations['getTree'].parameters!['id']).toBeDefined()
+    expect(updatedState.operations['getTree']?.parameters!['x-tree']).toBeUndefined()
+    expect(updatedState.operations['getTree']?.parameters!['id']).toBeDefined()
   })
 
   it('defaultParameters should not be removed when ignoreDefaultParameters is false', async () => {
-    const api = getApi()
-    const initState = api.getState()
+    const initState = getApiState()
 
-    expect(initState.operations['getTree'].parameters!['x-tree']).toBeDefined()
-    expect(initState.operations['getTree'].parameters!['id']).toBeDefined()
+    expect(initState.operations['getTree']?.parameters!['x-tree']).toBeDefined()
+    expect(initState.operations['getTree']?.parameters!['id']).toBeDefined()
 
-    const updatedState = applyExportOptions(api.getState(), {
+    const updatedState = applyExportOptions(initState, {
       ignoreDefaultParameters: false,
     })
 
-    expect(updatedState.operations['getTree'].parameters!['x-tree']).toBeDefined()
-    expect(updatedState.operations['getTree'].parameters!['id']).toBeDefined()
+    expect(updatedState.operations['getTree']?.parameters!['x-tree']).toBeDefined()
+    expect(updatedState.operations['getTree']?.parameters!['id']).toBeDefined()
   })
 
   it('security should not be removed when ignoreSecurity is false', async () => {
-    const api = getApi()
-    const initState = api.getState()
+    const initState = getApiState()
 
     expect(initState.security).toBeDefined()
-    expect(initState.operations['getTree'].security).toBeDefined()
+    expect(initState.operations['getTree']?.security).toBeDefined()
 
-    const updatedState = applyExportOptions(api.getState(), {
+    const updatedState = applyExportOptions(initState, {
       ignoreSecurity: false,
     })
 
     expect(updatedState.security).toBeDefined()
-    expect(updatedState.operations['getTree'].security).toBeDefined()
+    expect(updatedState.operations['getTree']?.security).toBeDefined()
   })
 
   it('security should be removed when ignoreSecurity is true', async () => {
-    const api = getApi()
-    const initState = api.getState()
+    const initState = getApiState()
 
     expect(initState.security).toBeDefined()
-    expect(initState.operations['getTree'].security).toBeDefined()
+    expect(initState.operations['getTree']?.security).toBeDefined()
 
-    const updatedState = applyExportOptions(api.getState(), {
+    const updatedState = applyExportOptions(initState, {
       ignoreSecurity: true,
     })
 
     expect(updatedState.security).toBeUndefined()
-    expect(updatedState.operations['getTree'].security).toBeUndefined()
+    expect(updatedState.operations['getTree']?.security).toBeUndefined()
   })
 })

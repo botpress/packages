@@ -1,36 +1,127 @@
 import type { SchemaObject } from 'openapi3-ts'
 import { VError } from 'verror'
 import { z } from 'zod'
-import { schema } from './opapi'
+import { OpenApiProps, schema } from './opapi'
 import type { PathParams } from './path-params'
 import { isAlphanumeric, isCapitalAlphabetical, uniqueBy } from './util'
 import { generateSchemaFromZod } from './jsonschema'
 import { OpenApiZodAny } from '@anatine/zod-openapi'
 import { objects } from './objects'
+import { addOperation } from './operation'
+
+export class State<SchemaName extends string, DefaultParameterName extends string, SectionName extends string> {
+  metadata: Metadata
+  refs: RefMap
+  defaultParameters?: { [name in DefaultParameterName]: Parameter<'json-schema'> }
+  sections: Section<SectionName>[]
+  schemas: Record<SchemaName, { schema: SchemaObject; section: SectionName }>
+  errors?: ApiError[]
+  operations: { [name: string]: Operation<DefaultParameterName, SectionName, string, 'json-schema'> } = {}
+  options?: Options
+  security?: Security[]
+
+  constructor(props: OpenApiProps<SchemaName, DefaultParameterName, SectionName>, opts: Partial<Options> = {}) {
+    this.options = { ...DEFAULT_OPTIONS, ...opts }
+
+    const schemaEntries = props.schemas
+      ? Object.entries<(typeof props.schemas)[SchemaName]>(props.schemas).map(([name, data]) => ({
+          name,
+          schema: data.schema,
+          section: data.section,
+        }))
+      : []
+
+    this.refs = {
+      parameters: {},
+      requestBodies: {},
+      responses: {},
+      schemas: {},
+    }
+
+    const toPairs = <K extends string, T>(obj: Record<K, T>): [K, T][] => Object.entries(obj) as [K, T][]
+
+    this.sections = props.sections
+      ? toPairs(props.sections).map(([name, section]) => ({
+          ...section,
+          name,
+          operations: [],
+          schema: schemaEntries.find((schemaEntry) => schemaEntry.section === name)?.name,
+        }))
+      : []
+
+    const schemas: Record<string, { schema: SchemaObject; section: SectionName }> = {}
+    schemaEntries.forEach((schemaEntry) => {
+      const name = schemaEntry.name
+
+      if (!isAlphanumeric(name)) {
+        throw new VError(`Invalid operation name ${name}. It must be alphanumeric and start with a letter`)
+      }
+
+      if (schemas[name]) {
+        throw new VError(`Schema ${name} already exists`)
+      }
+
+      schemas[name] = {
+        section: schemaEntry.section,
+        schema: generateSchemaFromZod(schemaEntry.schema, this.options),
+      }
+      this.refs.schemas[name] = true
+    })
+
+    this.schemas = schemas
+
+    const userErrors = props.errors ?? []
+    const defaultErrors = [unknownError, internalError]
+    this.errors = uniqueBy([...defaultErrors, ...userErrors], 'type')
+
+    this.errors.forEach((error) => {
+      if (!isCapitalAlphabetical(error.type)) {
+        throw new VError(`Invalid error type ${error.type}. It must be alphabetical and start with a capital letter`)
+      }
+
+      if (error.description.includes('\n')) {
+        throw new VError(`Error ${error.type} description must not contain new lines`)
+      }
+
+      if (error.description.includes("\\'")) {
+        throw new VError(`Error ${error.type} description must not contain single quotes`)
+      }
+    })
+
+    this.defaultParameters = props.defaultParameters
+      ? (objects.mapValues(props.defaultParameters, mapParameter) satisfies Record<
+          DefaultParameterName,
+          Parameter<'json-schema'>
+        >)
+      : undefined
+
+    this.metadata = props.metadata
+    this.security = props.security
+  }
+
+  addOperation<Path extends string>(operation: Operation<DefaultParameterName, SectionName, Path, 'zod-schema'>) {
+    addOperation(this, operation)
+  }
+
+  getRef(type: ComponentType, name: string): OpenApiZodAny {
+    if (!this.refs[type][name]) {
+      throw new VError(`${type} ${name} does not exist`)
+    }
+
+    return schema(z.object({}), {
+      type: undefined,
+      properties: undefined,
+      required: undefined,
+      $ref: `#/components/${type}/${name}`,
+    })
+  }
+}
 
 type SchemaType = 'zod-schema' | 'json-schema'
 type SchemaOfType<T extends SchemaType> = T extends 'zod-schema' ? OpenApiZodAny : SchemaObject
 
 export type Options = { allowUnions: boolean }
 const DEFAULT_OPTIONS: Options = { allowUnions: false }
-
-export type State<SchemaName extends string, DefaultParameterName extends string, SectionName extends string> = {
-  metadata: Metadata
-  refs: RefMap
-  defaultParameters?: { [name in DefaultParameterName]: Parameter<'json-schema'> }
-  sections: {
-    name: SectionName
-    title: string
-    description: string
-    schema?: string
-    operations: string[]
-  }[]
-  schemas: Record<SchemaName, { schema: SchemaObject; section: SectionName }>
-  errors?: ApiError[]
-  operations: { [name: string]: Operation<DefaultParameterName, SectionName, string, 'json-schema'> }
-  options?: Options
-  security?: Security[]
-}
 
 const unknownError: ApiError = {
   status: 500,
@@ -50,6 +141,14 @@ export type ApiError = {
   status: 400 | 401 | 402 | 403 | 404 | 405 | 408 | 409 | 410 | 413 | 415 | 424 | 429 | 500 | 501 | 502 | 503 | 504
   type: string
   description: string
+}
+
+export type Section<SectionName extends string> = {
+  name: SectionName
+  title: string
+  description: string
+  schema?: string
+  operations: string[]
 }
 
 export type Metadata = {
@@ -226,118 +325,6 @@ type BaseOperationProps<
   tags?: string[]
   // If an operation is deprecated
   deprecated?: boolean
-}
-
-type CreateStateProps<SchemaName extends string, DefaultParameterName extends string, SectionName extends string> = {
-  metadata: Metadata
-  defaultParameters?: Record<DefaultParameterName, Parameter<'zod-schema'>>
-  schemas?: Record<SchemaName, { schema: OpenApiZodAny; section: SectionName }>
-  sections?: Record<SectionName, { title: string; description: string }>
-  errors?: readonly ApiError[]
-  security?: Security[]
-}
-
-export function createState<SchemaName extends string, DefaultParameterName extends string, SectionName extends string>(
-  props: CreateStateProps<SchemaName, DefaultParameterName, SectionName>,
-  opts: Partial<Options> = {},
-): State<SchemaName, DefaultParameterName, SectionName> {
-  const options = { ...DEFAULT_OPTIONS, ...opts }
-
-  const schemaEntries = props.schemas
-    ? Object.entries<(typeof props.schemas)[SchemaName]>(props.schemas).map(([name, data]) => ({
-        name,
-        schema: data.schema,
-        section: data.section,
-      }))
-    : []
-
-  const schemas: Record<string, { schema: SchemaObject; section: SectionName }> = {}
-
-  const refs: State<SchemaName, DefaultParameterName, SectionName>['refs'] = {
-    parameters: {},
-    requestBodies: {},
-    responses: {},
-    schemas: {},
-  }
-
-  const toPairs = <K extends string, T>(obj: Record<K, T>): [K, T][] => Object.entries(obj) as [K, T][]
-
-  const sections = props.sections
-    ? toPairs(props.sections).map(([name, section]) => ({
-        ...section,
-        name,
-        operations: [],
-        schema: schemaEntries.find((schemaEntry) => schemaEntry.section === name)?.name,
-      }))
-    : []
-
-  schemaEntries.forEach((schemaEntry) => {
-    const name = schemaEntry.name
-
-    if (!isAlphanumeric(name)) {
-      throw new VError(`Invalid operation name ${name}. It must be alphanumeric and start with a letter`)
-    }
-
-    if (schemas[name]) {
-      throw new VError(`Schema ${name} already exists`)
-    }
-
-    schemas[name] = {
-      section: schemaEntry.section,
-      schema: generateSchemaFromZod(schemaEntry.schema, options),
-    }
-    refs.schemas[name] = true
-  })
-
-  const userErrors = props.errors ?? []
-  const defaultErrors = [unknownError, internalError]
-  const errors = uniqueBy([...defaultErrors, ...userErrors], 'type')
-
-  errors.forEach((error) => {
-    if (!isCapitalAlphabetical(error.type)) {
-      throw new VError(`Invalid error type ${error.type}. It must be alphabetical and start with a capital letter`)
-    }
-
-    if (error.description.includes('\n')) {
-      throw new VError(`Error ${error.type} description must not contain new lines`)
-    }
-
-    if (error.description.includes("\\'")) {
-      throw new VError(`Error ${error.type} description must not contain single quotes`)
-    }
-  })
-
-  const defaultParameters = props.defaultParameters
-    ? (objects.mapValues(props.defaultParameters, mapParameter) satisfies Record<
-        DefaultParameterName,
-        Parameter<'json-schema'>
-      >)
-    : undefined
-
-  return {
-    operations: {},
-    metadata: props.metadata,
-    defaultParameters,
-    errors,
-    refs,
-    schemas,
-    sections,
-    options,
-    security: props.security,
-  }
-}
-
-export function getRef(state: State<string, string, string>, type: ComponentType, name: string): OpenApiZodAny {
-  if (!state.refs[type][name]) {
-    throw new VError(`${type} ${name} does not exist`)
-  }
-
-  return schema(z.object({}), {
-    type: undefined,
-    properties: undefined,
-    required: undefined,
-    $ref: `#/components/${type}/${name}`,
-  })
 }
 
 export const mapParameter = (param: Parameter<'zod-schema'>): Parameter<'json-schema'> => {

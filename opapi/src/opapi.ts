@@ -85,16 +85,16 @@ function exportClient(state: State<string, string, string>) {
   function _exportClient(
     dir = '.',
     propsOrEndpoint: GenerateClientProps | string,
-    postProcessorsOrStateOpts?: OpenApiPostProcessors & ExportStateOptions,
+    postProcessorsAndStateOpts?: OpenApiPostProcessors & ExportStateOptions,
   ) {
     let options: GenerateClientProps
     if (typeof propsOrEndpoint === 'string') {
-      options = { generator: 'openapi-generator', endpoint: propsOrEndpoint, postProcessors: postProcessorsOrStateOpts }
+      options = { generator: 'openapi-generator', endpoint: propsOrEndpoint, postProcessors: postProcessorsAndStateOpts }
     } else {
       options = propsOrEndpoint
     }
 
-    state = applyExportOptions(state, postProcessorsOrStateOpts)
+    state = applyExportOptions(state, postProcessorsAndStateOpts)
 
     if (options.generator === 'openapi-generator') {
       return generateClientWithOpenapiGenerator(state, dir, options.endpoint, options.postProcessors)

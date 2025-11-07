@@ -35,15 +35,12 @@ export const schema = <T extends OpenApiZodAny>(
 export class OpenApi<SchemaName extends string, DefaultParameterName extends string, SectionName extends string> {
   private _state: State<SchemaName, DefaultParameterName, SectionName>
 
-  private constructor(state: State<SchemaName, DefaultParameterName, SectionName>) {
-    this._state = state
+  constructor(props: OpenApiProps<SchemaName, DefaultParameterName, SectionName>, options: Partial<Options> = {}) {
+    this._state = new State(props, options)
   }
 
-  static from<SchemaName extends string, DefaultParameterName extends string, SectionName extends string>(
-    props: OpenApiProps<SchemaName, DefaultParameterName, SectionName>,
-    options: Partial<Options> = {},
-  ) {
-    return new OpenApi(new State(props, options))
+  getState() {
+    return this._state
   }
 
   getModelRef(name: SchemaName): OpenApiZodAny {

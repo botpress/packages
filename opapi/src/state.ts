@@ -38,10 +38,8 @@ export class State<SchemaName extends string, DefaultParameterName extends strin
       schemas: {},
     }
 
-    const toPairs = <K extends string, T>(obj: Record<K, T>): [K, T][] => Object.entries(obj) as [K, T][]
-
     this.sections = props.sections
-      ? toPairs(props.sections).map(([name, section]) => ({
+      ? objects.entries(props.sections).map(([name, section]) => ({
           ...section,
           name,
           operations: [],

@@ -3,7 +3,7 @@ import VError from 'verror'
 import { defaultResponseStatus } from './const'
 import { generateSchemaFromZod } from './jsonschema'
 import { objects } from './objects'
-import { ComponentType, Security, State, getRef, isOperationWithBodyProps } from './state'
+import { ComponentType, Security, State, isOperationWithBodyProps } from './state'
 import { formatBodyName, formatResponseName } from './util'
 
 export const createOpenapi = <
@@ -61,7 +61,7 @@ export const createOpenapi = <
     })
 
     const responseRefSchema = generateSchemaFromZod(
-      getRef(state, ComponentType.RESPONSES, responseName),
+      state.getRef(ComponentType.RESPONSES, responseName),
     ) as unknown as ReferenceObject
 
     operationObject.security?.forEach((name) => securitySchemes.add(name))
@@ -96,7 +96,7 @@ export const createOpenapi = <
       })
 
       const bodyRefSchema = generateSchemaFromZod(
-        getRef(state, ComponentType.REQUESTS, bodyName),
+        state.getRef(ComponentType.REQUESTS, bodyName),
       ) as unknown as ReferenceObject
 
       operation.requestBody = bodyRefSchema

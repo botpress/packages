@@ -1,18 +1,18 @@
 * @botpress/engineering
 
 const @botpress/engineering
-entities @franklevasseur @botpress/engineering
-depsynky @franklevasseur @botpress/engineering
-es-node @franklevasseur @botpress/engineering
-jex @franklevasseur @botpress/engineering
-log4bot @franklevasseur @botpress/engineering
-opapi @michaelmass @franklevasseur @botpress/engineering
-promex @michaelmass @botpress/engineering
-ptb-schema @franklevasseur @botpress/engineering
-readiness @franklevasseur @botpress/engineering
-trail @michaelmass @botpress/engineering
-tunnel @franklevasseur @botpress/engineering
-verel @franklevasseur @botpress/engineering
-yargs-extra @franklevasseur @botpress/engineering
-zui @franklevasseur @botpress/engineering
-slackdown @pascal-botpress @botpress/engineering
+entities @franklevasseur @botpress/leads
+depsynky @franklevasseur @botpress/leads
+es-node @franklevasseur @botpress/leads
+jex @botpress/squid @botpress/leads
+log4bot @franklevasseur @botpress/leads
+opapi @botpress/squid @botpress/leads
+promex @michaelmass @botpress/leads
+ptb-schema @franklevasseur @botpress/leads
+readiness @botpress/squid @botpress/leads
+trail @michaelmass @botpress/leads
+tunnel @botpress/squid @botpress/leads
+verel @botpress/squid @botpress/leads
+yargs-extra @franklevasseur @botpress/leads
+zui @botpress/squid @botpress/leads
+slackdown @botpress/squid @botpress/leads

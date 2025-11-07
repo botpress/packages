@@ -1,10 +1,10 @@
 import { describe, it, expect } from 'vitest'
-import { createState } from './state'
 import { z } from 'zod'
 import { applyExportOptions } from './export-options'
 import { addOperation } from './operation'
+import { State, CreateStateProps } from './state'
 
-type AnyProps = Parameters<typeof createState>[0]
+type AnyProps = CreateStateProps<string, string, string>
 
 function getApiState() {
   const metadata = {
@@ -34,7 +34,7 @@ function getApiState() {
   })
   const tree: z.ZodType = z.union([leaf, node])
 
-  const state = createState(
+  const state = new State(
     {
       metadata,
       sections,

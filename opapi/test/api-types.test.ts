@@ -10,7 +10,7 @@ describe('api types generator', () => {
 
     const api = getMockApi()
 
-    api.exportTypesBySection(genClientFolder)
+    await api.exportTypesBySection(genClientFolder)
 
     const files = getFiles(genClientFolder)
 

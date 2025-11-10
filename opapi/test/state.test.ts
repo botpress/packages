@@ -40,7 +40,7 @@ const expectedErrorMessage = 'allOf, anyOf and oneOf are not supported'
 describe('openapi generator with unions not allowed', () => {
   it('should not allow unions when creating api', async () => {
     expect(() => {
-      OpenApi({
+      new OpenApi({
         metadata,
         sections,
         schemas: {
@@ -54,7 +54,7 @@ describe('openapi generator with unions not allowed', () => {
   })
 
   it('should not allow unions in response when adding an operation', async () => {
-    const api = OpenApi({ metadata, sections })
+    const api = new OpenApi({ metadata, sections })
     expect(() => {
       api.addOperation({
         name: 'getTree',
@@ -77,7 +77,7 @@ describe('openapi generator with unions not allowed', () => {
   })
 
   it('should not allow unions in request body when adding an operation', async () => {
-    const api = OpenApi({ metadata, sections })
+    const api = new OpenApi({ metadata, sections })
     expect(() => {
       api.addOperation({
         name: 'createTree',
@@ -100,7 +100,7 @@ describe('openapi generator with unions not allowed', () => {
 describe('openapi generator with unions allowed', () => {
   const opts = { allowUnions: true } as const
   it('should allow unions when creating api', async () => {
-    OpenApi(
+    new OpenApi(
       {
         metadata,
         sections,
@@ -116,7 +116,7 @@ describe('openapi generator with unions allowed', () => {
   })
 
   it('should allow unions in response when adding an operation', async () => {
-    const api = OpenApi({ metadata, sections }, opts)
+    const api = new OpenApi({ metadata, sections }, opts)
     api.addOperation({
       name: 'getTree',
       description: 'Get a tree',
@@ -137,7 +137,7 @@ describe('openapi generator with unions allowed', () => {
   })
 
   it('should allow unions in request body when adding an operation', async () => {
-    const api = OpenApi({ metadata, sections }, opts)
+    const api = new OpenApi({ metadata, sections }, opts)
     api.addOperation({
       name: 'createTree',
       description: 'Create a tree',
@@ -157,7 +157,7 @@ describe('openapi generator with unions allowed', () => {
 
 describe('openapi state generator', () => {
   it('should export state', async () => {
-    const api = OpenApi(
+    const api = new OpenApi(
       {
         metadata,
         sections,
@@ -184,7 +184,7 @@ describe('openapi state generator', () => {
   })
 
   it('should export state without defaultParameters when ignoreDefaultParameters is set', async () => {
-    const api = OpenApi(
+    const api = new OpenApi(
       {
         security: ['BearerAuth'],
         metadata,
@@ -248,7 +248,7 @@ describe('openapi state generator', () => {
   })
 
   it('should export state defaultParameters', async () => {
-    const api = OpenApi(
+    const api = new OpenApi(
       {
         security: ['BearerAuth'],
         metadata,

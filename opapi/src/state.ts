@@ -228,7 +228,11 @@ type BaseOperationProps<
   deprecated?: boolean
 }
 
-type CreateStateProps<SchemaName extends string, DefaultParameterName extends string, SectionName extends string> = {
+export type CreateStateProps<
+  SchemaName extends string,
+  DefaultParameterName extends string,
+  SectionName extends string,
+> = {
   metadata: Metadata
   defaultParameters?: Record<DefaultParameterName, Parameter<'zod-schema'>>
   schemas?: Record<SchemaName, { schema: OpenApiZodAny; section: SectionName }>

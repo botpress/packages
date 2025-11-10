@@ -7,22 +7,11 @@ import {
   generateServer,
   generateTypesBySection,
 } from './generator'
-import { addOperation } from './operation'
-import {
-  ApiError,
-  ComponentType,
-  createState,
-  getRef,
-  Metadata,
-  Operation,
-  Options,
-  Parameter,
-  State,
-  Security,
-} from './state'
+import { ComponentType, Operation, Options, State, CreateStateProps, getRef, createState } from './state'
 import { exportStateAsTypescript, ExportStateAsTypescriptOptions } from './generators/ts-state'
 import { generateHandler } from './handler-generator'
 import { applyExportOptions, ExportStateOptions } from './export-options'
+import { addOperation } from './operation'
 export { Operation, Parameter } from './state'
 
 type AnatineSchemaObject = NonNullable<Parameters<typeof extendApi>[1]>
@@ -36,25 +25,67 @@ export const schema = <T extends OpenApiZodAny>(
   return extendApi(copy, schemaObject)
 }
 
-export type OpenApi<
-  SchemaName extends string = string,
-  DefaultParameterName extends string = string,
-  SectionName extends string = string,
-> = ReturnType<typeof createOpapiFromState<SchemaName, DefaultParameterName, SectionName>>
+export class OpenApi<SchemaName extends string, DefaultParameterName extends string, SectionName extends string> {
+  private _state: State<SchemaName, DefaultParameterName, SectionName>
 
-// TODO: ensure type inference comes from field 'sections' not 'schemas'
-export type OpenApiProps<SchemaName extends string, DefaultParameterName extends string, SectionName extends string> = {
-  metadata: Metadata
-  // adds default parameters to all operations
-  defaultParameters?: Record<DefaultParameterName, Parameter<'zod-schema'>>
-  // adds the openapi schemas
-  schemas?: Record<SchemaName, { schema: OpenApiZodAny; section: SectionName }>
-  // adds the openapi tags
-  sections?: Record<SectionName, { title: string; description: string }>
-  // add the openapi errors
-  errors?: readonly ApiError[]
-  // add security schemes
-  security?: Security[]
+  constructor(props: CreateStateProps<SchemaName, DefaultParameterName, SectionName>, options: Partial<Options> = {}) {
+    this._state = createState(props, options)
+  }
+
+  static fromState<SchemaName extends string, DefaultParameterName extends string, SectionName extends string>(
+    state: State<SchemaName, DefaultParameterName, SectionName>,
+  ) {
+    const openapi = new OpenApi({ metadata: state.metadata })
+    openapi._state = state
+    return openapi
+  }
+
+  getModelRef(name: SchemaName): OpenApiZodAny {
+    return getRef(this._state, ComponentType.SCHEMAS, name)
+  }
+
+  addOperation<Path extends string>(operation: Operation<DefaultParameterName, SectionName, Path, 'zod-schema'>) {
+    addOperation(this._state, operation)
+  }
+
+  exportClient(dir: string, options: GenerateClientOptions & ExportStateOptions) {
+    if (options.generator === 'openapi-generator') {
+      return generateClientWithOpenapiGenerator(
+        applyExportOptions(this._state, options),
+        dir,
+        options.endpoint,
+        options.postProcessors,
+      )
+    }
+    if (options.generator === 'opapi') {
+      return generateClientWithOpapi(applyExportOptions(this._state, options), dir)
+    }
+    throw new Error('Unknown generator')
+  }
+
+  exportTypesBySection(dir = '.', options?: ExportStateOptions) {
+    return generateTypesBySection(applyExportOptions(this._state, options), dir)
+  }
+
+  exportServer(dir = '.', useExpressTypes: boolean, options?: ExportStateOptions) {
+    return generateServer(applyExportOptions(this._state, options), dir, useExpressTypes)
+  }
+
+  exportOpenapi(dir = '.', options?: ExportStateOptions) {
+    return generateOpenapi(applyExportOptions(this._state, options), dir)
+  }
+
+  exportState(dir = '.', options?: ExportStateAsTypescriptOptions & ExportStateOptions) {
+    return exportStateAsTypescript(applyExportOptions(this._state, options), dir, options)
+  }
+
+  exportErrors(dir = '.') {
+    return generateErrorsFile(this._state.errors ?? [], dir)
+  }
+
+  exportHandler(dir = '.', options?: ExportStateOptions) {
+    return generateHandler(applyExportOptions(this._state, options), dir)
+  }
 }
 
 export type CodePostProcessor = (code: string) => Promise<string> | string
@@ -63,7 +94,7 @@ export type OpenApiPostProcessors = {
   apiCode: CodePostProcessor
 }
 
-export type GenerateClientProps = (
+export type GenerateClientOptions = (
   | {
       generator: 'openapi-generator'
       endpoint: string
@@ -74,82 +105,6 @@ export type GenerateClientProps = (
     }
 ) &
   ExportStateOptions
-
-function exportClient(state: State<string, string, string>) {
-  function _exportClient(dir: string, props: GenerateClientProps): Promise<void>
-  function _exportClient(
-    dir: string,
-    openapiGeneratorEndpoint: string,
-    props?: OpenApiPostProcessors & ExportStateOptions,
-  ): Promise<void>
-  function _exportClient(
-    dir = '.',
-    propsOrEndpoint: GenerateClientProps | string,
-    postProcessorsAndStateOpts?: OpenApiPostProcessors & ExportStateOptions,
-  ) {
-    let options: GenerateClientProps
-    if (typeof propsOrEndpoint === 'string') {
-      options = {
-        generator: 'openapi-generator',
-        endpoint: propsOrEndpoint,
-        postProcessors: postProcessorsAndStateOpts,
-      }
-    } else {
-      options = propsOrEndpoint
-    }
-
-    state = applyExportOptions(state, postProcessorsAndStateOpts)
-
-    if (options.generator === 'openapi-generator') {
-      return generateClientWithOpenapiGenerator(state, dir, options.endpoint, options.postProcessors)
-    }
-    if (options.generator === 'opapi') {
-      return generateClientWithOpapi(state, dir)
-    }
-    throw new Error('Unknown generator')
-  }
-  return _exportClient
-}
-
-const createOpapiFromState = <
-  SchemaName extends string,
-  DefaultParameterName extends string,
-  SectionName extends string,
->(
-  state: State<SchemaName, DefaultParameterName, SectionName>,
-) => {
-  return {
-    getModelRef: (name: SchemaName): OpenApiZodAny => getRef(state, ComponentType.SCHEMAS, name),
-    getState: () => state,
-    addOperation: <Path extends string>(
-      operationProps: Operation<DefaultParameterName, SectionName, Path, 'zod-schema'>,
-    ) => addOperation(state, operationProps),
-    exportClient: exportClient(state),
-    exportTypesBySection: (dir = '.', opts?: ExportStateOptions) =>
-      generateTypesBySection(applyExportOptions(state, opts), dir),
-    exportServer: (dir = '.', useExpressTypes: boolean, opts?: ExportStateOptions) =>
-      generateServer(applyExportOptions(state, opts), dir, useExpressTypes),
-    exportOpenapi: (dir = '.', opts?: ExportStateOptions) => generateOpenapi(applyExportOptions(state, opts), dir),
-    exportState: (dir = '.', opts?: ExportStateAsTypescriptOptions & ExportStateOptions) =>
-      exportStateAsTypescript(applyExportOptions(state, opts), dir, opts),
-    exportErrors: (dir = '.') => generateErrorsFile(state.errors ?? [], dir),
-    exportHandler: (dir = '.', opts?: ExportStateOptions) => generateHandler(applyExportOptions(state, opts), dir),
-  }
-}
-
-export function OpenApi<SchemaName extends string, DefaultParameterName extends string, SectionName extends string>(
-  props: OpenApiProps<SchemaName, DefaultParameterName, SectionName>,
-  opts: Partial<Options> = {},
-) {
-  const state = createState(props, opts)
-  return createOpapiFromState(state)
-}
-
-export namespace OpenApi {
-  export const fromState = <SchemaName extends string, DefaultParameterName extends string, SectionName extends string>(
-    state: State<SchemaName, DefaultParameterName, SectionName>,
-  ) => createOpapiFromState(state as State<SchemaName, DefaultParameterName, SectionName>)
-}
 
 export type SchemaOf<O extends OpenApi<any, any, any>> =
   O extends OpenApi<infer Skema, infer _Param, infer _Sexion> ? Skema : never

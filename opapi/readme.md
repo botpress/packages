@@ -10,7 +10,7 @@ Install the package and start creating your OpenAPI specification. See the examp
 import { OpenApi, schema } from '@bpinternal/opapi'
 import { z } from 'zod'
 
-const api = OpenApi({
+const api = new OpenApi({
   metadata: {
     title: 'Example API', // This is the title of the API
     description: 'Description of this api', // This is the description of the API
@@ -21,7 +21,7 @@ const api = OpenApi({
   // This is metadata to be used in the documentation
   section: {
     User: {
-      tilte: 'User',
+      title: 'User',
       description: 'User related endpoints',
     },
   },

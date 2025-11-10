@@ -7,7 +7,7 @@ import {
   generateServer,
   generateTypesBySection,
 } from './generator'
-import { ComponentType, Operation, Options, State, CreateStateProps, cloneState, getRef, createState } from './state'
+import { ComponentType, Operation, Options, State, CreateStateProps, getRef, createState } from './state'
 import { exportStateAsTypescript, ExportStateAsTypescriptOptions } from './generators/ts-state'
 import { generateHandler } from './handler-generator'
 import { applyExportOptions, ExportStateOptions } from './export-options'
@@ -38,10 +38,6 @@ export class OpenApi<SchemaName extends string, DefaultParameterName extends str
     const openapi = new OpenApi({ metadata: state.metadata })
     openapi._state = state
     return openapi
-  }
-
-  getState() {
-    return cloneState(this._state)
   }
 
   getModelRef(name: SchemaName): OpenApiZodAny {

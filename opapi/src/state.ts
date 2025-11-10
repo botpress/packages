@@ -331,10 +331,6 @@ export function createState<SchemaName extends string, DefaultParameterName exte
   }
 }
 
-export function cloneState(state: State<string, string, string>) {
-  return Object.assign(Object.create(Object.getPrototypeOf(state)), state)
-}
-
 export function getRef(state: State<string, string, string>, type: ComponentType, name: string): OpenApiZodAny {
   if (!state.refs[type][name]) {
     throw new VError(`${type} ${name} does not exist`)

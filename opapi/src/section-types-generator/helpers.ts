@@ -3,7 +3,6 @@ import type { SchemaObject } from 'openapi3-ts'
 import { pascal, title } from 'radash'
 import { createOpenapi } from '../openapi'
 import { Block, DefaultState } from './types'
-import { cloneState } from 'src/state'
 
 export const pascalize = (str: string) => pascal(title(str))
 
@@ -73,7 +72,7 @@ export function remove$RefPropertiesFromSchema(
 export async function getDereferencedSchema(state: DefaultState) {
   // this doesn't do a deep clone, which helps us in the dereference step
   // in other words, openapi still has references to the original objects in state
-  const clonedState = cloneState(state)
+  const clonedState = JSON.parse(JSON.stringify(state))
   const openapi = createOpenapi(clonedState).getSpec()
   // this dereferences those objects in place
   await OpenAPIParser.dereference(openapi as any)

@@ -13,6 +13,9 @@ import {
   Options,
   State,
   CreateStateProps,
+  cloneState,
+  getRef,
+  createState,
 } from './state'
 import { exportStateAsTypescript, ExportStateAsTypescriptOptions } from './generators/ts-state'
 import { generateHandler } from './handler-generator'
@@ -35,7 +38,7 @@ export class OpenApi<SchemaName extends string, DefaultParameterName extends str
   private _state: State<SchemaName, DefaultParameterName, SectionName>
 
   constructor(props: CreateStateProps<SchemaName, DefaultParameterName, SectionName>, options: Partial<Options> = {}) {
-    this._state = new State(props, options)
+    this._state = createState(props, options)
   }
 
   static fromState<SchemaName extends string, DefaultParameterName extends string, SectionName extends string>(
@@ -47,11 +50,11 @@ export class OpenApi<SchemaName extends string, DefaultParameterName extends str
   }
 
   getState() {
-    return this._state.clone()
+    return cloneState(this._state)
   }
 
   getModelRef(name: SchemaName): OpenApiZodAny {
-    return this._state.getRef(ComponentType.SCHEMAS, name)
+    return getRef(this._state, ComponentType.SCHEMAS, name)
   }
 
   addOperation<Path extends string>(operation: Operation<DefaultParameterName, SectionName, Path, 'zod-schema'>) {

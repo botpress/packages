@@ -2,7 +2,7 @@ import { describe, it, expect } from 'vitest'
 import { z } from 'zod'
 import { applyExportOptions } from './export-options'
 import { addOperation } from './operation'
-import { State, CreateStateProps } from './state'
+import { CreateStateProps, createState } from './state'
 
 type AnyProps = CreateStateProps<string, string, string>
 
@@ -34,27 +34,24 @@ function getApiState() {
   })
   const tree: z.ZodType = z.union([leaf, node])
 
-  const state = new State(
-    {
-      metadata,
-      sections,
-      defaultParameters: {
-        'x-tree': {
-          description: 'Tree id',
-          in: 'header',
-          type: 'string',
-        },
+  const state = createState({
+    metadata,
+    sections,
+    defaultParameters: {
+      'x-tree': {
+        description: 'Tree id',
+        in: 'header',
+        type: 'string',
       },
-      schemas: {
-        Tree: {
-          section: 'trees',
-          schema: tree,
-        },
-      },
-      security: ['BearerAuth'],
     },
-    { allowUnions: true },
-  )
+    schemas: {
+      Tree: {
+        section: 'trees',
+        schema: tree,
+      },
+    },
+    security: ['BearerAuth'],
+  }, { allowUnions: true })
 
   addOperation(state, {
     security: ['BearerAuth'],

@@ -98,7 +98,7 @@ function exportClient(state: State<string, string, string>) {
       options = propsOrEndpoint
     }
 
-    state = applyExportOptions(state, postProcessorsAndStateOpts)
+    state = applyExportOptions(state, options)
 
     if (options.generator === 'openapi-generator') {
       return generateClientWithOpenapiGenerator(state, dir, options.endpoint, options.postProcessors)

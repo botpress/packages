@@ -44,6 +44,14 @@ export const getMockApi = () => {
         type: 'FooNotFound',
       },
     ],
+    defaultParameters: {
+      xFoo: {
+        in: 'header',
+        description: 'Foo',
+        type: 'string',
+        required: true,
+      },
+    },
     metadata: {
       title: 'Test API',
       description: 'Test API',

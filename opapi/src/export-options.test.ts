@@ -34,24 +34,27 @@ function getApiState() {
   })
   const tree: z.ZodType = z.union([leaf, node])
 
-  const state = createState({
-    metadata,
-    sections,
-    defaultParameters: {
-      'x-tree': {
-        description: 'Tree id',
-        in: 'header',
-        type: 'string',
+  const state = createState(
+    {
+      metadata,
+      sections,
+      defaultParameters: {
+        'x-tree': {
+          description: 'Tree id',
+          in: 'header',
+          type: 'string',
+        },
       },
-    },
-    schemas: {
-      Tree: {
-        section: 'trees',
-        schema: tree,
+      schemas: {
+        Tree: {
+          section: 'trees',
+          schema: tree,
+        },
       },
+      security: ['BearerAuth'],
     },
-    security: ['BearerAuth'],
-  }, { allowUnions: true })
+    { allowUnions: true },
+  )
 
   addOperation(state, {
     security: ['BearerAuth'],

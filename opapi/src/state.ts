@@ -8,7 +8,9 @@ import { objects } from './objects'
 import { JSONSchema7 } from 'json-schema'
 
 type SchemaType = 'any-schema' | 'json-schema'
-export type SchemaOfType<T extends SchemaType> = T extends 'json-schema' ? SchemaObject : OpenApiZodAny | SchemaObject | JSONSchema7
+export type SchemaOfType<T extends SchemaType> = T extends 'json-schema'
+  ? SchemaObject
+  : OpenApiZodAny | SchemaObject | JSONSchema7
 
 export type Options = { allowUnions: boolean }
 const DEFAULT_OPTIONS: Options = { allowUnions: false }

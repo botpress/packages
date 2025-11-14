@@ -23,8 +23,10 @@ export const isJSONSchema = (source: SchemaOfType<'any-schema'>): source is JSON
   if (!('exclusiveMinimum' in source) && !('exclusiveMaximum' in source)) {
     return true
   }
-  if (('exclusiveMinimum' in source && typeof source['exclusiveMinimum'] === 'number')
-      || ('exclusiveMaximum' in source && typeof source['exclusiveMaximum'] === 'number')) {
+  if (
+    ('exclusiveMinimum' in source && typeof source['exclusiveMinimum'] === 'number') ||
+    ('exclusiveMaximum' in source && typeof source['exclusiveMaximum'] === 'number')
+  ) {
     return true
   }
   return false
@@ -51,7 +53,10 @@ export const extendSchema = <T extends SchemaOfType<'any-schema'>>(source: T, ex
   return extendApi(source, extra)
 }
 
-export const convertToJsonSchema = (source: SchemaOfType<'any-schema'>, opts?: GenerateSchemaFromZodOpts): SchemaObject => {
+export const convertToJsonSchema = (
+  source: SchemaOfType<'any-schema'>,
+  opts?: GenerateSchemaFromZodOpts,
+): SchemaObject => {
   let schema: SchemaObject | undefined = undefined
   if (isZodSchema(source)) {
     schema = generateJsonSchema(source, opts?.useOutput) as SchemaObject

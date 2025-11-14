@@ -31,7 +31,7 @@ const jsonSchemaToTs = async (originalSchema: JSONSchema7, name: string): Promis
 }
 
 const zodToJsonSchema = (zodSchema: OpenApiZodAny): JSONSchema7 => {
-  let jsonSchema = jsonschema.generateSchemaFromZod(zodSchema, { allowUnions: true }) as JSONSchema7
+  let jsonSchema = jsonschema.convertToJsonSchema(zodSchema, { allowUnions: true }) as JSONSchema7
   jsonSchema = jsonschema.replaceNullableWithUnion(jsonSchema)
   jsonSchema = jsonschema.replaceOneOfWithAnyOf(jsonSchema)
   return jsonSchema

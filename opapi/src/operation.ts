@@ -1,5 +1,5 @@
 import { VError } from 'verror'
-import { extendSchema, generateSchemaFromZod } from './jsonschema'
+import { extendSchema, convertToJsonSchema } from './jsonschema'
 import { objects } from './objects'
 import {
   Operation,
@@ -48,7 +48,7 @@ export const addOperation = <
   const response = {
     description: operationProps.response.description,
     status: operationProps.response.status,
-    schema: generateSchemaFromZod(
+    schema: convertToJsonSchema(
       extendSchema(operationProps.response.schema, { title: responseName, format: operationProps.response.format }),
       state.options,
     ),
@@ -64,7 +64,7 @@ export const addOperation = <
       response,
       requestBody: {
         description: operationProps.requestBody.description,
-        schema: generateSchemaFromZod(
+        schema: convertToJsonSchema(
           extendSchema(operationProps.requestBody.schema, {
             title: bodyName,
             format: operationProps.requestBody?.format,

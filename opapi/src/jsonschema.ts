@@ -3,20 +3,47 @@ import { JSONSchema7, JSONSchema7Definition } from 'json-schema'
 import type { SchemaObject } from 'openapi3-ts'
 import { removeFromArray } from './util'
 import _ from 'lodash'
+import { SchemaOfType } from './state'
 
 export type GenerateSchemaFromZodOpts = {
   useOutput?: boolean
   allowUnions?: boolean
 }
 
-export type JsonSchema = JSONSchema7
 export type NullableJsonSchema = JSONSchema7 & { nullable?: boolean }
 
-export const isZodSchema = (source: OpenApiZodAny | SchemaObject): source is OpenApiZodAny => {
+export const isZodSchema = (source: SchemaOfType<'any-schema'>): source is OpenApiZodAny => {
   return '_def' in source
 }
 
-export const extendSchema = <T extends OpenApiZodAny | SchemaObject>(source: T, extra: SchemaObject): T => {
+export const isJSONSchema = (source: SchemaOfType<'any-schema'>): source is JSONSchema7 => {
+  if (isZodSchema(source)) {
+    return false
+  }
+  if (!('exclusiveMinimum' in source) && !('exclusiveMaximum' in source)) {
+    return true
+  }
+  if (('exclusiveMinimum' in source && typeof source['exclusiveMinimum'] === 'number')
+      || ('exclusiveMaximum' in source && typeof source['exclusiveMaximum'] === 'number')) {
+    return true
+  }
+  return false
+}
+
+export const jsonSchemaToSchemaObject = (source: JSONSchema7): SchemaObject => {
+  const schema = source as any
+  if ('exclusiveMinimum' in schema) {
+    schema['minimum'] = schema['exclusiveMinimum']
+    schema['exclusiveMinimum'] = true
+  }
+  if ('exclusiveMaximum' in schema) {
+    schema['minimum'] = schema['exclusiveMaximum']
+    schema['exclusiveMaximum'] = true
+  }
+  return schema as SchemaObject
+}
+
+export const extendSchema = <T extends SchemaOfType<'any-schema'>>(source: T, extra: SchemaObject): T => {
   if (!isZodSchema(source)) {
     Object.assign(source, extra)
     return source
@@ -24,12 +51,20 @@ export const extendSchema = <T extends OpenApiZodAny | SchemaObject>(source: T, 
   return extendApi(source, extra)
 }
 
-export const generateSchemaFromZod = (source: OpenApiZodAny | SchemaObject, opts?: GenerateSchemaFromZodOpts) => {
-  if (!isZodSchema(source)) {
-    formatJsonSchema(source, opts?.allowUnions ?? false)
-    return source
+export const convertToJsonSchema = (source: SchemaOfType<'any-schema'>, opts?: GenerateSchemaFromZodOpts): SchemaObject => {
+  let schema: SchemaObject | undefined = undefined
+  if (isZodSchema(source)) {
+    schema = generateJsonSchema(source, opts?.useOutput) as SchemaObject
   }
-  const schema = generateJsonSchema(source, opts?.useOutput) as SchemaObject
+  if (isJSONSchema(source)) {
+    schema = jsonSchemaToSchemaObject(source)
+  }
+  if (!isJSONSchema(source) && !isZodSchema(source)) {
+    schema = source
+  }
+  if (schema === undefined) {
+    throw new Error('Invalid state. An internal error occured.')
+  }
   formatJsonSchema(schema, opts?.allowUnions ?? false)
   return schema
 }
@@ -86,26 +121,26 @@ export function schemaIsEmptyObject(schema: SchemaObject) {
 }
 
 const exploreJsonSchemaDef =
-  (cb: (s: JsonSchema) => JsonSchema) =>
+  (cb: (s: JSONSchema7) => JSONSchema7) =>
   (inputSchema: JSONSchema7Definition): JSONSchema7Definition => {
     if (typeof inputSchema === 'boolean') {
       return inputSchema
     }
-    return exploreJsonSchema(cb)(inputSchema)
+    return exploreJSONSchema7(cb)(inputSchema)
   }
 
-export const exploreJsonSchema =
-  (cb: (s: JsonSchema) => JsonSchema) =>
-  (inputSchema: JsonSchema): JsonSchema => {
+export const exploreJSONSchema7 =
+  (cb: (s: JSONSchema7) => JSONSchema7) =>
+  (inputSchema: JSONSchema7): JSONSchema7 => {
     const mappedSchema = cb(inputSchema)
 
     if (mappedSchema.type === 'object') {
       const properties = mappedSchema.properties
-        ? _.mapValues(mappedSchema.properties, exploreJsonSchema(cb))
+        ? _.mapValues(mappedSchema.properties, exploreJSONSchema7(cb))
         : mappedSchema.properties
       const additionalProperties =
         typeof mappedSchema.additionalProperties === 'object'
-          ? exploreJsonSchema(cb)(mappedSchema.additionalProperties)
+          ? exploreJSONSchema7(cb)(mappedSchema.additionalProperties)
           : mappedSchema.additionalProperties
       return { ...mappedSchema, properties, additionalProperties }
     }
@@ -154,7 +189,7 @@ export const exploreJsonSchema =
  * This function replaces all occurences of { type: T, nullable: true } with { anyOf: [{ type: T }, { type: 'null' }] }
  */
 export const replaceNullableWithUnion = (schema: NullableJsonSchema): JSONSchema7 => {
-  const mapper = exploreJsonSchema((s) => {
+  const mapper = exploreJSONSchema7((s) => {
     const { nullable, ...schema } = s as NullableJsonSchema
     if (nullable) {
       const { title, description, ...rest } = schema
@@ -170,8 +205,8 @@ export const replaceNullableWithUnion = (schema: NullableJsonSchema): JSONSchema
  * This is a mistake as a union does not enforce that only one of the types is present.
  * This function replaces all occurences of { oneOf: [{ type: T1 }, { type: T2 }] } with { anyOf: [{ type: T1 }, { type: T2 }] }
  */
-export const replaceOneOfWithAnyOf = (oneOfSchema: JsonSchema): JSONSchema7 => {
-  const mapper = exploreJsonSchema((schema) => {
+export const replaceOneOfWithAnyOf = (oneOfSchema: JSONSchema7): JSONSchema7 => {
+  const mapper = exploreJSONSchema7((schema) => {
     if (schema.oneOf) {
       const { oneOf, ...rest } = schema
       return { anyOf: oneOf, ...rest }
@@ -181,7 +216,7 @@ export const replaceOneOfWithAnyOf = (oneOfSchema: JsonSchema): JSONSchema7 => {
   return mapper(oneOfSchema)
 }
 
-const _setDefaultAdditionalPropertiesInPlace = (schema: JsonSchema, additionalProperties: boolean): void => {
+const _setDefaultAdditionalPropertiesInPlace = (schema: JSONSchema7, additionalProperties: boolean): void => {
   if (schema.type === 'object') {
     schema.additionalProperties ??= additionalProperties
 
@@ -218,7 +253,7 @@ const _setDefaultAdditionalPropertiesInPlace = (schema: JsonSchema, additionalPr
   return
 }
 
-export const setDefaultAdditionalProperties = (schema: JsonSchema, additionalProperties: boolean): JsonSchema => {
+export const setDefaultAdditionalProperties = (schema: JSONSchema7, additionalProperties: boolean): JSONSchema7 => {
   const copy = _.cloneDeep(schema)
   _setDefaultAdditionalPropertiesInPlace(copy, additionalProperties)
   return copy

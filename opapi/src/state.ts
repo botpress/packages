@@ -2,12 +2,13 @@ import type { ReferenceObject, SchemaObject } from 'openapi3-ts'
 import { VError } from 'verror'
 import type { PathParams } from './path-params'
 import { isAlphanumeric, isCapitalAlphabetical, uniqueBy } from './util'
-import { generateSchemaFromZod } from './jsonschema'
+import { convertToJsonSchema } from './jsonschema'
 import { OpenApiZodAny } from '@anatine/zod-openapi'
 import { objects } from './objects'
+import { JSONSchema7 } from 'json-schema'
 
 type SchemaType = 'any-schema' | 'json-schema'
-type SchemaOfType<T extends SchemaType> = T extends 'json-schema' ? SchemaObject : OpenApiZodAny | SchemaObject
+export type SchemaOfType<T extends SchemaType> = T extends 'json-schema' ? SchemaObject : OpenApiZodAny | SchemaObject | JSONSchema7
 
 export type Options = { allowUnions: boolean }
 const DEFAULT_OPTIONS: Options = { allowUnions: false }
@@ -286,7 +287,7 @@ export function createState<SchemaName extends string, DefaultParameterName exte
 
     schemas[name] = {
       section: schemaEntry.section,
-      schema: generateSchemaFromZod(schemaEntry.schema, options),
+      schema: convertToJsonSchema(schemaEntry.schema, options),
     }
     refs.schemas[name] = true
   })
@@ -343,7 +344,7 @@ export const mapParameter = (param: Parameter<'any-schema'>): Parameter<'json-sc
   if ('schema' in param) {
     return {
       ...param,
-      schema: generateSchemaFromZod(param.schema),
+      schema: convertToJsonSchema(param.schema),
     }
   }
   return param

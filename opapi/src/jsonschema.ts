@@ -1,4 +1,4 @@
-import { OpenApiZodAny, generateSchema as generateJsonSchema } from '@anatine/zod-openapi'
+import { OpenApiZodAny, extendApi, generateSchema as generateJsonSchema } from '@anatine/zod-openapi'
 import { JSONSchema7, JSONSchema7Definition } from 'json-schema'
 import type { SchemaObject } from 'openapi3-ts'
 import { removeFromArray } from './util'
@@ -12,10 +12,26 @@ export type GenerateSchemaFromZodOpts = {
 export type JsonSchema = JSONSchema7
 export type NullableJsonSchema = JSONSchema7 & { nullable?: boolean }
 
-export const generateSchemaFromZod = (zodRef: OpenApiZodAny, opts?: GenerateSchemaFromZodOpts) => {
-  const jsonSchema = generateJsonSchema(zodRef, opts?.useOutput) as SchemaObject
-  formatJsonSchema(jsonSchema, opts?.allowUnions ?? false)
-  return jsonSchema
+export const isZodSchema = (source: OpenApiZodAny | SchemaObject): source is OpenApiZodAny => {
+  return '_def' in source
+}
+
+export const extendSchema = <T extends OpenApiZodAny | SchemaObject>(source: T, extra: SchemaObject): T => {
+  if (!isZodSchema(source)) {
+    Object.assign(source, extra)
+    return source
+  }
+  return extendApi(source, extra)
+}
+
+export const generateSchemaFromZod = (source: OpenApiZodAny | SchemaObject, opts?: GenerateSchemaFromZodOpts) => {
+  if (!isZodSchema(source)) {
+    formatJsonSchema(source, opts?.allowUnions ?? false)
+    return source
+  }
+  const schema = generateJsonSchema(source, opts?.useOutput) as SchemaObject
+  formatJsonSchema(schema, opts?.allowUnions ?? false)
+  return schema
 }
 
 export const formatJsonSchema = (jsonSchema: SchemaObject, allowUnions: boolean) => {

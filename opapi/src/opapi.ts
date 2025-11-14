@@ -12,6 +12,8 @@ import { exportStateAsTypescript, ExportStateAsTypescriptOptions } from './gener
 import { generateHandler } from './handler-generator'
 import { applyExportOptions, ExportStateOptions } from './export-options'
 import { addOperation } from './operation'
+import { z } from 'zod'
+import { ReferenceObject } from 'openapi3-ts'
 export { Operation, Parameter } from './state'
 
 type AnatineSchemaObject = NonNullable<Parameters<typeof extendApi>[1]>
@@ -40,11 +42,15 @@ export class OpenApi<SchemaName extends string, DefaultParameterName extends str
     return openapi
   }
 
-  getModelRef(name: SchemaName): OpenApiZodAny {
+  getJSONModelRef(name: SchemaName): ReferenceObject {
     return getRef(this._state, ComponentType.SCHEMAS, name)
   }
 
-  addOperation<Path extends string>(operation: Operation<DefaultParameterName, SectionName, Path, 'zod-schema'>) {
+  getModelRef(name: SchemaName): OpenApiZodAny {
+    return schema(z.object({}), getRef(this._state, ComponentType.SCHEMAS, name))
+  }
+
+  addOperation<Path extends string>(operation: Operation<DefaultParameterName, SectionName, Path, 'any-schema'>) {
     addOperation(this._state, operation)
   }
 

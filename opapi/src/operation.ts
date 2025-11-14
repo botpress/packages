@@ -65,7 +65,10 @@ export const addOperation = <
       requestBody: {
         description: operationProps.requestBody.description,
         schema: generateSchemaFromZod(
-          extendSchema(operationProps.requestBody.schema, { title: bodyName, format: operationProps.requestBody?.format }),
+          extendSchema(operationProps.requestBody.schema, {
+            title: bodyName,
+            format: operationProps.requestBody?.format,
+          }),
           state.options,
         ),
       },

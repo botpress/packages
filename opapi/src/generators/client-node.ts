@@ -7,6 +7,7 @@ import { JSONSchema7 } from 'json-schema'
 import { Operation, State } from '../state'
 import { toRequestShape, toResponseShape } from '../handler-generator/map-operation'
 import { replaceNullableWithUnion, NullableJsonSchema, setDefaultAdditionalProperties } from '../jsonschema'
+import { SchemaObject } from 'openapi3-ts'
 
 type ObjectBuilder = utils.JsonSchemaBuilder['object']
 const objectBuilder: ObjectBuilder = (...args) => ({
@@ -15,10 +16,10 @@ const objectBuilder: ObjectBuilder = (...args) => ({
 })
 const s = { ...utils.jsonSchemaBuilder, object: objectBuilder }
 
-const mapRequest = (state: State<string, string, string>, op: Operation<string, string, string, 'json-schema'>) =>
+const mapRequest = (state: State<string, string, string>, op: Operation<string, string, string, SchemaObject>) =>
   toRequestShape(state, op, s)
 
-const mapResponse = (state: State<string, string, string>, op: Operation<string, string, string, 'json-schema'>) =>
+const mapResponse = (state: State<string, string, string>, op: Operation<string, string, string, SchemaObject>) =>
   toResponseShape(state, op, s)
 
 const fixSchema = (schema: JSONSchema7): JSONSchema7 => {

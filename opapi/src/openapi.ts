@@ -1,7 +1,7 @@
 import { OpenApiBuilder, OperationObject, ReferenceObject } from 'openapi3-ts'
 import VError from 'verror'
 import { defaultResponseStatus } from './const'
-import { convertToJsonSchema } from './jsonschema'
+import { convertToSchemaObject } from './jsonschema'
 import { objects } from './objects'
 import { ComponentType, Security, State, getRef, isOperationWithBodyProps } from './state'
 import { formatBodyName, formatResponseName } from './util'
@@ -60,7 +60,7 @@ export const createOpenapi = <
       },
     })
 
-    const responseRefSchema = convertToJsonSchema(
+    const responseRefSchema = convertToSchemaObject(
       getRef(state, ComponentType.RESPONSES, responseName),
     ) as unknown as ReferenceObject
 
@@ -95,7 +95,7 @@ export const createOpenapi = <
         },
       })
 
-      const bodyRefSchema = convertToJsonSchema(
+      const bodyRefSchema = convertToSchemaObject(
         getRef(state, ComponentType.REQUESTS, bodyName),
       ) as unknown as ReferenceObject
 

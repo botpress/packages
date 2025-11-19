@@ -1,5 +1,5 @@
 import { VError } from 'verror'
-import { extendSchema, convertToJsonSchema } from './jsonschema'
+import { extendSchema, convertToSchemaObject } from './jsonschema'
 import { objects } from './objects'
 import {
   Operation,
@@ -10,6 +10,8 @@ import {
   mapParameter,
 } from './state'
 import { formatBodyName, formatResponseName, isAlphanumeric } from './util'
+import { JSONSchema7 } from 'json-schema'
+import { SchemaObject } from 'openapi3-ts'
 
 export const addOperation = <
   SchemaName extends string,
@@ -17,7 +19,7 @@ export const addOperation = <
   SectionName extends string,
 >(
   state: State<SchemaName, DefaultParameterName, SectionName>,
-  operationProps: Operation<DefaultParameterName, SectionName, string, 'any-schema'>,
+  operationProps: Operation<DefaultParameterName, SectionName, string, JSONSchema7>,
 ) => {
   const { name } = operationProps
   const responseName = formatResponseName(name)
@@ -48,13 +50,13 @@ export const addOperation = <
   const response = {
     description: operationProps.response.description,
     status: operationProps.response.status,
-    schema: convertToJsonSchema(
+    schema: convertToSchemaObject(
       extendSchema(operationProps.response.schema, { title: responseName, format: operationProps.response.format }),
       state.options,
     ),
   }
 
-  let operation: Operation<DefaultParameterName, SectionName, string, 'json-schema'>
+  let operation: Operation<DefaultParameterName, SectionName, string, SchemaObject>
   if (isOperationWithBodyProps(operationProps)) {
     state.refs.requestBodies[formatBodyName(name)] = true
     operation = {
@@ -64,7 +66,7 @@ export const addOperation = <
       response,
       requestBody: {
         description: operationProps.requestBody.description,
-        schema: convertToJsonSchema(
+        schema: convertToSchemaObject(
           extendSchema(operationProps.requestBody.schema, {
             title: bodyName,
             format: operationProps.requestBody?.format,
@@ -91,11 +93,11 @@ export const addOperation = <
 }
 
 function createParameters<DefaultParameterNames extends string>(
-  parameters: ParametersMap<string, 'json-schema'> = {},
-  defaultParameters: ParametersMap<string, 'json-schema'> = {},
+  parameters: ParametersMap<string, SchemaObject> = {},
+  defaultParameters: ParametersMap<string, SchemaObject> = {},
   disableDefaultParameters: { [name in DefaultParameterNames]?: boolean } = {},
-): ParametersMap<string, 'json-schema'> {
-  const params: ParametersMap<string, 'json-schema'> = parameters
+): ParametersMap<string, SchemaObject> {
+  const params: ParametersMap<string, SchemaObject> = parameters
 
   Object.entries(defaultParameters).forEach(([name, parameter]) => {
     const isDefaultParameterEnabled = disableDefaultParameters[name as DefaultParameterNames] !== true
@@ -108,7 +110,7 @@ function createParameters<DefaultParameterNames extends string>(
   return params
 }
 
-function validateParametersInPath(path: string, parameters?: ParametersMap<string, 'json-schema'>) {
+function validateParametersInPath(path: string, parameters?: ParametersMap<string, SchemaObject>) {
   const parametersMapInPath = getParameterFromPath(path).reduce(
     (value, current) => {
       value[current] = false

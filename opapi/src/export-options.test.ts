@@ -3,6 +3,7 @@ import { z } from 'zod'
 import { applyExportOptions } from './export-options'
 import { addOperation } from './operation'
 import { CreateStateProps, createState } from './state'
+import { zodSchema } from './opapi'
 
 type AnyProps = CreateStateProps<string, string, string>
 
@@ -48,7 +49,7 @@ function getApiState() {
       schemas: {
         Tree: {
           section: 'trees',
-          schema: tree,
+          schema: zodSchema(tree),
         },
       },
       security: ['BearerAuth'],
@@ -71,7 +72,7 @@ function getApiState() {
     },
     response: {
       description: 'Tree information',
-      schema: tree,
+      schema: zodSchema(tree),
     },
   })
 

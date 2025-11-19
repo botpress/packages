@@ -5,7 +5,7 @@ import * as utils from './utils'
 import pathlib from 'path'
 import fs from 'fs/promises'
 import { jsonSchemaToZod } from 'json-schema-to-zod'
-import { OpenApiZodAny } from '@anatine/zod-openapi'
+import { generateSchema as generateJsonSchema, OpenApiZodAny } from '@anatine/zod-openapi'
 
 type jsonSchemaToZodInput = Parameters<typeof jsonSchemaToZod>[0]
 type jsonSchemaToTsInput = Parameters<typeof compile>[0]
@@ -31,7 +31,9 @@ const jsonSchemaToTs = async (originalSchema: JSONSchema7, name: string): Promis
 }
 
 const zodToJsonSchema = (zodSchema: OpenApiZodAny): JSONSchema7 => {
-  let jsonSchema = jsonschema.convertToJsonSchema(zodSchema, { allowUnions: true }) as JSONSchema7
+  let schemaObject = generateJsonSchema(zodSchema)
+  jsonschema.formatJsonSchema(schemaObject, true)
+  let jsonSchema = jsonschema.schemaObjectToJsonSchema(schemaObject)
   jsonSchema = jsonschema.replaceNullableWithUnion(jsonSchema)
   jsonSchema = jsonschema.replaceOneOfWithAnyOf(jsonSchema)
   return jsonSchema

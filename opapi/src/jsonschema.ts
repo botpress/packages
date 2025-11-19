@@ -1,4 +1,3 @@
-import { OpenApiZodAny, extendApi, generateSchema as generateJsonSchema } from '@anatine/zod-openapi'
 import { JSONSchema7, JSONSchema7Definition } from 'json-schema'
 import type { SchemaObject } from 'openapi3-ts'
 import { removeFromArray } from './util'
@@ -12,14 +11,7 @@ export type GenerateSchemaFromZodOpts = {
 
 export type NullableJsonSchema = JSONSchema7 & { nullable?: boolean }
 
-export const isZodSchema = (source: SchemaOfType<'any-schema'>): source is OpenApiZodAny => {
-  return '_def' in source
-}
-
-export const isJSONSchema = (source: SchemaOfType<'any-schema'>): source is JSONSchema7 => {
-  if (isZodSchema(source)) {
-    return false
-  }
+export const isJSONSchema = (source: SchemaOfType<JSONSchema7>): source is JSONSchema7 => {
   if (!('exclusiveMinimum' in source) && !('exclusiveMaximum' in source)) {
     return true
   }
@@ -34,41 +26,52 @@ export const isJSONSchema = (source: SchemaOfType<'any-schema'>): source is JSON
 
 export const jsonSchemaToSchemaObject = (source: JSONSchema7): SchemaObject => {
   const schema = source as any
-  if ('exclusiveMinimum' in schema) {
-    schema['minimum'] = schema['exclusiveMinimum']
+  if ('exclusiveMinimum' in source) {
+    schema['minimum'] = source['exclusiveMinimum']
     schema['exclusiveMinimum'] = true
   }
-  if ('exclusiveMaximum' in schema) {
-    schema['minimum'] = schema['exclusiveMaximum']
+  if ('exclusiveMaximum' in source) {
+    schema['maximum'] = source['exclusiveMaximum']
     schema['exclusiveMaximum'] = true
   }
   return schema as SchemaObject
 }
 
-export const extendSchema = <T extends SchemaOfType<'any-schema'>>(source: T, extra: SchemaObject): T => {
-  if (!isZodSchema(source)) {
-    Object.assign(source, extra)
-    return source
+export const schemaObjectToJsonSchema = (source: SchemaObject): JSONSchema7 => {
+  const schema = source as JSONSchema7
+  if ('exclusiveMinimum' in source && source['exclusiveMinimum'] !== undefined) {
+    if ('minimum' in source && source['minimum'] !== undefined) {
+      schema['exclusiveMinimum'] = source['minimum']
+      schema['minimum'] = undefined
+    } else {
+      schema['exclusiveMinimum'] = undefined
+    }
   }
-  return extendApi(source, extra)
+  if ('exclusiveMaximum' in source && source['exclusiveMaximum'] !== undefined) {
+    if ('maximum' in source && source['maximum'] !== undefined) {
+      schema['exclusiveMaximum'] = source['maximum']
+      schema['maximum'] = undefined
+    } else {
+      schema['exclusiveMaximum'] = undefined
+    }
+  }
+  return schema as JSONSchema7
 }
 
-export const convertToJsonSchema = (
-  source: SchemaOfType<'any-schema'>,
+export const extendSchema = <T extends SchemaOfType<JSONSchema7>>(source: T, extra: SchemaObject): T => {
+  Object.assign(source, extra)
+  return source
+}
+
+export const convertToSchemaObject = (
+  source: SchemaOfType<JSONSchema7>,
   opts?: GenerateSchemaFromZodOpts,
 ): SchemaObject => {
-  let schema: SchemaObject | undefined = undefined
-  if (isZodSchema(source)) {
-    schema = generateJsonSchema(source, opts?.useOutput) as SchemaObject
-  }
+  let schema: SchemaObject
   if (isJSONSchema(source)) {
     schema = jsonSchemaToSchemaObject(source)
-  }
-  if (!isJSONSchema(source) && !isZodSchema(source)) {
+  } else {
     schema = source
-  }
-  if (schema === undefined) {
-    throw new Error('Invalid state. An internal error occured.')
   }
   formatJsonSchema(schema, opts?.allowUnions ?? false)
   return schema

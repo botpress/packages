@@ -2,10 +2,11 @@ import { title, sift, camel } from 'radash'
 import type { Parameter as OpenApiParameter } from '../state'
 import type { GenerateHandlersProps, GenerateHandlerProps } from './handlers'
 import { typeHelpers } from './helpers'
+import { SchemaObject } from 'openapi3-ts'
 
 type Parameters = {
   name: string
-  parameter: OpenApiParameter<'json-schema'>
+  parameter: OpenApiParameter<SchemaObject>
 }[]
 
 type GenerateClientsProps = Omit<GenerateHandlersProps, 'useExpressTypes'>

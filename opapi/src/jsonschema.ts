@@ -58,11 +58,6 @@ export const schemaObjectToJsonSchema = (source: SchemaObject): JSONSchema7 => {
   return schema as JSONSchema7
 }
 
-export const extendSchema = <T extends SchemaOfType<JSONSchema7>>(source: T, extra: SchemaObject): T => {
-  Object.assign(source, extra)
-  return source
-}
-
 export const convertToSchemaObject = (
   source: SchemaOfType<JSONSchema7>,
   opts?: GenerateSchemaFromZodOpts,

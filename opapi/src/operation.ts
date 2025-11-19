@@ -1,5 +1,5 @@
 import { VError } from 'verror'
-import { extendSchema, convertToSchemaObject } from './jsonschema'
+import { convertToSchemaObject } from './jsonschema'
 import { objects } from './objects'
 import {
   Operation,
@@ -51,7 +51,7 @@ export const addOperation = <
     description: operationProps.response.description,
     status: operationProps.response.status,
     schema: convertToSchemaObject(
-      extendSchema(operationProps.response.schema, { title: responseName, format: operationProps.response.format }),
+      objects.extend(operationProps.response.schema, { title: responseName, format: operationProps.response.format }),
       state.options,
     ),
   }
@@ -67,7 +67,7 @@ export const addOperation = <
       requestBody: {
         description: operationProps.requestBody.description,
         schema: convertToSchemaObject(
-          extendSchema(operationProps.requestBody.schema, {
+          objects.extend(operationProps.requestBody.schema, {
             title: bodyName,
             format: operationProps.requestBody?.format,
           }),

@@ -12,19 +12,17 @@ import { exportStateAsTypescript, ExportStateAsTypescriptOptions } from './gener
 import { generateHandler } from './handler-generator'
 import { applyExportOptions, ExportStateOptions } from './export-options'
 import { addOperation } from './operation'
-import { ReferenceObject } from 'openapi3-ts'
+import { ReferenceObject, SchemaObject } from 'openapi3-ts'
 import { schemaObjectToJsonSchema } from './jsonschema'
 import { JSONSchema7 } from 'json-schema'
 export { Operation, Parameter } from './state'
 
 type AnatineSchemaObject = NonNullable<Parameters<typeof extendApi>[1]>
 
-export const zodSchema = <T extends OpenApiZodAny>(
-  schema: T,
-  schemaObject?: AnatineSchemaObject & { $ref?: string },
-): JSONSchema7 => {
+export const zodSchema = (schema: OpenApiZodAny, schemaObject?: SchemaObject & { $ref?: string }): JSONSchema7 => {
   const This = (schema as any).constructor
-  const copy = new This(schema._def) as T
+  const copy = new This(schema._def) as OpenApiZodAny
+  copy.metaOpenApi = structuredClone(schema.metaOpenApi)
   return schemaObjectToJsonSchema(generateSchema(extendApi(copy, schemaObject)))
 }
 

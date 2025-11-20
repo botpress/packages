@@ -58,16 +58,8 @@ export const schemaObjectToJsonSchema = (source: SchemaObject): JSONSchema7 => {
   return schema as JSONSchema7
 }
 
-export const convertToSchemaObject = (
-  source: SchemaOfType<JSONSchema7>,
-  opts?: GenerateSchemaFromZodOpts,
-): SchemaObject => {
-  let schema: SchemaObject
-  if (isJSONSchema(source)) {
-    schema = jsonSchemaToSchemaObject(source)
-  } else {
-    schema = source
-  }
+export const convertToSchemaObject = (source: JSONSchema7, opts?: GenerateSchemaFromZodOpts): SchemaObject => {
+  let schema = jsonSchemaToSchemaObject(source)
   formatJsonSchema(schema, opts?.allowUnions ?? false)
   return schema
 }

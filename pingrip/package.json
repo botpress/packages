@@ -2,7 +2,11 @@
   "name": "@bpinternal/pingrip",
   "version": "0.1.0",
   "description": "Pushpin GRIP Websocket-over-HTTP",
-  "keywords": ["pushpin", "grip", "websocket"],
+  "keywords": [
+    "pushpin",
+    "grip",
+    "websocket"
+  ],
   "author": "Botpress, Inc.",
   "license": "MIT",
   "main": "./dist/index.js",

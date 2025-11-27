@@ -1,0 +1,43 @@
+{
+  "name": "@bpinternal/pingrip",
+  "version": "0.1.0",
+  "description": "Pushpin GRIP Websocket-over-HTTP",
+  "keywords": [
+    "pushpin",
+    "grip",
+    "websocket"
+  ],
+  "author": "Botpress, Inc.",
+  "license": "MIT",
+  "main": "./dist/index.js",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.ts",
+  "repository": {
+    "url": "https://github.com/botpress/packages"
+  },
+  "exports": {
+    ".": {
+      "require": "./dist/index.js",
+      "import": "./dist/index.mjs",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "scripts": {
+    "build": "tsup src/index.ts --dts --format cjs,esm --clean",
+    "check:format": "prettier --check .",
+    "fix:format": "prettier --write .",
+    "check:type": "tsc --noEmit",
+    "test": "vitest"
+  },
+  "devDependencies": {
+    "@types/node": "^24.10.1",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.9.3",
+    "tsup": "8.3.5",
+    "vitest": "^4.0.13",
+    "prettier": "3.4.1"
+  },
+  "dependencies": {
+    "axios": "^1.13.2"
+  }
+}

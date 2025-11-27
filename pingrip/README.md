@@ -1,18 +1,16 @@
 # PinGrip
 
-PinGrip is an implementation of the Pushpin GRIP for WebSocket-over-HTTP tunneling. It provides utilities for
-serializing and parsing WebSocket messages in the GRIP protocol format, and includes a fluent ResponseBuilder API for
-constructing WebSocket responses with support for opening/closing connections, sending text/binary messages, subscribing
-to channels, and configuring keep-alive behavior.
+PinGrip is an implementation of the [Pushpin](https://pushpin.org) GRIP for WebSocket-over-HTTP tunneling. It provides
+utilities for serializing and parsing WebSocket messages in the GRIP protocol format, and includes a fluent
+ResponseBuilder API for constructing WebSocket responses with support for opening/closing connections, sending
+text/binary messages, subscribing to channels, and configuring keep-alive behavior.
 
 ## Usage
 
 ```js
-import * as messages from './messages'
-import * as ws from './websocket'
-import { GripPublisher } from './publisher'
+import * as pingrip from '@bpinternal/pingrip'
 
-const grip = new GripPublisher({
+const grip = new pingrip.outputs.GripPublisher({
   signalUrl: 'http://localhost:7999',
 })
 
@@ -26,14 +24,14 @@ function onDataUpdate(channels: string[]) {
   */
 function handler(body: string) {
   const channels = ['channel1', 'channel2'] // extract channels from the body for example
-  const { messages: _messages, error } = messages.safeParse(Buffer.from(body))
+  const { messages: _messages, error } = pingrip.messages.safeParse(Buffer.from(body))
   if (error) {
     console.error(error)
     return
   }
   for (const message of _messages) {
     if (message.type === 'open') {
-      const response = new ws.ResponseBuilder()
+      const response = new pingrip.outputs.ResponseBuilder()
         .open()
         .subscribe(channels)
         .keepAlive('ping', 30)
@@ -41,7 +39,7 @@ function handler(body: string) {
       return response
     }
     if (message.type === 'close') {
-      const response = new ws.ResponseBuilder()
+      const response = new pingrip.outputs.ResponseBuilder()
         .close(message.code)
         .unsubscribe(channels)
         .toResponse()

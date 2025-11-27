@@ -1,6 +1,8 @@
 import * as messages from './messages'
 import { type Message } from './messages'
 
+export { GripPublisher } from './publisher'
+
 export type Response = {
   body: Buffer
   headers: Record<string, string>

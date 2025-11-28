@@ -2,6 +2,9 @@ import * as errs from '../common/errors'
 import z from '../../z'
 import { describe, test, expect } from 'vitest'
 import { toJSONSchema } from './index'
+import { JSONSchema7 } from 'json-schema'
+
+const asJsonSchema7 = <T extends JSONSchema7>(schema: T): T => schema
 
 describe('zuiToJSONSchemaNext', () => {
   test('should map ZodString to StringSchema', () => {
@@ -373,5 +376,22 @@ describe('zuiToJSONSchemaNext', () => {
   test('should map ZodRef to RefSchema', () => {
     const schema = toJSONSchema(z.ref('foo'))
     expect(schema).toEqual({ $ref: 'foo' })
+  })
+
+  test('should preserve title and description of nullable schemas', () => {
+    const title = 'My Title'
+    const description = 'My Description'
+    const expected = asJsonSchema7({
+      anyOf: [{ type: 'string', description, 'x-zui': { title: title } }, { type: 'null' }],
+      'x-zui': {
+        def: { typeName: 'ZodNullable' },
+      },
+    })
+
+    const schema1 = toJSONSchema(z.string().nullable().title(title).describe(description))
+    expect(schema1).toEqual(expected)
+
+    const schema2 = toJSONSchema(z.string().title(title).describe(description).nullable())
+    expect(schema2).toEqual(expected)
   })
 })

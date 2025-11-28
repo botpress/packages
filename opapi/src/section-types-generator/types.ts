@@ -1,3 +1,4 @@
+import { SchemaObject } from 'openapi3-ts'
 import { Operation, State } from '../state'
 export type BlockComposer = (blocks: Block[], targetDirectory: string) => void
 export type DefaultState = State<string, string, string>
@@ -17,11 +18,11 @@ export type SectionParser = (
 
 export type OperationParser = (payload: {
   section: DefaultState['sections'][number]
-  operation: Operation<string, string, string, 'json-schema'>
+  operation: Operation<string, string, string, SchemaObject>
   /**
    * schema that has been dereferenced by the `OpenAPIParser`
    */
-  dereferencedOperation: Operation<string, string, string, 'json-schema'>
+  dereferencedOperation: Operation<string, string, string, SchemaObject>
 }) => Promise<Block>
 
 /**

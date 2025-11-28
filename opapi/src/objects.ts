@@ -7,4 +7,8 @@ export namespace objects {
     })
     return result
   }
+  export const extend = <T extends object, U extends object>(destination: T, source: U) => {
+    Object.assign(destination, source)
+    return destination
+  }
 }

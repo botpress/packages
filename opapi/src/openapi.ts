@@ -1,7 +1,7 @@
 import { OpenApiBuilder, OperationObject, ReferenceObject } from 'openapi3-ts'
 import VError from 'verror'
 import { defaultResponseStatus } from './const'
-import { generateSchemaFromZod } from './jsonschema'
+import { convertToSchemaObject } from './jsonschema'
 import { objects } from './objects'
 import { ComponentType, Security, State, getRef, isOperationWithBodyProps } from './state'
 import { formatBodyName, formatResponseName } from './util'
@@ -60,7 +60,7 @@ export const createOpenapi = <
       },
     })
 
-    const responseRefSchema = generateSchemaFromZod(
+    const responseRefSchema = convertToSchemaObject(
       getRef(state, ComponentType.RESPONSES, responseName),
     ) as unknown as ReferenceObject
 
@@ -95,7 +95,7 @@ export const createOpenapi = <
         },
       })
 
-      const bodyRefSchema = generateSchemaFromZod(
+      const bodyRefSchema = convertToSchemaObject(
         getRef(state, ComponentType.REQUESTS, bodyName),
       ) as unknown as ReferenceObject
 

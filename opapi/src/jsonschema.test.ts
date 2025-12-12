@@ -1,7 +1,6 @@
 import { JSONSchema7 } from 'json-schema'
 import { test, expect } from 'vitest'
 import {
-  JsonSchema,
   NullableJsonSchema,
   replaceNullableWithUnion,
   replaceOneOfWithAnyOf,
@@ -114,7 +113,7 @@ test('setDefaultAdditionalProperties', () => {
   const expectedSchemas = buildSchemas(builderWithDefaults)
 
   for (let i = 0; i < inputSchemas.length; i++) {
-    const inputSchema = inputSchemas[i] as JsonSchema
+    const inputSchema = inputSchemas[i] as JSONSchema7
     const expectedSchema = expectedSchemas[i]
     const actual = setDefaultAdditionalProperties(inputSchema, defaultAdditionalProperties)
     expect(actual).toEqual(expectedSchema)
@@ -122,7 +121,7 @@ test('setDefaultAdditionalProperties', () => {
 })
 
 test('setDefaultAdditionalProperties with real example', () => {
-  const input: JsonSchema = {
+  const input: JSONSchema7 = {
     type: 'object',
     properties: {
       pats: {
@@ -184,7 +183,7 @@ test('setDefaultAdditionalProperties with real example', () => {
 })
 
 test('replaceOneOfWithAnyOf', () => {
-  const input: JsonSchema = {
+  const input: JSONSchema7 = {
     type: 'object',
     properties: {
       id: {
@@ -204,7 +203,7 @@ test('replaceOneOfWithAnyOf', () => {
 
   const actual = replaceOneOfWithAnyOf(input)
 
-  const expected: JsonSchema = {
+  const expected: JSONSchema7 = {
     type: 'object',
     properties: {
       id: {

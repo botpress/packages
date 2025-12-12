@@ -31,6 +31,7 @@ import {
 import { Block } from './section-types-generator/types'
 import { ApiError, isOperationWithBodyProps, type Operation, type State } from './state'
 import { generateSectionsFile } from './section-types-generator/generator'
+import { SchemaObject } from 'openapi3-ts'
 
 /**
  * Generates files containing typescript types for each item in the state object - Sections, Operations, Responses, etc.
@@ -219,7 +220,7 @@ export function generateOpenapi(state: State<string, string, string>, dir = '.')
 
 function mapOperationPropsToHandlerProps(
   operationName: string,
-  operation: Operation<string, string, string, 'json-schema'>,
+  operation: Operation<string, string, string, SchemaObject>,
 ) {
   const generateHandlerProps: GenerateHandlerProps = {
     operationName,

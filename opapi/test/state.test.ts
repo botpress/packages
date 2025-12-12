@@ -1,11 +1,11 @@
 import { describe, expect, it } from 'vitest'
 import z from 'zod'
-import { OpenApi, OpenApiProps } from '../src'
+import { CreateStateProps, OpenApi, zodSchema } from '../src'
 import { join } from 'path'
 import { getFiles } from '../src/file'
 import { requireTsFile, validateTypescriptFile } from './util'
 
-type AnyProps = OpenApiProps<string, string, string>
+type AnyProps = CreateStateProps<string, string, string>
 
 const metadata = {
   title: 'Test API',
@@ -46,7 +46,7 @@ describe('openapi generator with unions not allowed', () => {
         schemas: {
           Tree: {
             section: 'trees',
-            schema: tree,
+            schema: zodSchema(tree),
           },
         },
       })
@@ -70,7 +70,7 @@ describe('openapi generator with unions not allowed', () => {
         },
         response: {
           description: 'Tree information',
-          schema: tree,
+          schema: zodSchema(tree),
         },
       })
     }).toThrowError(expectedErrorMessage)
@@ -86,11 +86,11 @@ describe('openapi generator with unions not allowed', () => {
         path: '/trees',
         requestBody: {
           description: 'Tree information',
-          schema: tree,
+          schema: zodSchema(tree),
         },
         response: {
           description: 'Tree information',
-          schema: z.object({}),
+          schema: zodSchema(z.object({})),
         },
       })
     }).toThrowError(expectedErrorMessage)
@@ -107,7 +107,7 @@ describe('openapi generator with unions allowed', () => {
         schemas: {
           Tree: {
             section: 'trees',
-            schema: tree,
+            schema: zodSchema(tree),
           },
         },
       },
@@ -131,7 +131,7 @@ describe('openapi generator with unions allowed', () => {
       },
       response: {
         description: 'Tree information',
-        schema: tree,
+        schema: zodSchema(tree),
       },
     })
   })
@@ -145,11 +145,11 @@ describe('openapi generator with unions allowed', () => {
       path: '/trees',
       requestBody: {
         description: 'Tree information',
-        schema: tree,
+        schema: zodSchema(tree),
       },
       response: {
         description: 'Tree information',
-        schema: z.object({}),
+        schema: zodSchema(z.object({})),
       },
     })
   })
@@ -164,7 +164,7 @@ describe('openapi state generator', () => {
         schemas: {
           Tree: {
             section: 'trees',
-            schema: tree,
+            schema: zodSchema(tree),
           },
         },
       },
@@ -199,7 +199,7 @@ describe('openapi state generator', () => {
         schemas: {
           Tree: {
             section: 'trees',
-            schema: tree,
+            schema: zodSchema(tree),
           },
         },
       },
@@ -221,7 +221,7 @@ describe('openapi state generator', () => {
       },
       response: {
         description: 'Tree information',
-        schema: tree,
+        schema: zodSchema(tree),
       },
     })
 
@@ -263,7 +263,7 @@ describe('openapi state generator', () => {
         schemas: {
           Tree: {
             section: 'trees',
-            schema: tree,
+            schema: zodSchema(tree),
           },
         },
       },
@@ -285,7 +285,7 @@ describe('openapi state generator', () => {
       },
       response: {
         description: 'Tree information',
-        schema: tree,
+        schema: zodSchema(tree),
       },
     })
 

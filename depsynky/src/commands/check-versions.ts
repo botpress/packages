@@ -2,6 +2,7 @@ import { YargsConfig } from '@bpinternal/yargs-extra'
 import * as config from '../config'
 import * as errors from '../errors'
 import * as utils from '../utils'
+import * as semver from 'semver'
 
 const { logger } = utils.logging
 
@@ -22,16 +23,16 @@ const checker =
       }
       const isLocal = utils.pnpm.isLocalVersion(currentVersion)
       const isPublic = !pkg.private
-      if (isPublic && isLocal) {
-        throw new errors.DepSynkyError(
-          `Package ${pkg.name} is public and cannot depend on local package ${name}. To keep reference on local package, make ${pkg.name} private.`
-        )
+      if (isLocal) {
+        if (isPublic) {
+          throw new errors.DepSynkyError(
+            `Package ${pkg.name} is public and cannot depend on local package ${name}. To keep reference on local package, make ${pkg.name} private.`
+          )
+        }
+        continue
       }
-      const currentLowerBound = utils.semver.getLowerBound(currentVersion)
-      if (!isLocal && currentLowerBound === null) {
-        throw new errors.DepSynkyError(`Invalid version ${currentVersion} for ${name} in ${pkg.name}`)
-      }
-      if (!isLocal && currentLowerBound !== targetVersion) {
+
+      if (!semver.satisfies(targetVersion, currentVersion)) {
         throw new errors.DepSynkyError(
           `Dependency ${name} is out of sync in ${pkg.name}: ${currentVersion} < ${targetVersion}`
         )

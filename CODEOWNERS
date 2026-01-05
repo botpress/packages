@@ -14,5 +14,4 @@ trail @michaelmass @botpress/leads
 tunnel @botpress/squid @botpress/leads
 verel @botpress/squid @botpress/leads
 yargs-extra @botpress/squid @botpress/leads
-zui @botpress/squid @botpress/leads
 slackdown @botpress/squid @botpress/leads

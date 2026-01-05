@@ -81,7 +81,7 @@ function getReturnTypeName(operationName: string): string {
 
 function getFunctionParams(
   operationName: string,
-  operation: Operation<string, string, string, 'json-schema'> | undefined,
+  operation: Operation<string, string, string, SchemaObject> | undefined,
 ): string {
   if (!operation) {
     return ''

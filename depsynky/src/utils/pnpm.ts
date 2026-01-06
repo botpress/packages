@@ -5,6 +5,7 @@ import * as yaml from 'yaml'
 import * as errors from '../errors'
 import * as objects from './objects'
 import * as pkgjson from './pkgjson'
+import * as sets from './sets'
 
 const abs = (rootDir: string) => (p: string) => pathlib.resolve(rootDir, p)
 
@@ -30,17 +31,51 @@ export const searchWorkspaces = (rootDir: string): PnpmWorkspace[] => {
   return absolutePaths.map((p) => ({ path: p, content: pkgjson.read(p) }))
 }
 
-export const findReferences = (rootDir: string, pkgName: string) => {
+export const findDirectReferences = (rootDir: string, pkgName: string) => {
   const workspaces = searchWorkspaces(rootDir)
   const dependency = workspaces.find((w) => w.content.name === pkgName)
   if (!dependency) {
     throw new errors.DepSynkyError(`Could not find package "${pkgName}"`)
   }
-  const dependents = workspaces.filter(
+  const dependents = _findDirectDependents(workspaces, pkgName)
+  return { dependency, dependents }
+}
+
+export const findRecursiveReferences = (rootDir: string, pkgName: string) => {
+  const workspaces = searchWorkspaces(rootDir)
+  const dependency = workspaces.find((w) => w.content.name === pkgName)
+  if (!dependency) {
+    throw new errors.DepSynkyError(`Could not find package "${pkgName}"`)
+  }
+
+  const visited = new sets.SetBy<PnpmWorkspace>([], (s) => s.content.name)
+  const queued = new sets.SetBy<PnpmWorkspace>([dependency], (s) => s.content.name)
+
+  while (queued.length > 0) {
+    const currentPkg = queued.shift()!
+    if (visited.hasKey(currentPkg.content.name)) {
+      continue
+    }
+
+    visited.add(currentPkg)
+
+    const dependents = _findDirectDependents(workspaces, currentPkg.content.name)
+    for (const dependent of dependents) {
+      if (!visited.hasKey(dependent.content.name) && !queued.hasKey(dependent.content.name)) {
+        queued.add(dependent)
+      }
+    }
+  }
+
+  const dependents = visited.values.filter((w) => w.content.name !== pkgName)
+  return { dependency, dependents }
+}
+
+const _findDirectDependents = (workspaces: PnpmWorkspace[], pkgName: string): PnpmWorkspace[] => {
+  return workspaces.filter(
     (w) =>
       w.content.dependencies?.[pkgName] || w.content.devDependencies?.[pkgName] || w.content.peerDependencies?.[pkgName]
   )
-  return { dependency, dependents }
 }
 
 export const versions = (workspaces: PnpmWorkspace[]): Record<string, string> => {

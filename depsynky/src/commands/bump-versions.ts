@@ -52,7 +52,7 @@ export const bumpVersion = async (argv: YargsConfig<typeof config.bumpSchema> & 
     pkgName = await promptPackage(publicPkgs)
   }
 
-  const { dependency, dependents } = utils.pnpm.findReferences(argv.rootDir, pkgName)
+  const { dependency, dependents } = utils.pnpm.findRecursiveReferences(argv.rootDir, pkgName)
   const targetPackages = [dependency, ...dependents]
 
   const currentVersions = utils.pnpm.versions(targetPackages)

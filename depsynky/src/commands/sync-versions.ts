@@ -20,17 +20,16 @@ const updater =
       }
       const isLocal = utils.pnpm.isLocalVersion(currentVersion)
       const isPublic = !pkg.private
-      if (!isLocal) {
-        current[name] = version
+      if (isLocal) {
+        if (isPublic) {
+          utils.logging.logger.warn(
+            `Package ${pkg.name} is public and cannot depend on local package ${name}. To keep reference on local package, make ${pkg.name} private.`
+          )
+        }
+        current[name] = currentVersion
         continue
       }
-      if (isPublic && isLocal) {
-        utils.logging.logger.warn(
-          `Package ${pkg.name} is public and cannot depend on local package ${name}. To keep reference on local package, make ${pkg.name} private.`
-        )
-        current[name] = version
-        continue
-      }
+      current[name] = utils.semver.attemptBumpLowerbound(currentVersion, version)
     }
     return current
   }

@@ -9,7 +9,8 @@
     "build": "tsup",
     "test": "tsup && vitest run --config vitest.config.ts",
     "test:update": "vitest -u run --config vitest.config.ts",
-    "test:watch": "vitest --config vitest.config.ts"
+    "test:watch": "vitest --config vitest.config.ts",
+    "check:type": "tsc --noEmit"
   },
   "exports": {
     ".": {

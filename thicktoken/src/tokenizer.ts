@@ -1,11 +1,13 @@
 import cl100k_base from 'tiktoken/encoders/cl100k_base.json'
 import { Tiktoken, init } from 'tiktoken/lite/init'
 import { deepClone, mapValues, uniq } from './utils'
+import { Slice, SmartSlice } from './smart-slice'
 
 let tokenizer: TextTokenizer | null = null
 let lock: Promise<void> | false = false
 
 const CHUNK_SIZE = 100_000
+const DEFAULT_SLICES: Slice[] = [[0, Number.POSITIVE_INFINITY]]
 
 export class TextTokenizer {
   private warnOnSlowCalls = true
@@ -41,7 +43,7 @@ export class TextTokenizer {
       }
 
       const next = text.slice(i + CHUNK_SIZE - MARGIN, i + CHUNK_SIZE)
-      const unsafe = this.split(next).slice(-1)[0].length
+      const unsafe = this.split(next).slice(-1)[0]!.length
 
       yield text.slice(i, i + CHUNK_SIZE - unsafe)
 
@@ -137,15 +139,25 @@ export class TextTokenizer {
     return newObject
   }
 
-  public split(text: string): string[] {
+  public split(text: string, slices: Slice[] = DEFAULT_SLICES): string[] {
     const decoder = new TextDecoder()
+    const output = this.tokenizer.encode(text ?? '')
+
     const str: string[] = []
-    this.tokenizer.encode(text ?? '').forEach((x) => {
-      // copying to a new array because of memory allocation in WASM
-      str.push(decoder.decode(this.tokenizer.decode(new Uint32Array([x]))))
-    })
+
+    const smartSlice = new SmartSlice(slices, output.length)
+    for (const idx of smartSlice) {
+      const encodedToken = output[idx]!
+      str.push(this._decodeToken(decoder, encodedToken))
+    }
 
     return str
+  }
+
+  private _decodeToken(decoder: TextDecoder, encodedToken: number): string {
+    // copying to a new array because of memory allocation in WASM
+    const copy = this.tokenizer.decode(new Uint32Array([encodedToken]))
+    return decoder.decode(copy)
   }
 
   /**

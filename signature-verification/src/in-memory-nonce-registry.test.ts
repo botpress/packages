@@ -1,5 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { createInMemoryNonceRegistry } from './in-memory-nonce-registry'
+import { SIGNATURE_VALIDATION_WINDOW_MS } from './constants'
 
 describe.concurrent(createInMemoryNonceRegistry, () => {
   describe.concurrent('isReplayedRequest', () => {
@@ -114,7 +115,7 @@ describe.concurrent(createInMemoryNonceRegistry, () => {
     it('should remove expired entries during cleanup', () => {
       // Arrange
       using nonceRegistry = createInMemoryNonceRegistry({ maxSize: 5 })
-      const expiredTimestamp = Date.now() - 10 * 60 * 1000
+      const expiredTimestamp = Date.now() - SIGNATURE_VALIDATION_WINDOW_MS - 1
       const validTimestamp = Date.now()
 
       nonceRegistry.isReplayedRequest({ signatureHash: 'expiredHash1', timestamp: expiredTimestamp })
@@ -137,6 +138,37 @@ describe.concurrent(createInMemoryNonceRegistry, () => {
       expect(validResult1).toBeTruthy()
       expect(validResult2).toBeTruthy()
       expect(validResult3).toBeTruthy()
+    })
+
+    it('should remove expired entries even when timestamps are out of order', () => {
+      // Arrange
+      using nonceRegistry = createInMemoryNonceRegistry({ maxSize: 5 })
+
+      // Use timestamps that are expired (we want to test cleanup of expired entries):
+      const expiredTime = Date.now() - SIGNATURE_VALIDATION_WINDOW_MS * 2
+
+      // Scenario: older timestamp arrives later in the queue (network delays):
+      nonceRegistry.isReplayedRequest({ signatureHash: 'hash1', timestamp: expiredTime })
+      nonceRegistry.isReplayedRequest({ signatureHash: 'hash2', timestamp: expiredTime + 60_000 })
+      nonceRegistry.isReplayedRequest({ signatureHash: 'hash3', timestamp: expiredTime - 65_000 })
+      nonceRegistry.isReplayedRequest({ signatureHash: 'hash4', timestamp: expiredTime + 120_000 })
+      nonceRegistry.isReplayedRequest({ signatureHash: 'hash5', timestamp: expiredTime + 180_000 })
+
+      // Act
+      vi.advanceTimersByTime(1)
+
+      // Assert - all expired hashes should be removed:
+      const result1 = nonceRegistry.isReplayedRequest({ signatureHash: 'hash1', timestamp: Date.now() })
+      const result2 = nonceRegistry.isReplayedRequest({ signatureHash: 'hash2', timestamp: Date.now() })
+      const result3 = nonceRegistry.isReplayedRequest({ signatureHash: 'hash3', timestamp: Date.now() })
+      const result4 = nonceRegistry.isReplayedRequest({ signatureHash: 'hash4', timestamp: Date.now() })
+      const result5 = nonceRegistry.isReplayedRequest({ signatureHash: 'hash5', timestamp: Date.now() })
+
+      expect(result1).toBeFalsy()
+      expect(result2).toBeFalsy()
+      expect(result3).toBeFalsy()
+      expect(result4).toBeFalsy()
+      expect(result5).toBeFalsy()
     })
   })
 })

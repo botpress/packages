@@ -69,8 +69,6 @@ class InMemoryNonceRegistry implements SignatureNonceRegistry {
       if (timestampDifference > SIGNATURE_VALIDATION_WINDOW_MS) {
         expiredQueueKeys.push(queueKey)
         this._seenHashes.delete(requestEntry.hash)
-      } else {
-        break
       }
     }
 

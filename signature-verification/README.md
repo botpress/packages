@@ -69,14 +69,17 @@ const redisClient = new Redis({ ... })
 
 using signatureNonceRegistry = createRedisNonceRegistry({
   client: redisClient,
-  failOpen: true // Allow requests if Redis is unavailable
+  failOpen: false, // Reject requests if Redis is unavailable (default)
 })
 
 using verifier = createSignatureVerifier({
   sharedSecrets: [process.env.WEBHOOK_SECRET],
-  signatureNonceRegistry
+  signatureNonceRegistry,
 })
 ```
+
+> [!IMPORTANT]
+> By default, the Redis registry fails closed (`failOpen: false`), meaning requests will be rejected if Redis is unavailable. This is more secure but requires reliable Redis infrastructure. Set `failOpen: true` if you prefer availability over security.
 
 ### Express Middleware Example
 

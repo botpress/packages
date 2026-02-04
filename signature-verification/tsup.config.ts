@@ -7,7 +7,7 @@ export default defineConfig({
   entry: ['src/index.ts'],
   format: ['esm', 'cjs'],
   keepNames: true,
-  platform: 'browser',
+  platform: 'neutral',
   plugins: [],
   shims: true,
   sourcemap: true,

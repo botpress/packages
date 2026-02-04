@@ -14,7 +14,7 @@ class RedisNonceRegistry implements SignatureNonceRegistry {
 
   public constructor(params: { client: RedisClient; failOpen?: boolean; logger?: Logger }) {
     this._redisClient = params.client
-    this._shouldAllowRequestsOnRedisError = params.failOpen ?? true
+    this._shouldAllowRequestsOnRedisError = params.failOpen ?? false
     this._logger = params.logger
   }
 
@@ -47,8 +47,8 @@ class RedisNonceRegistry implements SignatureNonceRegistry {
  * @param params - Configuration options for the Redis nonce registry.
  * @param params.client - The Redis client instance to use for storing nonces.
  * @param params.failOpen - Whether to allow requests when Redis is unavailable.
- *   When `true` (default), requests will be allowed if Redis fails.
- *   When `false`, requests will be rejected if Redis fails.
+ *   When `false` (default), requests will be rejected if Redis fails.
+ *   When `true`, requests will be allowed if Redis fails.
  * @param params.logger - Optional logger for error reporting.
  *
  * @returns A new `RedisNonceRegistry` instance.

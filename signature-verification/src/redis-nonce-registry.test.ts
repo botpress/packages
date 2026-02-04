@@ -1,6 +1,7 @@
 import { describe, expect, it, vi } from 'vitest'
 import { createRedisNonceRegistry } from './redis-nonce-registry'
 import type { RedisClient } from './types'
+import { SIGNATURE_VALIDATION_WINDOW_MS } from './constants'
 
 describe.concurrent(createRedisNonceRegistry, () => {
   const _getMocks = () => {
@@ -20,7 +21,13 @@ describe.concurrent(createRedisNonceRegistry, () => {
       const result = await nonceRegistry.isReplayedRequest({ signatureHash, timestamp })
 
       expect(result).toBeFalsy()
-      expect(mockRedisClient.set).toHaveBeenCalledWith('replay:hash1', '1', 'NX', 'PX', 10 * 60 * 1000)
+      expect(mockRedisClient.set).toHaveBeenCalledWith(
+        'replay:hash1',
+        '1',
+        'NX',
+        'PX',
+        SIGNATURE_VALIDATION_WINDOW_MS * 2
+      )
     })
 
     it('should detect replay when Redis returns null', async () => {
@@ -36,17 +43,29 @@ describe.concurrent(createRedisNonceRegistry, () => {
     })
   })
 
-  describe.concurrent('fail-open behavior (default)', () => {
-    it('should allow request when Redis throws error with default failOpen', async () => {
+  describe.concurrent('fail-closed behavior (default)', () => {
+    it('should reject request when Redis throws error with default failClosed', async () => {
       const { mockRedisClient } = _getMocks()
       mockRedisClient.set = vi.fn().mockRejectedValue(new Error('Redis connection failed'))
       using nonceRegistry = createRedisNonceRegistry({ client: mockRedisClient })
 
       const result = await nonceRegistry.isReplayedRequest({ signatureHash: 'hash1', timestamp: Date.now() })
 
-      expect(result).toBeFalsy()
+      expect(result).toBeTruthy()
     })
 
+    it('should reject request when Redis throws error with explicit failOpen=false', async () => {
+      const { mockRedisClient } = _getMocks()
+      mockRedisClient.set = vi.fn().mockRejectedValue(new Error('Redis unavailable'))
+      using nonceRegistry = createRedisNonceRegistry({ client: mockRedisClient, failOpen: false })
+
+      const result = await nonceRegistry.isReplayedRequest({ signatureHash: 'hash1', timestamp: Date.now() })
+
+      expect(result).toBeTruthy()
+    })
+  })
+
+  describe.concurrent('fail-open behavior', () => {
     it('should allow request when Redis throws error with explicit failOpen=true', async () => {
       const { mockRedisClient } = _getMocks()
       mockRedisClient.set = vi.fn().mockRejectedValue(new Error('Redis timeout'))
@@ -55,18 +74,6 @@ describe.concurrent(createRedisNonceRegistry, () => {
       const result = await nonceRegistry.isReplayedRequest({ signatureHash: 'hash1', timestamp: Date.now() })
 
       expect(result).toBeFalsy()
-    })
-  })
-
-  describe.concurrent('fail-closed behavior', () => {
-    it('should reject request when Redis throws error with failOpen=false', async () => {
-      const { mockRedisClient } = _getMocks()
-      mockRedisClient.set = vi.fn().mockRejectedValue(new Error('Redis unavailable'))
-      using nonceRegistry = createRedisNonceRegistry({ client: mockRedisClient, failOpen: false })
-
-      const result = await nonceRegistry.isReplayedRequest({ signatureHash: 'hash1', timestamp: Date.now() })
-
-      expect(result).toBeTruthy()
     })
   })
 })

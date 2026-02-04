@@ -51,7 +51,7 @@ const _createTestApp = (secret: string): Express => {
     })
   )
 
-  using verifier = createSignatureVerifier({
+  const verifier = createSignatureVerifier({
     sharedSecrets: [secret],
   })
 

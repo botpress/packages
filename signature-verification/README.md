@@ -2,6 +2,13 @@
 
 A TypeScript library for verifying Botpress webhook signatures with built-in replay protection. This should only be used for self-hosted integrations and bots, since Botpress Cloud handles signature verification automatically.
 
+## Disclaimer ⚠️
+
+> [!IMPORTANT]
+> This package is published under the `@bpinternal` organization and is primarily intended for internal use by the [Botpress](https://github.com/botpress/botpress) team. As such, it may have unstable APIs, breaking changes without notice, and limited documentation or support. That said, we've made it public because we love open source! Feel free to use or fork it, but we recommend pinning to specific versions.
+>
+> — The Botpress Engineering team
+
 ## Features
 
 - **HMAC-SHA256 Signature Verification**: Validates signatures against shared secrets

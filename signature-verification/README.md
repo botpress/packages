@@ -1,4 +1,4 @@
-# Signature Verification Library
+# Botpress Webhook Authentication Library
 
 A TypeScript library for verifying Botpress webhook signatures with built-in replay protection. This should only be used for self-hosted integrations and bots, since Botpress Cloud handles signature verification automatically.
 

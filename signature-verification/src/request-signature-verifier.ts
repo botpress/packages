@@ -114,85 +114,27 @@ class RequestSignatureVerifier implements Disposable {
     return Math.abs(now - timestamp) <= SIGNATURE_VALIDATION_WINDOW_MS
   }
 
+  // oxlint-disable-next-line eslint/complexity
   private async _verifySignaturesWithSecrets(params: {
     receivedHashes: string[]
     payloadToSign: string
   }): Promise<boolean> {
-    return await this._verifyWithSecretIndex({
-      ...params,
-      secretIndex: 0,
-    })
-  }
+    for (let secretIndex = 0; secretIndex < this._secretBuffers.length; secretIndex++) {
+      for (const receivedHash of params.receivedHashes) {
+        // oxlint-disable-next-line no-await-in-loop
+        const isValid = await this._verifyHmac({
+          expectedHash: receivedHash,
+          payload: params.payloadToSign,
+          secretIndex,
+        })
 
-  private async _verifyWithSecretIndex(params: {
-    secretIndex: number
-    receivedHashes: string[]
-    payloadToSign: string
-  }): Promise<boolean> {
-    const { secretIndex, receivedHashes, payloadToSign } = params
-
-    if (secretIndex >= this._secretBuffers.length) {
-      return false
+        if (isValid) {
+          return true
+        }
+      }
     }
 
-    const result = await this._verifySignaturesWithSecret({
-      payloadToSign,
-      receivedHashes,
-      secretIndex,
-    })
-
-    if (result) {
-      return true
-    }
-
-    return await this._verifyWithSecretIndex({
-      ...params,
-      secretIndex: secretIndex + 1,
-    })
-  }
-
-  private async _verifySignaturesWithSecret(params: {
-    secretIndex: number
-    receivedHashes: string[]
-    payloadToSign: string
-  }): Promise<boolean> {
-    return await this._verifyHashAtIndex({
-      ...params,
-      hashIndex: 0,
-    })
-  }
-
-  private async _verifyHashAtIndex(params: {
-    hashIndex: number
-    secretIndex: number
-    receivedHashes: string[]
-    payloadToSign: string
-  }): Promise<boolean> {
-    const { hashIndex, secretIndex, receivedHashes, payloadToSign } = params
-
-    const receivedHash = this._getHashAtIndex({ hashIndex, receivedHashes })
-    if (receivedHash === undefined) {
-      return false
-    }
-
-    const isValid = await this._verifyHmac({ expectedHash: receivedHash, payload: payloadToSign, secretIndex })
-
-    if (isValid) {
-      return true
-    }
-
-    return await this._verifyHashAtIndex({
-      ...params,
-      hashIndex: hashIndex + 1,
-    })
-  }
-
-  private _getHashAtIndex(params: { hashIndex: number; receivedHashes: string[] }): string | undefined {
-    if (params.hashIndex >= params.receivedHashes.length) {
-      return undefined
-    }
-
-    return params.receivedHashes[params.hashIndex]
+    return false
   }
 
   private async _verifyHmac(params: { secretIndex: number; payload: string; expectedHash: string }): Promise<boolean> {

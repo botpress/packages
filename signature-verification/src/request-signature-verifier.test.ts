@@ -1,6 +1,5 @@
-import { describe, expect, it, vi } from 'vitest'
+import { describe, expect, it } from 'vitest'
 import { createSignatureVerifier } from './request-signature-verifier'
-import type { SignatureNonceRegistry } from './types'
 
 const _generateBase64UrlSecret = (): string => {
   const bytes = globalThis.crypto.getRandomValues(new Uint8Array(32))
@@ -235,78 +234,6 @@ describe.concurrent(createSignatureVerifier, () => {
       const result = await verifier.verify({ rawRequestBody, signatureHeaderValue })
 
       expect(result).toBeTruthy()
-    })
-  })
-
-  describe('replay protection', () => {
-    it('should call replay protection when signature is valid', async () => {
-      using mockSignatureNonceRegistry = (() => {
-        const registry: SignatureNonceRegistry = {
-          [Symbol.dispose]: vi.fn(),
-          isReplayedRequest: vi.fn().mockResolvedValue(false),
-        }
-        return registry
-      })()
-
-      const { secret, rawRequestBody, timestamp } = _getMocks()
-      const payload = `${timestamp}.${rawRequestBody}`
-      const hash = await _computeHmac({ payload, secret })
-      const signatureHeaderValue = `${timestamp},${hash}`
-
-      using verifier = createSignatureVerifier({
-        sharedSecrets: [secret],
-        signatureNonceRegistry: mockSignatureNonceRegistry,
-      })
-      const result = await verifier.verify({ rawRequestBody, signatureHeaderValue })
-
-      expect(result).toBeTruthy()
-      expect(mockSignatureNonceRegistry.isReplayedRequest).toHaveBeenCalledWith({ signatureHash: hash, timestamp })
-    })
-
-    it('should reject when replay protection detects replay', async () => {
-      using mockSignatureNonceRegistry = (() => {
-        const registry: SignatureNonceRegistry = {
-          [Symbol.dispose]: vi.fn(),
-          isReplayedRequest: vi.fn().mockResolvedValue(true),
-        }
-        return registry
-      })()
-
-      const { secret, rawRequestBody, timestamp } = _getMocks()
-      const payload = `${timestamp}.${rawRequestBody}`
-      const hash = await _computeHmac({ payload, secret })
-      const signatureHeaderValue = `${timestamp},${hash}`
-
-      using verifier = createSignatureVerifier({
-        sharedSecrets: [secret],
-        signatureNonceRegistry: mockSignatureNonceRegistry,
-      })
-      const result = await verifier.verify({ rawRequestBody, signatureHeaderValue })
-
-      expect(result).toBeFalsy()
-    })
-
-    it('should not call replay protection when signature is invalid', async () => {
-      using mockSignatureNonceRegistry = (() => {
-        const registry: SignatureNonceRegistry = {
-          [Symbol.dispose]: vi.fn(),
-          isReplayedRequest: vi.fn().mockResolvedValue(false),
-        }
-        return registry
-      })()
-
-      const { secret, rawRequestBody, timestamp } = _getMocks()
-      const wrongHash = _generateBase64UrlSecret().slice(0, 43)
-      const signatureHeaderValue = `${timestamp},${wrongHash}`
-
-      using verifier = createSignatureVerifier({
-        sharedSecrets: [secret],
-        signatureNonceRegistry: mockSignatureNonceRegistry,
-      })
-      const result = await verifier.verify({ rawRequestBody, signatureHeaderValue })
-
-      expect(result).toBeFalsy()
-      expect(mockSignatureNonceRegistry.isReplayedRequest).not.toHaveBeenCalled()
     })
   })
 })

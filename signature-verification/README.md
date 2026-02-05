@@ -1,6 +1,6 @@
 # Botpress Webhook Authentication Library
 
-A TypeScript library for verifying Botpress webhook signatures with built-in replay protection. This should only be used for self-hosted integrations and bots, since Botpress Cloud handles signature verification automatically.
+A TypeScript library for verifying Botpress webhook signatures. This should only be used for self-hosted integrations and bots, since Botpress Cloud handles signature verification automatically.
 
 ## Disclaimer ⚠️
 
@@ -13,10 +13,8 @@ A TypeScript library for verifying Botpress webhook signatures with built-in rep
 
 - **HMAC-SHA256 Signature Verification**: Validates signatures against shared secrets
 - **Timestamp Validation**: Rejects requests outside a ±5 minute time window
-- **Replay Protection**: Prevents signature reuse with pluggable nonce registries
 - **Secret Rotation**: Supports multiple secrets for zero-downtime rotation
 - **Resource Management**: Automatic cleanup using `Disposable` interface
-- **Distributed Systems**: Supports Redis-backed registry for multi-instance deployments
 
 ## Installation
 
@@ -63,30 +61,6 @@ using verifier = createSignatureVerifier({
 ```
 
 Secrets are tried in order until a match is found.
-
-### Distributed Systems (Redis)
-
-For multi-instance deployments, use a Redis-backed nonce registry:
-
-```typescript
-import { createRedisNonceRegistry } from '@bpinternal/signature-verification'
-import Redis from 'ioredis'
-
-const redisClient = new Redis({ ... })
-
-using signatureNonceRegistry = createRedisNonceRegistry({
-  client: redisClient,
-  failOpen: false, // Reject requests if Redis is unavailable (default)
-})
-
-using verifier = createSignatureVerifier({
-  sharedSecrets: [process.env.WEBHOOK_SECRET],
-  signatureNonceRegistry,
-})
-```
-
-> [!IMPORTANT]
-> By default, the Redis registry fails closed (`failOpen: false`), meaning requests will be rejected if Redis is unavailable. This is more secure but requires reliable Redis infrastructure. Set `failOpen: true` if you prefer availability over security.
 
 ### Express Middleware Example
 

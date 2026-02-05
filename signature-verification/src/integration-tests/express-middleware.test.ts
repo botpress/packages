@@ -182,40 +182,6 @@ describe('Express middleware integration', () => {
     await expect(response.json()).resolves.toEqual({ error: 'Invalid signature' })
   })
 
-  it('should prevent replay attacks', async () => {
-    // Arrange
-    const body = { event: 'user.created', userId: 456 }
-    const rawBody = JSON.stringify(body)
-    const timestamp = Date.now()
-    const payload = `${timestamp}.${rawBody}`
-    const hash = await _computeHmac({ payload, secret })
-    const signature = `${timestamp},${hash}`
-
-    // Act
-    const response1 = await fetch(`${baseUrl}/webhook`, {
-      body: rawBody,
-      headers: {
-        'Content-Type': 'application/json',
-        'X-BP-Signature': signature,
-      },
-      method: 'POST',
-    })
-
-    const response2 = await fetch(`${baseUrl}/webhook`, {
-      body: rawBody,
-      headers: {
-        'Content-Type': 'application/json',
-        'X-BP-Signature': signature,
-      },
-      method: 'POST',
-    })
-
-    // Assert
-    expect(response1.status).toBe(200)
-    expect(response2.status).toBe(401)
-    await expect(response2.json()).resolves.toEqual({ error: 'Invalid signature' })
-  })
-
   it('should reject request without signature header', async () => {
     // Arrange
     const body = { event: 'user.created', userId: 789 }

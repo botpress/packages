@@ -1,4 +1,3 @@
-import type { SignatureNonceRegistry } from './types'
 import {
   SIGNATURE_HASH_BASE64_LENGTH,
   SIGNATURE_HEADER_DELIMITER,
@@ -7,17 +6,14 @@ import {
   SIGNATURE_VALIDATION_WINDOW_MS,
   TIMESTAMP_PAYLOAD_DELIMITER,
 } from './constants'
-import { createInMemoryNonceRegistry } from './in-memory-nonce-registry'
 
 class RequestSignatureVerifier implements Disposable {
   private readonly _secretBuffers: Uint8Array<ArrayBuffer>[]
-  private readonly _signatureNonceRegistry?: SignatureNonceRegistry
   private readonly _cryptoKeys: Promise<CryptoKey>[]
   private readonly _textEncoder = new TextEncoder()
 
-  public constructor(params: { sharedSecrets: string[]; signatureNonceRegistry?: SignatureNonceRegistry }) {
+  public constructor(params: { sharedSecrets: string[] }) {
     this._secretBuffers = params.sharedSecrets.map((secret) => this._base64urlToBytes(secret))
-    this._signatureNonceRegistry = params.signatureNonceRegistry
     this._cryptoKeys = this._secretBuffers.map(
       async (secretBytes) =>
         await globalThis.crypto.subtle.importKey('raw', secretBytes, { hash: 'SHA-256', name: 'HMAC' }, false, [
@@ -46,7 +42,7 @@ class RequestSignatureVerifier implements Disposable {
 
     const payloadToSign = timestamp + TIMESTAMP_PAYLOAD_DELIMITER + rawRequestBody
 
-    return await this._verifySignaturesWithSecrets({ payloadToSign, receivedHashes, timestamp })
+    return await this._verifySignaturesWithSecrets({ payloadToSign, receivedHashes })
   }
 
   private _validateSignatureFormat(
@@ -96,7 +92,6 @@ class RequestSignatureVerifier implements Disposable {
   private async _verifySignaturesWithSecrets(params: {
     receivedHashes: string[]
     payloadToSign: string
-    timestamp: number
   }): Promise<boolean> {
     return await this._verifyWithSecretIndex({
       ...params,
@@ -108,9 +103,8 @@ class RequestSignatureVerifier implements Disposable {
     secretIndex: number
     receivedHashes: string[]
     payloadToSign: string
-    timestamp: number
   }): Promise<boolean> {
-    const { secretIndex, receivedHashes, payloadToSign, timestamp } = params
+    const { secretIndex, receivedHashes, payloadToSign } = params
 
     if (secretIndex >= this._secretBuffers.length) {
       return false
@@ -120,7 +114,6 @@ class RequestSignatureVerifier implements Disposable {
       payloadToSign,
       receivedHashes,
       secretIndex,
-      timestamp,
     })
 
     if (result) {
@@ -137,7 +130,6 @@ class RequestSignatureVerifier implements Disposable {
     secretIndex: number
     receivedHashes: string[]
     payloadToSign: string
-    timestamp: number
   }): Promise<boolean> {
     return await this._verifyHashAtIndex({
       ...params,
@@ -150,9 +142,8 @@ class RequestSignatureVerifier implements Disposable {
     secretIndex: number
     receivedHashes: string[]
     payloadToSign: string
-    timestamp: number
   }): Promise<boolean> {
-    const { hashIndex, secretIndex, receivedHashes, payloadToSign, timestamp } = params
+    const { hashIndex, secretIndex, receivedHashes, payloadToSign } = params
 
     const receivedHash = this._getHashAtIndex({ hashIndex, receivedHashes })
     if (receivedHash === undefined) {
@@ -162,7 +153,7 @@ class RequestSignatureVerifier implements Disposable {
     const isValid = await this._verifyHmac({ expectedHash: receivedHash, payload: payloadToSign, secretIndex })
 
     if (isValid) {
-      return await this._checkReplayProtection({ receivedHash, timestamp })
+      return true
     }
 
     return await this._verifyHashAtIndex({
@@ -177,18 +168,6 @@ class RequestSignatureVerifier implements Disposable {
     }
 
     return params.receivedHashes[params.hashIndex]
-  }
-
-  private async _checkReplayProtection(params: { receivedHash: string; timestamp: number }): Promise<boolean> {
-    if (!this._signatureNonceRegistry) {
-      return true
-    }
-
-    const isReplayed = await this._signatureNonceRegistry.isReplayedRequest({
-      signatureHash: params.receivedHash,
-      timestamp: params.timestamp,
-    })
-    return !isReplayed
   }
 
   private async _verifyHmac(params: { secretIndex: number; payload: string; expectedHash: string }): Promise<boolean> {
@@ -225,7 +204,7 @@ class RequestSignatureVerifier implements Disposable {
   }
 
   public [Symbol.dispose](): void {
-    this._signatureNonceRegistry?.[Symbol.dispose]()
+    // No resources to dispose
   }
 }
 
@@ -234,12 +213,11 @@ class RequestSignatureVerifier implements Disposable {
  * self-hosted bots and integrations.
  *
  * The verifier validates HMAC-SHA256 signatures against one or more shared
- * secrets, rejects requests outside a ±5 minute time window, prevents replay
- * attacks using a nonce registry (in-memory by default), supports zero-downtime
- * secret rotation with multiple secrets, and implements `Disposable` for
- * automatic cleanup with `using` declarations.
+ * secrets, rejects requests outside a ±5 minute time window, supports
+ * zero-downtime secret rotation with multiple secrets, and implements
+ * `Disposable` for automatic cleanup with `using` declarations.
  *
- * ## Basic Usage (with default in-memory registry)
+ * ## Basic Usage
  *
  * ```typescript
  * using verifier = createSignatureVerifier({
@@ -249,20 +227,6 @@ class RequestSignatureVerifier implements Disposable {
  * const isValid = await verifier.verify({
  *   rawRequestBody,
  *   signatureHeaderValue
- * })
- * ```
- *
- * ## With Redis-backed Nonce Registry (for distributed systems)
- *
- * ```typescript
- * using nonceRegistry = createRedisNonceRegistry({
- *   client: redisClient,
- *   failOpen: true
- * })
- *
- * using verifier = createSignatureVerifier({
- *   sharedSecrets: ['your-secret'],
- *   signatureNonceRegistry: nonceRegistry
  * })
  * ```
  *
@@ -287,9 +251,6 @@ class RequestSignatureVerifier implements Disposable {
  *
  * @param params - Configuration for the signature verifier
  * @param params.sharedSecrets - Array of shared secrets for signature verification. Secrets are tried in order.
- * @param params.signatureNonceRegistry - Optional nonce registry for replay protection.
- *   Defaults to an in-memory registry with 100,000 max entries. Use a Redis-backed registry
- *   for distributed systems.
  *
  * @returns A disposable signature verifier instance.
  *
@@ -313,11 +274,5 @@ class RequestSignatureVerifier implements Disposable {
  * })
  * ```
  */
-export const createSignatureVerifier = (params: {
-  sharedSecrets: string[]
-  signatureNonceRegistry?: SignatureNonceRegistry
-}): RequestSignatureVerifier => {
-  const signatureNonceRegistry = params.signatureNonceRegistry ?? createInMemoryNonceRegistry()
-
-  return new RequestSignatureVerifier({ ...params, signatureNonceRegistry })
-}
+export const createSignatureVerifier = (params: { sharedSecrets: string[] }): RequestSignatureVerifier =>
+  new RequestSignatureVerifier(params)

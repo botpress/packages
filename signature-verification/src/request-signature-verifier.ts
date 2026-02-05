@@ -3,9 +3,12 @@ import {
   SIGNATURE_HEADER_DELIMITER,
   SIGNATURE_HEADER_MAX_PARTS,
   SIGNATURE_HEADER_MIN_PARTS,
+  SIGNATURE_HEADER_NAME,
   SIGNATURE_VALIDATION_WINDOW_MS,
   TIMESTAMP_PAYLOAD_DELIMITER,
 } from './constants'
+
+type AnyHeaders = Iterable<[string, unknown]> | Record<string, unknown> | Headers
 
 class RequestSignatureVerifier implements Disposable {
   private readonly _secretBuffers: Uint8Array<ArrayBuffer>[]
@@ -22,27 +25,49 @@ class RequestSignatureVerifier implements Disposable {
     )
   }
 
-  public async verify({
-    rawRequestBody,
-    signatureHeaderValue,
-  }: {
-    rawRequestBody: string
-    signatureHeaderValue: string
-  }): Promise<boolean> {
+  // oxlint-disable-next-line eslint/complexity
+  public async verify(request: { headers: AnyHeaders; method: string; rawBody?: string }): Promise<boolean> {
+    if (!this._assertMethodIsPost(request.method) || !this._assertBodyIsNonEmpty(request.rawBody)) {
+      return false
+    }
+
+    const signatureHeaderValue = this._extractSignatureHeader(this._convertIterableToHeaders(request.headers))
+    if (signatureHeaderValue === undefined) {
+      return false
+    }
+
     const validationResult = this._validateSignatureFormat(signatureHeaderValue)
-    if (!validationResult) {
+    if (!validationResult || !this._isTimestampValid(validationResult.timestamp)) {
       return false
     }
 
-    const { timestamp, receivedHashes } = validationResult
+    const payloadToSign = validationResult.timestamp + TIMESTAMP_PAYLOAD_DELIMITER + request.rawBody
+    return await this._verifySignaturesWithSecrets({ payloadToSign, receivedHashes: validationResult.receivedHashes })
+  }
 
-    if (!this._isTimestampValid(timestamp)) {
-      return false
+  private _assertMethodIsPost(method: string): boolean {
+    return method.toUpperCase() === 'POST'
+  }
+
+  private _assertBodyIsNonEmpty(rawBody: string | undefined): boolean {
+    return rawBody !== undefined && rawBody.length > 0
+  }
+
+  private _convertIterableToHeaders(headersIterable: AnyHeaders): Headers {
+    if (headersIterable instanceof Headers) {
+      return headersIterable
     }
 
-    const payloadToSign = timestamp + TIMESTAMP_PAYLOAD_DELIMITER + rawRequestBody
+    const entries = Symbol.iterator in headersIterable ? [...headersIterable] : Object.entries(headersIterable)
 
-    return await this._verifySignaturesWithSecrets({ payloadToSign, receivedHashes })
+    return new Headers(
+      entries.filter((entry): entry is [string, string] => typeof entry[0] === 'string' && typeof entry[1] === 'string')
+    )
+  }
+
+  private _extractSignatureHeader(headers: Headers): string | undefined {
+    const headerValue = headers.get(SIGNATURE_HEADER_NAME)
+    return headerValue ?? undefined
   }
 
   private _validateSignatureFormat(
@@ -225,8 +250,9 @@ class RequestSignatureVerifier implements Disposable {
  * })
  *
  * const isValid = await verifier.verify({
- *   rawRequestBody,
- *   signatureHeaderValue
+ *   headers: req.headers,
+ *   rawBody: req.rawBody,
+ *   method: req.method
  * })
  * ```
  *
@@ -262,8 +288,9 @@ class RequestSignatureVerifier implements Disposable {
  *
  * app.post('/webhook', async (req, res) => {
  *   const isValid = await verifier.verify({
- *     rawRequestBody: req.rawBody, // Must be raw bytes, not parsed
- *     signatureHeaderValue: req.headers['X-BP-Signature']
+ *     headers: req.headers,
+ *     rawBody: req.rawBody, // Must be raw bytes, not parsed
+ *     method: req.method
  *   })
  *
  *   if (!isValid) {

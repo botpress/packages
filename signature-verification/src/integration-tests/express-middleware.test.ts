@@ -55,18 +55,13 @@ const _createTestApp = (secret: string): Express => {
     sharedSecrets: [secret],
   })
 
-  const _verifySignature: express.RequestHandler = async (req, res, next) => {
-    const signature = req.headers['x-bp-signature']
+  const verifySignature: express.RequestHandler = async (req, res, next) => {
     const { rawBody } = req as express.Request & { rawBody?: string }
 
-    if (signature === undefined || typeof signature !== 'string' || rawBody === undefined) {
-      res.status(400).json({ error: 'Missing signature or body' })
-      return
-    }
-
     const isValid = await verifier.verify({
-      rawRequestBody: rawBody,
-      signatureHeaderValue: signature,
+      headers: Object.entries(req.headers),
+      method: req.method,
+      rawBody,
     })
 
     if (!isValid) {
@@ -77,7 +72,7 @@ const _createTestApp = (secret: string): Express => {
     next()
   }
 
-  app.post('/webhook', _verifySignature, (req, res) => {
+  app.all('/webhook', verifySignature, (req, res) => {
     res.status(200).json({ data: req.body as string, message: 'Webhook received' })
   })
 
@@ -111,7 +106,7 @@ describe('Express middleware integration', () => {
     })
   })
 
-  it('should accept request with valid signature', async () => {
+  it('should accept requests with a valid signature', async () => {
     // Arrange
     const body = { event: 'user.created', userId: 123 }
     const rawBody = JSON.stringify(body)
@@ -135,7 +130,7 @@ describe('Express middleware integration', () => {
     await expect(response.json()).resolves.toEqual({ data: body, message: 'Webhook received' })
   })
 
-  it('should reject request with invalid signature', async () => {
+  it('should reject requests with an invalid signature', async () => {
     // Arrange
     const body = { event: 'user.created', userId: 123 }
     const rawBody = JSON.stringify(body)
@@ -158,7 +153,7 @@ describe('Express middleware integration', () => {
     await expect(response.json()).resolves.toEqual({ error: 'Invalid signature' })
   })
 
-  it('should reject request with expired timestamp', async () => {
+  it('should reject requests with an expired timestamp', async () => {
     // Arrange
     const body = { event: 'user.created', userId: 123 }
     const rawBody = JSON.stringify(body)
@@ -182,7 +177,7 @@ describe('Express middleware integration', () => {
     await expect(response.json()).resolves.toEqual({ error: 'Invalid signature' })
   })
 
-  it('should reject request without signature header', async () => {
+  it('should reject requests without a signature header', async () => {
     // Arrange
     const body = { event: 'user.created', userId: 789 }
     const rawBody = JSON.stringify(body)
@@ -197,7 +192,26 @@ describe('Express middleware integration', () => {
     })
 
     // Assert
-    expect(response.status).toBe(400)
-    await expect(response.json()).resolves.toEqual({ error: 'Missing signature or body' })
+    expect(response.status).toBe(401)
+    await expect(response.json()).resolves.toEqual({ error: 'Invalid signature' })
+  })
+
+  it('should reject non-POST requests', async () => {
+    // Arrange
+    const timestamp = Date.now()
+    const hash = await _computeHmac({ payload: `${timestamp}.{}`, secret })
+    const signature = `${timestamp},${hash}`
+
+    // Act
+    const response = await fetch(`${baseUrl}/webhook`, {
+      headers: {
+        'X-BP-Signature': signature,
+      },
+      method: 'GET',
+    })
+
+    // Assert
+    expect(response.status).toBe(401)
+    await expect(response.json()).resolves.toEqual({ error: 'Invalid signature' })
   })
 })

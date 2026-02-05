@@ -32,10 +32,11 @@ using verifier = createSignatureVerifier({
   sharedSecrets: [process.env.WEBHOOK_SECRET],
 })
 
-// Verify a webhook signature:
+// Verify a webhook request:
 const isValid = await verifier.verify({
-  rawRequestBody: '{"event":"action_called"}',
-  signatureHeaderValue: '1234567890,abc123...',
+  headers: req.headers,
+  rawBody: req.rawBody,
+  method: req.method,
 })
 
 if (!isValid) {
@@ -85,15 +86,10 @@ using requestVerifier = createSignatureVerifier({
 
 // Create a reusable middleware:
 const verifySignature = async (req, res, next) => {
-  const signature = req.headers['x-bp-signature']
-
-  if (!signature || typeof signature !== 'string' || !req.rawBody) {
-    return res.status(400).json({ error: 'Missing signature or body' })
-  }
-
   const isValid = await requestVerifier.verify({
-    rawRequestBody: req.rawBody,
-    signatureHeaderValue: signature,
+    headers: req.headers,
+    rawBody: req.rawBody,
+    method: req.method,
   })
 
   if (!isValid) {

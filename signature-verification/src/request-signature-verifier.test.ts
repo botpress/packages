@@ -53,7 +53,11 @@ describe.concurrent(createSignatureVerifier, () => {
       const signatureHeaderValue = `${timestamp},${hash}`
 
       using verifier = createSignatureVerifier({ sharedSecrets: [secret] })
-      const result = await verifier.verify({ rawRequestBody, signatureHeaderValue })
+      const result = await verifier.verify({
+        headers: { 'X-BP-Signature': signatureHeaderValue },
+        method: 'POST',
+        rawBody: rawRequestBody,
+      })
 
       expect(result).toBeTruthy()
     })
@@ -66,7 +70,11 @@ describe.concurrent(createSignatureVerifier, () => {
       const signatureHeaderValue = `${timestamp},${hash}`
 
       using verifier = createSignatureVerifier({ sharedSecrets: [secret, secret2] })
-      const result = await verifier.verify({ rawRequestBody, signatureHeaderValue })
+      const result = await verifier.verify({
+        headers: { 'X-BP-Signature': signatureHeaderValue },
+        method: 'POST',
+        rawBody: rawRequestBody,
+      })
 
       expect(result).toBeTruthy()
     })
@@ -80,7 +88,11 @@ describe.concurrent(createSignatureVerifier, () => {
       const signatureHeaderValue = `${timestamp},${hash}`
 
       using verifier = createSignatureVerifier({ sharedSecrets: [secret1, secret2] })
-      const result = await verifier.verify({ rawRequestBody, signatureHeaderValue })
+      const result = await verifier.verify({
+        headers: { 'X-BP-Signature': signatureHeaderValue },
+        method: 'POST',
+        rawBody: rawRequestBody,
+      })
 
       expect(result).toBeTruthy()
     })
@@ -93,7 +105,11 @@ describe.concurrent(createSignatureVerifier, () => {
       const signatureHeaderValue = `${timestamp},${hash1},${hash2}`
 
       using verifier = createSignatureVerifier({ sharedSecrets: [secret] })
-      const result = await verifier.verify({ rawRequestBody, signatureHeaderValue })
+      const result = await verifier.verify({
+        headers: { 'X-BP-Signature': signatureHeaderValue },
+        method: 'POST',
+        rawBody: rawRequestBody,
+      })
 
       expect(result).toBeTruthy()
     })
@@ -106,7 +122,11 @@ describe.concurrent(createSignatureVerifier, () => {
       const signatureHeaderValue = `${timestamp},${wrongHash}`
 
       using verifier = createSignatureVerifier({ sharedSecrets: [secret] })
-      const result = await verifier.verify({ rawRequestBody, signatureHeaderValue })
+      const result = await verifier.verify({
+        headers: { 'X-BP-Signature': signatureHeaderValue },
+        method: 'POST',
+        rawBody: rawRequestBody,
+      })
 
       expect(result).toBeFalsy()
     })
@@ -120,7 +140,11 @@ describe.concurrent(createSignatureVerifier, () => {
       const signatureHeaderValue = `${timestamp},${hash}`
 
       using verifier = createSignatureVerifier({ sharedSecrets: [correctSecret] })
-      const result = await verifier.verify({ rawRequestBody, signatureHeaderValue })
+      const result = await verifier.verify({
+        headers: { 'X-BP-Signature': signatureHeaderValue },
+        method: 'POST',
+        rawBody: rawRequestBody,
+      })
 
       expect(result).toBeFalsy()
     })
@@ -134,7 +158,11 @@ describe.concurrent(createSignatureVerifier, () => {
       const signatureHeaderValue = `${timestamp},${hash}`
 
       using verifier = createSignatureVerifier({ sharedSecrets: [secret] })
-      const result = await verifier.verify({ rawRequestBody: modifiedBody, signatureHeaderValue })
+      const result = await verifier.verify({
+        headers: { 'X-BP-Signature': signatureHeaderValue },
+        method: 'POST',
+        rawBody: modifiedBody,
+      })
 
       expect(result).toBeFalsy()
     })
@@ -145,7 +173,11 @@ describe.concurrent(createSignatureVerifier, () => {
       const signatureHeaderValue = `${timestamp},${hashWithInvalidBase64}`
 
       using verifier = createSignatureVerifier({ sharedSecrets: [secret] })
-      const result = await verifier.verify({ rawRequestBody, signatureHeaderValue })
+      const result = await verifier.verify({
+        headers: { 'X-BP-Signature': signatureHeaderValue },
+        method: 'POST',
+        rawBody: rawRequestBody,
+      })
 
       expect(result).toBeFalsy()
     })
@@ -157,7 +189,11 @@ describe.concurrent(createSignatureVerifier, () => {
       const signatureHeaderValue = `${Date.now()}`
 
       using verifier = createSignatureVerifier({ sharedSecrets: [secret] })
-      const result = await verifier.verify({ rawRequestBody, signatureHeaderValue })
+      const result = await verifier.verify({
+        headers: { 'X-BP-Signature': signatureHeaderValue },
+        method: 'POST',
+        rawBody: rawRequestBody,
+      })
 
       expect(result).toBeFalsy()
     })
@@ -168,7 +204,11 @@ describe.concurrent(createSignatureVerifier, () => {
       const signatureHeaderValue = `${timestamp},${hash},${hash},${hash},${hash},${hash},${hash}`
 
       using verifier = createSignatureVerifier({ sharedSecrets: [secret] })
-      const result = await verifier.verify({ rawRequestBody, signatureHeaderValue })
+      const result = await verifier.verify({
+        headers: { 'X-BP-Signature': signatureHeaderValue },
+        method: 'POST',
+        rawBody: rawRequestBody,
+      })
 
       expect(result).toBeFalsy()
     })
@@ -179,7 +219,11 @@ describe.concurrent(createSignatureVerifier, () => {
       const signatureHeaderValue = `${timestamp},${invalidHash}`
 
       using verifier = createSignatureVerifier({ sharedSecrets: [secret] })
-      const result = await verifier.verify({ rawRequestBody, signatureHeaderValue })
+      const result = await verifier.verify({
+        headers: { 'X-BP-Signature': signatureHeaderValue },
+        method: 'POST',
+        rawBody: rawRequestBody,
+      })
 
       expect(result).toBeFalsy()
     })
@@ -190,7 +234,11 @@ describe.concurrent(createSignatureVerifier, () => {
       const signatureHeaderValue = `invalid,${hash}`
 
       using verifier = createSignatureVerifier({ sharedSecrets: [secret] })
-      const result = await verifier.verify({ rawRequestBody, signatureHeaderValue })
+      const result = await verifier.verify({
+        headers: { 'X-BP-Signature': signatureHeaderValue },
+        method: 'POST',
+        rawBody: rawRequestBody,
+      })
 
       expect(result).toBeFalsy()
     })
@@ -205,7 +253,11 @@ describe.concurrent(createSignatureVerifier, () => {
       const signatureHeaderValue = `${oldTimestamp},${hash}`
 
       using verifier = createSignatureVerifier({ sharedSecrets: [secret] })
-      const result = await verifier.verify({ rawRequestBody, signatureHeaderValue })
+      const result = await verifier.verify({
+        headers: { 'X-BP-Signature': signatureHeaderValue },
+        method: 'POST',
+        rawBody: rawRequestBody,
+      })
 
       expect(result).toBeFalsy()
     })
@@ -218,7 +270,11 @@ describe.concurrent(createSignatureVerifier, () => {
       const signatureHeaderValue = `${futureTimestamp},${hash}`
 
       using verifier = createSignatureVerifier({ sharedSecrets: [secret] })
-      const result = await verifier.verify({ rawRequestBody, signatureHeaderValue })
+      const result = await verifier.verify({
+        headers: { 'X-BP-Signature': signatureHeaderValue },
+        method: 'POST',
+        rawBody: rawRequestBody,
+      })
 
       expect(result).toBeFalsy()
     })
@@ -231,7 +287,155 @@ describe.concurrent(createSignatureVerifier, () => {
       const signatureHeaderValue = `${timestamp},${hash}`
 
       using verifier = createSignatureVerifier({ sharedSecrets: [secret] })
-      const result = await verifier.verify({ rawRequestBody, signatureHeaderValue })
+      const result = await verifier.verify({
+        headers: { 'X-BP-Signature': signatureHeaderValue },
+        method: 'POST',
+        rawBody: rawRequestBody,
+      })
+
+      expect(result).toBeTruthy()
+    })
+  })
+
+  describe.concurrent('request validation', () => {
+    it('should reject GET requests', async () => {
+      const { secret, rawRequestBody, timestamp } = _getMocks()
+      const payload = `${timestamp}.${rawRequestBody}`
+      const hash = await _computeHmac({ payload, secret })
+      const signatureHeaderValue = `${timestamp},${hash}`
+
+      using verifier = createSignatureVerifier({ sharedSecrets: [secret] })
+      const result = await verifier.verify({
+        headers: { 'X-BP-Signature': signatureHeaderValue },
+        method: 'GET',
+        rawBody: rawRequestBody,
+      })
+
+      expect(result).toBeFalsy()
+    })
+
+    it('should reject PUT requests', async () => {
+      const { secret, rawRequestBody, timestamp } = _getMocks()
+      const payload = `${timestamp}.${rawRequestBody}`
+      const hash = await _computeHmac({ payload, secret })
+      const signatureHeaderValue = `${timestamp},${hash}`
+
+      using verifier = createSignatureVerifier({ sharedSecrets: [secret] })
+      const result = await verifier.verify({
+        headers: { 'X-BP-Signature': signatureHeaderValue },
+        method: 'PUT',
+        rawBody: rawRequestBody,
+      })
+
+      expect(result).toBeFalsy()
+    })
+
+    it('should reject DELETE requests', async () => {
+      const { secret, rawRequestBody, timestamp } = _getMocks()
+      const payload = `${timestamp}.${rawRequestBody}`
+      const hash = await _computeHmac({ payload, secret })
+      const signatureHeaderValue = `${timestamp},${hash}`
+
+      using verifier = createSignatureVerifier({ sharedSecrets: [secret] })
+      const result = await verifier.verify({
+        headers: { 'X-BP-Signature': signatureHeaderValue },
+        method: 'DELETE',
+        rawBody: rawRequestBody,
+      })
+
+      expect(result).toBeFalsy()
+    })
+
+    it('should accept POST with any casing', async () => {
+      const { secret, rawRequestBody, timestamp } = _getMocks()
+      const payload = `${timestamp}.${rawRequestBody}`
+      const hash = await _computeHmac({ payload, secret })
+      const signatureHeaderValue = `${timestamp},${hash}`
+
+      using verifier = createSignatureVerifier({ sharedSecrets: [secret] })
+      const result = await verifier.verify({
+        headers: { 'X-BP-Signature': signatureHeaderValue },
+        method: 'post',
+        rawBody: rawRequestBody,
+      })
+
+      expect(result).toBeTruthy()
+    })
+
+    it('should reject empty body', async () => {
+      const { secret, timestamp } = _getMocks()
+      const hash = await _computeHmac({ payload: `${timestamp}.`, secret })
+      const signatureHeaderValue = `${timestamp},${hash}`
+
+      using verifier = createSignatureVerifier({ sharedSecrets: [secret] })
+      const result = await verifier.verify({
+        headers: { 'X-BP-Signature': signatureHeaderValue },
+        method: 'POST',
+        rawBody: '',
+      })
+
+      expect(result).toBeFalsy()
+    })
+
+    it('should reject undefined body', async () => {
+      const { secret, timestamp } = _getMocks()
+      const hash = await _computeHmac({ payload: `${timestamp}.`, secret })
+      const signatureHeaderValue = `${timestamp},${hash}`
+
+      using verifier = createSignatureVerifier({ sharedSecrets: [secret] })
+      const result = await verifier.verify({
+        headers: { 'X-BP-Signature': signatureHeaderValue },
+        method: 'POST',
+        rawBody: undefined,
+      })
+
+      expect(result).toBeFalsy()
+    })
+
+    it('should reject missing signature header', async () => {
+      const { secret, rawRequestBody } = _getMocks()
+
+      using verifier = createSignatureVerifier({ sharedSecrets: [secret] })
+      const result = await verifier.verify({
+        headers: new Map(),
+        method: 'POST',
+        rawBody: rawRequestBody,
+      })
+
+      expect(result).toBeFalsy()
+    })
+
+    it('should accept headers as an Headers object', async () => {
+      const { secret, rawRequestBody, timestamp } = _getMocks()
+      const payload = `${timestamp}.${rawRequestBody}`
+      const hash = await _computeHmac({ payload, secret })
+      const signatureHeaderValue = `${timestamp},${hash}`
+
+      const headers = new Headers()
+      headers.set('X-BP-Signature', signatureHeaderValue)
+
+      using verifier = createSignatureVerifier({ sharedSecrets: [secret] })
+      const result = await verifier.verify({
+        headers,
+        method: 'POST',
+        rawBody: rawRequestBody,
+      })
+
+      expect(result).toBeTruthy()
+    })
+
+    it('should accept headers as an array of tuples', async () => {
+      const { secret, rawRequestBody, timestamp } = _getMocks()
+      const payload = `${timestamp}.${rawRequestBody}`
+      const hash = await _computeHmac({ payload, secret })
+      const signatureHeaderValue = `${timestamp},${hash}`
+
+      using verifier = createSignatureVerifier({ sharedSecrets: [secret] })
+      const result = await verifier.verify({
+        headers: [['X-BP-Signature', signatureHeaderValue]],
+        method: 'POST',
+        rawBody: rawRequestBody,
+      })
 
       expect(result).toBeTruthy()
     })

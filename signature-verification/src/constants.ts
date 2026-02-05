@@ -10,3 +10,4 @@ export const SIGNATURE_HASH_BASE64_LENGTH = 43
 
 export const SIGNATURE_HEADER_DELIMITER = ','
 export const TIMESTAMP_PAYLOAD_DELIMITER = '.'
+export const SIGNATURE_HEADER_NAME = 'X-BP-Signature'

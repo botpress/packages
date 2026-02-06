@@ -20,6 +20,7 @@
     "emitDecoratorMetadata": true,
     "useUnknownInCatchVariables": false,
     "forceConsistentCasingInFileNames": true,
+    "noUncheckedIndexedAccess": true,
     "outDir": "./dist",
     "rootDir": "./src",
     "types": ["node"],

@@ -1,6 +1,6 @@
 {
   "name": "@bpinternal/opapi",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "description": "Opapi is a highly opinionated library to generate server, client and documentation from OpenAPI specification using typescript.",
   "main": "./dist/index.js",
   "module": "./dist/index.mjs",
@@ -39,7 +39,8 @@
     "typescript": "5.7.2",
     "vite": "5.4.11",
     "vite-node": "1.6.0",
-    "vitest": "1.6.0"
+    "vitest": "1.6.0",
+    "zod": "3.22.4"
   },
   "dependencies": {
     "@anatine/zod-openapi": "1.12.1",
@@ -56,8 +57,7 @@
     "radash": "12.1.0",
     "tsconfig-paths": "4.2.0",
     "verror": "1.10.1",
-    "winston": "3.17.0",
-    "zod": "3.22.4"
+    "winston": "3.17.0"
   },
   "author": "Botpress, Inc.",
   "license": "MIT",

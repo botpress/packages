@@ -1,4 +1,4 @@
-import { extendApi, OpenApiZodAny } from '@anatine/zod-openapi'
+import { extendApi, generateSchema, OpenApiZodAny } from '@anatine/zod-openapi'
 import {
   generateClientWithOpenapiGenerator,
   generateClientWithOpapi,
@@ -12,9 +12,19 @@ import { exportStateAsTypescript, ExportStateAsTypescriptOptions } from './gener
 import { generateHandler } from './handler-generator'
 import { applyExportOptions, ExportStateOptions } from './export-options'
 import { addOperation } from './operation'
+import { ReferenceObject, SchemaObject } from 'openapi3-ts'
+import { schemaObjectToJsonSchema } from './jsonschema'
+import { JSONSchema7 } from 'json-schema'
 export { Operation, Parameter } from './state'
 
 type AnatineSchemaObject = NonNullable<Parameters<typeof extendApi>[1]>
+
+export const zodSchema = (schema: OpenApiZodAny, schemaObject?: SchemaObject & { $ref?: string }): JSONSchema7 => {
+  const This = (schema as any).constructor
+  const copy = new This(schema._def) as OpenApiZodAny
+  copy.metaOpenApi = structuredClone(schema.metaOpenApi)
+  return schemaObjectToJsonSchema(generateSchema(extendApi(copy, schemaObject)))
+}
 
 export const schema = <T extends OpenApiZodAny>(
   schema: T,
@@ -40,11 +50,11 @@ export class OpenApi<SchemaName extends string, DefaultParameterName extends str
     return openapi
   }
 
-  getModelRef(name: SchemaName): OpenApiZodAny {
+  getModelRef(name: SchemaName): ReferenceObject {
     return getRef(this._state, ComponentType.SCHEMAS, name)
   }
 
-  addOperation<Path extends string>(operation: Operation<DefaultParameterName, SectionName, Path, 'zod-schema'>) {
+  addOperation<Path extends string>(operation: Operation<DefaultParameterName, SectionName, Path, JSONSchema7>) {
     addOperation(this._state, operation)
   }
 

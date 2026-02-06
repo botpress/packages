@@ -1,6 +1,7 @@
 import fs from 'fs'
 import _ from 'lodash'
 import { Operation } from '../state'
+import { SchemaObject } from 'openapi3-ts'
 
 const IMPORTS = `import * as types from './typings'
 import { json as requestSchemas } from './requests'
@@ -58,7 +59,7 @@ const CREATE_ROUTE_TREE_FOOT = `  }
 `
 
 export const exportRouteTree =
-  (operations: Record<string, Operation<string, string, string, 'json-schema'>>) => async (path: string) => {
+  (operations: Record<string, Operation<string, string, string, SchemaObject>>) => async (path: string) => {
     let content = ''
     content += IMPORTS
     content += PARSE_OPERATION_REQUEST

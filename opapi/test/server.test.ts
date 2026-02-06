@@ -5,6 +5,7 @@ import { existsSync, rmdirSync } from 'fs'
 import { getFiles } from '../src/file'
 import { getTypescriptErrors, validateTypescriptFile } from './util'
 import { z } from 'zod'
+import { zodSchema } from '../src'
 
 const serverFiles = [
   'definition.ts',
@@ -54,8 +55,17 @@ describe('server generator', () => {
       description: 'Post a baz',
       method: 'post',
       path: '/baz/{id}',
-      requestBody: { schema: z.object({}), description: 'Baz information' },
-      response: { schema: z.object({ baz: z.object({ id: z.string() }) }), description: 'Baz information' },
+      requestBody: {
+        schema: {
+          type: 'object',
+          additionalProperties: false,
+        },
+        description: 'Baz information',
+      },
+      response: {
+        schema: zodSchema(z.object({ baz: z.object({ id: z.string() }) })),
+        description: 'Baz information'
+      },
       parameters: {
         id: {
           in: 'path',

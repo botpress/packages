@@ -3,11 +3,12 @@ import { Operation, Parameter, State } from '../state'
 import * as utils from './utils'
 import _ from 'lodash'
 import { partiallyUnref } from './unref'
+import { SchemaObject } from 'openapi3-ts'
 
 // ### request ###
 
-type PathParam = Extract<Parameter<'json-schema'>, { in: 'path' }>
-type OptionalParam = Exclude<Parameter<'json-schema'>, { in: 'path' }>
+type PathParam = Extract<Parameter<SchemaObject>, { in: 'path' }>
+type OptionalParam = Exclude<Parameter<SchemaObject>, { in: 'path' }>
 
 const _mapPathParam = (p: PathParam, s: utils.JsonSchemaBuilder): JSONSchema7 => {
   if (p.enum) {
@@ -45,7 +46,7 @@ export type RequestShape = Record<RequestProp, JSONSchema7> & Record<RequestOpti
 
 export const toRequestShape = (
   _state: State<string, string, string>,
-  op: Operation<string, string, string, 'json-schema'>,
+  op: Operation<string, string, string, SchemaObject>,
   s: utils.JsonSchemaBuilder = utils.jsonSchemaBuilder,
 ): RequestShape => {
   const headerParams = utils.filterObject(op.parameters ?? {}, (p): p is OptionalParam => p.in === 'header')
@@ -94,7 +95,7 @@ export const toRequestShape = (
 
 export const toRequestSchema = (
   state: State<string, string, string>,
-  op: Operation<string, string, string, 'json-schema'>,
+  op: Operation<string, string, string, SchemaObject>,
   s: utils.JsonSchemaBuilder = utils.jsonSchemaBuilder,
 ): JSONSchema7 => {
   const { body, ...shape } = toRequestShape(state, op, s)
@@ -125,7 +126,7 @@ const _unrefResponseSchema = (state: State<string, string, string>, responseSche
 
 export const toResponseShape = (
   state: State<string, string, string>,
-  op: Operation<string, string, string, 'json-schema'>,
+  op: Operation<string, string, string, SchemaObject>,
   s: utils.JsonSchemaBuilder = utils.jsonSchemaBuilder,
 ): ResponseShape => {
   const responseSchema = _unrefResponseSchema(state, op.response.schema as JSONSchema7)
@@ -138,7 +139,7 @@ export const toResponseShape = (
 
 export const toResponseSchema = (
   state: State<string, string, string>,
-  op: Operation<string, string, string, 'json-schema'>,
+  op: Operation<string, string, string, SchemaObject>,
   s: utils.JsonSchemaBuilder = utils.jsonSchemaBuilder,
 ): JSONSchema7 => {
   const rawShape = toResponseShape(state, op, s)

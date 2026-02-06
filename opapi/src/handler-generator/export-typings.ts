@@ -1,9 +1,10 @@
 import { Operation } from '../state'
 import fs from 'fs/promises'
 import _ from 'lodash'
+import { SchemaObject } from 'openapi3-ts'
 
 const getRouting = (
-  operations: Record<string, Operation<string, string, string, 'json-schema'>>,
+  operations: Record<string, Operation<string, string, string, SchemaObject>>,
 ): Record<string, Record<string, string>> => {
   const opList = _.values(operations)
   const byPath = _.groupBy(opList, (op) => op.path)
@@ -24,7 +25,7 @@ const getRouting = (
 }
 
 const CONTENT = (
-  operations: Record<string, Operation<string, string, string, 'json-schema'>>,
+  operations: Record<string, Operation<string, string, string, SchemaObject>>,
 ) => `import { Types as _Requests } from '../gen/requests'
 import { Types as _Responses } from '../gen/responses'
 
@@ -112,6 +113,6 @@ export type Route<OperationProps extends object> = ValueOf<Routes<OperationProps
 `
 
 export const exportTypings =
-  (operations: Record<string, Operation<string, string, string, 'json-schema'>>) => async (outFile: string) => {
+  (operations: Record<string, Operation<string, string, string, SchemaObject>>) => async (outFile: string) => {
     await fs.writeFile(outFile, CONTENT(operations))
   }

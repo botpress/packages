@@ -1,6 +1,6 @@
 {
   "name": "@bpinternal/entities",
-  "version": "0.0.19",
+  "version": "0.0.20",
   "description": "Botpress Entities Extractor",
   "main": "./dist/node/index.js",
   "module": "./dist/web/index.js",
@@ -25,11 +25,11 @@
   "devDependencies": {
     "@types/lodash": "^4.14.195",
     "@types/node": "^22.16.4",
-    "esbuild": "^0.25.0",
+    "esbuild": "^0.27.0",
     "ts-node": "^10.9.1",
-    "typescript": "5.8.2",
+    "typescript": "5.9.3",
     "vitest": "1.6.0",
-    "wasm-pack": "^0.13.0"
+    "wasm-pack": "^0.14.0"
   },
   "author": "Botpress, Inc.",
   "license": "MIT",

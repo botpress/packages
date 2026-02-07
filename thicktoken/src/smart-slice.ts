@@ -4,21 +4,11 @@ export class SmartSlice {
   private _sortedSlices: Slice[]
 
   public constructor(slices: Slice[], max: number) {
-    // merge and sort slices here if needed
-
-    const trimmed: Slice[] = []
-    for (const [start, end] of slices) {
-      const clampedStart = Math.max(0, Math.min(max, start))
-      const clampedEnd = Math.max(0, Math.min(max, end))
-      if (clampedStart < clampedEnd) {
-        trimmed.push([clampedStart, clampedEnd])
-      }
-    }
-
-    const sorted: Slice[] = trimmed.sort((a, b) => a[0] - b[0])
+    const clampedSlices: Slice[] = slices.map((s) => this._clampSlice(s, max))
+    const sortedSlices: Slice[] = clampedSlices.sort((a, b) => a[0] - b[0])
 
     const merged: Slice[] = []
-    for (const [start, end] of sorted) {
+    for (const [start, end] of sortedSlices) {
       const last = merged[merged.length - 1]
       if (last && start <= last[1]) {
         // overlapping or contiguous slices, merge them
@@ -30,6 +20,27 @@ export class SmartSlice {
     }
 
     this._sortedSlices = merged
+  }
+
+  private _clampSlice = (slice: Slice, max: number): Slice => {
+    let [start, end] = slice
+
+    // flip slice
+    start = start < 0 ? max + start : start
+    end = end < 0 ? max + end : end
+
+    // order slice
+    if (end < start) {
+      const tmp = start
+      start = end
+      end = tmp
+    }
+
+    // clamp slice
+    const clampedStart = Math.max(0, Math.min(start, max))
+    const clampedEnd = Math.max(0, Math.min(end, max))
+
+    return [clampedStart, clampedEnd]
   }
 
   public *[Symbol.iterator](): Generator<number> {

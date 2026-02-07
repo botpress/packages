@@ -26,6 +26,16 @@ test('SmartSlice handles empty slices', () => {
   expect(indices).toEqual([])
 })
 
+test('SmartSlice handles slices of zero elements', () => {
+  const slice1 = new SmartSlice([[2, 2]], 10)
+  const indices1 = [...slice1]
+  expect(indices1).toEqual([])
+
+  const slice2 = new SmartSlice([[-5, 5]], 10)
+  const indices2 = [...slice2]
+  expect(indices2).toEqual([])
+})
+
 test('SmartSlice handles overlapping slices', () => {
   const slice = new SmartSlice(
     [
@@ -38,10 +48,16 @@ test('SmartSlice handles overlapping slices', () => {
   expect(indices).toEqual([0, 1, 2, 3, 4, 5, 6, 7])
 })
 
+test('SmartSlice counts negative slices from the end', () => {
+  const slice = new SmartSlice([[0, -3]], 10)
+  const indices = [...slice]
+  expect(indices).toEqual([0, 1, 2, 3, 4, 5, 6]) // -3 means up to index 7 (10 - 3)
+})
+
 test('SmartSlice handles out-of-bounds slices', () => {
   const slice = new SmartSlice(
     [
-      [-5, 3],
+      [-12, 3],
       [8, 12]
     ],
     10
@@ -74,4 +90,10 @@ test('SmartSlice sorts and merges slices correctly', () => {
   )
   const indices = [...slice]
   expect(indices).toEqual([0, 1, 2, 3, 4, 5, 6, 9])
+})
+
+test('SmartSlice sorts slices left and right bound', () => {
+  const slice = new SmartSlice([[-6, 6]], 10)
+  const indices = [...slice]
+  expect(indices).toEqual([4, 5])
 })

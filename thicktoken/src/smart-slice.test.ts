@@ -31,9 +31,13 @@ test('SmartSlice handles slices of zero elements', () => {
   const indices1 = [...slice1]
   expect(indices1).toEqual([])
 
-  const slice2 = new SmartSlice([[-5, 5]], 10)
-  const indices2 = [...slice2]
+  const slices2 = new SmartSlice([[9, 1]], 10)
+  const indices2 = [...slices2]
   expect(indices2).toEqual([])
+
+  const slice3 = new SmartSlice([[-5, 5]], 10)
+  const indices3 = [...slice3]
+  expect(indices3).toEqual([])
 })
 
 test('SmartSlice handles overlapping slices', () => {

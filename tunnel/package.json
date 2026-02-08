@@ -1,6 +1,6 @@
 {
   "name": "@bpinternal/tunnel",
-  "version": "0.1.25",
+  "version": "0.1.26",
   "description": "Tunneling logic for client and server",
   "main": "./dist/index.cjs",
   "browser": "./dist/index.mjs",
@@ -25,15 +25,15 @@
     "zod": "^3.20.6"
   },
   "devDependencies": {
-    "@bpinternal/log4bot": "0.0.26",
-    "@bpinternal/yargs-extra": "0.0.20",
+    "@bpinternal/log4bot": "0.0.28",
+    "@bpinternal/yargs-extra": "0.0.21",
     "@types/lodash": "^4.14.195",
     "@types/node": "^22.16.4",
-    "@types/web": "^0.0.216",
-    "esbuild": "^0.25.0",
+    "@types/web": "^0.0.328",
+    "esbuild": "^0.27.0",
     "puppeteer": "^22.0.0",
     "ts-node": "^10.9.1",
-    "typescript": "5.8.3"
+    "typescript": "5.9.3"
   },
   "engines": {
     "node": ">=16.0.0",

@@ -1,13 +1,56 @@
 import cl100k_base from 'tiktoken/encoders/cl100k_base.json'
 import { Tiktoken, init } from 'tiktoken/lite/init'
 import { deepClone, mapValues, uniq } from './utils'
-import { Slice, SmartSlice } from './smart-slice'
 
 let tokenizer: TextTokenizer | null = null
 let lock: Promise<void> | false = false
 
 const CHUNK_SIZE = 100_000
-const DEFAULT_SLICES: Slice[] = [[0, Number.POSITIVE_INFINITY]]
+
+class TokenCollection {
+  public constructor(private _tokenizer: Tiktoken, private _modelOutput: Uint32Array<ArrayBufferLike>) {}
+
+  public get length(): number {
+    return this._modelOutput.length
+  }
+
+  public slice(start: number, end?: number): string[] {
+    ;[start, end] = this._clampIndexes(start, end)
+    if (start >= end) {
+      return []
+    }
+
+    const decoder = new TextDecoder()
+    const str: string[] = []
+
+    for (let i = start; i < end; i++) {
+      const token = this._modelOutput[i]!
+      str.push(this._decodeToken(decoder, token))
+    }
+
+    return str
+  }
+
+  private _decodeToken(decoder: TextDecoder, encodedToken: number): string {
+    // copying to a new array because of memory allocation in WASM
+    const copy = this._tokenizer.decode(new Uint32Array([encodedToken]))
+    return decoder.decode(copy)
+  }
+
+  private _clampIndexes(start: number, end?: number): [number, number] {
+    const max = this._modelOutput.length
+
+    end ??= max
+
+    start = start < 0 ? max + start : start
+    end = end < 0 ? max + end : end
+
+    start = Math.max(0, Math.min(start, max))
+    end = Math.max(0, Math.min(end, max))
+
+    return [start, end]
+  }
+}
 
 export class TextTokenizer {
   private warnOnSlowCalls = true
@@ -139,25 +182,15 @@ export class TextTokenizer {
     return newObject
   }
 
-  public split(text: string, slices: Slice[] = DEFAULT_SLICES): string[] {
-    const decoder = new TextDecoder()
+  public split(text: string): string[] {
     const output = this.tokenizer.encode(text ?? '')
-
-    const str: string[] = []
-
-    const smartSlice = new SmartSlice(slices, output.length)
-    for (const idx of smartSlice) {
-      const encodedToken = output[idx]!
-      str.push(this._decodeToken(decoder, encodedToken))
-    }
-
-    return str
+    const collection = new TokenCollection(this.tokenizer, output)
+    return collection.slice(0)
   }
 
-  private _decodeToken(decoder: TextDecoder, encodedToken: number): string {
-    // copying to a new array because of memory allocation in WASM
-    const copy = this.tokenizer.decode(new Uint32Array([encodedToken]))
-    return decoder.decode(copy)
+  public splitAndSlice(text: string): TokenCollection {
+    const output = this.tokenizer.encode(text ?? '')
+    return new TokenCollection(this.tokenizer, output)
   }
 
   /**

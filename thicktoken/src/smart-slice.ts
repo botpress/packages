@@ -5,7 +5,8 @@ export class SmartSlice {
 
   public constructor(slices: Slice[], max: number) {
     const clampedSlices: Slice[] = slices.map((s) => this._clampSlice(s, max))
-    const sortedSlices: Slice[] = clampedSlices.sort((a, b) => a[0] - b[0])
+    const nonEmptySlices: Slice[] = clampedSlices.filter(([start, end]) => start < end)
+    const sortedSlices: Slice[] = nonEmptySlices.sort((a, b) => a[0] - b[0])
 
     const merged: Slice[] = []
     for (const [start, end] of sortedSlices) {
@@ -28,13 +29,6 @@ export class SmartSlice {
     // flip slice
     start = start < 0 ? max + start : start
     end = end < 0 ? max + end : end
-
-    // order slice
-    if (end < start) {
-      const tmp = start
-      start = end
-      end = tmp
-    }
 
     // clamp slice
     const clampedStart = Math.max(0, Math.min(start, max))

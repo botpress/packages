@@ -201,14 +201,11 @@ export class IntegrationGenerator {
     console.log('Fetching latest package versions from npm...')
 
     // Fetch latest versions (with fallbacks)
-    const [botpressClient, botpressSdk, zui, mcpSdk, botpressCli, typesNode, typescript] = await Promise.all([
+    const [botpressClient, botpressSdk, zui, botpressCli] = await Promise.all([
       getLatestNpmVersion('@botpress/client', '1.27.2'),
       getLatestNpmVersion('@botpress/sdk', '4.17.2'),
       getLatestNpmVersion('@bpinternal/zui', '1.0.3'),
-      getLatestNpmVersion('@modelcontextprotocol/sdk', '1.26.0'),
-      getLatestNpmVersion('@botpress/cli', '5.5.3'),
-      getLatestNpmVersion('@types/node', '22.15.0'),
-      getLatestNpmVersion('typescript', '5.7.2')
+      getLatestNpmVersion('@botpress/cli', '5.5.3')
     ])
 
     const packageJson = {
@@ -225,12 +222,12 @@ export class IntegrationGenerator {
         '@botpress/client': `^${botpressClient}`,
         '@botpress/sdk': botpressSdk,
         '@bpinternal/zui': zui,
-        '@modelcontextprotocol/sdk': `^${mcpSdk}`
+        '@modelcontextprotocol/sdk': `^1.26.0`
       },
       devDependencies: {
         '@botpress/cli': `^${botpressCli}`,
-        '@types/node': `^${typesNode}`,
-        typescript: `^${typescript}`
+        '@types/node': `^22.15.0`,
+        typescript: `^5.7.2`
       }
     }
     await writeFormattedFile(path.join(outputDir, 'package.json'), JSON.stringify(packageJson, null, 2), 'json')

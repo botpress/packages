@@ -31,11 +31,7 @@ export class ConfigManager {
     const configPath = path.join(outputDir, this.configFilename)
 
     try {
-      await fs.writeFile(
-        configPath,
-        JSON.stringify(validatedConfig, null, 2),
-        { encoding: 'utf-8', mode: 0o644 }
-      )
+      await fs.writeFile(configPath, JSON.stringify(validatedConfig, null, 2), { encoding: 'utf-8', mode: 0o644 })
       console.log(`  ✓ Saved MCP server config to ${this.configFilename}`)
     } catch (error) {
       if (error instanceof Error) {
@@ -123,7 +119,7 @@ export class ConfigManager {
         const entries = await fs.readdir(dir, { withFileTypes: true })
 
         const subDirs = entries
-          .filter(entry => entry.isDirectory() && !entry.name.startsWith('.') && entry.name !== 'node_modules')
+          .filter((entry) => entry.isDirectory() && !entry.name.startsWith('.') && entry.name !== 'node_modules')
           .slice(0, 50)
 
         for (const entry of subDirs) {

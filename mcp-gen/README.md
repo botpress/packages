@@ -1,6 +1,6 @@
 # MCP Integration Generator
 
-Generate Botpress integrations from Model Context Protocol (MCP) servers with zero code duplication using a clean proxy pattern.
+Generate Botpress integrations from Model Context Protocol (MCP) servers using a proxy pattern.
 
 ## Quick Start
 
@@ -21,7 +21,7 @@ mcp-gen update
 ## Features
 
 - **Automatic Tool Discovery**: Connects to any MCP server and discovers available tools
-- **Zero Duplication**: Proxy pattern - single implementation for all tools (78% code reduction)
+- **Proxy Pattern**: Single shared implementation for all tools
 - **Multiple Transports**: HTTP (default) and SSE support
 - **Type-Safe**: Generates Zui (Zod) schemas from JSON Schema with comprehensive validation
 - **Update Mode**: Refresh tools while preserving customizations
@@ -130,19 +130,18 @@ output/
 │   ├── tool1.ts
 │   └── tool2.ts
 └── src/
-    ├── index.ts                  # Proxy router (3 lines per action)
-    └── mcp-proxy.ts              # Shared implementation
+    ├── index.ts                  # Action router
+    └── mcp-proxy.ts              # Shared MCP proxy implementation
 ```
 
-### Proxy Pattern Benefits
+### Proxy Pattern
 
-**Old approach** (before): 60 lines × N tools = massive duplication
-**New approach**: 60 lines total + 3 lines per tool = 78% reduction
+The integration uses a shared proxy implementation that routes all tool calls through a single codebase:
 
-- Zero code duplication across actions
 - Single point of configuration
 - Easy maintenance (change once, affects all)
 - Consistent error handling and authentication
+- Clean separation between definitions and implementation
 
 ## Programmatic API
 
@@ -271,11 +270,11 @@ Specify with `--transport sse` if needed.
 
 ## Architecture
 
-The generator creates integrations using a **clean proxy pattern**:
+The generator creates integrations using a **proxy pattern**:
 
 1. **Definitions Layer** (`tool-definitions/`): What each tool does (schemas, descriptions)
 2. **Implementation Layer** (`src/mcp-proxy.ts`): How to call MCP tools (single shared implementation)
-3. **Integration Layer** (`src/index.ts`): Routes actions to proxy (3 lines per action)
+3. **Integration Layer** (`src/index.ts`): Routes actions to proxy
 
 ### Tool Name Sanitization
 

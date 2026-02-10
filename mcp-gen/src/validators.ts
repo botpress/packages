@@ -26,9 +26,7 @@ export const transportTypeSchema = z.enum(['http', 'sse'], {
   errorMap: () => ({ message: 'Transport type must be "http" or "sse"' })
 })
 
-export const headerNameSchema = z
-  .string()
-  .regex(/^[!#$%&'*+\-.0-9A-Z^_`a-z|~]+$/, 'Invalid header name (RFC 7230)')
+export const headerNameSchema = z.string().regex(/^[!#$%&'*+\-.0-9A-Z^_`a-z|~]+$/, 'Invalid header name (RFC 7230)')
 
 export const headerValueSchema = z.string().min(1, 'Header value cannot be empty')
 
@@ -48,7 +46,10 @@ export function validateTransportType(transport: string): asserts transport is '
   transportTypeSchema.parse(transport)
 }
 
-export function parseHeaders(headerArgs: string[] | undefined, savedHeaders?: Record<string, string>): Record<string, string> {
+export function parseHeaders(
+  headerArgs: string[] | undefined,
+  savedHeaders?: Record<string, string>
+): Record<string, string> {
   const headers: Record<string, string> = savedHeaders || {}
 
   if (headerArgs) {

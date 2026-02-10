@@ -4,12 +4,7 @@ import { Command, Option } from 'commander'
 import { ZodError } from '@botpress/sdk'
 import { IntegrationGenerator, type GeneratorOptions } from './generator.js'
 import { ConfigManager, type McpServerConfig } from './config-manager.js'
-import {
-  validateIntegrationName,
-  validateUrl,
-  validateTransportType,
-  parseHeaders
-} from './validators.js'
+import { validateIntegrationName, validateUrl, validateTransportType, parseHeaders } from './validators.js'
 
 function formatZodError(error: ZodError): string {
   return error.issues.map((issue) => issue.message).join(', ')

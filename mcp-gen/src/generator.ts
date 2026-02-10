@@ -1,5 +1,6 @@
 import * as fs from 'fs/promises'
 import * as path from 'path'
+import * as prettier from 'prettier'
 import { McpClient, type McpServerInfo, type TransportType } from './mcp-client.js'
 import { ConfigManager, type ConfigManagerOptions } from './config-manager.js'
 import {
@@ -11,6 +12,13 @@ import {
   generateReadme,
   generateIcon
 } from './templates.js'
+
+type PrettierParser = 'typescript' | 'markdown' | 'html' | 'json'
+
+async function writeFormattedFile(filePath: string, content: string, parser: PrettierParser): Promise<void> {
+  const formatted = await prettier.format(content, { parser })
+  await fs.writeFile(filePath, formatted, 'utf-8')
+}
 
 async function getLatestNpmVersion(packageName: string, fallbackVersion: string): Promise<string> {
   try {
@@ -147,12 +155,12 @@ export class IntegrationGenerator {
     // Generate tool-definitions/index.ts
     console.log('Generating tool-definitions/index.ts...')
     const toolDefsIndex = generateToolDefinitionsIndex(serverInfo.tools)
-    await fs.writeFile(path.join(outputDir, 'tool-definitions', 'index.ts'), toolDefsIndex, 'utf-8')
+    await writeFormattedFile(path.join(outputDir, 'tool-definitions', 'index.ts'), toolDefsIndex, 'typescript')
 
     // Generate src/mcp-proxy.ts
     console.log('Generating src/mcp-proxy.ts...')
     const mcpProxyFile = generateMcpProxy()
-    await fs.writeFile(path.join(outputDir, 'src', 'mcp-proxy.ts'), mcpProxyFile, 'utf-8')
+    await writeFormattedFile(path.join(outputDir, 'src', 'mcp-proxy.ts'), mcpProxyFile, 'typescript')
 
     if (updateMode) {
       console.log('\n✓ Update mode: Tool definitions and proxy updated')
@@ -163,22 +171,22 @@ export class IntegrationGenerator {
     // Generate integration.definition.ts
     console.log('Generating integration.definition.ts...')
     const definitionFile = generateIntegrationDefinition(integrationName, serverInfo, serverInfo.tools)
-    await fs.writeFile(path.join(outputDir, 'integration.definition.ts'), definitionFile, 'utf-8')
+    await writeFormattedFile(path.join(outputDir, 'integration.definition.ts'), definitionFile, 'typescript')
 
     // Generate src/index.ts
     console.log('Generating src/index.ts...')
     const indexFile = generateIntegrationIndex(serverInfo.tools)
-    await fs.writeFile(path.join(outputDir, 'src', 'index.ts'), indexFile, 'utf-8')
+    await writeFormattedFile(path.join(outputDir, 'src', 'index.ts'), indexFile, 'typescript')
 
     // Generate hub.md
     console.log('Generating hub.md...')
     const readmeFile = generateReadme(serverInfo, serverInfo.tools)
-    await fs.writeFile(path.join(outputDir, 'hub.md'), readmeFile, 'utf-8')
+    await writeFormattedFile(path.join(outputDir, 'hub.md'), readmeFile, 'markdown')
 
     // Generate icon.svg
     console.log('Generating icon.svg...')
     const iconFile = generateIcon()
-    await fs.writeFile(path.join(outputDir, 'icon.svg'), iconFile, 'utf-8')
+    await writeFormattedFile(path.join(outputDir, 'icon.svg'), iconFile, 'html')
 
     // Generate package.json
     console.log('Generating package.json...')
@@ -217,7 +225,7 @@ export class IntegrationGenerator {
         typescript: `^${typescript}`
       }
     }
-    await fs.writeFile(path.join(outputDir, 'package.json'), JSON.stringify(packageJson, null, 2), 'utf-8')
+    await writeFormattedFile(path.join(outputDir, 'package.json'), JSON.stringify(packageJson, null, 2), 'json')
 
     console.log('Generating tsconfig.json...')
     const tsConfig = {
@@ -232,7 +240,7 @@ export class IntegrationGenerator {
       include: ['src/**/*', 'tool-definitions/**/*', 'integration.definition.ts'],
       exclude: ['node_modules', 'dist', '.botpress']
     }
-    await fs.writeFile(path.join(outputDir, 'tsconfig.json'), JSON.stringify(tsConfig, null, 2), 'utf-8')
+    await writeFormattedFile(path.join(outputDir, 'tsconfig.json'), JSON.stringify(tsConfig, null, 2), 'json')
 
     console.log('Generating .gitignore...')
     const gitignore = `node_modules

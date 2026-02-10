@@ -63,8 +63,7 @@ export const ${sanitizeName(tool.name)} = {
 export function generateToolDefinitionsIndex(tools: Tool[]): string {
   const imports = tools.map((tool) => `export { ${sanitizeName(tool.name)} } from './${tool.name}.js'`).join('\n')
 
-  return `${imports}
-`
+  return `${imports}\n`
 }
 
 export function generateMcpProxy(): string {
@@ -162,11 +161,9 @@ export default new IntegrationDefinition({
   icon: 'icon.svg',
   configuration: {
     schema: z.object({
-      mcpServerUrl: z.string().title('MCP Server URL').describe('The URL of the MCP server (e.g., http://localhost:3567/pat/mcp)'),
+      mcpServerUrl: z.string().title('MCP Server URL').describe('The URL of the MCP server (e.g., https://api.github.com/mcp)'),
       transportType: z.enum(['http', 'sse']).title('Transport Type').default('http').optional().describe('MCP transport type: http (default) or sse'),
       authToken: z.string().title('Authorization Token').optional().describe('Authentication token (will be sent as "Bearer <token>")'),
-      userEmail: z.string().title('User Email').optional().describe('User email for x-user-email header'),
-      userId: z.string().title('User ID').optional().describe('User ID for x-user-id header'),
       customHeaders: z.string().title('Custom Headers (JSON)').optional().describe('Additional headers as JSON object (e.g., {"X-Custom": "value"})')
     })
   },

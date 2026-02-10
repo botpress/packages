@@ -16,7 +16,15 @@ import {
 type PrettierParser = 'typescript' | 'markdown' | 'html' | 'json'
 
 async function writeFormattedFile(filePath: string, content: string, parser: PrettierParser): Promise<void> {
-  const formatted = await prettier.format(content, { parser })
+  const formatted = await prettier.format(content, {
+    parser,
+    printWidth: 120,
+    singleQuote: true,
+    trailingComma: 'none',
+    semi: false,
+    bracketSpacing: true,
+    requirePragma: false
+  })
   await fs.writeFile(filePath, formatted, 'utf-8')
 }
 
@@ -140,7 +148,7 @@ export class IntegrationGenerator {
     for (const tool of serverInfo.tools) {
       const definitionFile = await generateToolDefinitionFile(tool)
       const filePath = path.join(outputDir, 'tool-definitions', `${tool.name}.ts`)
-      await fs.writeFile(filePath, definitionFile, 'utf-8')
+      await writeFormattedFile(filePath, definitionFile, 'typescript')
       console.log(`  - Generated tool-definitions/${tool.name}.ts`)
 
       // Track truncated descriptions

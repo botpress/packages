@@ -39,8 +39,7 @@ export async function generateToolDefinitionFile(tool: Tool): Promise<string> {
   const rawDescription = tool.description || ''
   const description = rawDescription.length > 256 ? rawDescription.substring(0, 253) + '...' : rawDescription
 
-  return await prettier.format(
-    `import { z } from '@botpress/sdk'
+  return `import { z } from '@botpress/sdk'
 
 export const ${sanitizeName(tool.name)} = {
   title: '${tool.name}',
@@ -55,9 +54,7 @@ export const ${sanitizeName(tool.name)} = {
     })
   }
 } as const
-`,
-    { parser: 'typescript' }
-  )
+`
 }
 
 export function generateToolDefinitionsIndex(tools: Tool[]): string {

@@ -201,7 +201,7 @@ export class IntegrationGenerator {
       version: '0.1.0',
       description: `MCP Integration for ${serverInfo.name}`,
       scripts: {
-        bpbuild: 'bp build',
+        build: 'bp build',
         'check:type': 'tsc --noEmit'
       },
       private: true,
@@ -219,7 +219,6 @@ export class IntegrationGenerator {
     }
     await fs.writeFile(path.join(outputDir, 'package.json'), JSON.stringify(packageJson, null, 2), 'utf-8')
 
-    // Generate tsconfig.json
     console.log('Generating tsconfig.json...')
     const tsConfig = {
       compilerOptions: {
@@ -235,7 +234,6 @@ export class IntegrationGenerator {
     }
     await fs.writeFile(path.join(outputDir, 'tsconfig.json'), JSON.stringify(tsConfig, null, 2), 'utf-8')
 
-    // Generate .gitignore
     console.log('Generating .gitignore...')
     const gitignore = `node_modules
 dist

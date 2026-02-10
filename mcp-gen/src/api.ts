@@ -5,12 +5,11 @@ export { ConfigManager, type McpServerConfig, type ConfigManagerOptions } from '
 
 import { IntegrationGenerator, type GeneratorOptions } from './generator.js'
 import { ConfigManager } from './config-manager.js'
-import { validateIntegrationName, validateUrl, validatePath } from './validators.js'
+import { validateIntegrationName, validateUrl } from './validators.js'
 
 export async function generateIntegration(options: GeneratorOptions): Promise<void> {
   validateIntegrationName(options.integrationName)
   validateUrl(options.mcpServerUrl)
-  validatePath(options.outputDir)
 
   const generator = new IntegrationGenerator({
     configFilename: options.configFilename
@@ -22,8 +21,6 @@ export async function generateIntegration(options: GeneratorOptions): Promise<vo
 export async function generateIntegrationWithConfig(
   options: Partial<GeneratorOptions> & { outputDir: string; integrationName?: string }
 ): Promise<void> {
-  validatePath(options.outputDir)
-
   const configManager = new ConfigManager({
     configFilename: options.configFilename
   })

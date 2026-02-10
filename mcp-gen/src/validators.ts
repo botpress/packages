@@ -1,4 +1,3 @@
-import * as path from 'path'
 import { z } from '@botpress/sdk'
 
 export const integrationNameSchema = z
@@ -35,17 +34,7 @@ export const headerValueSchema = z.string().min(1, 'Header value cannot be empty
 
 export const headersSchema = z.record(headerNameSchema, headerValueSchema)
 
-export const pathSchema = z
-  .string()
-  .min(1, 'Path cannot be empty')
-  .refine(
-    (outputPath) => {
-      const normalized = path.normalize(outputPath)
-      const absolutePath = path.resolve(normalized)
-      return !normalized.includes('..') || absolutePath.startsWith(process.cwd())
-    },
-    { message: 'Path traversal detected' }
-  )
+export const pathSchema = z.string().min(1, 'Path cannot be empty')
 
 export function validateIntegrationName(name: string): void {
   integrationNameSchema.parse(name)
@@ -53,10 +42,6 @@ export function validateIntegrationName(name: string): void {
 
 export function validateUrl(url: string): void {
   urlSchema.parse(url)
-}
-
-export function validatePath(outputPath: string): void {
-  pathSchema.parse(outputPath)
 }
 
 export function validateTransportType(transport: string): asserts transport is 'http' | 'sse' {
@@ -76,31 +61,9 @@ export function parseHeaders(headerArgs: string[] | undefined, savedHeaders?: Re
       const key = header.substring(0, colonIndex).trim()
       const value = header.substring(colonIndex + 1).trim()
 
-      headerNameSchema.parse(key)
-      headerValueSchema.parse(value)
-
       headers[key] = value
     }
   }
 
   return headers
-}
-
-export function sanitizeHeaders(headers: Record<string, string>): Record<string, string> {
-  const sanitized: Record<string, string> = {}
-
-  for (const [key, value] of Object.entries(headers)) {
-    const cleanValue = value.replace(/[\x00-\x1F\x7F]/g, '')
-
-    const keyResult = headerNameSchema.safeParse(key)
-    const valueResult = headerValueSchema.safeParse(cleanValue)
-
-    if (keyResult.success && valueResult.success) {
-      sanitized[key] = cleanValue
-    } else {
-      console.warn(`Skipping invalid header: ${key}`)
-    }
-  }
-
-  return sanitized
 }

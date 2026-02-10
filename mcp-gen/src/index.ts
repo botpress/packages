@@ -7,7 +7,6 @@ import { ConfigManager, type McpServerConfig } from './config-manager.js'
 import {
   validateIntegrationName,
   validateUrl,
-  validatePath,
   validateTransportType,
   parseHeaders
 } from './validators.js'
@@ -54,7 +53,6 @@ program
     try {
       validateIntegrationName(name)
       validateUrl(url)
-      validatePath(options.output)
       validateTransportType(options.transport)
 
       const transport = options.transport

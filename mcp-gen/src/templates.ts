@@ -72,9 +72,6 @@ export function generateMcpProxy(): string {
 import { SSEClientTransport } from '@modelcontextprotocol/sdk/client/sse.js'
 import { StreamableHTTPClientTransport } from '@modelcontextprotocol/sdk/client/streamableHttp.js'
 
-/**
- * MCP Proxy - Handles all MCP tool calls with a single implementation
- */
 export async function callMcpTool(params: {
   toolName: string
   input: Record<string, unknown>
@@ -91,18 +88,10 @@ export async function callMcpTool(params: {
   const transportType = ctx.configuration.transportType || 'http'
   const headers: Record<string, string> = {}
 
-  // Build headers from configuration
   if (ctx.configuration.authToken) {
     headers['Authorization'] = \`Bearer \${ctx.configuration.authToken}\`
   }
-  if (ctx.configuration.userEmail) {
-    headers['x-user-email'] = ctx.configuration.userEmail
-  }
-  if (ctx.configuration.userId) {
-    headers['x-user-id'] = ctx.configuration.userId
-  }
 
-  // Support custom headers (JSON string format)
   if (ctx.configuration.customHeaders) {
     try {
       const customHeaders = JSON.parse(ctx.configuration.customHeaders)
@@ -112,7 +101,6 @@ export async function callMcpTool(params: {
     }
   }
 
-  // Create appropriate transport
   const url = new URL(mcpServerUrl)
   const requestInit = { headers }
   const transport =

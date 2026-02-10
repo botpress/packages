@@ -1,7 +1,7 @@
 import * as fs from 'fs/promises'
 import * as path from 'path'
 import { z } from '@botpress/sdk'
-import { urlSchema, transportTypeSchema, headersSchema, validatePath, integrationNameSchema } from './validators.js'
+import { urlSchema, transportTypeSchema, headersSchema, integrationNameSchema } from './validators.js'
 
 const mcpServerConfigSchema = z.object({
   name: integrationNameSchema,
@@ -24,18 +24,11 @@ export class ConfigManager {
   }
 
   async save(outputDir: string, config: McpServerConfig): Promise<void> {
-    validatePath(outputDir)
-
     const validatedConfig = mcpServerConfigSchema.parse(config)
 
     await fs.mkdir(outputDir, { recursive: true })
 
     const configPath = path.join(outputDir, this.configFilename)
-    const normalized = path.normalize(configPath)
-
-    if (!normalized.includes(path.normalize(outputDir))) {
-      throw new Error('Security: Config path escapes output directory')
-    }
 
     try {
       await fs.writeFile(
@@ -58,11 +51,6 @@ export class ConfigManager {
     }
 
     const configPath = path.join(outputDir, this.configFilename)
-    const normalized = path.normalize(configPath)
-
-    if (!normalized.includes(path.normalize(outputDir))) {
-      throw new Error('Security: Config path escapes output directory')
-    }
 
     try {
       const content = await fs.readFile(configPath, 'utf-8')

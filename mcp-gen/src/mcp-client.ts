@@ -3,7 +3,7 @@ import { SSEClientTransport } from '@modelcontextprotocol/sdk/client/sse.js'
 import { StreamableHTTPClientTransport } from '@modelcontextprotocol/sdk/client/streamableHttp.js'
 import type { Tool } from '@modelcontextprotocol/sdk/types.js'
 import { EventSource as EventSourcePolyfill } from 'eventsource'
-import { validateUrl, sanitizeHeaders } from './validators.js'
+import { validateUrl } from './validators.js'
 
 if (typeof globalThis.EventSource === 'undefined') {
   ;(globalThis as any).EventSource = EventSourcePolyfill
@@ -35,8 +35,7 @@ export class McpClient {
       throw new Error(`Invalid transport type: ${transportType}`)
     }
 
-    const cleanHeaders = headers ? sanitizeHeaders(headers) : {}
-    const requestInit = { headers: cleanHeaders }
+    const requestInit = { headers: headers || {} }
 
     const transport =
       transportType === 'sse'

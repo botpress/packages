@@ -151,7 +151,7 @@ export default new IntegrationDefinition({
   name: '${integrationName}',
   title: '${serverInfo.name}',
   description: '${serverInfo.description || `MCP Integration for ${serverInfo.name}`}',
-  version: '${serverInfo.version}',
+  version: '0.0.1',
   readme: 'hub.md',
   icon: 'icon.svg',
   configuration: {

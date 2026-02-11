@@ -1,7 +1,7 @@
 import type { Tool } from '@modelcontextprotocol/sdk/types.js'
 import * as sdk from '@botpress/sdk'
-import * as prettier from 'prettier'
 import { dereference } from '@apidevtools/json-schema-ref-parser'
+import type { McpServerInfo } from './schemas.js'
 
 const dereferenceSchema = async (schema: sdk.JSONSchema7): Promise<sdk.JSONSchema7> => {
   return dereference(schema, {
@@ -34,7 +34,7 @@ const jsonSchemaToTypescriptZuiSchema = async (schema: sdk.JSONSchema7): Promise
   return tsSchema
 }
 
-export async function generateToolDefinitionFile(tool: Tool): Promise<string> {
+export const generateToolDefinitionFile = async (tool: Tool): Promise<string> => {
   const inputSchema = await jsonSchemaToTypescriptZuiSchema(tool.inputSchema)
   const rawDescription = tool.description || ''
   const description = rawDescription.length > 256 ? rawDescription.substring(0, 253) + '...' : rawDescription
@@ -57,13 +57,13 @@ export const ${sanitizeName(tool.name)} = {
 `
 }
 
-export function generateToolDefinitionsIndex(tools: Tool[]): string {
+export const generateToolDefinitionsIndex = (tools: Tool[]): string => {
   const imports = tools.map((tool) => `export { ${sanitizeName(tool.name)} } from './${tool.name}.js'`).join('\n')
 
   return `${imports}\n`
 }
 
-export function generateMcpProxy(): string {
+export const generateMcpProxy = (): string => {
   return `import { Client } from '@modelcontextprotocol/sdk/client/index.js'
 import { SSEClientTransport } from '@modelcontextprotocol/sdk/client/sse.js'
 import { StreamableHTTPClientTransport } from '@modelcontextprotocol/sdk/client/streamableHttp.js'
@@ -119,7 +119,6 @@ export async function callMcpTool(params: {
 
     logger.forBot().info(\`Tool \${toolName} executed successfully\`)
 
-    // Extract content and isError from MCP result
     const content = 'content' in result ? result.content : [] as any
     const isError = typeof result.isError === 'boolean' ? result.isError : false
 
@@ -137,14 +136,10 @@ export async function callMcpTool(params: {
 `
 }
 
-export function generateIntegrationDefinition(
-  integrationName: string,
-  serverInfo: { name: string; version: string; description?: string },
-  tools: Tool[]
-): string {
-  const toolImports = tools.map((tool) => sanitizeName(tool.name)).join(', ')
+export const generateIntegrationDefinition = (integrationName: string, serverInfo: McpServerInfo): string => {
+  const toolImports = serverInfo.tools.map((tool) => sanitizeName(tool.name)).join(', ')
 
-  const actionsDefinition = tools.map((tool) => `    ${sanitizeName(tool.name)}`).join(',\n')
+  const actionsDefinition = serverInfo.tools.map((tool) => `    ${sanitizeName(tool.name)}`).join(',\n')
 
   return `import { IntegrationDefinition, z } from '@botpress/sdk'
 import { ${toolImports} } from './tool-definitions/index.js'
@@ -158,11 +153,16 @@ export default new IntegrationDefinition({
   icon: 'icon.svg',
   configuration: {
     schema: z.object({
-      mcpServerUrl: z.string().title('MCP Server URL').describe('The URL of the MCP server (e.g., https://api.github.com/mcp)'),
+      mcpServerUrl: z.string().title('MCP Server URL').describe(\`The URL of the MCP server (default is ${serverInfo.url}). Can be pre-filled via the MCP_SERVER_URL secret.\`),
       transportType: z.enum(['http', 'sse']).title('Transport Type').default('http').optional().describe('MCP transport type: http (default) or sse'),
       authToken: z.string().title('Authorization Token').optional().describe('Authentication token (will be sent as "Bearer <token>")'),
       customHeaders: z.string().title('Custom Headers (JSON)').optional().describe('Additional headers as JSON object (e.g., {"X-Custom": "value"})')
     })
+  },
+  secrets: {
+    MCP_SERVER_URL: {
+      description: 'Default MCP server URL. Can be overridden in configuration. Used to auto-fill the mcpServerUrl field when installing the integration.'
+    }
   },
   actions: {
 ${actionsDefinition}
@@ -171,12 +171,10 @@ ${actionsDefinition}
 `
 }
 
-export function generateIntegrationIndex(tools: Tool[]): string {
+export const generateIntegrationIndex = (tools: Tool[]): string => {
   const actionProxies = tools
     .map((tool) => {
       const sanitizedName = sanitizeName(tool.name)
-      // Note: sanitizedName is the Botpress action name (camelCase)
-      // tool.name is the original MCP tool name (used in proxy call)
       return `    ${sanitizedName}: async ({ input, ctx, logger }) => {
       return callMcpTool({ toolName: '${tool.name}', input, ctx, logger })
     }`
@@ -200,7 +198,7 @@ ${actionProxies}
 `
 }
 
-export function generateReadme(serverInfo: { name: string; description?: string }, tools: Tool[]): string {
+export const generateReadme = (serverInfo: { name: string; description?: string }, tools: Tool[]): string => {
   const toolsList = tools.map((tool) => `- **${tool.name}**: ${tool.description || 'No description'}`).join('\n')
 
   return `# ${serverInfo.name} Integration
@@ -222,8 +220,7 @@ This integration provides access to all tools exposed by the ${serverInfo.name} 
 `
 }
 
-// Generate a generic SVG icon for the integration
-export function generateIcon(): string {
+export const generateIcon = (): string => {
   return `<svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
   <!-- Background circle -->
   <circle cx="32" cy="32" r="30" fill="#6366f1"/>

@@ -1,35 +1,27 @@
 import { Client } from '@modelcontextprotocol/sdk/client/index.js'
 import { SSEClientTransport } from '@modelcontextprotocol/sdk/client/sse.js'
 import { StreamableHTTPClientTransport } from '@modelcontextprotocol/sdk/client/streamableHttp.js'
-import type { Tool } from '@modelcontextprotocol/sdk/types.js'
 import { EventSource as EventSourcePolyfill } from 'eventsource'
-import { validateUrl } from './validators.js'
+import { urlSchema } from './schemas.js'
+import type { TransportType, McpServerInfo } from './schemas.js'
 
 if (typeof globalThis.EventSource === 'undefined') {
   ;(globalThis as any).EventSource = EventSourcePolyfill
 }
 
-export type TransportType = 'http' | 'sse'
-
-export interface McpServerInfo {
-  name: string
-  version: string
-  description?: string
-  tools: Tool[]
-}
-
 export class McpClient {
   private client: Client | null = null
-
+  private serverUrl: string | null = null
   async connect(
     serverUrl: string,
     transportType: TransportType = 'http',
     headers?: Record<string, string>,
     timeoutMs: number = 30000
   ): Promise<void> {
-    validateUrl(serverUrl)
+    urlSchema.parse(serverUrl)
 
     const url = new URL(serverUrl)
+    this.serverUrl = serverUrl
 
     if (transportType !== 'http' && transportType !== 'sse') {
       throw new Error(`Invalid transport type: ${transportType}`)
@@ -107,7 +99,8 @@ export class McpClient {
       name: serverInfo.name,
       version: serverInfo.version || '0.0.0',
       description: serverInfo.description,
-      tools: toolsResponse.tools
+      tools: toolsResponse.tools,
+      url: this.serverUrl!
     }
   }
 

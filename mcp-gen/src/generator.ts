@@ -1,8 +1,7 @@
 import * as fs from 'fs/promises'
 import * as path from 'path'
-import * as prettier from 'prettier'
-import { McpClient, type McpServerInfo, type TransportType } from './mcp-client.js'
-import { ConfigManager, type ConfigManagerOptions } from './config-manager.js'
+import { McpClient } from './mcp-client.js'
+import { ConfigManager } from './config-manager.js'
 import {
   generateToolDefinitionFile,
   generateToolDefinitionsIndex,
@@ -12,47 +11,8 @@ import {
   generateReadme,
   generateIcon
 } from './templates.js'
-
-type PrettierParser = 'typescript' | 'markdown' | 'html' | 'json'
-
-async function writeFormattedFile(filePath: string, content: string, parser: PrettierParser): Promise<void> {
-  const formatted = await prettier.format(content, {
-    parser,
-    printWidth: 120,
-    singleQuote: true,
-    trailingComma: 'none',
-    semi: false,
-    bracketSpacing: true,
-    requirePragma: false
-  })
-  await fs.writeFile(filePath, formatted, 'utf-8')
-}
-
-async function getLatestNpmVersion(packageName: string, fallbackVersion: string): Promise<string> {
-  try {
-    const response = await fetch(`https://registry.npmjs.org/${packageName}/latest`)
-    if (!response.ok) {
-      console.warn(`  ⚠ Could not fetch ${packageName}, using fallback: ${fallbackVersion}`)
-      return fallbackVersion
-    }
-    const data = (await response.json()) as { version: string }
-    return data.version
-  } catch (error) {
-    console.warn(`  ⚠ Error fetching ${packageName}, using fallback: ${fallbackVersion}`)
-    return fallbackVersion
-  }
-}
-
-export interface GeneratorOptions {
-  mcpServerUrl: string
-  outputDir: string
-  integrationName: string
-  headers?: Record<string, string>
-  transport?: TransportType
-  updateMode?: boolean // Only update tool definitions and proxy, preserve customizations
-  saveConfig?: boolean // Whether to save config to file
-  configFilename?: string // Custom config filename
-}
+import { getLatestNpmVersion, writeFormattedFile } from './utils.js'
+import type { GeneratorOptions, ConfigManagerOptions, McpServerInfo } from './schemas.js'
 
 export class IntegrationGenerator {
   private client: McpClient
@@ -93,7 +53,6 @@ export class IntegrationGenerator {
 
     await this.client.close()
 
-    // Save MCP server config for future updates if requested (Claude-compatible format)
     if (options.saveConfig) {
       const config = this.configManager.createConfig(
         options.integrationName,
@@ -137,12 +96,10 @@ export class IntegrationGenerator {
     serverInfo: McpServerInfo,
     updateMode: boolean = false
   ): Promise<void> {
-    // Create directory structure
     await fs.mkdir(outputDir, { recursive: true })
     await fs.mkdir(path.join(outputDir, 'src'), { recursive: true })
     await fs.mkdir(path.join(outputDir, 'tool-definitions'), { recursive: true })
 
-    // Generate tool definition files
     console.log('\nGenerating tool definition files...')
     let truncatedCount = 0
     for (const tool of serverInfo.tools) {
@@ -151,7 +108,6 @@ export class IntegrationGenerator {
       await writeFormattedFile(filePath, definitionFile, 'typescript')
       console.log(`  - Generated tool-definitions/${tool.name}.ts`)
 
-      // Track truncated descriptions
       if (tool.description && tool.description.length > 256) {
         truncatedCount++
       }
@@ -160,12 +116,10 @@ export class IntegrationGenerator {
       console.log(`  ⚠ ${truncatedCount} description(s) truncated to 256 chars (Botpress limit)`)
     }
 
-    // Generate tool-definitions/index.ts
     console.log('Generating tool-definitions/index.ts...')
     const toolDefsIndex = generateToolDefinitionsIndex(serverInfo.tools)
     await writeFormattedFile(path.join(outputDir, 'tool-definitions', 'index.ts'), toolDefsIndex, 'typescript')
 
-    // Generate src/mcp-proxy.ts
     console.log('Generating src/mcp-proxy.ts...')
     const mcpProxyFile = generateMcpProxy()
     await writeFormattedFile(path.join(outputDir, 'src', 'mcp-proxy.ts'), mcpProxyFile, 'typescript')
@@ -176,31 +130,25 @@ export class IntegrationGenerator {
       return
     }
 
-    // Generate integration.definition.ts
     console.log('Generating integration.definition.ts...')
-    const definitionFile = generateIntegrationDefinition(integrationName, serverInfo, serverInfo.tools)
+    const definitionFile = generateIntegrationDefinition(integrationName, serverInfo)
     await writeFormattedFile(path.join(outputDir, 'integration.definition.ts'), definitionFile, 'typescript')
 
-    // Generate src/index.ts
     console.log('Generating src/index.ts...')
     const indexFile = generateIntegrationIndex(serverInfo.tools)
     await writeFormattedFile(path.join(outputDir, 'src', 'index.ts'), indexFile, 'typescript')
 
-    // Generate hub.md
     console.log('Generating hub.md...')
     const readmeFile = generateReadme(serverInfo, serverInfo.tools)
     await writeFormattedFile(path.join(outputDir, 'hub.md'), readmeFile, 'markdown')
 
-    // Generate icon.svg
     console.log('Generating icon.svg...')
     const iconFile = generateIcon()
     await writeFormattedFile(path.join(outputDir, 'icon.svg'), iconFile, 'html')
 
-    // Generate package.json
     console.log('Generating package.json...')
     console.log('Fetching latest package versions from npm...')
 
-    // Fetch latest versions (with fallbacks)
     const [botpressClient, botpressSdk, zui, botpressCli] = await Promise.all([
       getLatestNpmVersion('@botpress/client', '1.27.2'),
       getLatestNpmVersion('@botpress/sdk', '4.17.2'),

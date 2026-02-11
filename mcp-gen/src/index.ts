@@ -2,27 +2,14 @@
 
 import { Command, Option } from 'commander'
 import { ZodError } from '@botpress/sdk'
-import { IntegrationGenerator, type GeneratorOptions } from './generator.js'
-import { ConfigManager, type McpServerConfig } from './config-manager.js'
-import { validateIntegrationName, validateUrl, validateTransportType, parseHeaders } from './validators.js'
+import { IntegrationGenerator } from './generator.js'
+import { ConfigManager } from './config-manager.js'
+import { parseHeaders } from './utils.js'
+import { integrationNameSchema, urlSchema, transportTypeSchema } from './schemas.js'
+import type { InitOptions, UpdateOptions, McpServerConfig, GeneratorOptions, TransportType } from './schemas.js'
 
-function formatZodError(error: ZodError): string {
+const formatZodError = (error: ZodError): string => {
   return error.issues.map((issue) => issue.message).join(', ')
-}
-
-interface InitOptions {
-  output: string
-  transport: string
-  auth?: string
-  header?: string[]
-  save: boolean
-  configFile: string
-}
-
-interface UpdateOptions {
-  auth?: string
-  header?: string[]
-  configFile: string
 }
 
 const program = new Command()
@@ -46,11 +33,11 @@ program
   .option('--config-file <filename>', 'Custom config filename (default: mcp-server.json)', 'mcp-server.json')
   .action(async (name: string, url: string, options: InitOptions) => {
     try {
-      validateIntegrationName(name)
-      validateUrl(url)
-      validateTransportType(options.transport)
+      integrationNameSchema.parse(name)
+      urlSchema.parse(url)
+      transportTypeSchema.parse(options.transport)
 
-      const transport = options.transport
+      const transport = options.transport as TransportType
 
       const headers = parseHeaders(options.header)
 
@@ -96,6 +83,8 @@ program
   .command('update')
   .description('Update an existing integration (refreshes tool definitions and proxy)')
   .argument('[output]', 'Output directory (optional if mcp-server.json exists in current directory)')
+  .option('-u, --url <url>', 'Override MCP server URL')
+  .option('-t, --transport <type>', 'Override transport type: http or sse')
   .addOption(
     new Option('-a, --auth <token>', 'Override authorization token (sets Authorization: Bearer <token> header)').env(
       'MCP_AUTH_TOKEN'
@@ -134,6 +123,18 @@ program
 
       console.log(`✓ Loaded MCP server config from ${options.configFile}`)
 
+      const url = options.url || savedConfig.url
+      const transport = options.transport || savedConfig.type
+
+      if (options.url) {
+        urlSchema.parse(options.url)
+        console.log(`  Overriding URL: ${savedConfig.url} → ${options.url}`)
+      }
+      if (options.transport) {
+        transportTypeSchema.parse(options.transport)
+        console.log(`  Overriding transport: ${savedConfig.type} → ${options.transport}`)
+      }
+
       const headers = parseHeaders(options.header, savedConfig.headers)
 
       if (options.auth) {
@@ -142,9 +143,9 @@ program
 
       const generatorOptions: GeneratorOptions = {
         integrationName: savedConfig.name,
-        mcpServerUrl: savedConfig.url,
+        mcpServerUrl: url,
         outputDir,
-        transport: savedConfig.type,
+        transport,
         headers: Object.keys(headers).length > 0 ? headers : undefined,
         updateMode: true,
         saveConfig: false,

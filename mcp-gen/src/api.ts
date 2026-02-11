@@ -1,15 +1,17 @@
 export { IntegrationGenerator } from './generator.js'
-export type { GeneratorOptions } from './generator.js'
-export type { TransportType } from './mcp-client.js'
-export { ConfigManager, type McpServerConfig, type ConfigManagerOptions } from './config-manager.js'
+export type { GeneratorOptions } from './schemas.js'
+export type { TransportType } from './schemas.js'
+export { ConfigManager } from './config-manager.js'
+export type { McpServerConfig, ConfigManagerOptions } from './schemas.js'
 
-import { IntegrationGenerator, type GeneratorOptions } from './generator.js'
+import { IntegrationGenerator } from './generator.js'
 import { ConfigManager } from './config-manager.js'
-import { validateIntegrationName, validateUrl } from './validators.js'
+import { integrationNameSchema, urlSchema } from './schemas.js'
+import type { GeneratorOptions } from './schemas.js'
 
-export async function generateIntegration(options: GeneratorOptions): Promise<void> {
-  validateIntegrationName(options.integrationName)
-  validateUrl(options.mcpServerUrl)
+export const generateIntegration = async (options: GeneratorOptions): Promise<void> => {
+  integrationNameSchema.parse(options.integrationName)
+  urlSchema.parse(options.mcpServerUrl)
 
   const generator = new IntegrationGenerator({
     configFilename: options.configFilename
@@ -18,9 +20,9 @@ export async function generateIntegration(options: GeneratorOptions): Promise<vo
   await generator.generate(options)
 }
 
-export async function generateIntegrationWithConfig(
+export const generateIntegrationWithConfig = async (
   options: Partial<GeneratorOptions> & { outputDir: string; integrationName?: string }
-): Promise<void> {
+): Promise<void> => {
   const configManager = new ConfigManager({
     configFilename: options.configFilename
   })
@@ -40,8 +42,8 @@ export async function generateIntegrationWithConfig(
     throw new Error('mcpServerUrl is required (provide in options or ensure mcp-server.json exists)')
   }
 
-  validateIntegrationName(integrationName)
-  validateUrl(mcpServerUrl)
+  integrationNameSchema.parse(integrationName)
+  urlSchema.parse(mcpServerUrl)
 
   const fullOptions: GeneratorOptions = {
     integrationName,

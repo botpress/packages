@@ -1,20 +1,7 @@
 import * as fs from 'fs/promises'
 import * as path from 'path'
-import { z } from '@botpress/sdk'
-import { urlSchema, transportTypeSchema, headersSchema, integrationNameSchema } from './validators.js'
-
-const mcpServerConfigSchema = z.object({
-  name: integrationNameSchema,
-  url: urlSchema,
-  type: transportTypeSchema,
-  headers: headersSchema.optional()
-})
-
-export type McpServerConfig = z.infer<typeof mcpServerConfigSchema>
-
-export interface ConfigManagerOptions {
-  configFilename?: string
-}
+import { mcpServerConfigSchema } from './schemas.js'
+import type { McpServerConfig, ConfigManagerOptions, TransportType } from './schemas.js'
 
 export class ConfigManager {
   private configFilename: string
@@ -89,7 +76,7 @@ export class ConfigManager {
     return this.findConfigRecursive(startDir, 0, maxDepth)
   }
 
-  createConfig(name: string, url: string, type: 'http' | 'sse', headers?: Record<string, string>): McpServerConfig {
+  createConfig(name: string, url: string, type: TransportType, headers?: Record<string, string>): McpServerConfig {
     const config = mcpServerConfigSchema.parse({
       name,
       url,

@@ -118,7 +118,7 @@ export class IntegrationGenerator {
     await fs.mkdir(path.join(outputDir, 'action-definitions'), { recursive: true })
 
     const flags = this.resolveFlags(updateMode, scope)
-    console.log(flags)
+
     if (flags.tools) {
       console.log('\nGenerating tool definition files...')
       let truncatedCount = 0

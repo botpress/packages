@@ -61,6 +61,7 @@ program
       })
 
       await generator.generate(generatorOptions)
+      process.exit(0)
     } catch (error) {
       if (error instanceof ZodError) {
         console.error(`Validation error: ${formatZodError(error)}`)
@@ -91,7 +92,7 @@ program
     )
   )
   .option('-H, --header <header...>', 'Override request headers (format: "Key: Value")')
-  .option('--tools', 'Update tool-definitions, actions, definition, and hub.md')
+  .option('--tools', 'Update action-definitions, actions, definition, and hub.md')
   .option('--definition', 'Update integration.definition.ts')
   .option('--code', 'Update src/index.ts and src/mcp-proxy.ts')
   .option('--config-file <filename>', 'Custom config filename (default: mcp-server.json)', 'mcp-server.json')
@@ -166,6 +167,7 @@ program
       })
 
       await generator.generate(generatorOptions)
+      process.exit(0)
     } catch (error) {
       if (error instanceof ZodError) {
         console.error(`Validation error: ${formatZodError(error)}`)

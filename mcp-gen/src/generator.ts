@@ -74,11 +74,11 @@ export class IntegrationGenerator {
 
     if (options.updateMode) {
       console.log(`\n✓ Integration updated at: ${options.outputDir}`)
-      console.log('\nNext step: Run `pnpm bpbuild` to rebuild')
+      console.log('\nNext step: Run `pnpm build` to rebuild')
     } else {
       console.log(`\nIntegration generated successfully at: ${options.outputDir}`)
       console.log('\nGenerated structure:')
-      console.log('  - tool-definitions/     # Action definitions (one per tool)')
+      console.log('  - action-definitions/     # Action definitions (one per tool)')
       console.log('  - src/actions.ts        # Action proxies (MCP tool mappings)')
       console.log('  - src/mcp-proxy.ts      # Shared MCP client logic')
       console.log('  - src/index.ts          # Integration entry point')
@@ -99,7 +99,7 @@ export class IntegrationGenerator {
     const hasScope = scope && (scope.tools || scope.definition || scope.code)
     return {
       tools: !hasScope || !!scope?.tools,
-      definition: !hasScope || !!scope?.tools || !!scope?.definition,
+      definition: !hasScope || !!scope?.definition,
       code: !hasScope || !!scope?.code,
       index: !!scope?.code,
       scaffold: false
@@ -115,18 +115,18 @@ export class IntegrationGenerator {
   ): Promise<void> {
     await fs.mkdir(outputDir, { recursive: true })
     await fs.mkdir(path.join(outputDir, 'src'), { recursive: true })
-    await fs.mkdir(path.join(outputDir, 'tool-definitions'), { recursive: true })
+    await fs.mkdir(path.join(outputDir, 'action-definitions'), { recursive: true })
 
     const flags = this.resolveFlags(updateMode, scope)
-
+    console.log(flags)
     if (flags.tools) {
       console.log('\nGenerating tool definition files...')
       let truncatedCount = 0
       for (const tool of serverInfo.tools) {
         const definitionFile = await generateToolDefinitionFile(tool)
-        const filePath = path.join(outputDir, 'tool-definitions', `${tool.name}.ts`)
+        const filePath = path.join(outputDir, 'action-definitions', `${tool.name}.ts`)
         await writeFormattedFile(filePath, definitionFile, 'typescript')
-        console.log(`  - Generated tool-definitions/${tool.name}.ts`)
+        console.log(`  - Generated action-definitions/${tool.name}.ts`)
 
         if (tool.description && tool.description.length > 256) {
           truncatedCount++
@@ -136,9 +136,9 @@ export class IntegrationGenerator {
         console.log(`  ⚠ ${truncatedCount} description(s) truncated to 256 chars (Botpress limit)`)
       }
 
-      console.log('Generating tool-definitions/index.ts...')
+      console.log('Generating action-definitions/index.ts...')
       const toolDefsIndex = generateToolDefinitionsIndex(serverInfo.tools)
-      await writeFormattedFile(path.join(outputDir, 'tool-definitions', 'index.ts'), toolDefsIndex, 'typescript')
+      await writeFormattedFile(path.join(outputDir, 'action-definitions', 'index.ts'), toolDefsIndex, 'typescript')
 
       console.log('Generating src/actions.ts...')
       const actionsFile = generateActions(serverInfo.tools)
@@ -225,7 +225,7 @@ export class IntegrationGenerator {
         experimentalDecorators: true,
         emitDecoratorMetadata: true
       },
-      include: ['src/**/*', 'tool-definitions/**/*', 'integration.definition.ts'],
+      include: ['src/**/*', 'action-definitions/**/*', 'integration.definition.ts'],
       exclude: ['node_modules', 'dist', '.botpress']
     }
     await writeFormattedFile(path.join(outputDir, 'tsconfig.json'), JSON.stringify(tsConfig, null, 2), 'json')

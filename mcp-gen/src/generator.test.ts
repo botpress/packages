@@ -103,7 +103,7 @@ describe('IntegrationGenerator', () => {
 
     expect(fs.mkdir).toHaveBeenCalledWith('./output', { recursive: true })
     expect(fs.mkdir).toHaveBeenCalledWith(expect.stringContaining('src'), { recursive: true })
-    expect(fs.mkdir).toHaveBeenCalledWith(expect.stringContaining('tool-definitions'), { recursive: true })
+    expect(fs.mkdir).toHaveBeenCalledWith(expect.stringContaining('action-definitions'), { recursive: true })
   })
 
   it('should save config when saveConfig is true', async () => {

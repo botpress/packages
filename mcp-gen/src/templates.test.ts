@@ -73,7 +73,7 @@ describe('templates', () => {
   })
 
   describe('generateIntegrationDefinition', () => {
-    it('should import actions from tool-definitions and use them directly', () => {
+    it('should import actions from action-definitions and use them directly', () => {
       const result = generateIntegrationDefinition('test-integration', {
         name: 'Test Server',
         version: '1.0.0',
@@ -87,7 +87,7 @@ describe('templates', () => {
 
       expect(result).toContain("name: 'test-integration'")
       expect(result).toContain("title: 'Test Server'")
-      expect(result).toContain("import { actions } from './tool-definitions/index.js'")
+      expect(result).toContain("import { actions } from './action-definitions/index.js'")
       expect(result).not.toContain('import { toolOne')
       expect(result).toContain('actions')
       expect(result).not.toContain('actions: {')

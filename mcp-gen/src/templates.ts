@@ -145,7 +145,7 @@ export async function callMcpTool(params: {
 
 export const generateIntegrationDefinition = (integrationName: string, serverInfo: McpServerInfo): string => {
   return `import { IntegrationDefinition, z } from '@botpress/sdk'
-import { actions } from './tool-definitions/index.js'
+import { actions } from './action-definitions/index.js'
 
 export default new IntegrationDefinition({
   name: '${integrationName}',

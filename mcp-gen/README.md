@@ -14,8 +14,8 @@ mcp-gen init github-mcp https://api.github.com/mcp \
   --auth ghp_your_github_token \
   --save
 
-# Update existing integration (from saved config)
-mcp-gen update
+# Update tools from saved config
+mcp-gen update --tools
 ```
 
 ## Features
@@ -24,7 +24,7 @@ mcp-gen update
 - **Proxy Pattern**: Single shared implementation for all tools
 - **Multiple Transports**: HTTP (default) and SSE support
 - **Type-Safe**: Generates Zui (Zod) schemas from JSON Schema with comprehensive validation
-- **Update Mode**: Refresh tools while preserving customizations
+- **Scoped Updates**: Refresh tools, definition, or code independently
 - **Config Persistence**: Claude-compatible mcp-server.json format
 
 ## CLI Commands
@@ -77,11 +77,20 @@ mcp-gen init github-mcp https://api.github.com/mcp \
 mcp-gen update [output] [options]
 ```
 
-Updates tool definitions from saved mcp-server.json. Preserves customizations in src/index.ts.
+Updates an existing integration from saved mcp-server.json. No scope flags = update all. Use flags to select what to update.
 
-**Options:**
+**Scope Flags:**
 
-- `[output]` - Output directory (optional if config exists in current directory)
+- `--tools` - Update action-definitions, actions, and hub.md
+- `--definition` - Update integration.definition.ts
+- `--code` - Update src/index.ts and src/mcp-proxy.ts
+
+When no scope flags are provided, all scopes are updated (equivalent to `--tools --definition --code`), except `src/index.ts` which is only regenerated with `--code` to preserve your customizations.
+
+**Override Options:**
+
+- `--url, -u <url>` - Override MCP server URL (instead of what's in config)
+- `--transport, -t <type>` - Override transport type
 - `--auth, -a <token>` - Override authorization token
 - `--header, -H <header>` - Override request headers
 - `--config-file <filename>` - Custom config filename (default: mcp-server.json)
@@ -89,14 +98,23 @@ Updates tool definitions from saved mcp-server.json. Preserves customizations in
 **Examples:**
 
 ```bash
-# Auto-detect config in current directory or subdirectories
+# Update just tools (most common)
+mcp-gen update --tools
+
+# Auto-detect config, update everything
 mcp-gen update
 
 # Specify directory
-mcp-gen update ./my-integration
+mcp-gen update ./my-integration --tools
 
-# Override auth token
-mcp-gen update --auth bp_pat_new_token
+# Override auth token for this run
+mcp-gen update --auth bp_pat_new_token --tools
+
+# Override the MCP server URL
+mcp-gen update --url https://new-api.example.com/mcp --tools
+
+# Update only the proxy code
+mcp-gen update --code
 ```
 
 ## Config File Format
@@ -125,12 +143,14 @@ output/
 ├── .gitignore
 ├── integration.definition.ts    # Integration metadata
 ├── hub.md                        # Documentation
-├── tool-definitions/             # One file per tool
+├── icon.svg                      # Generic MCP icon (customize)
+├── action-definitions/             # One file per tool
 │   ├── index.ts
 │   ├── tool1.ts
 │   └── tool2.ts
 └── src/
-    ├── index.ts                  # Action router
+    ├── index.ts                  # Integration entry point
+    ├── actions.ts                # Action router (MCP tool mappings)
     └── mcp-proxy.ts              # Shared MCP proxy implementation
 ```
 
@@ -220,26 +240,25 @@ mcp-gen --help
 ## Updating When MCP Server Changes
 
 ```bash
-# Option 1: Auto-detect config
-cd my-integration
-mcp-gen update
+# Most common: just refresh tools
+mcp-gen update --tools
 
-# Option 2: Specify directory
-mcp-gen update ./my-integration
+# Or update everything
+mcp-gen update
 
 # Review changes
 git diff
 
 # Rebuild
-cd my-integration && pnpm bpbuild
+pnpm bpbuild
 ```
 
 The update command:
 
-- ✅ Refreshes tool definitions
-- ✅ Updates schemas
-- ✅ Preserves your customizations in src/index.ts
-- ✅ Uses saved credentials from mcp-server.json
+- Refreshes tool definitions, actions, and hub.md (`--tools`)
+- Updates integration.definition.ts (`--definition`)
+- Updates src/mcp-proxy.ts and src/index.ts (`--code`)
+- Uses saved credentials from mcp-server.json
 
 ## Troubleshooting
 
@@ -272,9 +291,10 @@ Specify with `--transport sse` if needed.
 
 The generator creates integrations using a **proxy pattern**:
 
-1. **Definitions Layer** (`tool-definitions/`): What each tool does (schemas, descriptions)
-2. **Implementation Layer** (`src/mcp-proxy.ts`): How to call MCP tools (single shared implementation)
-3. **Integration Layer** (`src/index.ts`): Routes actions to proxy
+1. **Definitions Layer** (`action-definitions/`): What each tool does (schemas, descriptions)
+2. **Actions Layer** (`src/actions.ts`): Maps each action to its MCP tool call via the proxy
+3. **Implementation Layer** (`src/mcp-proxy.ts`): How to call MCP tools (single shared implementation)
+4. **Integration Layer** (`src/index.ts`): Entry point that wires everything together
 
 ### Tool Name Sanitization
 

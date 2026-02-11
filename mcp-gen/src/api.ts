@@ -1,5 +1,5 @@
 export { IntegrationGenerator } from './generator.js'
-export type { GeneratorOptions } from './schemas.js'
+export type { GeneratorOptions, UpdateScope } from './schemas.js'
 export type { TransportType } from './schemas.js'
 export { ConfigManager } from './config-manager.js'
 export type { McpServerConfig, ConfigManagerOptions } from './schemas.js'

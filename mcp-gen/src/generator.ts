@@ -13,7 +13,7 @@ import {
   generateIcon
 } from './templates.js'
 import { getLatestNpmVersion, writeFormattedFile } from './utils.js'
-import type { GeneratorOptions, ConfigManagerOptions, McpServerInfo } from './schemas.js'
+import type { GeneratorOptions, ConfigManagerOptions, McpServerInfo, UpdateScope } from './schemas.js'
 
 export class IntegrationGenerator {
   private client: McpClient
@@ -42,14 +42,22 @@ export class IntegrationGenerator {
     console.log('Tools:', serverInfo.tools.map((t) => t.name).join(', '))
 
     if (options.updateMode) {
-      console.log('\n⚡ Update mode: Only updating tool definitions and proxy')
+      const scope = options.updateScope
+      const hasScope = scope && (scope.tools || scope.definition || scope.code)
+      if (hasScope) {
+        const parts = [scope.tools && 'tools', scope.definition && 'definition', scope.code && 'code'].filter(Boolean)
+        console.log(`\n⚡ Update mode: Updating ${parts.join(' + ')}`)
+      } else {
+        console.log('\n⚡ Update mode: Updating all')
+      }
     }
 
     await this.generateIntegrationFiles(
       options.outputDir,
       options.integrationName,
       serverInfo,
-      options.updateMode || false
+      options.updateMode || false,
+      options.updateScope
     )
 
     await this.client.close()
@@ -66,16 +74,6 @@ export class IntegrationGenerator {
 
     if (options.updateMode) {
       console.log(`\n✓ Integration updated at: ${options.outputDir}`)
-      console.log('\nUpdated:')
-      console.log('  ✓ tool-definitions/          # Tool schemas refreshed')
-      console.log('  ✓ src/actions.ts             # Action proxies updated')
-      console.log('  ✓ src/mcp-proxy.ts           # Proxy implementation updated')
-      console.log('  ✓ integration.definition.ts  # Definition refreshed')
-      console.log('  ✓ hub.md                     # Documentation refreshed')
-      console.log('\nPreserved (not modified):')
-      console.log('  • src/index.ts')
-      console.log('  • package.json')
-      console.log('  • icon.svg')
       console.log('\nNext step: Run `pnpm bpbuild` to rebuild')
     } else {
       console.log(`\nIntegration generated successfully at: ${options.outputDir}`)
@@ -94,66 +92,95 @@ export class IntegrationGenerator {
     }
   }
 
+  private resolveFlags(updateMode: boolean, scope?: UpdateScope) {
+    if (!updateMode) {
+      return { tools: true, definition: true, code: true, index: true, scaffold: true }
+    }
+    const hasScope = scope && (scope.tools || scope.definition || scope.code)
+    return {
+      tools: !hasScope || !!scope?.tools,
+      definition: !hasScope || !!scope?.tools || !!scope?.definition,
+      code: !hasScope || !!scope?.code,
+      index: !!scope?.code,
+      scaffold: false
+    }
+  }
+
   private async generateIntegrationFiles(
     outputDir: string,
     integrationName: string,
     serverInfo: McpServerInfo,
-    updateMode: boolean = false
+    updateMode: boolean = false,
+    scope?: UpdateScope
   ): Promise<void> {
     await fs.mkdir(outputDir, { recursive: true })
     await fs.mkdir(path.join(outputDir, 'src'), { recursive: true })
     await fs.mkdir(path.join(outputDir, 'tool-definitions'), { recursive: true })
 
-    console.log('\nGenerating tool definition files...')
-    let truncatedCount = 0
-    for (const tool of serverInfo.tools) {
-      const definitionFile = await generateToolDefinitionFile(tool)
-      const filePath = path.join(outputDir, 'tool-definitions', `${tool.name}.ts`)
-      await writeFormattedFile(filePath, definitionFile, 'typescript')
-      console.log(`  - Generated tool-definitions/${tool.name}.ts`)
+    const flags = this.resolveFlags(updateMode, scope)
 
-      if (tool.description && tool.description.length > 256) {
-        truncatedCount++
+    if (flags.tools) {
+      console.log('\nGenerating tool definition files...')
+      let truncatedCount = 0
+      for (const tool of serverInfo.tools) {
+        const definitionFile = await generateToolDefinitionFile(tool)
+        const filePath = path.join(outputDir, 'tool-definitions', `${tool.name}.ts`)
+        await writeFormattedFile(filePath, definitionFile, 'typescript')
+        console.log(`  - Generated tool-definitions/${tool.name}.ts`)
+
+        if (tool.description && tool.description.length > 256) {
+          truncatedCount++
+        }
       }
-    }
-    if (truncatedCount > 0) {
-      console.log(`  ⚠ ${truncatedCount} description(s) truncated to 256 chars (Botpress limit)`)
-    }
+      if (truncatedCount > 0) {
+        console.log(`  ⚠ ${truncatedCount} description(s) truncated to 256 chars (Botpress limit)`)
+      }
 
-    console.log('Generating tool-definitions/index.ts...')
-    const toolDefsIndex = generateToolDefinitionsIndex(serverInfo.tools)
-    await writeFormattedFile(path.join(outputDir, 'tool-definitions', 'index.ts'), toolDefsIndex, 'typescript')
+      console.log('Generating tool-definitions/index.ts...')
+      const toolDefsIndex = generateToolDefinitionsIndex(serverInfo.tools)
+      await writeFormattedFile(path.join(outputDir, 'tool-definitions', 'index.ts'), toolDefsIndex, 'typescript')
 
-    console.log('Generating src/mcp-proxy.ts...')
-    const mcpProxyFile = generateMcpProxy()
-    await writeFormattedFile(path.join(outputDir, 'src', 'mcp-proxy.ts'), mcpProxyFile, 'typescript')
+      console.log('Generating src/actions.ts...')
+      const actionsFile = generateActions(serverInfo.tools)
+      await writeFormattedFile(path.join(outputDir, 'src', 'actions.ts'), actionsFile, 'typescript')
 
-    console.log('Generating src/actions.ts...')
-    const actionsFile = generateActions(serverInfo.tools)
-    await writeFormattedFile(path.join(outputDir, 'src', 'actions.ts'), actionsFile, 'typescript')
-
-    console.log('Generating integration.definition.ts...')
-    const definitionFile = generateIntegrationDefinition(integrationName, serverInfo)
-    await writeFormattedFile(path.join(outputDir, 'integration.definition.ts'), definitionFile, 'typescript')
-
-    console.log('Generating hub.md...')
-    const readmeFile = generateReadme(serverInfo, serverInfo.tools)
-    await writeFormattedFile(path.join(outputDir, 'hub.md'), readmeFile, 'markdown')
-
-    if (updateMode) {
-      console.log('\n✓ Update mode complete')
-      console.log('  Skipped: src/index.ts, package.json, icon.svg (preserved customizations)')
-      return
+      console.log('Generating hub.md...')
+      const readmeFile = generateReadme(serverInfo, serverInfo.tools)
+      await writeFormattedFile(path.join(outputDir, 'hub.md'), readmeFile, 'markdown')
     }
 
-    console.log('Generating src/index.ts...')
-    const indexFile = generateIntegrationIndex()
-    await writeFormattedFile(path.join(outputDir, 'src', 'index.ts'), indexFile, 'typescript')
+    if (flags.definition) {
+      console.log('Generating integration.definition.ts...')
+      const definitionFile = generateIntegrationDefinition(integrationName, serverInfo)
+      await writeFormattedFile(path.join(outputDir, 'integration.definition.ts'), definitionFile, 'typescript')
+    }
 
-    console.log('Generating icon.svg...')
-    const iconFile = generateIcon()
-    await writeFormattedFile(path.join(outputDir, 'icon.svg'), iconFile, 'html')
+    if (flags.code) {
+      console.log('Generating src/mcp-proxy.ts...')
+      const mcpProxyFile = generateMcpProxy()
+      await writeFormattedFile(path.join(outputDir, 'src', 'mcp-proxy.ts'), mcpProxyFile, 'typescript')
+    }
 
+    if (flags.index) {
+      console.log('Generating src/index.ts...')
+      const indexFile = generateIntegrationIndex()
+      await writeFormattedFile(path.join(outputDir, 'src', 'index.ts'), indexFile, 'typescript')
+    }
+
+    if (flags.scaffold) {
+      console.log('Generating icon.svg...')
+      const iconFile = generateIcon()
+      await writeFormattedFile(path.join(outputDir, 'icon.svg'), iconFile, 'html')
+
+      await this.generatePackageFiles(outputDir, integrationName, serverInfo)
+    }
+  }
+
+  private async generatePackageFiles(
+    outputDir: string,
+    integrationName: string,
+    serverInfo: McpServerInfo
+  ): Promise<void> {
     console.log('Generating package.json...')
     console.log('Fetching latest package versions from npm...')
 

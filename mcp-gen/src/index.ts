@@ -81,7 +81,7 @@ program
 
 program
   .command('update')
-  .description('Update an existing integration (refreshes tool definitions and proxy)')
+  .description('Update an existing integration. No scope flags = update all. Use flags to select what to update.')
   .argument('[output]', 'Output directory (optional if mcp-server.json exists in current directory)')
   .option('-u, --url <url>', 'Override MCP server URL')
   .option('-t, --transport <type>', 'Override transport type: http or sse')
@@ -91,6 +91,9 @@ program
     )
   )
   .option('-H, --header <header...>', 'Override request headers (format: "Key: Value")')
+  .option('--tools', 'Update tool-definitions, actions, definition, and hub.md')
+  .option('--definition', 'Update integration.definition.ts')
+  .option('--code', 'Update src/index.ts and src/mcp-proxy.ts')
   .option('--config-file <filename>', 'Custom config filename (default: mcp-server.json)', 'mcp-server.json')
   .action(async (outputArg: string | undefined, options: UpdateOptions) => {
     try {
@@ -141,6 +144,11 @@ program
         headers['Authorization'] = `Bearer ${options.auth}`
       }
 
+      const hasScope = options.tools || options.definition || options.code
+      const updateScope = hasScope
+        ? { tools: options.tools, definition: options.definition, code: options.code }
+        : undefined
+
       const generatorOptions: GeneratorOptions = {
         integrationName: savedConfig.name,
         mcpServerUrl: url,
@@ -148,6 +156,7 @@ program
         transport,
         headers: Object.keys(headers).length > 0 ? headers : undefined,
         updateMode: true,
+        updateScope,
         saveConfig: false,
         configFilename: options.configFile
       }

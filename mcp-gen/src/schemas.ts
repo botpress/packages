@@ -39,6 +39,12 @@ export const mcpServerConfigSchema = z.object({
   headers: headersSchema.optional()
 })
 
+export const updateScopeSchema = z.object({
+  tools: z.boolean().optional(),
+  definition: z.boolean().optional(),
+  code: z.boolean().optional()
+})
+
 export const generatorOptionsSchema = z.object({
   integrationName: integrationNameSchema,
   mcpServerUrl: urlSchema,
@@ -46,6 +52,7 @@ export const generatorOptionsSchema = z.object({
   transport: transportTypeSchema.optional(),
   headers: headersSchema.optional(),
   updateMode: z.boolean().optional(),
+  updateScope: updateScopeSchema.optional(),
   saveConfig: z.boolean().optional(),
   configFilename: z.string().optional()
 })
@@ -68,7 +75,10 @@ export const updateOptionsSchema = z.object({
   transport: transportTypeSchema.optional(),
   auth: z.string().optional(),
   header: z.array(z.string()).optional(),
-  configFile: z.string()
+  configFile: z.string(),
+  tools: z.boolean().optional(),
+  definition: z.boolean().optional(),
+  code: z.boolean().optional()
 })
 
 export const mcpServerInfoSchema = z.object({
@@ -81,6 +91,7 @@ export const mcpServerInfoSchema = z.object({
 
 export const prettierParserSchema = z.enum(['typescript', 'markdown', 'html', 'json'])
 
+export type UpdateScope = z.infer<typeof updateScopeSchema>
 export type TransportType = z.infer<typeof transportTypeSchema>
 export type Headers = z.infer<typeof headersSchema>
 export type IntegrationName = z.infer<typeof integrationNameSchema>

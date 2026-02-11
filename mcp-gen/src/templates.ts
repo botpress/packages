@@ -67,6 +67,7 @@ export const generateMcpProxy = (): string => {
   return `import { Client } from '@modelcontextprotocol/sdk/client/index.js'
 import { SSEClientTransport } from '@modelcontextprotocol/sdk/client/sse.js'
 import { StreamableHTTPClientTransport } from '@modelcontextprotocol/sdk/client/streamableHttp.js'
+import { secrets, TIntegration } from '.botpress'
 
 export async function callMcpTool(params: {
   toolName: string
@@ -76,7 +77,7 @@ export async function callMcpTool(params: {
 }): Promise<{ content: any[]; isError: boolean }> {
   const { toolName, input, ctx, logger } = params
 
-  const mcpServerUrl = ctx.configuration.mcpServerUrl || process.env.MCP_SERVER_URL
+  const mcpServerUrl = ctx.configuration.mcpServerUrl || secrets.MCP_SERVER_URL
   if (!mcpServerUrl) {
     throw new Error('MCP server URL not configured')
   }

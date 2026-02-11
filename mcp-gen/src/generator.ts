@@ -101,7 +101,7 @@ export class IntegrationGenerator {
       tools: !hasScope || !!scope?.tools,
       definition: !hasScope || !!scope?.definition,
       code: !hasScope || !!scope?.code,
-      index: !!scope?.code,
+      index: !hasScope || !!scope?.code,
       scaffold: false
     }
   }

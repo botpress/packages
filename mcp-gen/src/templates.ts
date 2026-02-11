@@ -156,7 +156,7 @@ export default new IntegrationDefinition({
   icon: 'icon.svg',
   configuration: {
     schema: z.object({
-      mcpServerUrl: z.string().title('MCP Server URL').describe(\`The URL of the MCP server (default is ${serverInfo.url}). Can be pre-filled via the MCP_SERVER_URL secret.\`).optional()
+      mcpServerUrl: z.string().title('MCP Server URL').describe(\`The URL of the MCP server (default is ${serverInfo.url}). Can be pre-filled via the MCP_SERVER_URL secret.\`).optional(),
       transportType: z.enum(['http', 'sse']).title('Transport Type').default('http').optional().describe('MCP transport type: http (default) or sse'),
       authToken: z.string().title('Authorization Token').optional().describe('Authentication token (will be sent as "Bearer <token>")'),
       customHeaders: z.string().title('Custom Headers (JSON)').optional().describe('Additional headers as JSON object (e.g., {"X-Custom": "value"})')

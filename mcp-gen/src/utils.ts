@@ -52,3 +52,13 @@ export const parseHeaders = (
 
   return headers
 }
+
+export const shortenString = (str: string | undefined, maxLength: number): string => {
+  if (!str) {
+    return ''
+  }
+  if (str.length <= maxLength) {
+    return str
+  }
+  return str.substring(0, maxLength) + '...'
+}

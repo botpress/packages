@@ -2,6 +2,7 @@ import type { Tool } from '@modelcontextprotocol/sdk/types.js'
 import * as sdk from '@botpress/sdk'
 import { dereference } from '@apidevtools/json-schema-ref-parser'
 import type { McpServerInfo } from './schemas.js'
+import { shortenString } from './utils.js'
 
 const dereferenceSchema = async (schema: sdk.JSONSchema7): Promise<sdk.JSONSchema7> => {
   return dereference(schema, {
@@ -36,14 +37,12 @@ const jsonSchemaToTypescriptZuiSchema = async (schema: sdk.JSONSchema7): Promise
 
 export const generateToolDefinitionFile = async (tool: Tool): Promise<string> => {
   const inputSchema = await jsonSchemaToTypescriptZuiSchema(tool.inputSchema)
-  const rawDescription = tool.description || ''
-  const description = rawDescription.length > 256 ? rawDescription.substring(0, 253) + '...' : rawDescription
 
   return `import { z } from '@botpress/sdk'
 
 export const ${sanitizeName(tool.name)} = {
   title: '${tool.name}',
-  description: \`${description.replace(/`/g, '\\`')}\`,
+  description: \`${shortenString(tool.description, 256).replace(/`/g, '\\`')}\`,
   input: {
     schema: ${inputSchema}
   },
@@ -150,7 +149,7 @@ import { actions } from './action-definitions/index.js'
 export default new IntegrationDefinition({
   name: '${integrationName}',
   title: '${serverInfo.name}',
-  description: '${serverInfo.description || `MCP Integration for ${serverInfo.name}`}',
+  description: '${shortenString(serverInfo.description, 256) || `MCP Integration for ${serverInfo.name}`}',
   version: '0.0.1',
   readme: 'hub.md',
   icon: 'icon.svg',

@@ -30,6 +30,10 @@
     "check:type": "tsc --noEmit",
     "check:format": "prettier --check .",
     "generate": "node dist/index.js",
+    "test": "vitest",
+    "test:run": "vitest run",
+    "test:watch": "vitest watch",
+    "test:coverage": "vitest run --coverage",
     "prepublishOnly": "pnpm build && pnpm type-check"
   },
   "dependencies": {
@@ -45,9 +49,11 @@
   },
   "devDependencies": {
     "@types/node": "^22.15.0",
+    "@vitest/coverage-v8": "^2.1.8",
     "prettier": "^3.8.1",
     "tsup": "^8.0.1",
     "tsx": "^4.19.0",
-    "typescript": "^5.7.2"
+    "typescript": "^5.7.2",
+    "vitest": "^2.1.8"
   }
 }

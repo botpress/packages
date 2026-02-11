@@ -19,7 +19,7 @@ program.name('mcp-gen').description('Generate Botpress integrations from MCP ser
 program
   .command('init')
   .description('Initialize a new Botpress integration from an MCP server')
-  .argument('<name>', 'Integration name (e.g., sauron-mcp)')
+  .argument('<name>', 'Integration name (e.g., github-mcp)')
   .argument('<url>', 'MCP server URL')
   .requiredOption('-o, --output <dir>', 'Output directory')
   .option('-t, --transport <type>', 'Transport type: http or sse (default: http)', 'http')

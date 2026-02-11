@@ -6,6 +6,7 @@ import {
   generateToolDefinitionFile,
   generateToolDefinitionsIndex,
   generateMcpProxy,
+  generateActions,
   generateIntegrationDefinition,
   generateIntegrationIndex,
   generateReadme,
@@ -66,20 +67,23 @@ export class IntegrationGenerator {
     if (options.updateMode) {
       console.log(`\n✓ Integration updated at: ${options.outputDir}`)
       console.log('\nUpdated:')
-      console.log('  ✓ tool-definitions/     # Tool schemas refreshed')
-      console.log('  ✓ src/mcp-proxy.ts      # Proxy implementation updated')
+      console.log('  ✓ tool-definitions/          # Tool schemas refreshed')
+      console.log('  ✓ src/actions.ts             # Action proxies updated')
+      console.log('  ✓ src/mcp-proxy.ts           # Proxy implementation updated')
+      console.log('  ✓ integration.definition.ts  # Definition refreshed')
+      console.log('  ✓ hub.md                     # Documentation refreshed')
       console.log('\nPreserved (not modified):')
-      console.log('  • integration.definition.ts')
       console.log('  • src/index.ts')
       console.log('  • package.json')
-      console.log('  • hub.md, icon.svg')
+      console.log('  • icon.svg')
       console.log('\nNext step: Run `pnpm bpbuild` to rebuild')
     } else {
       console.log(`\nIntegration generated successfully at: ${options.outputDir}`)
       console.log('\nGenerated structure:')
       console.log('  - tool-definitions/     # Action definitions (one per tool)')
+      console.log('  - src/actions.ts        # Action proxies (MCP tool mappings)')
       console.log('  - src/mcp-proxy.ts      # Shared MCP client logic')
-      console.log('  - src/index.ts          # Integration entry with proxy pattern')
+      console.log('  - src/index.ts          # Integration entry point')
       console.log('  - integration.definition.ts')
       console.log('  - icon.svg              # Generic MCP icon (customize if needed)')
       console.log('\nNext steps:')
@@ -124,23 +128,27 @@ export class IntegrationGenerator {
     const mcpProxyFile = generateMcpProxy()
     await writeFormattedFile(path.join(outputDir, 'src', 'mcp-proxy.ts'), mcpProxyFile, 'typescript')
 
-    if (updateMode) {
-      console.log('\n✓ Update mode: Tool definitions and proxy updated')
-      console.log('  Skipped: integration.definition.ts, src/index.ts, package.json (preserved customizations)')
-      return
-    }
+    console.log('Generating src/actions.ts...')
+    const actionsFile = generateActions(serverInfo.tools)
+    await writeFormattedFile(path.join(outputDir, 'src', 'actions.ts'), actionsFile, 'typescript')
 
     console.log('Generating integration.definition.ts...')
     const definitionFile = generateIntegrationDefinition(integrationName, serverInfo)
     await writeFormattedFile(path.join(outputDir, 'integration.definition.ts'), definitionFile, 'typescript')
 
-    console.log('Generating src/index.ts...')
-    const indexFile = generateIntegrationIndex(serverInfo.tools)
-    await writeFormattedFile(path.join(outputDir, 'src', 'index.ts'), indexFile, 'typescript')
-
     console.log('Generating hub.md...')
     const readmeFile = generateReadme(serverInfo, serverInfo.tools)
     await writeFormattedFile(path.join(outputDir, 'hub.md'), readmeFile, 'markdown')
+
+    if (updateMode) {
+      console.log('\n✓ Update mode complete')
+      console.log('  Skipped: src/index.ts, package.json, icon.svg (preserved customizations)')
+      return
+    }
+
+    console.log('Generating src/index.ts...')
+    const indexFile = generateIntegrationIndex()
+    await writeFormattedFile(path.join(outputDir, 'src', 'index.ts'), indexFile, 'typescript')
 
     console.log('Generating icon.svg...')
     const iconFile = generateIcon()

@@ -33,6 +33,7 @@ vi.mock('./templates.js', () => ({
   generateToolDefinitionFile: vi.fn((tool) => Promise.resolve(`// Tool: ${tool.name}`)),
   generateToolDefinitionsIndex: vi.fn(() => 'export {}'),
   generateMcpProxy: vi.fn(() => '// MCP Proxy'),
+  generateActions: vi.fn(() => '// Actions'),
   generateIntegrationDefinition: vi.fn(() => '// Integration Definition'),
   generateIntegrationIndex: vi.fn(() => '// Integration Index'),
   generateReadme: vi.fn(() => '# README'),

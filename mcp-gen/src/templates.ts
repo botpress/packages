@@ -58,9 +58,15 @@ export const ${sanitizeName(tool.name)} = {
 }
 
 export const generateToolDefinitionsIndex = (tools: Tool[]): string => {
-  const imports = tools.map((tool) => `export { ${sanitizeName(tool.name)} } from './${tool.name}.js'`).join('\n')
+  const imports = tools.map((tool) => `import { ${sanitizeName(tool.name)} } from './${tool.name}.js'`).join('\n')
+  const actionEntries = tools.map((tool) => `  ${sanitizeName(tool.name)}`).join(',\n')
 
-  return `${imports}\n`
+  return `${imports}
+
+export const actions = {
+${actionEntries}
+}
+`
 }
 
 export const generateMcpProxy = (): string => {
@@ -138,12 +144,8 @@ export async function callMcpTool(params: {
 }
 
 export const generateIntegrationDefinition = (integrationName: string, serverInfo: McpServerInfo): string => {
-  const toolImports = serverInfo.tools.map((tool) => sanitizeName(tool.name)).join(', ')
-
-  const actionsDefinition = serverInfo.tools.map((tool) => `    ${sanitizeName(tool.name)}`).join(',\n')
-
   return `import { IntegrationDefinition, z } from '@botpress/sdk'
-import { ${toolImports} } from './tool-definitions/index.js'
+import { actions } from './tool-definitions/index.js'
 
 export default new IntegrationDefinition({
   name: '${integrationName}',
@@ -165,34 +167,39 @@ export default new IntegrationDefinition({
       description: 'Default MCP server URL. Can be overridden in configuration. Used to auto-fill the mcpServerUrl field when installing the integration.'
     }
   },
-  actions: {
-${actionsDefinition}
-  }
+  actions
 })
 `
 }
 
-export const generateIntegrationIndex = (tools: Tool[]): string => {
+export const generateActions = (tools: Tool[]): string => {
   const actionProxies = tools
     .map((tool) => {
       const sanitizedName = sanitizeName(tool.name)
-      return `    ${sanitizedName}: async ({ input, ctx, logger }) => {
-      return callMcpTool({ toolName: '${tool.name}', input, ctx, logger })
-    }`
+      return `  ${sanitizedName}: async ({ input, ctx, logger }) => {
+    return callMcpTool({ toolName: '${tool.name}', input, ctx, logger })
+  }`
     })
     .join(',\n')
 
+  return `import { callMcpTool } from './mcp-proxy.js'
+
+export const actions = {
+${actionProxies}
+}
+`
+}
+
+export const generateIntegrationIndex = (): string => {
   return `import * as bp from '.botpress/index.js'
-import { callMcpTool } from './mcp-proxy.js'
+import { actions } from './actions.js'
 
 export default new bp.Integration({
   register: async ({ ctx, logger }) => {
     logger.forBot().info('MCP Integration registered')
   },
   unregister: async () => {},
-  actions: {
-${actionProxies}
-  },
+  actions,
   channels: {},
   handler: async () => {}
 })

@@ -2,6 +2,7 @@ import { describe, it, expect, vi } from 'vitest'
 import {
   generateToolDefinitionFile,
   generateToolDefinitionsIndex,
+  generateActions,
   generateIntegrationDefinition,
   generateIntegrationIndex,
   generateReadme
@@ -57,19 +58,22 @@ describe('templates', () => {
   })
 
   describe('generateToolDefinitionsIndex', () => {
-    it('should export all tools with sanitized names', () => {
+    it('should import all tools and export a combined actions object', () => {
       const result = generateToolDefinitionsIndex([
         { name: 'tool-one', inputSchema: { type: 'object' } },
         { name: 'tool_two', inputSchema: { type: 'object' } }
       ])
 
-      expect(result).toContain("export { toolOne } from './tool-one.js'")
-      expect(result).toContain("export { toolTwo } from './tool_two.js'")
+      expect(result).toContain("import { toolOne } from './tool-one.js'")
+      expect(result).toContain("import { toolTwo } from './tool_two.js'")
+      expect(result).toContain('export const actions = {')
+      expect(result).toContain('  toolOne')
+      expect(result).toContain('  toolTwo')
     })
   })
 
   describe('generateIntegrationDefinition', () => {
-    it('should include metadata and list tools as actions', () => {
+    it('should import actions from tool-definitions and use them directly', () => {
       const result = generateIntegrationDefinition('test-integration', {
         name: 'Test Server',
         version: '1.0.0',
@@ -83,8 +87,10 @@ describe('templates', () => {
 
       expect(result).toContain("name: 'test-integration'")
       expect(result).toContain("title: 'Test Server'")
-      expect(result).toContain("import { toolOne, toolTwo } from './tool-definitions/index.js'")
-      expect(result).toContain('actions: {')
+      expect(result).toContain("import { actions } from './tool-definitions/index.js'")
+      expect(result).not.toContain('import { toolOne')
+      expect(result).toContain('actions')
+      expect(result).not.toContain('actions: {')
     })
 
     it('should use default description when not provided', () => {
@@ -99,16 +105,28 @@ describe('templates', () => {
     })
   })
 
-  describe('generateIntegrationIndex', () => {
+  describe('generateActions', () => {
     it('should generate action proxies for all tools', () => {
-      const result = generateIntegrationIndex([
+      const result = generateActions([
         { name: 'tool-one', inputSchema: { type: 'object' } },
         { name: 'tool-two', inputSchema: { type: 'object' } }
       ])
 
+      expect(result).toContain("import { callMcpTool } from './mcp-proxy.js'")
+      expect(result).toContain('export const actions = {')
       expect(result).toContain('toolOne: async ({ input, ctx, logger }) => {')
       expect(result).toContain("return callMcpTool({ toolName: 'tool-one'")
       expect(result).toContain("return callMcpTool({ toolName: 'tool-two'")
+    })
+  })
+
+  describe('generateIntegrationIndex', () => {
+    it('should import actions and create integration entry', () => {
+      const result = generateIntegrationIndex()
+
+      expect(result).toContain("import { actions } from './actions.js'")
+      expect(result).toContain('actions,')
+      expect(result).not.toContain('callMcpTool')
     })
   })
 

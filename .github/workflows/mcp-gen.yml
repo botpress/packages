@@ -18,6 +18,10 @@ defaults:
   run:
     working-directory: ./mcp-gen
 
+permissions:
+  id-token: write
+  contents: read
+
 jobs:
   mcp-gen:
     runs-on: ubuntu-latest
@@ -41,4 +45,3 @@ jobs:
         uses: botpress/gh-actions/publish-if-not-exists@master
         with:
           path: './mcp-gen'
-          token: '${{ secrets.NPM_ACCESS_TOKEN }}'

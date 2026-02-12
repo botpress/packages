@@ -34,7 +34,7 @@
     "test:run": "vitest run",
     "test:watch": "vitest watch",
     "test:coverage": "vitest run --coverage",
-    "prepublishOnly": "pnpm build && pnpm type-check"
+    "prepublishOnly": "pnpm build && pnpm check:type"
   },
   "dependencies": {
     "@apidevtools/json-schema-ref-parser": "^15.2.2",

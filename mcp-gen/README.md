@@ -222,7 +222,7 @@ pnpm watch
 pnpm build
 
 # Type check
-pnpm type-check
+pnpm check:type
 
 # Install globally
 pnpm link --global

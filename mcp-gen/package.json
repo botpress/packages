@@ -5,6 +5,9 @@
   "type": "module",
   "main": "dist/api.js",
   "types": "dist/api.d.ts",
+  "repository": {
+    "url": "https://github.com/botpress/packages"
+  },
   "bin": {
     "mcp-gen": "./dist/index.js"
   },

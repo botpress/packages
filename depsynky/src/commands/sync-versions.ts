@@ -34,8 +34,11 @@ const updater =
     return current
   }
 
-export const syncVersions = (argv: YargsConfig<typeof config.syncSchema>, opts: Partial<SyncVersionsOpts> = {}) => {
-  const allPackages = searchWorkspaces(argv.rootDir)
+export const syncVersions = async (
+  argv: YargsConfig<typeof config.syncSchema>,
+  opts: Partial<SyncVersionsOpts> = {}
+) => {
+  const allPackages = await searchWorkspaces(argv.rootDir)
   const targetVersions = opts.targetVersions ?? utils.pnpm.versions(allPackages)
 
   for (const { path: pkgPath, content } of allPackages) {

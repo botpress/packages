@@ -48,11 +48,11 @@ const promptPackage = async (publicPkgs: string[]): Promise<string> => {
 export const bumpVersion = async (argv: YargsConfig<typeof config.bumpSchema> & { pkgName?: string }) => {
   let pkgName = argv.pkgName
   if (!pkgName) {
-    const publicPkgs = utils.pnpm.listPublicPackages(argv.rootDir)
+    const publicPkgs = await utils.pnpm.listPublicPackages(argv.rootDir)
     pkgName = await promptPackage(publicPkgs)
   }
 
-  const { dependency, dependents } = utils.pnpm.findRecursiveReferences(argv.rootDir, pkgName)
+  const { dependency, dependents } = await utils.pnpm.findRecursiveReferences(argv.rootDir, pkgName)
   const targetPackages = [dependency, ...dependents]
 
   const currentVersions = utils.pnpm.versions(targetPackages)

@@ -11,20 +11,20 @@ export type PackageJson = {
   peerDependencies?: Record<string, string>
 }
 
-export const read = (filePath: string): PackageJson => {
-  const strContent = fs.readFileSync(filePath, 'utf-8')
+export const read = async (filePath: string): Promise<PackageJson> => {
+  const strContent = await fs.promises.readFile(filePath, 'utf-8')
   const content = JSON.parse(strContent)
   return content
 }
 
-export const write = (filePath: string, content: PackageJson) => {
+export const write = async (filePath: string, content: PackageJson): Promise<void> => {
   let strContent = JSON.stringify(content, null, 2)
   strContent = prettier.format(strContent, { parser: 'json' })
-  fs.writeFileSync(filePath, strContent)
+  await fs.promises.writeFile(filePath, strContent)
 }
 
-export const update = (filePath: string, content: Partial<PackageJson>) => {
-  const currentPackage = read(filePath)
+export const update = async (filePath: string, content: Partial<PackageJson>) => {
+  const currentPackage = await read(filePath)
 
   // this preserves the order of the keys
   const newPackage = objects.keys(currentPackage).reduce((acc, key) => {
@@ -34,5 +34,5 @@ export const update = (filePath: string, content: Partial<PackageJson>) => {
     return acc
   }, currentPackage)
 
-  write(filePath, newPackage)
+  await write(filePath, newPackage)
 }

@@ -5,8 +5,8 @@ import * as utils from '../utils'
 
 const { logger } = utils.logging
 
-export const listVersions = (argv: YargsConfig<typeof config.listSchema>) => {
-  const allPackages = utils.pnpm.searchWorkspaces(argv.rootDir)
+export const listVersions = async (argv: YargsConfig<typeof config.listSchema>) => {
+  const allPackages = await utils.pnpm.searchWorkspaces(argv.rootDir)
 
   const versions: Record<string, string> = {}
 

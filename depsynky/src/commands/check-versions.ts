@@ -40,8 +40,11 @@ const checker =
     }
   }
 
-export const checkVersions = (argv: YargsConfig<typeof config.checkSchema>, opts: Partial<CheckVersionsOpts> = {}) => {
-  const allPackages = utils.pnpm.searchWorkspaces(argv.rootDir)
+export const checkVersions = async (
+  argv: YargsConfig<typeof config.checkSchema>,
+  opts: Partial<CheckVersionsOpts> = {}
+) => {
+  const allPackages = await utils.pnpm.searchWorkspaces(argv.rootDir)
   const targetVersions = opts.targetVersions ?? utils.pnpm.versions(allPackages)
 
   for (const { content } of allPackages) {

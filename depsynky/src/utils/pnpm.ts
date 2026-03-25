@@ -16,7 +16,7 @@ export type PnpmWorkspace = {
 
 const PNPM_WORKSPACE_FILE = 'pnpm-workspace.yaml'
 
-export const searchWorkspaces = (rootDir: string): PnpmWorkspace[] => {
+export const searchWorkspaces = async (rootDir: string): Promise<PnpmWorkspace[]> => {
   const pnpmWorkspacesFile = pathlib.join(rootDir, PNPM_WORKSPACE_FILE)
   if (!fs.existsSync(pnpmWorkspacesFile)) {
     throw new errors.DepSynkyError(`Could not find ${PNPM_WORKSPACE_FILE} at "${rootDir}"`)
@@ -28,11 +28,12 @@ export const searchWorkspaces = (rootDir: string): PnpmWorkspace[] => {
   const packageJsonPaths = absGlobMatches.map((p) => pathlib.join(p, 'package.json'))
   const actualPackages = packageJsonPaths.filter(fs.existsSync)
   const absolutePaths = actualPackages.map(abs(rootDir))
-  return absolutePaths.map((p) => ({ path: p, content: pkgjson.read(p) }))
+  const workspaces = await Promise.all(absolutePaths.map(async (p) => ({ path: p, content: await pkgjson.read(p) })))
+  return workspaces
 }
 
-export const findDirectReferences = (rootDir: string, pkgName: string) => {
-  const workspaces = searchWorkspaces(rootDir)
+export const findDirectReferences = async (rootDir: string, pkgName: string) => {
+  const workspaces = await searchWorkspaces(rootDir)
   const dependency = workspaces.find((w) => w.content.name === pkgName)
   if (!dependency) {
     throw new errors.DepSynkyError(`Could not find package "${pkgName}"`)
@@ -41,8 +42,8 @@ export const findDirectReferences = (rootDir: string, pkgName: string) => {
   return { dependency, dependents }
 }
 
-export const findRecursiveReferences = (rootDir: string, pkgName: string) => {
-  const workspaces = searchWorkspaces(rootDir)
+export const findRecursiveReferences = async (rootDir: string, pkgName: string) => {
+  const workspaces = await searchWorkspaces(rootDir)
   const dependency = workspaces.find((w) => w.content.name === pkgName)
   if (!dependency) {
     throw new errors.DepSynkyError(`Could not find package "${pkgName}"`)
@@ -82,8 +83,8 @@ export const versions = (workspaces: PnpmWorkspace[]): Record<string, string> =>
   return objects.fromEntries(workspaces.map(({ content: { name, version } }) => [name, version]))
 }
 
-export const listPublicPackages = (rootDir: string): string[] => {
-  const workspaces = searchWorkspaces(rootDir)
+export const listPublicPackages = async (rootDir: string): Promise<string[]> => {
+  const workspaces = await searchWorkspaces(rootDir)
   return workspaces.filter((w) => !w.content.private).map((w) => w.content.name)
 }
 

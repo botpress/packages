@@ -26,15 +26,15 @@ export type SyncVersionsArgs = {
 
 export class DepSynkyApplication {
   public constructor(
-    private readonly _pnpmRepo: types.PnpmRepository,
-    private readonly _pkgJsonRepo: types.PackageJsonRepository,
-    private readonly _promptRepo: types.PomptRepository
+    private readonly _pnpm: types.PnpmService,
+    private readonly _pkgJson: types.PackageJsonService,
+    private readonly _prompt: types.PromptRepository
   ) {}
 
   public async bumpVersion(args: BumpVersionArgs) {
     let pkgName = args.pkgName
 
-    const { dependency, dependents } = await this._findRecursiveReferences(pkgName)
+    const { dependency, dependents } = await this._pnpm.findRecursiveReferences(pkgName)
     const targetPackages = [dependency, ...dependents]
 
     const currentVersions = this._pnpmVersions(targetPackages)
@@ -45,7 +45,16 @@ export class DepSynkyApplication {
         continue // no need to bump the version of private packages
       }
 
-      const jump = await this._promptRepo.promptJump(content.name, content.version)
+      const jump = await this._prompt.promptChoices({
+        message: `Bump ${pkgName} version from ${content.version}`,
+        choices: [
+          { name: 'Patch', value: 'patch' },
+          { name: 'Minor', value: 'minor' },
+          { name: 'Major', value: 'major' },
+          { name: 'None', value: 'none' }
+        ]
+      })
+
       if (jump === 'none') {
         continue
       }
@@ -56,7 +65,7 @@ export class DepSynkyApplication {
       }
 
       targetVersions[content.name] = next
-      await this._pkgJsonRepo.update(pkgPath, { version: next })
+      await this._pkgJson.update(pkgPath, { version: next })
     }
 
     await this.listVersions()
@@ -67,7 +76,7 @@ export class DepSynkyApplication {
   }
 
   public async checkVersions(args: CheckVersionsArgs) {
-    const allPackages = await this._pnpmRepo.searchWorkspaces()
+    const allPackages = await this._pnpm.searchWorkspaces()
     const targetVersions = args.targetVersions ?? this._pnpmVersions(allPackages)
 
     for (const { content } of allPackages) {
@@ -83,7 +92,7 @@ export class DepSynkyApplication {
   }
 
   public async listVersions(): Promise<ListVersionsResult> {
-    const allPackages = await this._pnpmRepo.searchWorkspaces()
+    const allPackages = await this._pnpm.searchWorkspaces()
 
     const versions: Record<string, string> = {}
 
@@ -98,7 +107,7 @@ export class DepSynkyApplication {
   }
 
   public async syncVersions(args: SyncVersionsArgs) {
-    const allPackages = await this._pnpmRepo.searchWorkspaces()
+    const allPackages = await this._pnpm.searchWorkspaces()
     const targetVersions = args.targetVersions ?? this._pnpmVersions(allPackages)
 
     for (const { path: pkgPath, content } of allPackages) {
@@ -110,7 +119,7 @@ export class DepSynkyApplication {
       const updatedPeerDeps = args.ignorePeers ? peerDependencies : update(peerDependencies, targetVersions)
       const updatedDevDeps = args.ignoreDev ? devDependencies : update(devDependencies, targetVersions)
 
-      await this._pkgJsonRepo.update(pkgPath, {
+      await this._pkgJson.update(pkgPath, {
         dependencies: updatedDeps,
         devDependencies: updatedDevDeps,
         peerDependencies: updatedPeerDeps
@@ -129,7 +138,7 @@ export class DepSynkyApplication {
         if (!currentVersion) {
           continue
         }
-        const isLocal = utils.pnpm.isLocalVersion(currentVersion)
+        const isLocal = this._pnpm.isLocalVersion(currentVersion)
         const isPublic = !pkg.private
         if (isLocal) {
           if (isPublic) {
@@ -156,7 +165,7 @@ export class DepSynkyApplication {
         if (!currentVersion) {
           continue
         }
-        const isLocal = utils.pnpm.isLocalVersion(currentVersion)
+        const isLocal = this._pnpm.isLocalVersion(currentVersion)
         const isPublic = !pkg.private
         if (isLocal) {
           if (isPublic) {
@@ -174,36 +183,6 @@ export class DepSynkyApplication {
         }
       }
     }
-
-  private _findRecursiveReferences = async (pkgName: string) => {
-    const workspaces = await this._pnpmRepo.searchWorkspaces()
-    const dependency = workspaces.find((w) => w.content.name === pkgName)
-    if (!dependency) {
-      throw new errors.DepSynkyError(`Could not find package "${pkgName}"`)
-    }
-
-    const visited = new utils.sets.SetBy<types.PnpmWorkspace>([], (s) => s.content.name)
-    const queued = new utils.sets.SetBy<types.PnpmWorkspace>([dependency], (s) => s.content.name)
-
-    while (queued.length > 0) {
-      const currentPkg = queued.shift()!
-      if (visited.hasKey(currentPkg.content.name)) {
-        continue
-      }
-
-      visited.add(currentPkg)
-
-      const dependents = utils.pnpm.findDirectDependents(workspaces, currentPkg.content.name)
-      for (const dependent of dependents) {
-        if (!visited.hasKey(dependent.content.name) && !queued.hasKey(dependent.content.name)) {
-          queued.add(dependent)
-        }
-      }
-    }
-
-    const dependents = visited.values.filter((w) => w.content.name !== pkgName)
-    return { dependency, dependents }
-  }
 
   private _pnpmVersions = (workspaces: types.PnpmWorkspace[]): Record<string, string> => {
     return utils.objects.fromEntries(workspaces.map(({ content: { name, version } }) => [name, version]))

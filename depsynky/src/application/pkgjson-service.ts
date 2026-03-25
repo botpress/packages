@@ -1,10 +1,9 @@
 import * as prettier from 'prettier'
-import * as objects from '../../utils/objects'
-import * as types from '../../types'
-import { InMemoryFileSystem } from './mem-fs'
+import * as objects from '../utils/objects'
+import * as types from '../types'
 
-export class PackageJsonInMemoryRepo implements types.PackageJsonRepository {
-  public constructor(private _fs: InMemoryFileSystem) {}
+export class PackageJsonService implements types.PackageJsonService {
+  public constructor(private _fs: types.FsRepository) {}
 
   public read = async (filePath: string): Promise<types.PackageJson> => {
     const strContent = await this._fs.readFile(filePath)

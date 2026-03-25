@@ -1,21 +1,17 @@
-import * as prompts from 'prompts'
+import prompts from 'prompts'
 import * as types from '../types'
 
-type VersionJump = 'major' | 'minor' | 'patch' | 'none'
-
-export class PromptStdinRepo implements types.PomptRepository {
-  async promptJump(pkgName: string, currentVersion: string): Promise<VersionJump> {
-    const { jump: promptedJump } = await prompts.prompt({
+export class PromptStdinRepo implements types.PromptRepository {
+  public async promptChoices<T extends string>(args: {
+    message: string
+    choices: { name: string; value: T }[]
+  }): Promise<T> {
+    const { x } = await prompts({
       type: 'select',
-      name: 'jump',
-      message: `Bump ${pkgName} version from ${currentVersion}`,
-      choices: [
-        { title: 'Patch', value: 'patch' },
-        { title: 'Minor', value: 'minor' },
-        { title: 'Major', value: 'major' },
-        { title: 'None', value: 'none' }
-      ]
+      name: 'x',
+      message: args.message,
+      choices: args.choices.map((c) => ({ title: c.name, value: c.value }))
     })
-    return promptedJump
+    return x
   }
 }

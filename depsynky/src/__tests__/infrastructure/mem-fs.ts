@@ -1,6 +1,7 @@
 import picomatch from 'picomatch'
+import * as types from '../../types'
 
-export class InMemoryFileSystem {
+export class InMemoryFileSystem implements types.FsRepository {
   public constructor(private _files: Record<string, string>) {}
 
   public existsSync = (path: string): boolean => {

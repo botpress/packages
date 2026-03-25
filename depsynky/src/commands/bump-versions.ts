@@ -24,11 +24,11 @@ const promptPackage = async (publicPkgs: string[]): Promise<string> => {
 }
 
 export const bumpVersion = async (argv: YargsConfig<typeof config.bumpSchema> & { pkgName?: string }) => {
-  const { app, pnpmRepo } = await bootstrap(argv)
+  const { app, pnpm } = await bootstrap(argv)
 
   let pkgName = argv.pkgName
   if (!pkgName) {
-    const publicPkgs = await pnpmRepo.listPublicPackages()
+    const publicPkgs = await pnpm.listPublicPackages()
     pkgName = await promptPackage(publicPkgs)
   }
 

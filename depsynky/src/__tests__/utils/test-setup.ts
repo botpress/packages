@@ -4,8 +4,12 @@ import { PackageJsonService } from '../../application/pkgjson-service'
 import { PNPM_WORKSPACE_FILE, PnpmWorkspaceService } from '../../application/pnpm-service'
 import { DepSynkyApplication } from '../../application/application'
 
-export type Monorepo = {
-  packages: types.PackageJson[]
+export type Monorepo<Name extends string> = {
+  packages: (types.PackageJson & { name: Name })[]
+}
+
+export type PkgReader<Name extends string> = {
+  read: (pkgName: Name) => Promise<types.PackageJson>
 }
 
 const ROOT_DIR = '/repo'
@@ -18,7 +22,7 @@ const kebabCase = (str: string) => {
   return tokens.map((t) => t.toLowerCase()).join('-')
 }
 
-const _buildFs = (monorepo: Monorepo): InMemoryFileSystem => {
+const _buildFs = (monorepo: Monorepo<string>): InMemoryFileSystem => {
   const files: Record<string, string> = {}
 
   const workspacePatterns = ['packages/*']
@@ -39,18 +43,23 @@ const _buildFs = (monorepo: Monorepo): InMemoryFileSystem => {
   return new InMemoryFileSystem(files)
 }
 
-export const buildApp = (monorepo: Monorepo, bumpFn: types.BumpService['promptJump'] = async () => 'none') => {
+export const buildApp = <Name extends string>(
+  monorepo: Monorepo<Name>,
+  bumpFn: types.BumpService['promptJump'] = async () => 'none'
+) => {
   const fs = _buildFs(monorepo)
   const pkg = new PackageJsonService(fs)
   const pnpm = new PnpmWorkspaceService(pkg, fs, ROOT_DIR)
   const bump: types.BumpService = { promptJump: bumpFn }
   const app = new DepSynkyApplication(pnpm, pkg, bump)
-  return { app, fs, bump, pkg, pnpm }
-}
-
-export const readPkgJson = async (fs: InMemoryFileSystem, pkgName: string) => {
-  const dirName = kebabCase(pkgName)
-  const pkgJsonPath = `${ROOT_DIR}/packages/${dirName}/package.json`
-  const content = await fs.readFile(pkgJsonPath)
-  return JSON.parse(content) as types.PackageJson
+  return {
+    app,
+    pkg: {
+      read: async (pkgName: Name) => {
+        const dirName = kebabCase(pkgName)
+        const pkgJsonPath = `${ROOT_DIR}/packages/${dirName}/package.json`
+        return pkg.read(pkgJsonPath)
+      }
+    }
+  }
 }

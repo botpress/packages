@@ -1,10 +1,10 @@
 import { test, expect, describe } from 'vitest'
-import { buildApp, readPkgJson } from './utils/test-setup'
+import { buildApp } from './utils/test-setup'
 import { DepSynkyError } from '../errors'
 
 describe('bumpVersion', () => {
   test('bumps a package version with patch', async () => {
-    const { app, fs } = buildApp(
+    const { app, pkg } = buildApp(
       {
         packages: [
           { name: 'pkg-a', version: '1.0.0' },
@@ -16,12 +16,12 @@ describe('bumpVersion', () => {
 
     await app.bumpVersion({ pkgName: 'pkg-a', sync: false })
 
-    const pkgA = await readPkgJson(fs, 'pkg-a')
+    const pkgA = await pkg.read('pkg-a')
     expect(pkgA.version).toBe('1.0.1')
   })
 
   test('bumps a package version with minor', async () => {
-    const { app, fs } = buildApp(
+    const { app, pkg } = buildApp(
       {
         packages: [{ name: 'pkg-a', version: '1.0.0' }]
       },
@@ -30,12 +30,12 @@ describe('bumpVersion', () => {
 
     await app.bumpVersion({ pkgName: 'pkg-a', sync: false })
 
-    const pkgA = await readPkgJson(fs, 'pkg-a')
+    const pkgA = await pkg.read('pkg-a')
     expect(pkgA.version).toBe('1.1.0')
   })
 
   test('bumps a package version with major', async () => {
-    const { app, fs } = buildApp(
+    const { app, pkg } = buildApp(
       {
         packages: [{ name: 'pkg-a', version: '1.0.0' }]
       },
@@ -44,12 +44,12 @@ describe('bumpVersion', () => {
 
     await app.bumpVersion({ pkgName: 'pkg-a', sync: false })
 
-    const pkgA = await readPkgJson(fs, 'pkg-a')
+    const pkgA = await pkg.read('pkg-a')
     expect(pkgA.version).toBe('2.0.0')
   })
 
   test('skips bump when "none" is selected', async () => {
-    const { app, fs } = buildApp(
+    const { app, pkg } = buildApp(
       {
         packages: [{ name: 'pkg-a', version: '1.0.0' }]
       },
@@ -58,12 +58,12 @@ describe('bumpVersion', () => {
 
     await app.bumpVersion({ pkgName: 'pkg-a', sync: false })
 
-    const pkgA = await readPkgJson(fs, 'pkg-a')
+    const pkgA = await pkg.read('pkg-a')
     expect(pkgA.version).toBe('1.0.0')
   })
 
   test('skips private packages during bump', async () => {
-    const { app, fs } = buildApp(
+    const { app, pkg } = buildApp(
       {
         packages: [
           { name: 'pkg-a', version: '1.0.0' },
@@ -75,15 +75,15 @@ describe('bumpVersion', () => {
 
     await app.bumpVersion({ pkgName: 'pkg-a', sync: false })
 
-    const pkgA = await readPkgJson(fs, 'pkg-a')
+    const pkgA = await pkg.read('pkg-a')
     expect(pkgA.version).toBe('1.0.1')
 
-    const pkgB = await readPkgJson(fs, 'pkg-b')
+    const pkgB = await pkg.read('pkg-b')
     expect(pkgB.version).toBe('1.0.0') // not bumped
   })
 
   test('bumps dependents recursively', async () => {
-    const { app, fs } = buildApp(
+    const { app, pkg } = buildApp(
       {
         packages: [
           { name: 'pkg-a', version: '1.0.0' },
@@ -101,18 +101,18 @@ describe('bumpVersion', () => {
 
     await app.bumpVersion({ pkgName: 'pkg-a', sync: false })
 
-    const pkgA = await readPkgJson(fs, 'pkg-a')
+    const pkgA = await pkg.read('pkg-a')
     expect(pkgA.version).toBe('1.0.1')
 
-    const pkgB = await readPkgJson(fs, 'pkg-b')
+    const pkgB = await pkg.read('pkg-b')
     expect(pkgB.version).toBe('1.1.0')
 
-    const pkgC = await readPkgJson(fs, 'pkg-c')
+    const pkgC = await pkg.read('pkg-c')
     expect(pkgC.version).toBe('1.0.1')
   })
 
   test('calls syncVersions when sync is true', async () => {
-    const { app, fs } = buildApp(
+    const { app, pkg } = buildApp(
       {
         packages: [
           { name: 'pkg-a', version: '1.0.0' },
@@ -124,14 +124,14 @@ describe('bumpVersion', () => {
 
     await app.bumpVersion({ pkgName: 'pkg-a', sync: true })
 
-    const pkgA = await readPkgJson(fs, 'pkg-a')
+    const pkgA = await pkg.read('pkg-a')
     expect(pkgA.version).toBe('1.0.1')
 
     // NOTE: syncVersions is called but not awaited inside bumpVersion,
     // so we allow a microtask tick for the fire-and-forget sync to complete
     await new Promise((r) => setTimeout(r, 10))
 
-    const pkgB = await readPkgJson(fs, 'pkg-b')
+    const pkgB = await pkg.read('pkg-b')
     expect(pkgB.dependencies?.['pkg-a']).toBe('^1.0.1')
   })
 
@@ -144,7 +144,7 @@ describe('bumpVersion', () => {
   })
 
   test('does not sync when sync is false', async () => {
-    const { app, fs } = buildApp(
+    const { app, pkg } = buildApp(
       {
         packages: [
           { name: 'pkg-a', version: '1.0.0' },
@@ -156,7 +156,7 @@ describe('bumpVersion', () => {
 
     await app.bumpVersion({ pkgName: 'pkg-a', sync: false })
 
-    const pkgB = await readPkgJson(fs, 'pkg-b')
+    const pkgB = await pkg.read('pkg-b')
     // dependency should NOT be updated because sync is false
     expect(pkgB.dependencies?.['pkg-a']).toBe('^1.0.0')
   })

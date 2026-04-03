@@ -14,7 +14,7 @@ export type PkgReader<Name extends string> = {
 
 const ROOT_DIR = '/repo'
 
-const kebabCase = (str: string) => {
+const _kebabCase = (str: string) => {
   const tokens = str.match(/[A-Za-z0-9]+/g)
   if (!tokens) {
     return str
@@ -34,7 +34,7 @@ const _buildFs = (monorepo: Monorepo<string>): InMemoryFileSystem => {
   ].join('\n')
 
   for (const pkg of monorepo.packages) {
-    const dirName = kebabCase(pkg.name)
+    const dirName = _kebabCase(pkg.name)
     files[`packages/${dirName}`] = ''
     const pkgJsonPath = `${ROOT_DIR}/packages/${dirName}/package.json`
     files[pkgJsonPath] = JSON.stringify(pkg)
@@ -56,7 +56,7 @@ export const buildApp = <Name extends string>(
     app,
     pkg: {
       read: async (pkgName: Name) => {
-        const dirName = kebabCase(pkgName)
+        const dirName = _kebabCase(pkgName)
         const pkgJsonPath = `${ROOT_DIR}/packages/${dirName}/package.json`
         return pkg.read(pkgJsonPath)
       }

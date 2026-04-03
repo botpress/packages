@@ -31,6 +31,9 @@ devDependencies:
   '@types/node':
     specifier: ^22.16.4
     version: 22.16.4
+  '@types/picomatch':
+    specifier: ^4.0.2
+    version: 4.0.2
   '@types/prettier':
     specifier: ^2.7.3
     version: 2.7.3
@@ -43,6 +46,9 @@ devDependencies:
   esbuild:
     specifier: ^0.25.0
     version: 0.25.2
+  picomatch:
+    specifier: ^4.0.4
+    version: 4.0.4
   ts-node:
     specifier: ^10.9.1
     version: 10.9.2(@types/node@22.16.4)(typescript@4.9.4)
@@ -501,6 +507,10 @@ packages:
       undici-types: 6.21.0
     dev: true
 
+  /@types/picomatch@4.0.2:
+    resolution: {integrity: sha512-qHHxQ+P9PysNEGbALT8f8YOSHW0KJu6l2xU8DYY0fu/EmGxXdVnuTLvFUvBgPJMSqXq29SYHveejeAha+4AYgA==}
+    dev: true
+
   /@types/prettier@2.7.3:
     resolution: {integrity: sha512-+68kP9yzs4LMp7VNh8gdzMSPZFL44MLGqiHWvttYJe+6qnuVr4Ek9wSBQoveqY/r+LwjCcU29kNVkidwim+kYA==}
     dev: true
@@ -881,6 +891,11 @@ packages:
 
   /picocolors@1.1.1:
     resolution: {integrity: sha512-xceH2snhtb5M9liqDsmEw56le376mTZkEX/jEb/RxNFyegNul7eNslCXP9FDj/Lcu0X8KEyMceP2ntpaHrDEVA==}
+    dev: true
+
+  /picomatch@4.0.4:
+    resolution: {integrity: sha512-QP88BAKvMam/3NxH6vj2o21R6MjxZUAd6nlwAS/pnGvN9IVLocLHxGYIzFhg6fUQ+5th6P4dv4eW9jX3DSIj7A==}
+    engines: {node: '>=12'}
     dev: true
 
   /postcss@8.5.3:

@@ -1,56 +1,8 @@
 import { YargsConfig } from '@bpinternal/yargs-extra'
 import * as config from '../config'
-import * as utils from '../utils'
-import { searchWorkspaces } from '../utils/pnpm'
+import { bootstrap } from '../bootstrap'
 
-export type SyncVersionsOpts = {
-  targetVersions: Record<string, string>
-}
-
-const updater =
-  (pkg: utils.pkgjson.PackageJson) => (current: Record<string, string> | undefined, target: Record<string, string>) => {
-    if (!current) {
-      return current
-    }
-
-    for (const [name, version] of utils.objects.entries(target)) {
-      const currentVersion = current[name]
-      if (!currentVersion) {
-        continue
-      }
-      const isLocal = utils.pnpm.isLocalVersion(currentVersion)
-      const isPublic = !pkg.private
-      if (isLocal) {
-        if (isPublic) {
-          utils.logging.logger.warn(
-            `Package ${pkg.name} is public and cannot depend on local package ${name}. To keep reference on local package, make ${pkg.name} private.`
-          )
-        }
-        current[name] = currentVersion
-        continue
-      }
-      current[name] = utils.semver.attemptBumpLowerbound(currentVersion, version)
-    }
-    return current
-  }
-
-export const syncVersions = (argv: YargsConfig<typeof config.syncSchema>, opts: Partial<SyncVersionsOpts> = {}) => {
-  const allPackages = searchWorkspaces(argv.rootDir)
-  const targetVersions = opts.targetVersions ?? utils.pnpm.versions(allPackages)
-
-  for (const { path: pkgPath, content } of allPackages) {
-    const { dependencies, devDependencies, peerDependencies } = content
-
-    const update = updater(content)
-
-    const updatedDeps = update(dependencies, targetVersions)
-    const updatedPeerDeps = argv.ignorePeers ? peerDependencies : update(peerDependencies, targetVersions)
-    const updatedDevDeps = argv.ignoreDev ? devDependencies : update(devDependencies, targetVersions)
-
-    utils.pkgjson.update(pkgPath, {
-      dependencies: updatedDeps,
-      devDependencies: updatedDevDeps,
-      peerDependencies: updatedPeerDeps
-    })
-  }
+export const syncVersions = async (argv: YargsConfig<typeof config.syncSchema>) => {
+  const { app } = await bootstrap(argv)
+  await app.checkVersions({ ...argv })
 }

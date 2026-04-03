@@ -39,12 +39,13 @@ const _buildFs = (monorepo: Monorepo): InMemoryFileSystem => {
   return new InMemoryFileSystem(files)
 }
 
-export const buildApp = (monorepo: Monorepo, bump: types.BumpService['promptJump'] = async () => 'none') => {
+export const buildApp = (monorepo: Monorepo, bumpFn: types.BumpService['promptJump'] = async () => 'none') => {
   const fs = _buildFs(monorepo)
   const pkg = new PackageJsonService(fs)
   const pnpm = new PnpmWorkspaceService(pkg, fs, ROOT_DIR)
-  const app = new DepSynkyApplication(pnpm, pkg, { promptJump: bump })
-  return { app, fs, prompt: bump, pkg, pnpm }
+  const bump: types.BumpService = { promptJump: bumpFn }
+  const app = new DepSynkyApplication(pnpm, pkg, bump)
+  return { app, fs, bump, pkg, pnpm }
 }
 
 export const readPkgJson = async (fs: InMemoryFileSystem, pkgName: string) => {

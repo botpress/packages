@@ -26,6 +26,12 @@ export type PnpmService = {
   isLocalVersion: (version: string) => boolean
 }
 
+export type VersionJump = 'patch' | 'minor' | 'major' | 'none'
+
+export type BumpService = {
+  promptJump: (args: { pkgName: string; currentVersion: string }) => Promise<VersionJump>
+}
+
 export type GlobOptions = {
   absolute?: boolean
   cwd?: string

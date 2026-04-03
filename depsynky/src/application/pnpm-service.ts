@@ -4,8 +4,8 @@ import * as yaml from 'yaml'
 import * as errors from '../errors'
 import * as utils from '../utils'
 
-const PNPM_WORKSPACE_FILE = 'pnpm-workspace.yaml'
-const LOCAL_VERSION_PREFIX = 'workspace:'
+export const PNPM_WORKSPACE_FILE = 'pnpm-workspace.yaml'
+export const LOCAL_VERSION_PREFIX = 'workspace:'
 
 export class PnpmWorkspaceService implements types.PnpmService {
   public constructor(

@@ -28,7 +28,7 @@ export class DepSynkyApplication {
   public constructor(
     private readonly _pnpm: types.PnpmService,
     private readonly _pkgJson: types.PackageJsonService,
-    private readonly _prompt: types.PromptRepository
+    private readonly _bump: types.BumpService
   ) {}
 
   public async bumpVersion(args: BumpVersionArgs) {
@@ -45,14 +45,9 @@ export class DepSynkyApplication {
         continue // no need to bump the version of private packages
       }
 
-      const jump = await this._prompt.promptChoices({
-        message: `Bump ${pkgName} version from ${content.version}`,
-        choices: [
-          { name: 'Patch', value: 'patch' },
-          { name: 'Minor', value: 'minor' },
-          { name: 'Major', value: 'major' },
-          { name: 'None', value: 'none' }
-        ]
+      const jump = await this._bump.promptJump({
+        pkgName: content.name,
+        currentVersion: content.version
       })
 
       if (jump === 'none') {

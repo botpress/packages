@@ -8,7 +8,9 @@ export const bootstrap = async (argv: config.CommonConfig) => {
 
   const pkgJsonService = new app.PackageJsonService(fs)
   const pnpmWorkspaceService = new app.PnpmWorkspaceService(pkgJsonService, fs, argv.rootDir)
-  const application = new app.DepSynkyApplication(pnpmWorkspaceService, pkgJsonService, promptRepo)
+  const bumpService = new app.BumpService(promptRepo)
+
+  const application = new app.DepSynkyApplication(pnpmWorkspaceService, pkgJsonService, bumpService)
   return {
     app: application,
     pnpm: pnpmWorkspaceService,

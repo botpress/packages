@@ -66,7 +66,7 @@ export class DepSynkyApplication {
     await this.listVersions()
     if (args.sync) {
       logger.info('Syncing versions...')
-      this.syncVersions({ ...args, targetVersions })
+      await this.syncVersions({ ...args, targetVersions })
     }
   }
 

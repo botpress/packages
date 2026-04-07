@@ -76,12 +76,8 @@ export class PnpmWorkspaceService implements types.PnpmService {
   public isLocalVersion = (version: string) => version.startsWith(LOCAL_VERSION_PREFIX)
 
   private _findDirectDependents = (workspaces: types.PnpmWorkspace[], pkgName: string): types.PnpmWorkspace[] => {
-    return workspaces.filter(
-      (w) =>
-        w.content.dependencies?.[pkgName] ||
-        w.content.devDependencies?.[pkgName] ||
-        w.content.peerDependencies?.[pkgName]
-    )
+    // devDependencies are'nt considered as real dependencies for the purpose of bumping versions, so we ignore them here
+    return workspaces.filter((w) => w.content.dependencies?.[pkgName] || w.content.peerDependencies?.[pkgName])
   }
 
   public listPublicPackages = async (): Promise<string[]> => {

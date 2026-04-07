@@ -32,15 +32,21 @@ export class DepSynkyApplication {
   ) {}
 
   public async bumpVersion(args: BumpVersionArgs) {
-    let pkgName = args.pkgName
+    const { dependency } = await this._pnpm.findDirectReferences(args.pkgName)
 
-    const { dependency, dependents } = await this._pnpm.findRecursiveReferences(pkgName)
-    const targetPackages = [dependency, ...dependents]
+    const allPackages = await this._pnpm.searchWorkspaces()
+    const targetVersions = this._pnpmVersions(allPackages)
 
-    const currentVersions = this._pnpmVersions(targetPackages)
-    const targetVersions = { ...currentVersions }
+    const visited = new Set<string>()
+    const queue: types.PnpmWorkspace[] = [dependency]
 
-    for (const { path: pkgPath, content } of targetPackages) {
+    while (queue.length > 0) {
+      const { path: pkgPath, content } = queue.shift()!
+      if (visited.has(content.name)) {
+        continue
+      }
+      visited.add(content.name)
+
       if (content.private) {
         continue // no need to bump the version of private packages
       }
@@ -61,6 +67,14 @@ export class DepSynkyApplication {
 
       targetVersions[content.name] = next
       await this._pkgJson.update(pkgPath, { version: next })
+
+      // only follow dependents of packages that were actually bumped
+      const { dependents } = await this._pnpm.findDirectReferences(content.name)
+      for (const dep of dependents) {
+        if (!visited.has(dep.content.name)) {
+          queue.push(dep)
+        }
+      }
     }
 
     await this.listVersions()

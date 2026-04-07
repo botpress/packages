@@ -186,4 +186,27 @@ describe('bumpVersion', () => {
     expect(pkgB.devDependencies?.['pkg-a']).toBe('workspace:*')
     expect(pkgC.devDependencies?.['pkg-a']).toBe('^1.0.1') // synced but not bumped
   })
+
+  test('does not bump recursive dependents when "none" is picked', async () => {
+    const { app, pkg } = buildApp(
+      {
+        packages: [
+          { name: 'pkg-a', version: '1.0.0' },
+          { name: 'pkg-b', version: '1.0.0', dependencies: { 'pkg-a': '1.0.0' } },
+          { name: 'pkg-c', version: '1.0.0', dependencies: { 'pkg-b': '1.0.0' } }
+        ]
+      },
+      async ({ pkgName }) => (pkgName === 'pkg-b' ? 'none' : 'patch')
+    )
+
+    await app.bumpVersion({ pkgName: 'pkg-a', sync: true })
+
+    const pkgA = await pkg.read('pkg-a')
+    const pkgB = await pkg.read('pkg-b')
+    const pkgC = await pkg.read('pkg-c')
+
+    expect(pkgA.version).toBe('1.0.1')
+    expect(pkgB.version).toBe('1.0.0')
+    expect(pkgC.version).toBe('1.0.0') // not bumped because pkg-b was not bumped
+  })
 })

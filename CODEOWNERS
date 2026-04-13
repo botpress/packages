@@ -1,3 +1,5 @@
+CODEOWNERS @botpress/leads
+
 entities @franklevasseur
 depsynky @botpress/squid
 es-node @botpress/squid

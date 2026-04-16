@@ -1,6 +1,6 @@
 CODEOWNERS @botpress/leads
 
-entities @franklevasseur
+entities @squid
 depsynky @botpress/squid
 es-node @botpress/squid
 jex @botpress/squid
@@ -8,7 +8,7 @@ log4bot @botpress/squid
 opapi @botpress/squid
 pingrip @botpress/kraken
 promex @michaelmass
-ptb-schema @franklevasseur
+ptb-schema @squid
 readiness @botpress/squid
 trail @michaelmass
 tunnel @botpress/kraken

@@ -99,7 +99,7 @@ class OpenResponseBuilder {
   subscribe(channels: string[]) {
     for (const channel of channels) {
       this._channels.push(channel)
-      this.text(`c:${JSON.stringify({ type: 'subscribe', channel })}`)
+      this._builder.text(`c:${JSON.stringify({ type: 'subscribe', channel })}`)
     }
     return this
   }

@@ -109,7 +109,7 @@ class OpenResponseBuilder {
     const headers: Record<string, string> = {
       'Content-Type': 'application/websocket-events',
       'Grip-Hold': 'stream',
-      'Sec-WebSocket-Extensions': 'grip'
+      'Sec-WebSocket-Extensions': 'grip; message-prefix=""'
     }
     if (this._channels.length > 0) {
       headers['Grip-Channel'] = this._channels.join(',')

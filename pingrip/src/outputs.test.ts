@@ -3,13 +3,13 @@ import { ResponseBuilder } from './outputs'
 import { parse } from './messages'
 
 describe('OpenResponseBuilder', () => {
-  it('text() prepends "m:" prefix so pushpin forwards the frame to the client', () => {
+  it('text() prepends "m:" to the content', () => {
     const { body } = new ResponseBuilder().open().text('hello').toResponse()
     const parsed = parse(body)
     expect(parsed).toEqual([{ type: 'open' }, { type: 'text', content: 'm:hello' }])
   })
 
-  it('subscribe() emits "c:" control frames without the "m:" data prefix', () => {
+  it('subscribe() emits "c:" prefixed frames and sets the Grip-Channel header', () => {
     const { body, headers } = new ResponseBuilder().open().subscribe(['conv_X', 'user_Y']).toResponse()
 
     expect(headers['Grip-Channel']).toBe('conv_X,user_Y')
@@ -22,7 +22,7 @@ describe('OpenResponseBuilder', () => {
     ])
   })
 
-  it('subscribe() and text() can be combined without cross-contamination', () => {
+  it('subscribe() and text() emit independent frames', () => {
     const { body } = new ResponseBuilder().open().subscribe(['conv_X']).text('hello').toResponse()
     const parsed = parse(body)
     expect(parsed).toEqual([
@@ -32,7 +32,7 @@ describe('OpenResponseBuilder', () => {
     ])
   })
 
-  it('binary() prepends "m:" bytes so pushpin forwards the frame to the client', () => {
+  it('binary() prepends "m:" to the buffer', () => {
     const payload = Buffer.from([0x01, 0x02, 0x03])
     const { body } = new ResponseBuilder().open().binary(payload).toResponse()
     const parsed = parse(body)
@@ -41,7 +41,7 @@ describe('OpenResponseBuilder', () => {
 })
 
 describe('ResponseBuilder.unsubscribe', () => {
-  it('emits "c:" control frames without the "m:" data prefix', () => {
+  it('emits "c:" prefixed frames', () => {
     const { body } = new ResponseBuilder().close(1000).unsubscribe(['conv_X']).toResponse()
     const parsed = parse(body)
     expect(parsed).toEqual([

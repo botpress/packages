@@ -87,12 +87,12 @@ class OpenResponseBuilder {
   }
 
   text(content: string) {
-    this._builder.text(content)
+    this._builder.text(`m:${content}`)
     return this
   }
 
   binary(content: Buffer) {
-    this._builder.binary(content)
+    this._builder.binary(Buffer.concat([Buffer.from('m:'), content]))
     return this
   }
 
@@ -109,7 +109,7 @@ class OpenResponseBuilder {
     const headers: Record<string, string> = {
       'Content-Type': 'application/websocket-events',
       'Grip-Hold': 'stream',
-      'Sec-WebSocket-Extensions': 'grip; message-prefix=""'
+      'Sec-WebSocket-Extensions': 'grip'
     }
     if (this._channels.length > 0) {
       headers['Grip-Channel'] = this._channels.join(',')

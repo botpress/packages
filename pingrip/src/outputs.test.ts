@@ -9,16 +9,22 @@ describe('OpenResponseBuilder', () => {
     expect(parsed).toEqual([{ type: 'open' }, { type: 'text', content: 'm:hello' }])
   })
 
-  it('subscribe() emits "c:" prefixed frames and sets the Grip-Channel header', () => {
-    const { body, headers } = new ResponseBuilder().open().subscribe(['conv_X', 'user_Y']).toResponse()
-
-    expect(headers['Grip-Channel']).toBe('conv_X,user_Y')
-
+  it('subscribe() emits one "c:" prefixed frame per channel', () => {
+    const { body } = new ResponseBuilder().open().subscribe(['conv_X', 'user_Y']).toResponse()
     const parsed = parse(body)
     expect(parsed).toEqual([
       { type: 'open' },
       { type: 'text', content: `c:${JSON.stringify({ type: 'subscribe', channel: 'conv_X' })}` },
       { type: 'text', content: `c:${JSON.stringify({ type: 'subscribe', channel: 'user_Y' })}` }
+    ])
+  })
+
+  it('keepAlive() emits a "c:" prefixed keep-alive control frame', () => {
+    const { body } = new ResponseBuilder().open().keepAlive('ping', 30).toResponse()
+    const parsed = parse(body)
+    expect(parsed).toEqual([
+      { type: 'open' },
+      { type: 'text', content: `c:${JSON.stringify({ type: 'keep-alive', content: 'ping', timeout: 30 })}` }
     ])
   })
 

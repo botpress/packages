@@ -26,9 +26,24 @@ export class ResponseBuilder {
     return new CloseResponseBuilder(this)
   }
 
+  text(content: string) {
+    this._pushText(content, 'm')
+    return this
+  }
+
+  binary(content: Buffer) {
+    this._pushBinary(content, 'm')
+    return this
+  }
+
+  control(content: string) {
+    this._pushText(content, 'c')
+    return this
+  }
+
   unsubscribe(channels: string[]) {
     for (const channel of channels) {
-      this._pushText(`c:${JSON.stringify({ type: 'unsubscribe', channel })}`)
+      this.control(JSON.stringify({ type: 'unsubscribe', channel }))
     }
     return this
   }
@@ -40,17 +55,17 @@ export class ResponseBuilder {
     }
   }
 
-  _pushText(content: string) {
+  private _pushText(content: string, type: 'm' | 'c') {
     this._messages.push({
       type: 'text',
-      content
+      content: `${type}:${content}`
     })
   }
 
-  _pushBinary(content: Buffer) {
+  private _pushBinary(content: Buffer, type: 'm' | 'c') {
     this._messages.push({
       type: 'binary',
-      content
+      content: Buffer.concat([Buffer.from(`${type}:`), content])
     })
   }
 }
@@ -75,23 +90,23 @@ class OpenResponseBuilder {
     if (timeout < 30) {
       throw new Error(`Keep Alive timeout should be at least 30 secondes. ${timeout} was given.`)
     }
-    this._builder._pushText(`c:${JSON.stringify({ type: 'keep-alive', content, timeout })}`)
+    this._builder.control(JSON.stringify({ type: 'keep-alive', content, timeout }))
     return this
   }
 
   text(content: string) {
-    this._builder._pushText(`m:${content}`)
+    this._builder.text(content)
     return this
   }
 
   binary(content: Buffer) {
-    this._builder._pushBinary(Buffer.concat([Buffer.from('m:'), content]))
+    this._builder.binary(content)
     return this
   }
 
   subscribe(channels: string[]) {
     for (const channel of channels) {
-      this._builder._pushText(`c:${JSON.stringify({ type: 'subscribe', channel })}`)
+      this._builder.control(JSON.stringify({ type: 'subscribe', channel }))
     }
     return this
   }

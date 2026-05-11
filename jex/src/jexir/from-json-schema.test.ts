@@ -39,7 +39,6 @@ test('JexIR should throw an error when the JSON schema is unsupported', () => {
     { type: 'string-index', value: 'foo' }
   ]
   expectJsonSchema(foo({ not: { type: 'number' } })).toFailAt(path)
-  expectJsonSchema(foo({ oneOf: [] })).toFailAt(path)
   expectJsonSchema(foo({ patternProperties: {} })).toFailAt(path)
   expectJsonSchema(foo({ propertyNames: {} })).toFailAt(path)
   expectJsonSchema(foo({ if: {} })).toFailAt(path)
@@ -140,6 +139,27 @@ test('JexIR should model union of literals of multiple primitives', () => {
       { type: 'number', value: 1 },
       { type: 'number', value: 0 },
       { type: 'boolean' }
+    ]
+  })
+})
+
+test('JexIR should treat exclusive unions just as regular unions', () => {
+  expectJsonSchema({
+    oneOf: [
+      { type: 'string', const: 'a' },
+      { type: 'string', const: 'b' }
+    ]
+  }).toEqualJex({
+    type: 'union',
+    anyOf: [
+      {
+        type: 'string',
+        value: 'a'
+      },
+      {
+        type: 'string',
+        value: 'b'
+      }
     ]
   })
 })

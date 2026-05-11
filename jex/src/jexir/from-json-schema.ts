@@ -72,10 +72,6 @@ const _toInternalRep = (path: JSONSchemaPropertyPath, schema: JSONSchema7Definit
     return { type: 'undefined' }
   }
 
-  if (schema.oneOf !== undefined) {
-    throw new errors.JexUnsupportedJsonSchemaError(path.path, { oneOf: schema.oneOf })
-  }
-
   if (schema.$ref !== undefined) {
     throw new errors.JexUnresolvedReferenceError(path.path)
   }
@@ -241,6 +237,14 @@ const _toInternalRep = (path: JSONSchemaPropertyPath, schema: JSONSchema7Definit
     return {
       type: 'union',
       anyOf: schema.anyOf.map((s, i) => _toInternalRep(path.key('anyOf').index(i), s))
+    }
+  }
+
+  if (schema.oneOf !== undefined) {
+    // technically a oneOf is more than a union, but from jexir's POV, it's equivalent.
+    return {
+      type: 'union',
+      anyOf: schema.oneOf.map((s, i) => _toInternalRep(path.key('oneOf').index(i), s))
     }
   }
 

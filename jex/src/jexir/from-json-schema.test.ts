@@ -32,7 +32,7 @@ const expectJsonSchema = (jsonSchema: JSONSchema7) => ({
   }
 })
 
-test('JexIR should should throw an error when the JSON schema is unsuported', () => {
+test('JexIR should throw an error when the JSON schema is unsupported', () => {
   const foo = (schema: JSONSchema7) => $.object({ foo: schema })
   const path: PropertyPath = [
     { type: 'key', value: 'properties' },
@@ -47,7 +47,7 @@ test('JexIR should should throw an error when the JSON schema is unsuported', ()
   expectJsonSchema(foo({ else: {} })).toFailAt(path)
 })
 
-test('JexIR should should throw an error when schema contains unresolved references', () => {
+test('JexIR should throw an error when schema contains unresolved references', () => {
   const path: PropertyPath = [
     { type: 'key', value: 'items' },
     { type: 'number-index', value: 2 }
@@ -187,7 +187,7 @@ test('JexIR should model map types', () => {
   })
 })
 
-test('JexIR should model a object type with both properties and additionalProperties', () => {
+test('JexIR should model an object type with both properties and additionalProperties', () => {
   expectJsonSchema({
     type: 'object',
     properties: {

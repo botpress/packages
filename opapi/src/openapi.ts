@@ -1,4 +1,4 @@
-import { OpenApiBuilder, OperationObject, ReferenceObject } from 'openapi3-ts/oas31'
+import { OpenApiBuilder, OpenAPIObject, OperationObject, ReferenceObject } from 'openapi3-ts/oas31'
 import VError from 'verror'
 import { defaultResponseStatus } from './const'
 import { generateSchemaFromZod } from './jsonschema'
@@ -6,7 +6,10 @@ import { objects } from './objects'
 import { ComponentType, State, getRef, isOperationWithBodyProps } from './state'
 import { formatBodyName, formatResponseName } from './util'
 
-export const createOpenapi = <
+export const createOpenapiFromSpec = (spec: OpenAPIObject) =>
+  OpenApiBuilder.create(spec)
+
+const createOpenapiFromState = <
   SchemaName extends string,
   DefaultParameterName extends string,
   SectionName extends string,
@@ -178,3 +181,5 @@ export const createOpenapi = <
 
   return openapi
 }
+
+export const createOpenapi = createOpenapiFromState

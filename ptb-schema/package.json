@@ -4,6 +4,9 @@
   "main": "./dist/index.js",
   "author": "Botpress, Inc.",
   "license": "MIT",
+  "repository": {
+    "url": "https://github.com/botpress/packages"
+  },
   "scripts": {
     "build": "tsc --build",
     "test": "vitest",

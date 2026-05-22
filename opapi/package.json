@@ -1,10 +1,13 @@
 {
   "name": "@bpinternal/opapi",
-  "version": "0.14.1",
+  "version": "1.0.0",
   "description": "Opapi is a highly opinionated library to generate server, client and documentation from OpenAPI specification using typescript.",
   "main": "./dist/index.js",
   "module": "./dist/index.mjs",
   "types": "./dist/index.d.ts",
+  "repository": {
+    "url": "https://github.com/botpress/packages"
+  },
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
@@ -17,7 +20,8 @@
     "build": "tsup src/index.ts --dts --format cjs,esm --clean --sourcemap",
     "check:type": "tsc --noEmit",
     "check:format": "biome format .",
-    "fix:format": "biome format --write ."
+    "fix:format": "biome format --write .",
+    "check": "pnpm run check:type && pnpm run check:format"
   },
   "devDependencies": {
     "@biomejs/biome": "2.1.4",
@@ -32,7 +36,6 @@
     "@types/ramda": "^0.31.1",
     "@types/verror": "1.10.10",
     "memfs": "^4.36.0",
-    "prettier": "3.4.1",
     "ts-node": "10.9.2",
     "tsup": "8.3.5",
     "typescript": "5.7.2",

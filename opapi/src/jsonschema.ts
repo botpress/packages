@@ -133,7 +133,7 @@ export const exploreJsonSchema = (cb: (s: JsonSchema) => JsonSchema, inputSchema
  * Lib "@anatine/zod-openapi" transforms zod to json-schema using the nullable property.
  * This property is not officially supported by json-schema, but supported by ajv (see: https://ajv.js.org/json-schema.html#nullable)
  * Since it's not officially supported, some tools like "json-schema-to-typescript" don't support it.
- * This function replaces all occurences of { type: T, nullable: true } with { anyOf: [{ type: T }, { type: 'null' }] }
+ * This function replaces all occurrences of { type: T, nullable: true } with { anyOf: [{ type: T }, { type: 'null' }] }
  */
 export const replaceNullableWithUnion = (schema: NullableJsonSchema): JSONSchema7 => {
   const mapper = (s: JsonSchema): JsonSchema => {
@@ -150,7 +150,7 @@ export const replaceNullableWithUnion = (schema: NullableJsonSchema): JSONSchema
 /**
  * Lib "@anatine/zod-openapi" transforms zod unions to json-schema oneOf.
  * This is a mistake as a union does not enforce that only one of the types is present.
- * This function replaces all occurences of { oneOf: [{ type: T1 }, { type: T2 }] } with { anyOf: [{ type: T1 }, { type: T2 }] }
+ * This function replaces all occurrences of { oneOf: [{ type: T1 }, { type: T2 }] } with { anyOf: [{ type: T1 }, { type: T2 }] }
  */
 export const replaceOneOfWithAnyOf = (oneOfSchema: JsonSchema): JSONSchema7 => {
   const mapper = (schema: JsonSchema): JsonSchema => {

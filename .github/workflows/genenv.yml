@@ -18,6 +18,10 @@ defaults:
   run:
     working-directory: ./genenv
 
+permissions:
+  id-token: write
+  contents: read
+
 jobs:
   genenv:
     runs-on: ubuntu-latest
@@ -40,4 +44,3 @@ jobs:
         uses: botpress/gh-actions/publish-if-not-exists@master
         with:
           path: './genenv'
-          token: '${{ secrets.NPM_ACCESS_TOKEN }}'

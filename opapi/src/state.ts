@@ -32,6 +32,7 @@ export type State<SchemaName extends string, DefaultParameterName extends string
   errors?: ApiError[]
   operations: { [name: string]: Operation<DefaultParameterName, SectionName, string, 'json-schema'> }
   options?: Options
+  security?: Security[]
 }
 
 const unknownError: ApiError = {
@@ -46,8 +47,10 @@ const internalError: ApiError = {
   description: 'An internal error occurred',
 }
 
+export type Security = 'BearerAuth' | 'BasicAuth'
+
 export type ApiError = {
-  status: 400 | 401 | 402 | 403 | 404 | 405 | 408 | 409 | 413 | 415 | 424 | 429 | 500 | 501 | 502 | 503 | 504
+  status: 400 | 401 | 402 | 403 | 404 | 405 | 408 | 409 | 410 | 413 | 415 | 424 | 429 | 500 | 501 | 502 | 503 | 504
   type: string
   description: string
 }
@@ -212,6 +215,8 @@ type BaseOperationProps<
     [name in DefaultParameterName]?: boolean
   }
   section?: SectionName
+  // Security of the operation
+  security?: Security[]
   // Response body of the operation
   response: {
     // Status code of the response
@@ -221,14 +226,23 @@ type BaseOperationProps<
     schema: SchemaOfType<S>
     format?: 'binary'
   }
+  // Tags of the operation
+  tags?: string[]
+  // If an operation is deprecated
+  deprecated?: boolean
 }
 
-type CreateStateProps<SchemaName extends string, DefaultParameterName extends string, SectionName extends string> = {
+export type CreateStateProps<
+  SchemaName extends string,
+  DefaultParameterName extends string,
+  SectionName extends string,
+> = {
   metadata: Metadata
   defaultParameters?: Record<DefaultParameterName, Parameter<'zod-schema'>>
   schemas?: Record<SchemaName, { schema: OpenApiZodAny; section: SectionName }>
   sections?: Record<SectionName, { title: string; description: string }>
   errors?: readonly ApiError[]
+  security?: Security[]
 }
 
 export function createState<SchemaName extends string, DefaultParameterName extends string, SectionName extends string>(
@@ -308,6 +322,7 @@ export function createState<SchemaName extends string, DefaultParameterName exte
     schemas,
     sections,
     options,
+    security: props.security,
   }
 }
 

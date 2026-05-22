@@ -3,7 +3,7 @@ import VError from 'verror'
 import { defaultResponseStatus } from './const'
 import { generateSchemaFromZod } from './jsonschema'
 import { objects } from './objects'
-import { ComponentType, State, getRef, isOperationWithBodyProps } from './state'
+import { ComponentType, Security, State, getRef, isOperationWithBodyProps } from './state'
 import { formatBodyName, formatResponseName } from './util'
 
 export const createOpenapiFromSpec = (spec: OpenAPIObject) =>
@@ -16,8 +16,13 @@ const createOpenapiFromState = <
 >(
   state: State<SchemaName, DefaultParameterName, SectionName>,
 ) => {
-  const { metadata, schemas, operations } = state
+  const { metadata, schemas, operations, security } = state
   const { description, server, title, version } = metadata
+
+  const securitySchemes: Set<Security> = new Set()
+  security?.forEach((name) => securitySchemes.add(name))
+
+  const tags: Set<string> = new Set()
 
   const openapi = OpenApiBuilder.create({
     openapi: '3.0.0',
@@ -33,7 +38,10 @@ const createOpenapiFromState = <
       responses: {},
       requestBodies: {},
       parameters: {},
+      securitySchemes: {},
     },
+    security: security ? [Object.fromEntries(security.map((name) => [name, []]))] : undefined,
+    tags: [],
   })
 
   objects.entries(schemas).forEach(([schemaName, { schema }]) => {
@@ -60,14 +68,22 @@ const createOpenapiFromState = <
       getRef(state, ComponentType.RESPONSES, responseName),
     ) as unknown as ReferenceObject
 
+    operationObject.security?.forEach((name) => securitySchemes.add(name))
+    operationObject.tags?.forEach((name) => tags.add(name))
+
     const operation: OperationObject = {
       operationId: operationName,
       description: operationObject.description,
       parameters: [],
+      security: operationObject.security
+        ? [Object.fromEntries(operationObject.security.map((name) => [name, []]))]
+        : undefined,
       responses: {
         default: responseRefSchema,
         [response.status ?? defaultResponseStatus]: responseRefSchema,
       },
+      tags: operationObject.tags,
+      deprecated: operationObject.deprecated,
     }
 
     if (isOperationWithBodyProps(operationObject)) {
@@ -178,6 +194,24 @@ const createOpenapiFromState = <
 
     openapi.rootDoc.paths[path]![method] = operation
   })
+
+  tags.forEach((name) => {
+    openapi.addTag({
+      name,
+    })
+  })
+  if (securitySchemes.has('BearerAuth')) {
+    openapi.addSecurityScheme('BearerAuth', {
+      type: 'http',
+      scheme: 'bearer',
+    })
+  }
+  if (securitySchemes.has('BasicAuth')) {
+    openapi.addSecurityScheme('BasicAuth', {
+      type: 'http',
+      scheme: 'basic',
+    })
+  }
 
   return openapi
 }

@@ -27,7 +27,7 @@ const fixSchema = (schema: JSONSchema7): JSONSchema7 => {
   return schema
 }
 
-// usefull for debugging, remove when generator is stable
+// useful for debugging, remove when generator is stable
 const debugSchema =
   (inputSchema: JSONSchema7, key: string, enable: boolean = false) =>
   (tsCode: string) => {

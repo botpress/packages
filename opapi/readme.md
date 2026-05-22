@@ -10,7 +10,7 @@ Install the package and start creating your OpenAPI specification. See the examp
 import { OpenApi, schema } from '@bpinternal/opapi'
 import { z } from 'zod'
 
-const api = OpenApi({
+const api = new OpenApi({
   metadata: {
     title: 'Example API', // This is the title of the API
     description: 'Description of this api', // This is the description of the API
@@ -22,8 +22,8 @@ const api = OpenApi({
   section: {
     User: {
       title: 'User',
-      description: 'User related endpoints'
-    }
+       description: 'User related endpoints',
+     },
   },
   // This is where you define your schemas that will be used in the API
   // You can use the `ref` function to reference a schema
@@ -46,7 +46,7 @@ const api = OpenApi({
     {
       status: 403,
       type: 'Forbidden',
-      description: "The requested action can't be peform by this resource."
+      description: "The requested action can't be perform by this resource.",
     },
     {
       status: 400,
@@ -88,6 +88,6 @@ api.exportClient('./gen/client') // This will generate a client that can be used
 
 ## Disclaimer ⚠️
 
-This package is published under the `@bpinternal` organization. All packages of this organization are meant to be used by the [Botpress](https://github.com/botpress/botpress) team internally and are not meant for our community. Since the packages are catered to our own use-cases, they might have less stable APIs, receive breaking changes without much warning, have minimal documentation and lack community-focused support. However, these packages were still left intentionally public for an important reason : We Love Open-Source. Therefore, if you wish to install or fork this package feel absolutly free to do it. We strongly recommend that you tag your versions properly.
+This package is published under the `@bpinternal` organization. All packages of this organization are meant to be used by the [Botpress](https://github.com/botpress/botpress) team internally and are not meant for our community. Since the packages are catered to our own use-cases, they might have less stable APIs, receive breaking changes without much warning, have minimal documentation and lack community-focused support. However, these packages were still left intentionally public for an important reason : We Love Open-Source. Therefore, if you wish to install or fork this package feel absolutely free to do it. We strongly recommend that you tag your versions properly.
 
 The Botpress Engineering team.

@@ -1,8 +1,11 @@
 {
   "name": "@bpinternal/depsynky",
-  "version": "0.2.3",
-  "description": "CLI to synchronize dependencies accross a pnpm mono-repo",
+  "version": "0.3.2",
+  "description": "CLI to synchronize dependencies across a pnpm mono-repo",
   "main": "dist/index.js",
+  "repository": {
+    "url": "https://github.com/botpress/packages"
+  },
   "scripts": {
     "check:type": "tsc --noEmit",
     "build": "esbuild --bundle --platform=node --outdir=dist src/index.ts",
@@ -26,10 +29,12 @@
   },
   "devDependencies": {
     "@types/node": "^22.16.4",
+    "@types/picomatch": "^4.0.2",
     "@types/prettier": "^2.7.3",
     "@types/prompts": "^2.0.14",
     "@types/semver": "^7.3.11",
     "esbuild": "^0.25.0",
+    "picomatch": "^4.0.4",
     "ts-node": "^10.9.1",
     "typescript": "^4.9.4",
     "vitest": "^3.0.7"

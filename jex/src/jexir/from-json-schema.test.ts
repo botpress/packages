@@ -32,14 +32,13 @@ const expectJsonSchema = (jsonSchema: JSONSchema7) => ({
   }
 })
 
-test('JexIR should should throw an error when the JSON schema is unsuported', () => {
+test('JexIR should throw an error when the JSON schema is unsupported', () => {
   const foo = (schema: JSONSchema7) => $.object({ foo: schema })
   const path: PropertyPath = [
     { type: 'key', value: 'properties' },
     { type: 'string-index', value: 'foo' }
   ]
   expectJsonSchema(foo({ not: { type: 'number' } })).toFailAt(path)
-  expectJsonSchema(foo({ oneOf: [] })).toFailAt(path)
   expectJsonSchema(foo({ patternProperties: {} })).toFailAt(path)
   expectJsonSchema(foo({ propertyNames: {} })).toFailAt(path)
   expectJsonSchema(foo({ if: {} })).toFailAt(path)
@@ -47,7 +46,7 @@ test('JexIR should should throw an error when the JSON schema is unsuported', ()
   expectJsonSchema(foo({ else: {} })).toFailAt(path)
 })
 
-test('JexIR should should throw an error when schema contains unresolved references', () => {
+test('JexIR should throw an error when schema contains unresolved references', () => {
   const path: PropertyPath = [
     { type: 'key', value: 'items' },
     { type: 'number-index', value: 2 }
@@ -144,6 +143,27 @@ test('JexIR should model union of literals of multiple primitives', () => {
   })
 })
 
+test('JexIR should treat exclusive unions just as regular unions', () => {
+  expectJsonSchema({
+    oneOf: [
+      { type: 'string', const: 'a' },
+      { type: 'string', const: 'b' }
+    ]
+  }).toEqualJex({
+    type: 'union',
+    anyOf: [
+      {
+        type: 'string',
+        value: 'a'
+      },
+      {
+        type: 'string',
+        value: 'b'
+      }
+    ]
+  })
+})
+
 test('JexIR should model empty object type as a map of unknown', () => {
   expectJsonSchema({ type: 'object' }).toEqualJex({
     type: 'map',
@@ -187,7 +207,7 @@ test('JexIR should model map types', () => {
   })
 })
 
-test('JexIR should model a object type with both properties and additionalProperties', () => {
+test('JexIR should model an object type with both properties and additionalProperties', () => {
   expectJsonSchema({
     type: 'object',
     properties: {

@@ -18,6 +18,10 @@ defaults:
   run:
     working-directory: ./retry
 
+permissions:
+  id-token: write
+  contents: read
+
 jobs:
   retry:
     runs-on: ubuntu-latest
@@ -40,4 +44,3 @@ jobs:
         uses: botpress/gh-actions/publish-if-not-exists@master
         with:
           path: './retry'
-          token: '${{ secrets.NPM_ACCESS_TOKEN }}'

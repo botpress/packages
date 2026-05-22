@@ -7,6 +7,51 @@ let lock: Promise<void> | false = false
 
 const CHUNK_SIZE = 100_000
 
+class TokenCollection {
+  public constructor(private _tokenizer: Tiktoken, private _modelOutput: Uint32Array<ArrayBufferLike>) {}
+
+  public get length(): number {
+    return this._modelOutput.length
+  }
+
+  public slice(start: number, end?: number): string[] {
+    ;[start, end] = this._clampIndexes(start, end)
+    if (start >= end) {
+      return []
+    }
+
+    const decoder = new TextDecoder()
+    const str: string[] = []
+
+    for (let i = start; i < end; i++) {
+      const token = this._modelOutput[i]!
+      str.push(this._decodeToken(decoder, token))
+    }
+
+    return str
+  }
+
+  private _decodeToken(decoder: TextDecoder, encodedToken: number): string {
+    // copying to a new array because of memory allocation in WASM
+    const copy = this._tokenizer.decode(new Uint32Array([encodedToken]))
+    return decoder.decode(copy)
+  }
+
+  private _clampIndexes(start: number, end?: number): [number, number] {
+    const max = this._modelOutput.length
+
+    end ??= max
+
+    start = start < 0 ? max + start : start
+    end = end < 0 ? max + end : end
+
+    start = Math.max(0, Math.min(start, max))
+    end = Math.max(0, Math.min(end, max))
+
+    return [start, end]
+  }
+}
+
 export class TextTokenizer {
   private warnOnSlowCalls = true
 
@@ -41,7 +86,7 @@ export class TextTokenizer {
       }
 
       const next = text.slice(i + CHUNK_SIZE - MARGIN, i + CHUNK_SIZE)
-      const unsafe = this.split(next).slice(-1)[0].length
+      const unsafe = this.split(next).slice(-1)[0]!.length
 
       yield text.slice(i, i + CHUNK_SIZE - unsafe)
 
@@ -138,14 +183,14 @@ export class TextTokenizer {
   }
 
   public split(text: string): string[] {
-    const decoder = new TextDecoder()
-    const str: string[] = []
-    this.tokenizer.encode(text ?? '').forEach((x) => {
-      // copying to a new array because of memory allocation in WASM
-      str.push(decoder.decode(this.tokenizer.decode(new Uint32Array([x]))))
-    })
+    const output = this.tokenizer.encode(text ?? '')
+    const collection = new TokenCollection(this.tokenizer, output)
+    return collection.slice(0)
+  }
 
-    return str
+  public splitAndSlice(text: string): TokenCollection {
+    const output = this.tokenizer.encode(text ?? '')
+    return new TokenCollection(this.tokenizer, output)
   }
 
   /**

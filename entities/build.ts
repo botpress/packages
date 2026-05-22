@@ -140,7 +140,7 @@ const main = async (argv: string[]) => {
     await buildWeb()
     return
   }
-  throw new Error(`Unsuported target: ${target}`)
+  throw new Error(`Unsupported target: ${target}`)
 }
 
 void main(process.argv.slice(2))

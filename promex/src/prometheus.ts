@@ -19,7 +19,7 @@ let defaultNormalizedPathEnabled = true
 type TOptionalPromsterOptions = NonNullable<Parameters<typeof createMiddleware>[0]>['options']
 
 /**
- * config is used to setup the global promster middleware
+ * config is used to set up the global promster middleware
  * @param options for the promster middleware
  * @returns the configured promster middleware
  */

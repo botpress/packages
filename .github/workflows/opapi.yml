@@ -18,6 +18,10 @@ defaults:
   run:
     working-directory: ./opapi
 
+permissions:
+  id-token: write
+  contents: read
+
 jobs:
   opapi:
     runs-on: ubuntu-latest
@@ -41,4 +45,3 @@ jobs:
         uses: botpress/gh-actions/publish-if-not-exists@master
         with:
           path: './opapi'
-          token: '${{ secrets.NPM_ACCESS_TOKEN }}'

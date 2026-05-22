@@ -1,5 +1,4 @@
 const esbuild = require('esbuild')
-const { polyfillNode } = require('esbuild-plugin-polyfill-node')
 
 esbuild
   .build({
@@ -7,7 +6,6 @@ esbuild
     bundle: true,
     platform: 'node',
     format: 'cjs',
-    outfile: 'dist/index.cjs',
-    plugins: [polyfillNode()]
+    outfile: 'dist/index.cjs'
   })
   .catch(() => process.exit(1))

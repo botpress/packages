@@ -9,6 +9,7 @@ const codes = {
   HTTP_STATUS_METHOD_NOT_ALLOWED: 405,
   HTTP_STATUS_REQUEST_TIMEOUT: 408,
   HTTP_STATUS_CONFLICT: 409,
+  HTTP_STATUS_GONE: 410,
   HTTP_STATUS_PAYLOAD_TOO_LARGE: 413,
   HTTP_STATUS_UNSUPPORTED_MEDIA_TYPE: 415,
   HTTP_STATUS_DEPENDENCY_FAILED: 424,
@@ -19,6 +20,8 @@ const codes = {
   HTTP_STATUS_SERVICE_UNAVAILABLE: 503,
   HTTP_STATUS_GATEWAY_TIMEOUT: 504,
 } as const satisfies Record<string, ApiError['status']>
+type _AssertExtends<_A extends B, B> = true
+type _AssertCodesDictIsExhaustive = _AssertExtends<ApiError['status'], (typeof codes)[keyof typeof codes]>
 
 export function generateErrors(errors: ApiError[]) {
   const types = errors.map((error) => error.type)
@@ -38,7 +41,7 @@ declare const window: any
 type CryptoLib = { getRandomValues(array: Uint8Array): Uint8Array }
 
 const cryptoLibPolyfill: CryptoLib = {
-  // Fallback in case crypto isn't available.
+  // Fallback when crypto isn't available.
   getRandomValues: (array: Uint8Array) => new Uint8Array(array.map(() => Math.floor(Math.random() * 256))),
 }
 
@@ -48,7 +51,7 @@ let cryptoLib: CryptoLib =
     : crypto
 
 if (!cryptoLib.getRandomValues) {
-  // Use a polyfill in older environments that have a crypto implementaton missing getRandomValues()
+  // Use a polyfill in older environments that have a crypto implementation missing getRandomValues()
   cryptoLib = cryptoLibPolyfill
 }
 
@@ -133,7 +136,7 @@ export const errorFrom = (err: unknown): ApiError => {
 }
 
 function getApiErrorFromObject(err: any) {
-  // Check if it's an deserialized API error object
+  // Check if it's a deserialized API error object
   if (typeof err === 'object' && 'code' in err && 'type' in err && 'id' in err && 'message' in err && typeof err.type === 'string' && typeof err.message === 'string') {
     const ErrorClass = errorTypes[err.type]
     if (!ErrorClass) {

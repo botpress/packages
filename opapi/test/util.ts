@@ -1,4 +1,6 @@
 import path from 'path'
+import Module from 'module'
+import fs from 'node:fs'
 import * as tsc from 'typescript'
 
 const host: tsc.FormatDiagnosticsHost = {
@@ -34,4 +36,27 @@ export function getTypescriptErrors(filename: string, opts: tsc.CompilerOptions 
   const diagnostics = tsc.getPreEmitDiagnostics(program)
 
   return diagnostics.map((diag) => tsc.formatDiagnostic(diag, host))
+}
+
+export function requireTsFile(filename: string) {
+  const content = fs.readFileSync(filename).toString()
+  const { outputText } = tsc.transpileModule(content, {
+    compilerOptions: DEFAULT_OPTIONS,
+    fileName: filename,
+  })
+  return requireJsCode(outputText)
+}
+
+export function requireJsCode(code: string) {
+  const filedir = 'tmp'
+  const filename = `${Date.now()}.js`
+
+  const fileid = path.join(filedir, filename)
+
+  const m = new Module(fileid)
+  m.filename = filename
+
+  /** @ts-ignore */
+  m._compile(code, filename)
+  return m.exports
 }

@@ -5,6 +5,9 @@
   "bin": {
     "genenv": "./bin.js"
   },
+  "repository": {
+    "url": "https://github.com/botpress/packages"
+  },
   "scripts": {
     "check:type": "tsc --noEmit",
     "dev": "ts-node -T ./src/index.ts",

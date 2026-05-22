@@ -18,6 +18,10 @@ defaults:
   run:
     working-directory: ./promex
 
+permissions:
+  id-token: write
+  contents: read
+
 jobs:
   promex:
     runs-on: ubuntu-latest
@@ -40,4 +44,3 @@ jobs:
         uses: botpress/gh-actions/publish-if-not-exists@master
         with:
           path: './promex'
-          token: '${{ secrets.NPM_ACCESS_TOKEN }}'

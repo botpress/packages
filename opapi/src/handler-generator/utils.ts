@@ -25,7 +25,7 @@ export function filterObject<K extends string, V>(obj: Record<K, V>, fn: (v: V, 
 const capitalizeFirstLetter = (text: string) => text.charAt(0).toUpperCase() + text.slice(1).toLowerCase()
 const splitHyphens = (tokens: string[]) => tokens.flatMap((token) => token.split('-'))
 const splitUnderscores = (tokens: string[]) => tokens.flatMap((token) => token.split('_'))
-const splitCaseChange = (tokens: string[]) => tokens.flatMap((token) => token.split(/(?<=[a-z])(?=[A-Z])/))
+const splitCaseChange = (tokens: string[]) => tokens.flatMap((token) => token.split(/(?<=[a-z0-9])(?=[A-Z])/))
 const splitTokens = (tokens: string[]) =>
   [splitHyphens, splitUnderscores, splitCaseChange].reduce((acc, step) => step(acc), tokens)
 

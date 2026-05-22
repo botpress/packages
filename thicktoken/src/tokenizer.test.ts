@@ -1,8 +1,12 @@
 import { describe, it, expect, beforeEach, afterEach, beforeAll } from 'vitest'
-import { getWasmTokenizer } from '../dist/tokenizer.mjs'
+import * as dist from '../dist/tokenizer.mjs'
 import { type TextTokenizer } from './tokenizer'
 import { performance } from 'perf_hooks'
 import { generateSentence } from './__tests/utils'
+
+const getWasmTokenizer = async (): Promise<TextTokenizer> => {
+  return (await dist.getWasmTokenizer()) as any
+}
 
 type TaskContext = {
   task: {

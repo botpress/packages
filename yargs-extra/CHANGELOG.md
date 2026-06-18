@@ -7,7 +7,6 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 ### Changed
 
 - Switched package development typings from `@types/node` 20 to `@types/node` 22.
-- Bumped the package patch version as part of the repository-wide package patch release.
 
 ## [0.0.20] - 2025-04-01
 
@@ -67,7 +66,6 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 ### Changed
 
 - Updated development dependencies: `@types/lodash` from `4.17.6` to `4.17.9` and TypeScript from `5.5.3` to `5.6.2`.
-- Refreshed the package lockfile.
 
 ## [0.0.11] - 2024-07-18
 
@@ -140,7 +138,6 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 - Updated `yargs` from `^17.5.1` to `^17.7.2`.
 - Updated development tooling for newer Node and TypeScript versions.
-- Kept `@types/yargs` available as a runtime dependency so consumers receive yargs typings.
 
 ### Fixed
 
@@ -162,4 +159,3 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 - Initial release of `@bpinternal/yargs-extra`.
 - Added helpers for cleaning argv objects, applying default values, parsing environment variables, parsing typed option values, and inferring yargs schema types.
-- Added the initial README, TypeScript configuration, Jest test setup, and package metadata.

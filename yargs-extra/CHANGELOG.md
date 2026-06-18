@@ -1,7 +1,5 @@
 # Changelog
 
-All notable changes to `@bpinternal/yargs-extra` from `0.0.3` through `0.0.21` are documented in this file.
-
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project adheres to semantic versioning.
 
 ## [0.0.21] - 2025-07-18
@@ -147,3 +145,21 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 ### Fixed
 
 - Fixed README documentation typos.
+
+## [0.0.2] - 2022-06-15
+
+### Fixed
+
+- Moved `@types/yargs` from development dependencies to runtime dependencies so consumers receive yargs typings.
+
+### Changed
+
+- Cleaned up package dependencies while keeping the release on `0.0.2`.
+
+## [0.0.1] - 2022-06-15
+
+### Added
+
+- Initial release of `@bpinternal/yargs-extra`.
+- Added helpers for cleaning argv objects, applying default values, parsing environment variables, parsing typed option values, and inferring yargs schema types.
+- Added the initial README, TypeScript configuration, Jest test setup, and package metadata.

@@ -78,33 +78,32 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 ### Changed
 
 - Updated development dependencies: `@types/lodash` from `4.17.5` to `4.17.6` and TypeScript from `5.4.5` to `5.5.3`.
-- Renamed the type-check script from `type:check` to `check:type`.
 
 ## [0.0.9] - 2024-06-10
 
 ### Changed
 
 - Updated `@types/lodash` from `4.17.4` to `4.17.5`.
+- Renamed the type-check script from `type:check` to `check:type`.
 
 ## [0.0.8] - 2024-05-31
 
 ### Changed
 
 - Updated development dependencies: `@types/lodash` from `4.17.0` to `4.17.4` and Vitest from `1.5.3` to `1.6.0`.
-- Migrated package manager metadata to pnpm `9.1.0` and pinned the pnpm engine version.
 
 ## [0.0.7] - 2024-05-01
 
 ### Changed
 
 - Updated Vitest from `1.5.0` to `1.5.3`.
+- Migrated package manager metadata to pnpm `9.1.0` and pinned the pnpm engine version.
 
 ## [0.0.6] - 2024-04-23
 
 ### Changed
 
 - Updated development dependencies: `@types/lodash` from `4.14.202` to `4.17.0`, Vitest from `1.3.1` to `1.5.0`, and TypeScript from `5.3.3` to `5.4.5`.
-- Added package manager metadata for pnpm `8.6.0+` and engines for Node `>=16.0.0` and pnpm `>=8.6.0 <9`.
 
 ## [0.0.5] - 2024-02-29
 
@@ -115,6 +114,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 ### Changed
 
 - Pinned Vitest to `1.3.1`.
+- Added package manager metadata for pnpm `8.6.0+` and engines for Node `>=16.0.0` and pnpm `>=8.6.0 <9`.
 
 ## [0.0.4] - 2024-02-28
 

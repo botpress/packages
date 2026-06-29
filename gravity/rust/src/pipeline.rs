@@ -6,7 +6,10 @@ use crate::{
     umap,
 };
 
-pub fn process_embeddings(dataset: EmbeddingDataset, options: &ClusteringOptions) -> ClusteringOutput {
+pub fn process_embeddings(
+    dataset: EmbeddingDataset,
+    options: &ClusteringOptions,
+) -> Result<ClusteringOutput, String> {
     let cfg = options.umap_config();
     let n = dataset.embeddings.len();
     let dim = dataset.dim;
@@ -21,7 +24,7 @@ pub fn process_embeddings(dataset: EmbeddingDataset, options: &ClusteringOptions
             umap_embeddings[i * cfg.n_components..i * cfg.n_components + cfg.n_components].to_vec()
         })
         .collect();
-    let labels = hdbscan_labels(&points, &hdbscan_config);
+    let labels = hdbscan_labels(&points, &hdbscan_config)?;
 
     let GroupedLabels { groups, noise } = clustering::group_labels(&labels);
     let mut clusters: Vec<Cluster> = Vec::with_capacity(groups.len());
@@ -53,23 +56,25 @@ pub fn process_embeddings(dataset: EmbeddingDataset, options: &ClusteringOptions
 
     let noise_ids = noise.iter().map(|&i| dataset.ids[i].clone()).collect();
 
-    ClusteringOutput {
+    Ok(ClusteringOutput {
         dataset,
         umap_config: cfg,
         hdbscan_config,
         labels,
         clusters,
         noise: noise_ids,
-    }
+    })
 }
 
-pub fn hdbscan_labels(points: &[Vec<f32>], config: &HdbscanConfig) -> Vec<i32> {
+pub fn hdbscan_labels(points: &[Vec<f32>], config: &HdbscanConfig) -> Result<Vec<i32>, String> {
     let params = HdbscanHyperParams::builder()
         .min_cluster_size(config.min_cluster_size)
         .min_samples(config.min_samples)
         .build();
     let clusterer = Hdbscan::new(points, params);
-    clusterer.cluster().unwrap()
+    clusterer
+        .cluster()
+        .map_err(|err| format!("hdbscan clustering failed: {err}"))
 }
 
 fn flatten_embeddings(dataset: &EmbeddingDataset) -> Vec<f32> {

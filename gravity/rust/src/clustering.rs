@@ -49,16 +49,25 @@ pub fn dot(a: &[f32], b: &[f32]) -> f32 {
     dot
 }
 
+fn l2_norm(v: &[f32]) -> f32 {
+    dot(v, v).sqrt().max(1e-12)
+}
+
 pub fn centroid_cosine_distances(
     data: &[f32],
     centroid: &[f32],
     members: &[usize],
     dim: usize,
 ) -> Vec<f32> {
+    // Cosine distance requires unit-length operands. The centroid is the arithmetic mean
+    // of the original (un-normalized) embeddings, so we divide by both magnitudes here
+    // rather than assuming the inputs were normalized.
+    let centroid_norm = l2_norm(centroid);
     let mut distances = Vec::with_capacity(members.len());
 
     for m in members {
-        let d = 1.0 - dot(&data[m * dim..m * dim + dim], centroid);
+        let vec = &data[m * dim..m * dim + dim];
+        let d = 1.0 - dot(vec, centroid) / (l2_norm(vec) * centroid_norm);
         distances.push(d);
     }
 

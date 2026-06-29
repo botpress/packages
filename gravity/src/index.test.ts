@@ -82,6 +82,12 @@ describe('cluster', () => {
     expect(() => cluster({ ids: ['a'], embeddings: [[1, 2, 3]], dim: 4 })).toThrow()
   })
 
+  it('surfaces a clean error (not a wasm trap) for an empty dataset', () => {
+    // Previously the HDBSCAN unwrap() would panic and trap; now it should come back
+    // as a normal Error with a readable message.
+    expect(() => cluster({ ids: [], embeddings: [], dim: 5 })).toThrow(/empty/i)
+  })
+
   it('applies option overrides', () => {
     const dataset = makeBlobs(3, 20, 10)
     const result = cluster(dataset, { minClusterSize: 5, minSamples: 2, seed: 7, nComponents: 3 })

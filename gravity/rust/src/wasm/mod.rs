@@ -36,7 +36,13 @@ pub unsafe extern "C" fn run_clustering_wasm(input_ptr: *const u8, input_len: us
         Err(exit_code) => return exit_code,
     };
 
-    let output = process_embeddings(request.dataset, &request.options);
+    let output = match process_embeddings(request.dataset, &request.options) {
+        Ok(output) => output,
+        Err(message) => {
+            set_error(message);
+            return 1;
+        }
+    };
     let json = match serde_json::to_string_pretty(&output) {
         Ok(json) => json,
         Err(err) => {

@@ -1,0 +1,6 @@
+node_modules
+dist
+gravity.wasm
+rust/target
+*.log
+.DS_Store

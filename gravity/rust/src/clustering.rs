@@ -1,0 +1,78 @@
+use std::collections::HashMap;
+
+pub struct GroupedLabels {
+    pub groups: HashMap<i32, Vec<usize>>,
+    pub noise: Vec<usize>,
+}
+
+pub fn group_labels(labels: &Vec<i32>) -> GroupedLabels {
+    let mut groups: HashMap<i32, Vec<usize>> = HashMap::new();
+    let mut noise = Vec::new();
+
+    for (idx, &l) in labels.iter().enumerate() {
+        if l == -1 {
+            noise.push(idx);
+        } else {
+            groups.entry(l).or_default().push(idx);
+        }
+    }
+
+    GroupedLabels { groups, noise }
+}
+
+pub fn centroid(data: &[f32], members: &[usize], dim: usize) -> Vec<f32> {
+    let mut centroid = vec![0.0_f32; dim];
+
+    for &m in members {
+        for d in 0..dim {
+            centroid[d] += data[m * dim + d];
+        }
+    }
+
+    let count = members.len() as f32;
+    for d in 0..dim {
+        centroid[d] /= count;
+    }
+
+    centroid
+}
+
+pub fn dot(a: &[f32], b: &[f32]) -> f32 {
+    let mut dot = 0.0;
+
+    assert_eq!(a.len(), b.len(), "vectors must have same length");
+
+    for i in 0..a.len() {
+        dot += a[i] * b[i];
+    }
+
+    dot
+}
+
+pub fn centroid_cosine_distances(
+    data: &[f32],
+    centroid: &[f32],
+    members: &[usize],
+    dim: usize,
+) -> Vec<f32> {
+    let mut distances = Vec::with_capacity(members.len());
+
+    for m in members {
+        let d = 1.0 - dot(&data[m * dim..m * dim + dim], centroid);
+        distances.push(d);
+    }
+
+    distances
+}
+
+pub fn sort_by_distances(distances: &[f32], members: &[usize]) -> Vec<usize> {
+    let mut order: Vec<usize> = (0..members.len()).collect();
+    order.sort_by(|&a, &b| {
+        distances[a]
+            .partial_cmp(&distances[b])
+            .unwrap()
+            .then(a.cmp(&b))
+    });
+
+    order.iter().map(|&i| members[i]).collect()
+}

@@ -1,0 +1,46 @@
+{
+  "name": "@bpinternal/gravity",
+  "version": "0.1.0",
+  "description": "Generic density-based clustering (UMAP + HDBSCAN) in TypeScript, with no native dependencies.",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "repository": {
+    "url": "https://github.com/botpress/packages"
+  },
+  "files": [
+    "dist",
+    "gravity.wasm"
+  ],
+  "scripts": {
+    "build:wasm": "node scripts/build-wasm.mjs",
+    "build:ts": "tsc",
+    "build": "pnpm build:wasm && pnpm build:ts",
+    "check:type": "tsc --noEmit",
+    "check:format": "prettier --check .",
+    "fix:format": "prettier --write .",
+    "check": "pnpm check:format && pnpm check:type",
+    "fix": "pnpm fix:format",
+    "test:rust": "cd rust && cargo test --lib",
+    "test": "pnpm build:wasm && vitest run"
+  },
+  "keywords": [
+    "clustering",
+    "hdbscan",
+    "umap",
+    "dimensionality-reduction",
+    "embeddings"
+  ],
+  "author": "Botpress, Inc.",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/node": "^22.16.4",
+    "prettier": "^3.3.3",
+    "typescript": "5.8.3",
+    "vitest": "^3.2.4"
+  },
+  "engines": {
+    "node": ">=16.0.0",
+    "pnpm": "8.6.2"
+  },
+  "packageManager": "pnpm@8.6.2"
+}

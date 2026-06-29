@@ -1,5 +1,4 @@
 pub mod clustering;
-pub mod output;
 pub mod pipeline;
 pub mod types;
 pub mod umap;

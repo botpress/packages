@@ -56,7 +56,6 @@ pub fn process_embeddings(dataset: EmbeddingDataset, options: &ClusteringOptions
     ClusteringOutput {
         dataset,
         umap_config: cfg,
-        umap_embeddings,
         hdbscan_config,
         labels,
         clusters,

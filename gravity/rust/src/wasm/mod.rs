@@ -1,15 +1,9 @@
 use std::cell::RefCell;
 
-use crate::{
-    output::{raw_embeddings_text, umap_embeddings_text},
-    pipeline::process_embeddings,
-    types::ClusteringRequest,
-};
+use crate::{pipeline::process_embeddings, types::ClusteringRequest};
 
 thread_local! {
     static OUTPUT_JSON: RefCell<Vec<u8>> = RefCell::new(Vec::new());
-    static RAW_EMBEDDINGS: RefCell<Vec<u8>> = RefCell::new(Vec::new());
-    static UMAP_EMBEDDINGS: RefCell<Vec<u8>> = RefCell::new(Vec::new());
     static ERROR_MESSAGE: RefCell<Vec<u8>> = RefCell::new(Vec::new());
 }
 
@@ -50,12 +44,7 @@ pub unsafe extern "C" fn run_clustering_wasm(input_ptr: *const u8, input_len: us
             return 1;
         }
     };
-    let raw_embeddings = raw_embeddings_text(&output);
-    let umap_embeddings = umap_embeddings_text(&output);
-
     OUTPUT_JSON.with(|buffer| *buffer.borrow_mut() = json.into_bytes());
-    RAW_EMBEDDINGS.with(|buffer| *buffer.borrow_mut() = raw_embeddings.into_bytes());
-    UMAP_EMBEDDINGS.with(|buffer| *buffer.borrow_mut() = umap_embeddings.into_bytes());
 
     0
 }
@@ -78,26 +67,6 @@ pub extern "C" fn output_json_ptr() -> usize {
 #[unsafe(no_mangle)]
 pub extern "C" fn output_json_len() -> usize {
     OUTPUT_JSON.with(|buffer| buffer.borrow().len())
-}
-
-#[unsafe(no_mangle)]
-pub extern "C" fn raw_embeddings_ptr() -> usize {
-    RAW_EMBEDDINGS.with(|buffer| buffer.borrow().as_ptr() as usize)
-}
-
-#[unsafe(no_mangle)]
-pub extern "C" fn raw_embeddings_len() -> usize {
-    RAW_EMBEDDINGS.with(|buffer| buffer.borrow().len())
-}
-
-#[unsafe(no_mangle)]
-pub extern "C" fn umap_embeddings_ptr() -> usize {
-    UMAP_EMBEDDINGS.with(|buffer| buffer.borrow().as_ptr() as usize)
-}
-
-#[unsafe(no_mangle)]
-pub extern "C" fn umap_embeddings_len() -> usize {
-    UMAP_EMBEDDINGS.with(|buffer| buffer.borrow().len())
 }
 
 fn clear_error() {

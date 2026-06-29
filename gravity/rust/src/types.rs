@@ -86,9 +86,6 @@ pub struct ClusteringOutput {
     pub umap_config: UmapConfig,
     pub hdbscan_config: HdbscanConfig,
 
-    #[serde(skip_serializing)]
-    pub umap_embeddings: Vec<f32>,
-
     pub labels: Vec<i32>,
     pub clusters: Vec<Cluster>,
     pub noise: Vec<String>,

@@ -20,7 +20,7 @@
     "fix": "pnpm fix:format",
     "test:rust": "cargo test --lib",
     "test:unit": "vitest run",
-    "test": "pnpm run build:node && pnpm run test:unit"
+    "test": "pnpm run test:rust && pnpm run build:node && pnpm run test:unit"
   },
   "keywords": [
     "clustering",

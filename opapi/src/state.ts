@@ -1,12 +1,13 @@
-import type { SchemaObject } from 'openapi3-ts'
-import { VError } from 'verror'
+import type { SchemaObject } from 'openapi3-ts/oas31'
+import VError from 'verror'
 import { z } from 'zod'
 import { schema } from './opapi'
 import type { PathParams } from './path-params'
-import { isAlphanumeric, isCapitalAlphabetical, uniqueBy } from './util'
+import { isAlphanumeric, isCapitalAlphabetical } from './util'
 import { generateSchemaFromZod } from './jsonschema'
 import { OpenApiZodAny } from '@anatine/zod-openapi'
 import { objects } from './objects'
+import { uniqBy, prop, map } from 'ramda'
 
 type SchemaType = 'zod-schema' | 'json-schema'
 type SchemaOfType<T extends SchemaType> = T extends 'zod-schema' ? OpenApiZodAny : SchemaObject
@@ -14,17 +15,19 @@ type SchemaOfType<T extends SchemaType> = T extends 'zod-schema' ? OpenApiZodAny
 export type Options = { allowUnions: boolean }
 const DEFAULT_OPTIONS: Options = { allowUnions: false }
 
+type StateSection<SectionName extends string> = {
+  name: SectionName
+  title: string
+  description: string
+  schema?: string
+  operations: string[]
+}
+
 export type State<SchemaName extends string, DefaultParameterName extends string, SectionName extends string> = {
   metadata: Metadata
   refs: RefMap
   defaultParameters?: { [name in DefaultParameterName]: Parameter<'json-schema'> }
-  sections: {
-    name: SectionName
-    title: string
-    description: string
-    schema?: string
-    operations: string[]
-  }[]
+  sections: StateSection<SectionName>[]
   schemas: Record<SchemaName, { schema: SchemaObject; section: SectionName }>
   errors?: ApiError[]
   operations: { [name: string]: Operation<DefaultParameterName, SectionName, string, 'json-schema'> }
@@ -180,6 +183,7 @@ export function isOperationWithBodyProps<
   } else return false
 }
 
+/** TODO get rid of use of typescript enum */
 export enum ComponentType {
   SCHEMAS = 'schemas',
   RESPONSES = 'responses',
@@ -247,14 +251,6 @@ export function createState<SchemaName extends string, DefaultParameterName exte
 ): State<SchemaName, DefaultParameterName, SectionName> {
   const options = { ...DEFAULT_OPTIONS, ...opts }
 
-  const schemaEntries = props.schemas
-    ? Object.entries<(typeof props.schemas)[SchemaName]>(props.schemas).map(([name, data]) => ({
-        name,
-        schema: data.schema,
-        section: data.section,
-      }))
-    : []
-
   const schemas: Record<string, { schema: SchemaObject; section: SectionName }> = {}
 
   const refs: State<SchemaName, DefaultParameterName, SectionName>['refs'] = {
@@ -264,20 +260,8 @@ export function createState<SchemaName extends string, DefaultParameterName exte
     schemas: {},
   }
 
-  const toPairs = <K extends string, T>(obj: Record<K, T>): [K, T][] => Object.entries(obj) as [K, T][]
-
-  const sections = props.sections
-    ? toPairs(props.sections).map(([name, section]) => ({
-        ...section,
-        name,
-        operations: [],
-        schema: schemaEntries.find((schemaEntry) => schemaEntry.section === name)?.name,
-      }))
-    : []
-
-  schemaEntries.forEach((schemaEntry) => {
-    const name = schemaEntry.name
-
+  const sectionNameToSchemaName = new Map<string, string>()
+  for (const name in props.schemas) {
     if (!isAlphanumeric(name)) {
       throw new VError(`Invalid operation name ${name}. It must be alphanumeric and start with a letter`)
     }
@@ -286,16 +270,32 @@ export function createState<SchemaName extends string, DefaultParameterName exte
       throw new VError(`Schema ${name} already exists`)
     }
 
+    const data = props.schemas[name]
+
+    if (!sectionNameToSchemaName.has(data.section)) {
+      sectionNameToSchemaName.set(data.section, name)
+    }
+
     schemas[name] = {
-      section: schemaEntry.section,
-      schema: generateSchemaFromZod(schemaEntry.schema, options),
+      section: data.section,
+      schema: generateSchemaFromZod(data.schema, options),
     }
     refs.schemas[name] = true
-  })
+  }
+
+  const sections: StateSection<SectionName>[] = []
+  for (const name in props.sections) {
+    sections.push({
+      ...props.sections[name],
+      name,
+      operations: [],
+      schema: sectionNameToSchemaName.get(name),
+    })
+  }
 
   const userErrors = props.errors ?? []
   const defaultErrors = [unknownError, internalError]
-  const errors = uniqueBy([...defaultErrors, ...userErrors], 'type')
+  const errors = uniqBy(prop('type'), [...defaultErrors, ...userErrors])
 
   errors.forEach((error) => {
     if (!isCapitalAlphabetical(error.type)) {
@@ -311,12 +311,7 @@ export function createState<SchemaName extends string, DefaultParameterName exte
     }
   })
 
-  const defaultParameters = props.defaultParameters
-    ? (objects.mapValues(props.defaultParameters, mapParameter) satisfies Record<
-        DefaultParameterName,
-        Parameter<'json-schema'>
-      >)
-    : undefined
+  const defaultParameters = props.defaultParameters ? map(mapParameter, props.defaultParameters) : undefined
 
   return {
     operations: {},

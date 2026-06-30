@@ -1,3 +1,42 @@
-export { OpenApiZodAny } from '@anatine/zod-openapi'
-export * from './opapi'
-export * from './state'
+export type { OpenApiZodAny } from '@anatine/zod-openapi'
+
+export {
+  NewOpapi,
+  schema,
+  type OpenApiProps,
+  type CodePostProcessor,
+  type OpenApiPostProcessors,
+  type GenerateClientProps,
+  OpenApi,
+  SchemaOf,
+  ParameterOf,
+  SectionOf,
+  exportJsonSchemas,
+  exportZodSchemas,
+} from './opapi'
+export {
+  type Options,
+  type State,
+  type ApiError,
+  type Metadata,
+  type PathParameter,
+  type StandardParameter,
+  type BooleanParameter,
+  type IntegerParameter,
+  type NumberParameter,
+  type QueryParameterStringArray,
+  type QueryParameterObject,
+  type Parameter,
+  operationsWithBodyMethod,
+  type OperationWithBodyProps,
+  operationsWithoutBodyMethod,
+  type OperationWithoutBodyMethod,
+  type OperationWithoutBodyProps,
+  type Operation,
+  isOperationWithBodyProps,
+  ComponentType,
+  type ParametersMap,
+  createState,
+  getRef,
+  mapParameter,
+} from './state'

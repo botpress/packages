@@ -1,8 +1,7 @@
 import { OpenApiZodAny, generateSchema as generateJsonSchema } from '@anatine/zod-openapi'
 import { JSONSchema7, JSONSchema7Definition } from 'json-schema'
-import type { SchemaObject } from 'openapi3-ts'
-import { removeFromArray } from './util'
-import _ from 'lodash'
+import { isReferenceObject, type SchemaObject } from 'openapi3-ts/oas31'
+import * as R from 'ramda'
 
 export type GenerateSchemaFromZodOpts = {
   useOutput?: boolean
@@ -13,7 +12,7 @@ export type JsonSchema = JSONSchema7
 export type NullableJsonSchema = JSONSchema7 & { nullable?: boolean }
 
 export const generateSchemaFromZod = (zodRef: OpenApiZodAny, opts?: GenerateSchemaFromZodOpts) => {
-  const jsonSchema = generateJsonSchema(zodRef, opts?.useOutput) as SchemaObject
+  const jsonSchema = generateJsonSchema(zodRef, opts?.useOutput)
   formatJsonSchema(jsonSchema, opts?.allowUnions ?? false)
   return jsonSchema
 }
@@ -33,12 +32,20 @@ export const formatJsonSchema = (jsonSchema: SchemaObject, allowUnions: boolean)
     }
 
     if (typeof jsonSchema.additionalProperties === 'object') {
-      formatJsonSchema(jsonSchema.additionalProperties as SchemaObject, allowUnions)
+      if (isReferenceObject(jsonSchema.additionalProperties)) {
+        throw new Error('Expected additionalProperties to be a SchemaObject')
+      }
+      formatJsonSchema(jsonSchema.additionalProperties, allowUnions)
     }
 
-    Object.entries(jsonSchema.properties ?? {}).forEach(([_, value]) =>
-      formatJsonSchema(value as SchemaObject, allowUnions),
-    )
+    if (jsonSchema.properties) {
+      for (const schemaObject of Object.values(jsonSchema.properties)) {
+        if (isReferenceObject(schemaObject)) {
+          throw new Error('Expected entries in properties to be of type SchemaObject')
+        }
+        formatJsonSchema(schemaObject, allowUnions)
+      }
+    }
   }
 
   if (!allowUnions && (jsonSchema.allOf || jsonSchema.anyOf || jsonSchema.oneOf)) {
@@ -47,10 +54,7 @@ export const formatJsonSchema = (jsonSchema: SchemaObject, allowUnions: boolean)
 }
 
 export function schemaIsEmptyObject(schema: SchemaObject) {
-  const keys = Object.keys(schema)
-
-  removeFromArray(keys, 'title')
-  removeFromArray(keys, 'description')
+  const keys = Object.keys(schema).filter((key) => !['title', 'description'].includes(key))
 
   if (keys.length === 0) {
     return true
@@ -69,67 +73,61 @@ export function schemaIsEmptyObject(schema: SchemaObject) {
   return false
 }
 
-const exploreJsonSchemaDef =
-  (cb: (s: JsonSchema) => JsonSchema) =>
-  (inputSchema: JSONSchema7Definition): JSONSchema7Definition => {
-    if (typeof inputSchema === 'boolean') {
-      return inputSchema
-    }
-    return exploreJsonSchema(cb)(inputSchema)
+const exploreJsonSchemaDef = (
+  cb: (s: JsonSchema) => JsonSchema,
+  inputSchema: JSONSchema7Definition,
+): JSONSchema7Definition => (typeof inputSchema === 'boolean' ? inputSchema : exploreJsonSchema(cb, inputSchema))
+
+export const exploreJsonSchema = (cb: (s: JsonSchema) => JsonSchema, inputSchema: JsonSchema): JsonSchema => {
+  const mappedSchema = cb(inputSchema)
+
+  if (mappedSchema.type === 'object') {
+    const properties = mappedSchema.properties
+      ? R.map((schema: JSONSchema7Definition) => exploreJsonSchemaDef(cb, schema), mappedSchema.properties)
+      : undefined
+    const additionalProperties =
+      typeof mappedSchema.additionalProperties === 'object'
+        ? exploreJsonSchema(cb, mappedSchema.additionalProperties)
+        : mappedSchema.additionalProperties
+    return { ...mappedSchema, properties, additionalProperties }
   }
 
-export const exploreJsonSchema =
-  (cb: (s: JsonSchema) => JsonSchema) =>
-  (inputSchema: JsonSchema): JsonSchema => {
-    const mappedSchema = cb(inputSchema)
-
-    if (mappedSchema.type === 'object') {
-      const properties = mappedSchema.properties
-        ? _.mapValues(mappedSchema.properties, exploreJsonSchema(cb))
-        : mappedSchema.properties
-      const additionalProperties =
-        typeof mappedSchema.additionalProperties === 'object'
-          ? exploreJsonSchema(cb)(mappedSchema.additionalProperties)
-          : mappedSchema.additionalProperties
-      return { ...mappedSchema, properties, additionalProperties }
+  if (mappedSchema.type === 'array') {
+    if (mappedSchema.items === undefined) {
+      return mappedSchema
     }
-
-    if (mappedSchema.type === 'array') {
-      if (mappedSchema.items === undefined) {
-        return mappedSchema
-      }
-      if (Array.isArray(mappedSchema.items)) {
-        return {
-          ...mappedSchema,
-          items: mappedSchema.items.map(exploreJsonSchemaDef(cb)),
-        }
-      }
-      return { ...mappedSchema, items: exploreJsonSchemaDef(cb)(mappedSchema.items) }
-    }
-
-    if (mappedSchema.anyOf) {
+    if (Array.isArray(mappedSchema.items)) {
       return {
         ...mappedSchema,
-        anyOf: mappedSchema.anyOf.map(exploreJsonSchemaDef(cb)),
+        items: mappedSchema.items.map((item) => exploreJsonSchemaDef(cb, item)),
       }
     }
-
-    if (mappedSchema.allOf) {
-      return {
-        ...mappedSchema,
-        allOf: mappedSchema.allOf.map(exploreJsonSchemaDef(cb)),
-      }
-    }
-
-    if (mappedSchema.oneOf) {
-      return {
-        ...mappedSchema,
-        oneOf: mappedSchema.oneOf.map(exploreJsonSchemaDef(cb)),
-      }
-    }
-
-    return mappedSchema
+    return { ...mappedSchema, items: exploreJsonSchemaDef(cb, mappedSchema.items) }
   }
+
+  if (mappedSchema.anyOf) {
+    return {
+      ...mappedSchema,
+      anyOf: mappedSchema.anyOf.map((item) => exploreJsonSchemaDef(cb, item)),
+    }
+  }
+
+  if (mappedSchema.allOf) {
+    return {
+      ...mappedSchema,
+      allOf: mappedSchema.allOf.map((item) => exploreJsonSchemaDef(cb, item)),
+    }
+  }
+
+  if (mappedSchema.oneOf) {
+    return {
+      ...mappedSchema,
+      oneOf: mappedSchema.oneOf.map((item) => exploreJsonSchemaDef(cb, item)),
+    }
+  }
+
+  return mappedSchema
+}
 
 /**
  * Lib "@anatine/zod-openapi" transforms zod to json-schema using the nullable property.
@@ -138,15 +136,15 @@ export const exploreJsonSchema =
  * This function replaces all occurrences of { type: T, nullable: true } with { anyOf: [{ type: T }, { type: 'null' }] }
  */
 export const replaceNullableWithUnion = (schema: NullableJsonSchema): JSONSchema7 => {
-  const mapper = exploreJsonSchema((s) => {
+  const mapper = (s: JsonSchema): JsonSchema => {
     const { nullable, ...schema } = s as NullableJsonSchema
     if (nullable) {
       const { title, description, ...rest } = schema
       return { title, description, anyOf: [rest, { type: 'null' }] }
     }
     return schema
-  })
-  return mapper(schema)
+  }
+  return exploreJsonSchema(mapper, schema)
 }
 
 /**
@@ -155,14 +153,14 @@ export const replaceNullableWithUnion = (schema: NullableJsonSchema): JSONSchema
  * This function replaces all occurrences of { oneOf: [{ type: T1 }, { type: T2 }] } with { anyOf: [{ type: T1 }, { type: T2 }] }
  */
 export const replaceOneOfWithAnyOf = (oneOfSchema: JsonSchema): JSONSchema7 => {
-  const mapper = exploreJsonSchema((schema) => {
+  const mapper = (schema: JsonSchema): JsonSchema => {
     if (schema.oneOf) {
       const { oneOf, ...rest } = schema
       return { anyOf: oneOf, ...rest }
     }
     return schema
-  })
-  return mapper(oneOfSchema)
+  }
+  return exploreJsonSchema(mapper, oneOfSchema)
 }
 
 const _setDefaultAdditionalPropertiesInPlace = (schema: JsonSchema, additionalProperties: boolean): void => {
@@ -203,7 +201,7 @@ const _setDefaultAdditionalPropertiesInPlace = (schema: JsonSchema, additionalPr
 }
 
 export const setDefaultAdditionalProperties = (schema: JsonSchema, additionalProperties: boolean): JsonSchema => {
-  const copy = _.cloneDeep(schema)
+  const copy = R.clone(schema)
   _setDefaultAdditionalPropertiesInPlace(copy, additionalProperties)
   return copy
 }

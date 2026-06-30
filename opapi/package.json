@@ -10,20 +10,21 @@
   },
   "exports": {
     ".": {
+      "types": "./dist/index.d.ts",
       "require": "./dist/index.js",
-      "import": "./dist/index.mjs",
-      "types": "./dist/index.d.ts"
+      "import": "./dist/index.mjs"
     }
   },
   "scripts": {
     "test": "vitest run",
-    "build": "tsup src/index.ts --dts --format cjs,esm --clean",
+    "build": "tsup src/index.ts --dts --format cjs,esm --clean --sourcemap",
     "check:type": "tsc --noEmit",
-    "check:format": "prettier --check .",
-    "fix:format": "prettier --write .",
+    "check:format": "biome format .",
+    "fix:format": "biome format --write .",
     "check": "pnpm run check:type && pnpm run check:format"
   },
   "devDependencies": {
+    "@biomejs/biome": "2.1.4",
     "@swc/core": "1.9.3",
     "@swc/helpers": "0.5.15",
     "@types/decompress": "4.2.7",
@@ -32,17 +33,18 @@
     "@types/lodash": "^4.17.0",
     "@types/node": "^22.16.4",
     "@types/qs": "^6.9.15",
+    "@types/ramda": "^0.31.1",
     "@types/verror": "1.10.10",
-    "prettier": "3.4.1",
+    "memfs": "^4.36.0",
     "ts-node": "10.9.2",
     "tsup": "8.3.5",
     "typescript": "5.7.2",
     "vite": "5.4.11",
     "vite-node": "1.6.0",
-    "vitest": "1.6.0"
+    "vitest": "3.2.4"
   },
   "dependencies": {
-    "@anatine/zod-openapi": "1.12.1",
+    "@anatine/zod-openapi": "2.2.8",
     "@readme/openapi-parser": "2.6.0",
     "axios": "1.7.8",
     "chalk": "4.1.2",
@@ -52,8 +54,9 @@
     "json-schema-to-zod": "1.1.1",
     "lodash": "^4.17.21",
     "openapi-typescript": "6.7.6",
-    "openapi3-ts": "2.0.2",
+    "openapi3-ts": "4.5.0",
     "radash": "12.1.0",
+    "ramda": "^0.31.3",
     "tsconfig-paths": "4.2.0",
     "verror": "1.10.1",
     "winston": "3.17.0",
@@ -63,7 +66,7 @@
   "license": "MIT",
   "engines": {
     "node": ">=16.0.0",
-    "pnpm": "8.6.2"
+    "pnpm": "8.15.9"
   },
-  "packageManager": "pnpm@8.6.2"
+  "packageManager": "pnpm@8.15.9"
 }

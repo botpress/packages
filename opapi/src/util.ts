@@ -15,22 +15,3 @@ export function formatResponseName(operationName: string) {
 export function formatBodyName(operationName: string) {
   return `${operationName}Body`
 }
-
-export function removeFromArray(array: string[], item: string) {
-  const index = array.indexOf(item)
-  if (index > -1) {
-    array.splice(index, 1)
-  }
-}
-
-export function uniqueBy<T, K extends keyof T>(array: readonly T[], k: K): T[] {
-  const seen = new Set<T[K]>()
-  return array.filter((item) => {
-    const v = item[k]
-    if (seen.has(v)) {
-      return false
-    }
-    seen.add(v)
-    return true
-  })
-}

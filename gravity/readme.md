@@ -94,10 +94,24 @@ Building requires the Rust toolchain (the wasm target is added automatically by
 pnpm build        # wasm-pack (node + web) + esbuild bundles + type declarations
 pnpm build:node   # just the Node target
 pnpm build:web    # just the browser target
-pnpm test         # build the node target, then run the wrapper tests (vitest)
-pnpm test:rust    # run the Rust unit tests (cargo)
+pnpm test         # run the Rust tests, then build the node target and run the wrapper tests
+pnpm test:rust    # just the Rust unit tests (cargo)
+pnpm test:unit    # just the TS wrapper tests (vitest)
 pnpm check        # format + type check
 ```
 
 The build emits `dist/node` (CommonJS), `dist/web` (ESM), and `dist/types`; the wasm is
 inlined into the bundles, so there is no separate `.wasm` file to ship.
+
+## Disclaimer ⚠️
+
+This package is published under the `@bpinternal` organization. All packages of this
+organization are meant to be used by the [Botpress](https://github.com/botpress/botpress)
+team internally and are not meant for our community. Since the packages are catered to our
+own use-cases, they might have less stable APIs, receive breaking changes without much
+warning, have minimal documentation and lack community-focused support. However, these
+packages were still left intentionally public for an important reason : We Love
+Open-Source. Therefore, if you wish to install or fork this package feel absolutely free to
+do it. We strongly recommend that you tag your versions properly.
+
+The Botpress Engineering team.

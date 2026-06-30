@@ -1,6 +1,6 @@
 {
   "name": "@bpinternal/gravity",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Generic density-based clustering (UMAP + HDBSCAN), compiled from Rust to WebAssembly.",
   "main": "./dist/node/index.js",
   "module": "./dist/web/index.js",

@@ -1,12 +1,15 @@
-use std::collections::HashMap;
+use std::collections::BTreeMap;
 
 pub struct GroupedLabels {
-    pub groups: HashMap<i32, Vec<usize>>,
+    // BTreeMap (not HashMap) so clusters come out in a deterministic, ascending-label
+    // order. With a persistent wasm instance, HashMap iteration order is not stable
+    // across calls, which would make the output cluster ordering non-deterministic.
+    pub groups: BTreeMap<i32, Vec<usize>>,
     pub noise: Vec<usize>,
 }
 
 pub fn group_labels(labels: &Vec<i32>) -> GroupedLabels {
-    let mut groups: HashMap<i32, Vec<usize>> = HashMap::new();
+    let mut groups: BTreeMap<i32, Vec<usize>> = BTreeMap::new();
     let mut noise = Vec::new();
 
     for (idx, &l) in labels.iter().enumerate() {

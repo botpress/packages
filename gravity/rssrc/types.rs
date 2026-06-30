@@ -56,15 +56,6 @@ impl ClusteringOptions {
     }
 }
 
-/// The full input to the WASM clustering entrypoint: the dataset plus optional overrides.
-#[derive(Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct ClusteringRequest {
-    pub dataset: EmbeddingDataset,
-    #[serde(default)]
-    pub options: ClusteringOptions,
-}
-
 #[derive(Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct Cluster {

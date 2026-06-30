@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "lib": ["es2022", "dom"],
+    "lib": ["es2022"],
     "module": "commonjs",
     "target": "es2022",
     "strict": true,
@@ -8,14 +8,11 @@
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
     "moduleResolution": "node",
-    "declaration": true,
-    "noImplicitReturns": true,
     "noFallthroughCasesInSwitch": true,
+    "noImplicitReturns": true,
     "noUncheckedIndexedAccess": false,
-    "resolveJsonModule": true,
-    "rootDir": "src",
-    "outDir": "dist"
+    "resolveJsonModule": true
   },
-  "include": ["src"],
-  "exclude": ["node_modules", "dist", "**/*.test.ts"]
+  "include": ["src/**/*.ts", "build.ts"],
+  "exclude": ["node_modules", "dist", "pkg"]
 }

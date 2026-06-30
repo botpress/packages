@@ -81,21 +81,23 @@ same clusters (UMAP is seeded with a fixed seed).
 
 ## Development
 
-The engine lives in [`rust/`](./rust). The TypeScript wrapper in [`src/`](./src) loads
-the compiled `gravity.wasm` and marshals data across the WASM boundary.
+The engine lives in [`rssrc/`](./rssrc) and is exposed across the WASM boundary with
+`wasm-bindgen`. `wasm-pack` compiles it to `node` and `web` targets, the wasm binary is
+base64-inlined into the generated glue, and [`build.ts`](./build.ts) bundles the
+TypeScript wrapper in [`src/`](./src) around it with esbuild. This matches the shape of
+the other Rust packages in this repo (`entities`, `verel`).
 
-Building requires the Rust toolchain and the wasm target:
+Building requires the Rust toolchain (the wasm target is added automatically by
+`wasm-pack`):
 
 ```bash
-rustup target add wasm32-unknown-unknown
-```
-
-```bash
-pnpm build        # build the wasm engine, then compile the TS wrapper
-pnpm build:wasm   # just rebuild rust/ -> gravity.wasm
-pnpm test         # rebuild wasm, then run the TS wrapper tests (vitest)
+pnpm build        # wasm-pack (node + web) + esbuild bundles + type declarations
+pnpm build:node   # just the Node target
+pnpm build:web    # just the browser target
+pnpm test         # build the node target, then run the wrapper tests (vitest)
 pnpm test:rust    # run the Rust unit tests (cargo)
 pnpm check        # format + type check
 ```
 
-`gravity.wasm` is a build artifact (git-ignored) and is published alongside `dist/`.
+The build emits `dist/node` (CommonJS), `dist/web` (ESM), and `dist/types`; the wasm is
+inlined into the bundles, so there is no separate `.wasm` file to ship.

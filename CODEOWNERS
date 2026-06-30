@@ -3,6 +3,7 @@ CODEOWNERS @botpress/leads
 entities @botpress/squid
 depsynky @botpress/squid
 es-node @botpress/squid
+gravity @botpress/orca
 jex @botpress/squid
 log4bot @botpress/squid
 opapi @botpress/squid

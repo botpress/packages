@@ -1,0 +1,24 @@
+[package]
+name = "gravity"
+version = "0.1.0"
+edition = "2024"
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+path = "./rssrc/lib.rs"
+
+[features]
+default = ["console_error_panic_hook"]
+
+[dependencies]
+hdbscan = "0.12.0"
+serde = { version = "1", features = ["derive"] }
+wasm-bindgen = "0.2"
+serde-wasm-bindgen = "0.6"
+
+# Better panic messages in the browser console during development.
+console_error_panic_hook = { version = "0.1.7", optional = true }
+
+[profile.release]
+opt-level = 3
+lto = true

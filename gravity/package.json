@@ -1,0 +1,53 @@
+{
+  "name": "@bpinternal/gravity",
+  "version": "0.1.0",
+  "description": "Generic density-based clustering (UMAP + HDBSCAN), compiled from Rust to WebAssembly.",
+  "main": "./dist/node/index.js",
+  "module": "./dist/web/index.js",
+  "types": "./dist/types/index.d.ts",
+  "repository": {
+    "url": "https://github.com/botpress/packages"
+  },
+  "scripts": {
+    "build:node": "ts-node -T ./build.ts nodejs",
+    "build:web": "ts-node -T ./build.ts web",
+    "build:type": "tsc -p tsconfig.build.json --noCheck",
+    "build": "pnpm run build:node && pnpm run build:web && pnpm run build:type",
+    "check:type": "tsc --noEmit",
+    "check:format": "prettier --check .",
+    "fix:format": "prettier --write .",
+    "check": "pnpm check:format && pnpm check:type",
+    "fix": "pnpm fix:format",
+    "test:rust": "cargo test --lib",
+    "test:unit": "vitest run",
+    "test": "pnpm run test:rust && pnpm run build:node && pnpm run test:unit"
+  },
+  "keywords": [
+    "clustering",
+    "hdbscan",
+    "umap",
+    "dimensionality-reduction",
+    "embeddings"
+  ],
+  "author": "Botpress, Inc.",
+  "license": "MIT",
+  "dependencies": {
+    "browser-or-node": "^2.1.1"
+  },
+  "devDependencies": {
+    "@types/lodash": "^4.14.202",
+    "@types/node": "^22.16.4",
+    "esbuild": "^0.25.0",
+    "lodash": "^4.17.21",
+    "prettier": "^3.3.3",
+    "ts-node": "^10.9.2",
+    "typescript": "5.8.3",
+    "vitest": "^3.2.4",
+    "wasm-pack": "^0.13.0"
+  },
+  "engines": {
+    "node": ">=16.0.0",
+    "pnpm": "8.6.2"
+  },
+  "packageManager": "pnpm@8.6.2"
+}

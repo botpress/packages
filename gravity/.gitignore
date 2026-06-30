@@ -1,0 +1,9 @@
+node_modules
+dist
+/target
+pkg/node
+pkg/web
+**/*.rs.bk
+wasm-pack.log
+*.log
+.DS_Store

@@ -35,9 +35,6 @@ jobs:
         with:
           node-version: '22.17.0'
           check-latest: true
-      - uses: dtolnay/rust-toolchain@stable
-        with:
-          targets: wasm32-unknown-unknown
       - run: pnpm install --frozen-lockfile
       - run: pnpm build
       - run: pnpm check:type

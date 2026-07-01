@@ -1,7 +1,7 @@
 import { readFileSync } from 'node:fs'
 
 /**
- * Mirror of the tsup `inline-wasm` esbuild plugin for vitest: turns `.wasm` imports
+ * Mirror of the tsup `inline-wasm` esbuild plugin for vitest: turns `.wasm` and `.gz` imports
  * into a module whose default export is the raw bytes, so tests can import
  * `wasm/index.ts` (which inlines the tokenizer wasm) without a bundling step.
  *
@@ -12,7 +12,7 @@ export const inlineWasm = () => ({
   name: 'inline-wasm',
   enforce: 'pre' as const,
   load(id: string) {
-    if (!id.endsWith('.wasm')) return null
+    if (!id.endsWith('.wasm') && !id.endsWith('.gz')) return null
     const base64 = readFileSync(id).toString('base64')
     return `const bytes = Buffer.from(${JSON.stringify(base64)}, 'base64');\nexport default bytes;`
   },

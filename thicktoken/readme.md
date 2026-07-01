@@ -10,6 +10,22 @@ MIT © Chonkie, Inc. — see `NOTICE`). Historically backed by tiktoken — the 
   end). Only tokenizes the window it needs, so it's fast on huge inputs.
 - `split(text)` / `splitAndSlice(text)` — per-token strings / sliceable collection.
 
+## Variants (edge / size-sensitive targets)
+
+Same API, smaller vocab (truncated cl100k merges — valid BPE by prefix-closure). One shared
+wasm engine; each entry bundles only its own vocab asset. Regenerate assets with
+`node wasm/scripts/gen-assets.mjs`.
+
+| import | vocab | total gz (ESM) | init | counts vs cl100k |
+| --- | --- | ---: | ---: | --- |
+| `@bpinternal/thicktoken` | cl100k (full) | ~647 KB | ~60 ms | exact |
+| `@bpinternal/thicktoken/lite` | cl50k | ~392 KB | ~25 ms | overcounts ~+3-7% |
+| `@bpinternal/thicktoken/micro` | cl25k | ~275 KB | ~13 ms | overcounts ~+8-20% |
+
+Truncated variants only ever **overcount** — safe for budget enforcement (they trim a bit
+more, never overflow a window). Do **not** use them for billing math or exact window
+packing; inflation is content-dependent (worst on emoji/unicode-dense text).
+
 
 ## Disclaimer ⚠️
 

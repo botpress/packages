@@ -78,12 +78,16 @@ export class WasmTokenizer {
         }
     }
     /**
-     * Construct from the embedded cl100k model.
+     * Construct from a gzip'd merges-only asset (see wasm/scripts/gen-assets.mjs).
+     * The JS entry point supplies the bytes of whichever vocab variant it bundles.
+     * @param {Uint8Array} asset_gz
      */
-    constructor() {
+    constructor(asset_gz) {
         try {
             const retptr = wasm.__wbindgen_add_to_stack_pointer(-16);
-            wasm.wasmtokenizer_new(retptr);
+            const ptr0 = passArray8ToWasm0(asset_gz, wasm.__wbindgen_export);
+            const len0 = WASM_VECTOR_LEN;
+            wasm.wasmtokenizer_new(retptr, ptr0, len0);
             var r0 = getDataViewMemory0().getInt32(retptr + 4 * 0, true);
             var r1 = getDataViewMemory0().getInt32(retptr + 4 * 1, true);
             var r2 = getDataViewMemory0().getInt32(retptr + 4 * 2, true);
@@ -290,6 +294,13 @@ let heap_next = heap.length;
 function passArray32ToWasm0(arg, malloc) {
     const ptr = malloc(arg.length * 4, 4) >>> 0;
     getUint32ArrayMemory0().set(arg, ptr / 4);
+    WASM_VECTOR_LEN = arg.length;
+    return ptr;
+}
+
+function passArray8ToWasm0(arg, malloc) {
+    const ptr = malloc(arg.length * 1, 1) >>> 0;
+    getUint8ArrayMemory0().set(arg, ptr / 1);
     WASM_VECTOR_LEN = arg.length;
     return ptr;
 }

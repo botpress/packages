@@ -18,9 +18,10 @@ export class WasmTokenizer {
      */
     encode(text: string): Uint32Array;
     /**
-     * Construct from the embedded cl100k model.
+     * Construct from a gzip'd merges-only asset (see wasm/scripts/gen-assets.mjs).
+     * The JS entry point supplies the bytes of whichever vocab variant it bundles.
      */
-    constructor();
+    constructor(asset_gz: Uint8Array);
     /**
      * Return the substring covered by tokens [start, end) (end exclusive; like
      * Array.slice). Negative-style indexing is done on the JS side. Exact.
@@ -50,7 +51,7 @@ export interface InitOutput {
     readonly wasmtokenizer_count: (a: number, b: number, c: number, d: number) => number;
     readonly wasmtokenizer_decode: (a: number, b: number, c: number, d: number) => void;
     readonly wasmtokenizer_encode: (a: number, b: number, c: number, d: number) => void;
-    readonly wasmtokenizer_new: (a: number) => void;
+    readonly wasmtokenizer_new: (a: number, b: number, c: number) => void;
     readonly wasmtokenizer_slice: (a: number, b: number, c: number, d: number, e: number, f: number) => void;
     readonly wasmtokenizer_split: (a: number, b: number, c: number, d: number) => void;
     readonly wasmtokenizer_truncate: (a: number, b: number, c: number, d: number, e: number, f: number, g: number) => void;

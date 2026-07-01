@@ -1,12 +1,12 @@
 use wasm_bindgen::prelude::*;
 
-// Merges-only cl100k asset, gzip-compressed (~469KB gz). The full `model.vocab`
-// (1.5MB of JSON, fully redundant for a topological/tiktoken-style BPE) is dropped
-// and the tokenizer is built directly from base bytes + merges at init — see
-// `build_tokenizer` (no JSON round-trip through tokie's `from_json_str`).
+// The merges-only vocab asset is NOT embedded here: the constructor takes the
+// gzip'd asset bytes from JS. This keeps the wasm code-only (~125KB gz) and lets
+// the package ship vocab variants (full cl100k / lite cl50k / micro cl25k — see
+// wasm/scripts/gen-assets.mjs) that share one binary and differ only in which
+// asset the JS entry bundles. The full `model.vocab` is never shipped at all —
+// it's fully derivable for a topological BPE and rebuilt in `build_tokenizer`.
 // Asset shape: { "merges": [...], "added_tokens": [...], "pre_tokenizer": {...} }.
-// (pre_tokenizer is embedded for provenance but unused — cl100k pretok is fixed.)
-const CL100K_MERGES_GZ: &[u8] = include_bytes!("../assets/cl100k_merges.json.gz");
 
 /// GPT-2/cl100k byte-level codec: maps each byte 0..=255 to the unicode code point
 /// used in `tokenizer.json` merge strings ("Ġ" = space, etc.), and its inverse.
@@ -217,10 +217,11 @@ fn ceil_char_boundary(s: &str, mut i: usize) -> usize {
 
 #[wasm_bindgen]
 impl WasmTokenizer {
-    /// Construct from the embedded cl100k model.
+    /// Construct from a gzip'd merges-only asset (see wasm/scripts/gen-assets.mjs).
+    /// The JS entry point supplies the bytes of whichever vocab variant it bundles.
     #[wasm_bindgen(constructor)]
-    pub fn new() -> Result<WasmTokenizer, JsValue> {
-        let asset_bytes = inflate_gzip(CL100K_MERGES_GZ)?;
+    pub fn new(asset_gz: &[u8]) -> Result<WasmTokenizer, JsValue> {
+        let asset_bytes = inflate_gzip(asset_gz)?;
         let asset: serde_json::Value = serde_json::from_slice(&asset_bytes)
             .map_err(|_| JsValue::from_str("asset parse failed"))?;
         let inner = build_tokenizer(&asset)?;

@@ -17,6 +17,16 @@
       "types": "./dist/tokenizer.d.ts",
       "import": "./dist/tokenizer.mjs",
       "require": "./dist/tokenizer.js"
+    },
+    "./lite": {
+      "types": "./dist/lite.d.ts",
+      "import": "./dist/lite.mjs",
+      "require": "./dist/lite.js"
+    },
+    "./micro": {
+      "types": "./dist/micro.d.ts",
+      "import": "./dist/micro.mjs",
+      "require": "./dist/micro.js"
     }
   },
   "keywords": [],

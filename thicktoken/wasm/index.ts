@@ -38,10 +38,13 @@ export interface CountOptions {
 export class WasmTokenizer {
   private constructor(private readonly raw: RawTokenizer) {}
 
-  /** Build the cl100k tokenizer (loads the embedded merges + builds the encoder). */
-  static create(): WasmTokenizer {
+  /**
+   * Build a tokenizer from a gzip'd merges-only asset (one of wasm/assets/*.gz —
+   * full cl100k, lite cl50k, or micro cl25k; see wasm/scripts/gen-assets.mjs).
+   */
+  static create(assetGz: Uint8Array): WasmTokenizer {
     ensureInit()
-    return new WasmTokenizer(new RawTokenizer())
+    return new WasmTokenizer(new RawTokenizer(assetGz))
   }
 
   /** The vocabulary size (100,263 for cl100k). */

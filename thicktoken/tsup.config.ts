@@ -3,7 +3,7 @@ import { defineConfig } from 'tsup'
 import { readFileSync } from 'fs'
 
 export default defineConfig({
-  entry: ['src/tokenizer.ts'],
+  entry: ['src/tokenizer.ts', 'src/lite.ts', 'src/micro.ts'],
   format: ['cjs', 'esm'],
   platform: 'neutral',
   clean: true,
@@ -13,9 +13,9 @@ export default defineConfig({
   cjsInterop: true,
   esbuildPlugins: [
     {
-      name: 'inline-wasm',
+      name: 'inline-binary', // inlines .wasm (engine code) and .gz (vocab assets) as bytes
       setup(build) {
-        build.onLoad({ filter: /\.wasm$/ }, async (args) => {
+        build.onLoad({ filter: /\.(wasm|gz)$/ }, async (args) => {
           const data = readFileSync(args.path)
           const base64 = data.toString('base64')
 

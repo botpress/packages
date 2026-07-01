@@ -11,6 +11,8 @@
  */
 import { describe, it, expect, beforeAll } from 'vitest'
 import { WasmTokenizer } from '../wasm/index'
+// @ts-ignore - inlined by the vitest plugin
+import cl100k from '../wasm/assets/cl100k_merges.json.gz'
 import { generateSentence } from './__tests/utils'
 
 // A tiktoken-backed reference for exact token slicing (thicktoken lacks a raw
@@ -35,7 +37,7 @@ describe('WasmTokenizer', () => {
   let big: string
 
   beforeAll(async () => {
-    wasm = WasmTokenizer.create()
+    wasm = WasmTokenizer.create(cl100k)
     // Large realistic input for truncate/slice/approx tests. We use natural-language
     // prose (repeated) rather than random glued words: tokie's cl100k pretokenizer has
     // a known alpha edge case on apostrophe-contractions glued mid-"word" with no

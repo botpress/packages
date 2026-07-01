@@ -206,4 +206,40 @@ describe('truncate', () => {
       )
     })
   })
+
+  describe('modes (head/tail/middle)', () => {
+    it('head is the default', async () => {
+      expect(tokenizer.truncate('one two three four five', 2)).toEqual('one two')
+      expect(tokenizer.truncate('one two three four five', 2, 'head')).toEqual('one two')
+    })
+
+    it('tail keeps the last N tokens', async () => {
+      const short = tokenizer.truncate('one two three four five', 2, 'tail')
+      expect(short).toEqual(' four five')
+      expect(tokenizer.count(short, { approximate: false })).toEqual(2)
+
+      const long = tokenizer.truncate(SINGLE_TOKEN.repeat(100_000), 3, 'tail')
+      expect(long).toEqual(SINGLE_TOKEN.repeat(3))
+      expect(tokenizer.count(long, { approximate: false })).toEqual(3)
+    })
+
+    it('middle keeps both ends, dropping the center', async () => {
+      const kept = tokenizer.truncate('one two three four five', 4, 'middle')
+      expect(kept).toEqual('one two four five')
+      expect(tokenizer.count(kept, { approximate: false })).toEqual(4)
+
+      // large input: exactly N tokens survive, half from each end
+      const big = 'BEGIN' + SINGLE_TOKEN.repeat(100_000) + ' END'
+      const trimmed = tokenizer.truncate(big, 1_000, 'middle')
+      expect(tokenizer.count(trimmed, { approximate: false })).toEqual(1_000)
+      expect(trimmed.startsWith('BEGIN')).toBe(true)
+      expect(trimmed.endsWith(' END')).toBe(true)
+    })
+
+    it('modes return the whole text when maxTokens exceeds total', async () => {
+      const s = 'short text'
+      expect(tokenizer.truncate(s, 1000, 'tail')).toEqual(s)
+      expect(tokenizer.truncate(s, 1000, 'middle')).toEqual(s)
+    })
+  })
 })

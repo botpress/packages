@@ -292,8 +292,17 @@ impl WasmTokenizer {
             "middle" => {
                 let head_n = max_tokens / 2;
                 let tail_n = max_tokens - head_n;
-                let mut out = self.take_head(text, head_n);
-                out.push_str(&self.take_tail(text, tail_n));
+                let head = self.take_head(text, head_n);
+                let tail = self.take_tail(text, tail_n);
+                // The head window covers the first head_n tokens, the tail window the
+                // last tail_n. If together they span (or exceed) the whole text, the
+                // windows meet/overlap — total <= max_tokens — so keep everything
+                // (naive concatenation would duplicate the overlap).
+                if head.len() + tail.len() >= text.len() {
+                    return Ok(text.to_string());
+                }
+                let mut out = head;
+                out.push_str(&tail);
                 Ok(out)
             }
             _ => Err(JsValue::from_str("mode must be head|tail|middle")),

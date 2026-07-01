@@ -67,11 +67,16 @@ export class TextTokenizer {
   }
 
   /**
-   * Truncates to `maxTokens` tokens. A positive count keeps the first N tokens
-   * (exact — only tokenizes the prefix window it needs, fast on huge inputs). A
-   * negative count removes |N| tokens from the end, mirroring the historical API.
+   * Truncates to `maxTokens` tokens, keeping the part selected by `mode`:
+   *  - `'head'` (default) — the first N tokens
+   *  - `'tail'` — the last N tokens
+   *  - `'middle'` — the first N/2 and last N/2, dropping the middle
+   *
+   * Exact, and fast on huge inputs — only tokenizes the window it needs. A
+   * negative count removes |N| tokens from the end (historical API; `mode` is
+   * ignored in that case).
    */
-  public truncate(text: string, maxTokens: number): string {
+  public truncate(text: string, maxTokens: number, mode: TruncateMode = 'head'): string {
     text ??= ''
     if (maxTokens === 0) {
       return ''
@@ -84,7 +89,7 @@ export class TextTokenizer {
       return text.slice(0, text.length - tail.length)
     }
 
-    return this.tokenizer.truncate(text, maxTokens, 'head')
+    return this.tokenizer.truncate(text, maxTokens, mode)
   }
 
   public truncateObject<T extends PropertyKey>(

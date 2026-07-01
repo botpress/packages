@@ -310,25 +310,33 @@ impl WasmTokenizer {
         }
     }
 
-    /// Return the substring covered by tokens [start, end) (end exclusive; like
-    /// Array.slice). Negative-style indexing is done on the JS side. Exact.
-    pub fn slice(&self, text: &str, start: usize, end: usize) -> Result<String, JsValue> {
-        if end <= start {
-            return Ok(String::new());
-        }
+    /// Return the substring covered by tokens [start, end) (end exclusive, like
+    /// Array.slice; negative indices count from the end, omitted end = to-the-end).
+    /// Negative/omitted indices are resolved HERE, against the single encode pass —
+    /// resolving on the JS side would need a separate exact count (a second full
+    /// encode). Exact.
+    pub fn slice(&self, text: &str, start: i32, end: Option<i32>) -> Result<String, JsValue> {
         // General path: encode the whole thing once and decode the id range. For the
         // common prefix/suffix cases the dedicated head/tail helpers are far cheaper,
         // so callers that only need those should use `truncate`.
         let ids = self.inner.encode(text, false).ids;
-        let s = start.min(ids.len());
-        let e = end.min(ids.len());
+        let total = ids.len() as i64;
+        let resolve = |i: i32| -> i64 {
+            if (i as i64) < 0 {
+                (total + i as i64).max(0)
+            } else {
+                (i as i64).min(total)
+            }
+        };
+        let s = resolve(start);
+        let e = end.map_or(total, resolve);
         if e <= s {
             return Ok(String::new());
         }
         // Lossy: a token-range boundary can split a multi-byte UTF-8 char (e.g. an
         // emoji spanning several tokens), so decode bytes and lossy-convert rather
         // than failing — matches thicktoken's TextDecoder behavior.
-        Ok(self.decode_lossy(&ids[s..e]))
+        Ok(self.decode_lossy(&ids[s as usize..e as usize]))
     }
 
     /// Decode token ids to a String, replacing any invalid UTF-8 (from a range that

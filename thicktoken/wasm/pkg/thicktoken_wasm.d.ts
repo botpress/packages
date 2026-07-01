@@ -23,10 +23,13 @@ export class WasmTokenizer {
      */
     constructor(asset_gz: Uint8Array);
     /**
-     * Return the substring covered by tokens [start, end) (end exclusive; like
-     * Array.slice). Negative-style indexing is done on the JS side. Exact.
+     * Return the substring covered by tokens [start, end) (end exclusive, like
+     * Array.slice; negative indices count from the end, omitted end = to-the-end).
+     * Negative/omitted indices are resolved HERE, against the single encode pass —
+     * resolving on the JS side would need a separate exact count (a second full
+     * encode). Exact.
      */
-    slice(text: string, start: number, end: number): string;
+    slice(text: string, start: number, end?: number | null): string;
     /**
      * Encode `text` and return one decoded string per token (lossy — a token whose
      * bytes aren't valid UTF-8 on their own yields U+FFFD, matching a lenient

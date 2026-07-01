@@ -1,14 +1,5 @@
-import { WasmTokenizer, type TruncateMode } from '../wasm/index'
+import { WasmTokenizer, type CountOptions, type TruncateMode } from '../wasm/index'
 import { deepClone, mapValues, uniq } from './utils'
-
-export type CountOptions = {
-  /**
-   * When true (default), very large inputs are counted by statistical sampling —
-   * orders of magnitude faster and within a few %. Small inputs
-   * are always counted exactly. Pass false to force an exact count.
-   */
-  approximate?: boolean
-}
 
 export class TokenCollection {
   public constructor(private _tokens: string[]) {}
@@ -165,4 +156,4 @@ export const makeGetTokenizer = (assetGz: Uint8Array) => {
   }
 }
 
-export { WasmTokenizer, type TruncateMode }
+export { WasmTokenizer, type CountOptions, type TruncateMode }

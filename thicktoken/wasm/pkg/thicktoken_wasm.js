@@ -102,11 +102,14 @@ export class WasmTokenizer {
         }
     }
     /**
-     * Return the substring covered by tokens [start, end) (end exclusive; like
-     * Array.slice). Negative-style indexing is done on the JS side. Exact.
+     * Return the substring covered by tokens [start, end) (end exclusive, like
+     * Array.slice; negative indices count from the end, omitted end = to-the-end).
+     * Negative/omitted indices are resolved HERE, against the single encode pass —
+     * resolving on the JS side would need a separate exact count (a second full
+     * encode). Exact.
      * @param {string} text
      * @param {number} start
-     * @param {number} end
+     * @param {number | null} [end]
      * @returns {string}
      */
     slice(text, start, end) {
@@ -116,7 +119,7 @@ export class WasmTokenizer {
             const retptr = wasm.__wbindgen_add_to_stack_pointer(-16);
             const ptr0 = passStringToWasm0(text, wasm.__wbindgen_export, wasm.__wbindgen_export2);
             const len0 = WASM_VECTOR_LEN;
-            wasm.wasmtokenizer_slice(retptr, this.__wbg_ptr, ptr0, len0, start, end);
+            wasm.wasmtokenizer_slice(retptr, this.__wbg_ptr, ptr0, len0, start, isLikeNone(end) ? Number.MAX_SAFE_INTEGER : (end) >> 0);
             var r0 = getDataViewMemory0().getInt32(retptr + 4 * 0, true);
             var r1 = getDataViewMemory0().getInt32(retptr + 4 * 1, true);
             var r2 = getDataViewMemory0().getInt32(retptr + 4 * 2, true);
@@ -290,6 +293,10 @@ let heap = new Array(1024).fill(undefined);
 heap.push(undefined, null, true, false);
 
 let heap_next = heap.length;
+
+function isLikeNone(x) {
+    return x === undefined || x === null;
+}
 
 function passArray32ToWasm0(arg, malloc) {
     const ptr = malloc(arg.length * 4, 4) >>> 0;

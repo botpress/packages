@@ -91,14 +91,10 @@ export class WasmTokenizer {
   /**
    * Return the substring covered by tokens `[start, end)` (end exclusive, like
    * `Array.prototype.slice`). Negative indices count from the end. `end` omitted
-   * means "to the end". Exact.
+   * means "to the end". Exact — indices are resolved inside the wasm against the
+   * single encode pass (no separate count call).
    */
   slice(text: string, start = 0, end?: number): string {
-    // Resolve negative / omitted indices against the exact token count.
-    const total = this.raw.count(text, false)
-    const s = start < 0 ? Math.max(0, total + start) : Math.min(start, total)
-    const e = end === undefined ? total : end < 0 ? Math.max(0, total + end) : Math.min(end, total)
-    if (e <= s) return ''
-    return this.raw.slice(text, s, e)
+    return this.raw.slice(text, start, end)
   }
 }

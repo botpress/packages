@@ -1,7 +1,7 @@
 {
   "name": "@bpinternal/thicktoken",
-  "version": "2.0.0",
-  "description": "Tiktoken but thicker; A bundled tokenizer with added helper functions",
+  "version": "3.0.0",
+  "description": "A bundled cl100k tokenizer (Rust→WASM) with count/truncate/split helpers",
   "repository": {
     "url": "https://github.com/botpress/packages"
   },
@@ -25,8 +25,8 @@
   "devDependencies": {
     "@types/node": "^22.16.4",
     "dotenv": "^16.4.7",
-    "tiktoken": "^1.0.17",
-    "tsup": "^8.3.6",
+    "gpt-tokenizer": "3.4.0",
+    "tsup": "^8.5.1",
     "typescript": "^5.7.3",
     "vitest": "^2.0.5"
   },

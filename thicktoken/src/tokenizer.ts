@@ -1,17 +1,22 @@
-import cl100k_base from 'tiktoken/encoders/cl100k_base.json'
-import { Tiktoken, init } from 'tiktoken/lite/init'
+import { WasmTokenizer, type TruncateMode } from '../wasm/index'
 import { deepClone, mapValues, uniq } from './utils'
 
 let tokenizer: TextTokenizer | null = null
-let lock: Promise<void> | false = false
 
-const CHUNK_SIZE = 100_000
+export type CountOptions = {
+  /**
+   * When true (default), very large inputs are counted by statistical sampling —
+   * orders of magnitude faster and within a few %. Small inputs
+   * are always counted exactly. Pass false to force an exact count.
+   */
+  approximate?: boolean
+}
 
-class TokenCollection {
-  public constructor(private _tokenizer: Tiktoken, private _modelOutput: Uint32Array<ArrayBufferLike>) {}
+export class TokenCollection {
+  public constructor(private _tokens: string[]) {}
 
   public get length(): number {
-    return this._modelOutput.length
+    return this._tokens.length
   }
 
   public slice(start: number, end?: number): string[] {
@@ -19,26 +24,11 @@ class TokenCollection {
     if (start >= end) {
       return []
     }
-
-    const decoder = new TextDecoder()
-    const str: string[] = []
-
-    for (let i = start; i < end; i++) {
-      const token = this._modelOutput[i]!
-      str.push(this._decodeToken(decoder, token))
-    }
-
-    return str
-  }
-
-  private _decodeToken(decoder: TextDecoder, encodedToken: number): string {
-    // copying to a new array because of memory allocation in WASM
-    const copy = this._tokenizer.decode(new Uint32Array([encodedToken]))
-    return decoder.decode(copy)
+    return this._tokens.slice(start, end)
   }
 
   private _clampIndexes(start: number, end?: number): [number, number] {
-    const max = this._modelOutput.length
+    const max = this._tokens.length
 
     end ??= max
 
@@ -55,7 +45,7 @@ class TokenCollection {
 export class TextTokenizer {
   private warnOnSlowCalls = true
 
-  constructor(private tokenizer: Tiktoken) {
+  constructor(private tokenizer: WasmTokenizer) {
     this.truncate = this.wrapWithWarning('truncate', this.truncate.bind(this))
     this.truncateObject = this.wrapWithWarning('truncateObject', this.truncateObject.bind(this))
     this.split = this.wrapWithWarning('split', this.split.bind(this))
@@ -76,70 +66,25 @@ export class TextTokenizer {
     }
   }
 
-  private *splitIntoChunks(text: string): Generator<string> {
-    const MARGIN = 1000
-    for (let i = 0; i < text.length; ) {
-      if (i + CHUNK_SIZE >= text.length) {
-        yield text.slice(i)
-        i += CHUNK_SIZE
-        break
-      }
-
-      const next = text.slice(i + CHUNK_SIZE - MARGIN, i + CHUNK_SIZE)
-      const unsafe = this.split(next).slice(-1)[0]!.length
-
-      yield text.slice(i, i + CHUNK_SIZE - unsafe)
-
-      i += CHUNK_SIZE - unsafe
-    }
-  }
-
-  private truncate_reverse(text: string, maxTokens: number): string {
-    const decoder = new TextDecoder()
-    let charsToTruncate = 0
-    let truncatedTokens = 0
-
-    const chunks = [...this.splitIntoChunks(text)].reverse()
-
-    master: for (const chunk of chunks) {
-      const tokens = this.tokenizer.encode(chunk ?? '').reverse()
-
-      for (const token of tokens) {
-        truncatedTokens += 1
-        charsToTruncate += decoder.decode(this.tokenizer.decode(new Uint32Array([token]))).length
-
-        if (truncatedTokens >= maxTokens) {
-          break master
-        }
-      }
-    }
-
-    return text.slice(0, -charsToTruncate)
-  }
-
+  /**
+   * Truncates to `maxTokens` tokens. A positive count keeps the first N tokens
+   * (exact — only tokenizes the prefix window it needs, fast on huge inputs). A
+   * negative count removes |N| tokens from the end, mirroring the historical API.
+   */
   public truncate(text: string, maxTokens: number): string {
+    text ??= ''
+    if (maxTokens === 0) {
+      return ''
+    }
+
     if (maxTokens < 0) {
-      return this.truncate_reverse(text, -maxTokens)
+      // remove |maxTokens| tokens from the end: find the trailing-token substring
+      // (fast suffix window) and cut it off the original text
+      const tail = this.tokenizer.truncate(text, -maxTokens, 'tail')
+      return text.slice(0, text.length - tail.length)
     }
 
-    const decoder = new TextDecoder()
-    let truncatedText = ''
-    let remainingTokens = maxTokens
-
-    for (const chunk of this.splitIntoChunks(text)) {
-      const tokens = this.tokenizer.encode(chunk ?? '')
-
-      if (tokens.length <= remainingTokens) {
-        truncatedText += chunk
-        remainingTokens -= tokens.length
-      } else {
-        const truncatedTokens = tokens.slice(0, remainingTokens)
-        truncatedText += decoder.decode(this.tokenizer.decode(truncatedTokens))
-        break
-      }
-    }
-
-    return truncatedText
+    return this.tokenizer.truncate(text, maxTokens, 'head')
   }
 
   public truncateObject<T extends PropertyKey>(
@@ -155,7 +100,9 @@ export class TextTokenizer {
       return mapValues(object, () => '')
     }
 
-    const tokens = this.count(Object.values(object).join(''))
+    // budget accounting must balance exactly, so force exact counts here
+    const exact = { approximate: false } as const
+    const tokens = this.count(Object.values(object).join(''), exact)
     let toTruncate = tokens - maxTokens
     const newObject = deepClone(object) as Record<T, string>
     const keys = uniq([...truncateOrder, ...Object.keys(object)]) as T[]
@@ -169,9 +116,9 @@ export class TextTokenizer {
       const truncatedValue = this.truncate(value, -toTruncate)
       newObject[key] = truncatedValue
       if (truncatedValue.length) {
-        toTruncate -= this.count(value) - this.count(truncatedValue)
+        toTruncate -= this.count(value, exact) - this.count(truncatedValue, exact)
       } else {
-        toTruncate -= this.count(value)
+        toTruncate -= this.count(value, exact)
       }
     }
 
@@ -182,58 +129,30 @@ export class TextTokenizer {
     return newObject
   }
 
+  /** One decoded string per token. */
   public split(text: string): string[] {
-    const output = this.tokenizer.encode(text ?? '')
-    const collection = new TokenCollection(this.tokenizer, output)
-    return collection.slice(0)
+    return this.tokenizer.split(text ?? '')
   }
 
   public splitAndSlice(text: string): TokenCollection {
-    const output = this.tokenizer.encode(text ?? '')
-    return new TokenCollection(this.tokenizer, output)
+    return new TokenCollection(this.tokenizer.split(text ?? ''))
   }
 
   /**
-   * Counts the number of tokens, up to a fixed ceiling, after which we return
-   * The reason to have a ceiling is to avoid performance issues with very large texts
+   * Counts tokens. Approximate by default on very large inputs (statistical
+   * sampling, within a few %) — pass `{ approximate: false }` for an exact count.
    */
-  public count(text: string, max: number = 1_000_000): number {
-    let total = 0
-    for (const chunk of this.splitIntoChunks(text)) {
-      const tokens = this.tokenizer.encode(chunk ?? '')
-      total += tokens.length
-      if (total > max) {
-        break
-      }
-    }
-
-    return total
+  public count(text: string, options: CountOptions = {}): number {
+    return this.tokenizer.count(text ?? '', options)
   }
-}
-
-const initialize = async () => {
-  const bytes = (await import('tiktoken/lite/tiktoken_bg.wasm')).default
-  await init((imports) => WebAssembly.instantiate(bytes, imports))
-  const _tokenizer = new Tiktoken(cl100k_base.bpe_ranks, cl100k_base.special_tokens, cl100k_base.pat_str)
-  tokenizer = new TextTokenizer(_tokenizer)
 }
 
 export const getWasmTokenizer = async () => {
-  if (tokenizer) {
-    return tokenizer
-  }
-
-  if (lock) {
-    await lock
-  } else {
-    lock = initialize()
-    await lock
-    lock = false
-  }
-
   if (!tokenizer) {
-    throw new Error('Tokenizer failed to initialize')
+    tokenizer = new TextTokenizer(WasmTokenizer.create())
   }
 
-  return tokenizer!
+  return tokenizer
 }
+
+export { WasmTokenizer, type TruncateMode }

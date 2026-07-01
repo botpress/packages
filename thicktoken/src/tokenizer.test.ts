@@ -119,14 +119,15 @@ describe('count', () => {
     expect(tokenizer.count(SINGLE_TOKEN.repeat(123))).toBe(123)
     expect(tokenizer.count(SINGLE_TOKEN.repeat(1111))).toBe(1111)
     expect(tokenizer.count(SINGLE_TOKEN.repeat(4444))).toBe(4444)
-    expect(tokenizer.count(SINGLE_TOKEN.repeat(120_000))).toBe(120_000)
+    // above the sampling threshold the default is approximate; exact mode is opt-in
+    expect(tokenizer.count(SINGLE_TOKEN.repeat(120_000), { approximate: false })).toBe(120_000)
   })
 
-  it('should count the number of tokens (overflow)', async () => {
-    const overflow = tokenizer.count(SINGLE_TOKEN.repeat(5_000_000))
-    expect(tokenizer.count(SINGLE_TOKEN.repeat(1_000_000))).toBe(1_000_000)
-    expect(overflow).toBeGreaterThanOrEqual(1_000_000)
-    expect(overflow).toBeLessThanOrEqual(1_250_000)
+  it('approximates large counts within 1% by default, exact on demand', async () => {
+    const approx = tokenizer.count(SINGLE_TOKEN.repeat(1_000_000))
+    expect(approx).toBeGreaterThanOrEqual(990_000)
+    expect(approx).toBeLessThanOrEqual(1_010_000)
+    expect(tokenizer.count(SINGLE_TOKEN.repeat(1_000_000), { approximate: false })).toBe(1_000_000)
   })
 })
 
@@ -164,8 +165,10 @@ describe('truncate', () => {
       )
 
       expect(tokenizer.truncate(begin + SINGLE_TOKEN.repeat(1_000_000), 200_000)).toEqual(
-        // Not sure why this is 199_998 instead of 199_999
-        begin + SINGLE_TOKEN.repeat(199_998)
+        // BEGIN (1 token) + 199_999 TOKENs = exactly 200_000 tokens. The old chunked
+        // tiktoken implementation dropped one token at a chunk boundary (199_998); the
+        // new engine is boundary-exact.
+        begin + SINGLE_TOKEN.repeat(199_999)
       )
     })
 

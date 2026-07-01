@@ -1,6 +1,15 @@
 # ThickToken
 
-Tiktoken but thicker; A bundled tokenizer with added helper functions
+A bundled cl100k tokenizer with added helper functions (count / truncate / split), powered
+by our own Rust→WASM build (see `wasm/`, engine: [tokie](https://github.com/feyninc/tokie),
+MIT © Chonkie, Inc. — see `NOTICE`). Historically backed by tiktoken — the API is unchanged.
+
+- `count(text, { approximate })` — approximate **by default** on large inputs (statistical
+  sampling, within a few %, ~100× faster); pass `{ approximate: false }` for exact.
+- `truncate(text, n)` — exact; keeps the first `n` tokens (negative `n` removes from the
+  end). Only tokenizes the window it needs, so it's fast on huge inputs.
+- `split(text)` / `splitAndSlice(text)` — per-token strings / sliceable collection.
+
 
 ## Disclaimer ⚠️
 

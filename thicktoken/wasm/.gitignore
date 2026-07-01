@@ -1,0 +1,3 @@
+# Rust build artifacts (144MB) — do not commit.
+# Cargo.lock IS committed (matches gravity/verel/entities convention for reproducible builds).
+/target

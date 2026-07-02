@@ -1,0 +1,30 @@
+[package]
+name = "thicktoken-wasm"
+version = "0.0.1"
+edition = "2021"
+
+[lib]
+name = "thicktoken_wasm"
+crate-type = ["cdylib"]
+
+[dependencies]
+wasm-bindgen = "0.2"
+# BPE engine: the `tokie` crate (github.com/feyninc/tokie, MIT © Chonkie, Inc.).
+# default features only -> no `hf` (network), no getrandom. See ../NOTICE.
+tokie = { version = "0.0.10", default-features = false }
+# pure-Rust gzip inflate (wasm-friendly) so we embed the vocab compressed and
+# decompress once at init.
+miniz_oxide = "0.8"
+# parse the merges-only asset at init (vocab is reconstructed from base bytes +
+# merges for topological cl100k).
+serde_json = "1.0"
+
+[profile.release]
+opt-level = "z"
+lto = true
+codegen-units = 1
+panic = "abort"
+strip = true
+
+[package.metadata.wasm-pack.profile.release]
+wasm-opt = ["-Oz", "--enable-bulk-memory", "--enable-sign-ext", "--enable-nontrapping-float-to-int"]

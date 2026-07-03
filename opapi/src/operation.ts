@@ -1,5 +1,5 @@
 import { extendApi } from '@anatine/zod-openapi'
-import { VError } from 'verror'
+import VError from 'verror'
 import { generateSchemaFromZod } from './jsonschema'
 import { objects } from './objects'
 import {

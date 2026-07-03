@@ -5,7 +5,8 @@ import { getFiles } from '../src/file'
 import { validateTypescriptFile } from './util'
 
 describe('client generator', () => {
-  it('should be able to generate a client with openapi-generator', async () => {
+  // Makes a call to api.openapi-generator.tech ???
+  it.skip('should be able to generate a client with openapi-generator', async () => {
     const genClientFolder = join(__dirname, 'gen/client-openapi-generator')
 
     const api = getMockApi()
@@ -24,6 +25,7 @@ describe('client generator', () => {
     })
   })
 
+  // Makes a call to api.openapi-generator.tech ???
   it('should be able to generate a client with opapi', async () => {
     const genClientFolder = join(__dirname, 'gen/client-opapi')
 

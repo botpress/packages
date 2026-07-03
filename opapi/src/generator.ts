@@ -2,7 +2,7 @@ import pathlib from 'path'
 import fslib from 'fs'
 import chalk from 'chalk'
 import _ from 'lodash'
-import { VError } from 'verror'
+import VError from 'verror'
 import { defaultResponseStatus, invalidLine, tsFileHeader } from './const'
 import { appendHeaders, initDirectory, removeLineFromFiles, saveFile } from './file'
 import {

@@ -31,12 +31,13 @@ export const config = (options: TOptionalPromsterOptions = {}): ReturnType<typeo
   if (!promsterMiddleware) {
     promsterMiddleware = createMiddleware({
       options: {
-        ...defaultNormalizers,
-        normalizePath: normalizePath() as any, // The type of normalizePath is wrong any is required
+        normalizeStatusCode: (statusCode) => defaultNormalizers.normalizeStatusCode(statusCode),
+        normalizeMethod: (method) => defaultNormalizers.normalizeMethod(method),
+        normalizePath: (path, { req }) => normalizePath()(path, { req }),
         metricBuckets: {
-          httpRequestDurationInSeconds: [0.05, 0.1, 0.5, 1, 3, 10, 60, 120],
+          httpRequestDurationInSeconds: [0.05, 0.1, 0.5, 1, 3, 10, 60, 120]
         },
-        ...options,
+        ...options
       }
     })
   }

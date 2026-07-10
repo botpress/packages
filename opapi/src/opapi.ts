@@ -7,12 +7,15 @@ import {
   generateServer,
   generateTypesBySection,
 } from './generator'
-import { ComponentType, Operation, Options, State, CreateStateProps, getRef, createState } from './state'
-import { exportStateAsTypescript, ExportStateAsTypescriptOptions } from './generators/ts-state'
+import { ComponentType, getRef, createState } from './state'
+import type { Operation, Options, State, CreateStateProps, Parameter } from './state'
+import { exportStateAsTypescript } from './generators/ts-state'
+import type { ExportStateAsTypescriptOptions } from './generators/ts-state'
 import { generateHandler } from './handler-generator'
-import { applyExportOptions, ExportStateOptions } from './export-options'
+import { applyExportOptions } from './export-options'
+import type { ExportStateOptions } from './export-options'
 import { addOperation } from './operation'
-export { Operation, Parameter } from './state'
+export type { Operation, Parameter } from './state'
 
 type AnatineSchemaObject = NonNullable<Parameters<typeof extendApi>[1]>
 

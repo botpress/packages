@@ -178,14 +178,42 @@ export class Github implements GitSource {
     if (setup.exitCode !== 0) {
       throw new Error(`configuring git credentials failed: ${setup.result}`);
     }
-    const push = await sandbox.process.executeCommand(
-      `git push --set-upstream origin '${branch.replace(/'/g, `'\\''`)}'`,
-      path,
-      undefined,
-      300,
-    );
-    if (push.exitCode !== 0) {
-      throw new Error(`git push failed: ${push.result}`);
+    // Push, rebasing onto the remote tip and retrying if the branch moved under us.
+    // Two comment webhooks for the same PR clone the same head independently, so the
+    // second push is rejected non-fast-forward; without this, that run's work would be
+    // silently lost when its sandbox is torn down. Replaying our commits onto the new
+    // tip preserves both updates. A bounded loop guards against a branch churning faster
+    // than we can push.
+    const quoted = branch.replace(/'/g, `'\\''`);
+    const maxAttempts = 5;
+    for (let attempt = 1; ; attempt++) {
+      const push = await sandbox.process.executeCommand(
+        `git push --set-upstream origin '${quoted}'`,
+        path,
+        undefined,
+        300,
+      );
+      if (push.exitCode === 0) return;
+
+      const rejected = /non-fast-forward|fetch first|\[rejected\]/i.test(push.result ?? "");
+      if (!rejected || attempt >= maxAttempts) {
+        throw new Error(`git push failed: ${push.result}`);
+      }
+
+      const rebase = await sandbox.process.executeCommand(
+        `git fetch origin '${quoted}' && git rebase 'origin/${quoted}'`,
+        path,
+        undefined,
+        300,
+      );
+      if (rebase.exitCode !== 0) {
+        // A real content conflict can't be resolved unattended; abort to leave the tree
+        // clean and surface it, rather than force-pushing over the other update.
+        await sandbox.process.executeCommand("git rebase --abort", path, undefined, 60);
+        throw new Error(
+          `git push failed: branch '${branch}' diverged and auto-rebase hit a conflict: ${rebase.result}`,
+        );
+      }
     }
   }
 
@@ -205,13 +233,57 @@ export class Github implements GitSource {
       base: this.branch,
       body: params.body,
     });
-    await this.octokit.rest.issues.addLabels({
-      owner: this.owner,
-      repo: this.name,
-      issue_number: pr.number,
-      labels: [params.label],
-    });
+
+    // The loop counts and discovers its PRs purely by label (see `openPrIssues`), so a PR
+    // that exists without the label is invisible: the next run would miss it, exceed
+    // `maxOpenPrCount`, and reopen the same signals. Labeling can't be made atomic with
+    // creation (the REST API has no combined call), so retry it to ride out a transient
+    // blip without discarding the agent's work, and if it still fails, close the PR rather
+    // than leave an unlabeled orphan — the signals stay unclaimed and a later run retries.
+    try {
+      await this.retry(() =>
+        this.octokit.rest.issues.addLabels({
+          owner: this.owner,
+          repo: this.name,
+          issue_number: pr.number,
+          labels: [params.label],
+        }),
+      );
+    } catch (error) {
+      await this.closePrQuietly(pr.number);
+      throw new Error(
+        `opened PR #${pr.number} but could not label it "${params.label}"; closed it to avoid an ` +
+          `unlabeled orphan the loop can't count or claim. Cause: ${(error as Error).message ?? String(error)}`,
+      );
+    }
     return pr.html_url;
+  }
+
+  /** Retries a request a few times; the label call must not be abandoned over a transient error. */
+  private async retry<T>(fn: () => Promise<T>, attempts = 3): Promise<T> {
+    let lastError: unknown;
+    for (let i = 0; i < attempts; i++) {
+      try {
+        return await fn();
+      } catch (error) {
+        lastError = error;
+      }
+    }
+    throw lastError;
+  }
+
+  /** Best-effort PR close used to roll back a partially-created PR; a failure here is swallowed. */
+  private async closePrQuietly(prNumber: number): Promise<void> {
+    try {
+      await this.octokit.rest.pulls.update({
+        owner: this.owner,
+        repo: this.name,
+        pull_number: prNumber,
+        state: "closed",
+      });
+    } catch {
+      // Nothing we can do — the caller is already throwing the underlying labeling error.
+    }
   }
 
   private async ensureLabel(label: string): Promise<void> {

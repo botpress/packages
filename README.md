@@ -1,10 +1,10 @@
 # packages
 
-Internal packages used by the Botpress team accross multiple repositories.
+Internal packages used by the Botpress team across multiple repositories.
 
 These packages are not meant for our community. Since the packages are catered to our own use-cases, they might have less stable APIs, receive breaking changes without much warning, have minimal documentation and lack community-focused support. However, they were still left intentionally public for an important reason : **We Love Open-Source**.
 
-Therefore, if you wish to install or fork any of these packages feel absolutly free to do it. We strongly recommend that you tag your versions properly.
+Therefore, if you wish to install or fork any of these packages feel absolutely free to do it. We strongly recommend that you tag your versions properly.
 
 ## Licensing
 

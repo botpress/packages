@@ -37,6 +37,7 @@ jobs:
           check-latest: true
       - run: pnpm install --frozen-lockfile
       - run: pnpm build
+      - run: pnpm check:type
       - run: pnpm test
       - name: Publish
         if: github.ref == 'refs/heads/master' || github.event_name == 'workflow_dispatch'

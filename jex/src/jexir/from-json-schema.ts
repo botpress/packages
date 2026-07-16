@@ -72,32 +72,28 @@ const _toInternalRep = (path: JSONSchemaPropertyPath, schema: JSONSchema7Definit
     return { type: 'undefined' }
   }
 
-  if (schema.oneOf !== undefined) {
-    throw new errors.JexUnsuportedJsonSchemaError(path.path, { oneOf: schema.oneOf })
-  }
-
   if (schema.$ref !== undefined) {
     throw new errors.JexUnresolvedReferenceError(path.path)
   }
 
   if (schema.patternProperties !== undefined) {
-    throw new errors.JexUnsuportedJsonSchemaError(path.path, { patternProperties: schema.patternProperties })
+    throw new errors.JexUnsupportedJsonSchemaError(path.path, { patternProperties: schema.patternProperties })
   }
 
   if (schema.propertyNames !== undefined) {
-    throw new errors.JexUnsuportedJsonSchemaError(path.path, { propertyNames: schema.propertyNames })
+    throw new errors.JexUnsupportedJsonSchemaError(path.path, { propertyNames: schema.propertyNames })
   }
 
   if (schema.if !== undefined) {
-    throw new errors.JexUnsuportedJsonSchemaError(path.path, { if: schema.if })
+    throw new errors.JexUnsupportedJsonSchemaError(path.path, { if: schema.if })
   }
 
   if (schema.then !== undefined) {
-    throw new errors.JexUnsuportedJsonSchemaError(path.path, { then: schema.then })
+    throw new errors.JexUnsupportedJsonSchemaError(path.path, { then: schema.then })
   }
 
   if (schema.else !== undefined) {
-    throw new errors.JexUnsuportedJsonSchemaError(path.path, { else: schema.else })
+    throw new errors.JexUnsupportedJsonSchemaError(path.path, { else: schema.else })
   }
 
   if (schema.not !== undefined) {
@@ -114,7 +110,7 @@ const _toInternalRep = (path: JSONSchemaPropertyPath, schema: JSONSchema7Definit
       }
     }
 
-    throw new errors.JexUnsuportedJsonSchemaError(path.path, { not: schema.not })
+    throw new errors.JexUnsupportedJsonSchemaError(path.path, { not: schema.not })
   }
 
   if (Array.isArray(schema.type)) {
@@ -241,6 +237,14 @@ const _toInternalRep = (path: JSONSchemaPropertyPath, schema: JSONSchema7Definit
     return {
       type: 'union',
       anyOf: schema.anyOf.map((s, i) => _toInternalRep(path.key('anyOf').index(i), s))
+    }
+  }
+
+  if (schema.oneOf !== undefined) {
+    // technically a oneOf is more than a union, but from jexir's POV, it's equivalent.
+    return {
+      type: 'union',
+      anyOf: schema.oneOf.map((s, i) => _toInternalRep(path.key('oneOf').index(i), s))
     }
   }
 

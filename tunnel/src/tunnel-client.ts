@@ -170,7 +170,7 @@ export class TunnelHead extends TunnelClient {
         this.events.emit('hello', {})
         return
       }
-      this.events.emit('response', message.reponse)
+      this.events.emit('response', message.response)
     })
   }
 
@@ -183,7 +183,7 @@ export class TunnelHead extends TunnelClient {
 
   private _parseMessage = (
     ev: WebSocket.MessageEvent
-  ): { type: 'hello' } | { type: 'response'; reponse: TunnelResponse } | undefined => {
+  ): { type: 'hello' } | { type: 'response'; response: TunnelResponse } | undefined => {
     const data = JSON.parse(ev.data.toString())
 
     const parseResult = headSchema.safeParse(data)
@@ -195,6 +195,6 @@ export class TunnelHead extends TunnelClient {
       return { type: 'hello' }
     }
 
-    return { type: 'response', reponse: parseResult.data }
+    return { type: 'response', response: parseResult.data }
   }
 }

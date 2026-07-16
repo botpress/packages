@@ -1,0 +1,6 @@
+dist
+node_modules
+pkg
+rssrc
+Cargo.lock
+pnpm-lock.yaml

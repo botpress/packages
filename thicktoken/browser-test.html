@@ -1,0 +1,51 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>thicktoken wasm browser test</title>
+  </head>
+  <body>
+    <h1>thicktoken browser test — full / lite / micro</h1>
+    <p>Serve this directory over HTTP (module imports don't work from <code>file://</code>).</p>
+    <pre id="out">loading…</pre>
+    <script type="module">
+      const out = document.getElementById('out')
+      const lines = []
+      const log = (s) => {
+        lines.push(s)
+        out.textContent = lines.join('\n')
+      }
+      window.addEventListener('error', (e) => log('WINDOW ERROR: ' + e.message))
+      try {
+        const sample = 'The quick brown fox jumps over the lazy dog. '.repeat(200)
+        const checks = []
+        let fullCount = 0
+        for (const [name, path] of [
+          ['full ', './dist/tokenizer.mjs'],
+          ['lite ', './dist/lite.mjs'],
+          ['micro', './dist/micro.mjs'],
+        ]) {
+          const t0 = performance.now()
+          const { getWasmTokenizer } = await import(path)
+          const tok = await getWasmTokenizer()
+          const init = performance.now() - t0
+          const count = tok.count(sample, { approximate: false })
+          if (name.trim() === 'full') fullCount = count
+          const ok =
+            tok.truncate('one two three four', 2) === 'one two' &&
+            tok.truncate('one two three four', 2, 'tail') === ' three four' &&
+            tok.split('Hello').join('') === 'Hello' &&
+            count >= fullCount // truncated variants only ever overcount
+          checks.push(ok)
+          log(
+            `${ok ? 'PASS' : 'FAIL'} ${name} init=${init.toFixed(0)}ms count=${count} (${((count / fullCount) * 100).toFixed(1)}% of full) truncate/split ok=${ok}`
+          )
+        }
+        log('')
+        log(checks.every(Boolean) ? `ALL ${checks.length} VARIANTS PASSED ✅` : 'SOME CHECKS FAILED ❌')
+      } catch (e) {
+        log('ERROR: ' + (e && e.stack ? e.stack : String(e)))
+      }
+    </script>
+  </body>
+</html>

@@ -81,3 +81,6 @@ gen/
 .ignore.me.*
 
 custom-e2e/
+
+# gstack (local tooling state)
+.gstack/

@@ -1,7 +1,7 @@
 {
   "name": "@bpinternal/thicktoken",
-  "version": "1.0.6",
-  "description": "Tiktoken but thicker; A bundled tokenizer with added helper functions",
+  "version": "3.0.0",
+  "description": "A bundled cl100k tokenizer (Rust→WASM) with count/truncate/split helpers",
   "repository": {
     "url": "https://github.com/botpress/packages"
   },
@@ -9,13 +9,24 @@
     "build": "tsup",
     "test": "tsup && vitest run --config vitest.config.ts",
     "test:update": "vitest -u run --config vitest.config.ts",
-    "test:watch": "vitest --config vitest.config.ts"
+    "test:watch": "vitest --config vitest.config.ts",
+    "check:type": "tsc --noEmit"
   },
   "exports": {
     ".": {
       "types": "./dist/tokenizer.d.ts",
       "import": "./dist/tokenizer.mjs",
       "require": "./dist/tokenizer.js"
+    },
+    "./lite": {
+      "types": "./dist/lite.d.ts",
+      "import": "./dist/lite.mjs",
+      "require": "./dist/lite.js"
+    },
+    "./micro": {
+      "types": "./dist/micro.d.ts",
+      "import": "./dist/micro.mjs",
+      "require": "./dist/micro.js"
     }
   },
   "keywords": [],
@@ -24,8 +35,8 @@
   "devDependencies": {
     "@types/node": "^22.16.4",
     "dotenv": "^16.4.7",
-    "tiktoken": "^1.0.17",
-    "tsup": "^8.3.6",
+    "gpt-tokenizer": "3.4.0",
+    "tsup": "^8.5.1",
     "typescript": "^5.7.3",
     "vitest": "^2.0.5"
   },

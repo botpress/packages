@@ -1,0 +1,1 @@
+# wasm-pack rewrites this to `*`; committed pkg lets tests run without Rust.

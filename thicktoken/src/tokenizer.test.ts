@@ -1,8 +1,12 @@
 import { describe, it, expect, beforeEach, afterEach, beforeAll } from 'vitest'
-import { getWasmTokenizer } from '../dist/tokenizer.mjs'
+import * as dist from '../dist/tokenizer.mjs'
 import { type TextTokenizer } from './tokenizer'
 import { performance } from 'perf_hooks'
 import { generateSentence } from './__tests/utils'
+
+const getWasmTokenizer = async (): Promise<TextTokenizer> => {
+  return (await dist.getWasmTokenizer()) as any
+}
 
 type TaskContext = {
   task: {
@@ -115,14 +119,15 @@ describe('count', () => {
     expect(tokenizer.count(SINGLE_TOKEN.repeat(123))).toBe(123)
     expect(tokenizer.count(SINGLE_TOKEN.repeat(1111))).toBe(1111)
     expect(tokenizer.count(SINGLE_TOKEN.repeat(4444))).toBe(4444)
-    expect(tokenizer.count(SINGLE_TOKEN.repeat(120_000))).toBe(120_000)
+    // above the sampling threshold the default is approximate; exact mode is opt-in
+    expect(tokenizer.count(SINGLE_TOKEN.repeat(120_000), { approximate: false })).toBe(120_000)
   })
 
-  it('should count the number of tokens (overflow)', async () => {
-    const overflow = tokenizer.count(SINGLE_TOKEN.repeat(5_000_000))
-    expect(tokenizer.count(SINGLE_TOKEN.repeat(1_000_000))).toBe(1_000_000)
-    expect(overflow).toBeGreaterThanOrEqual(1_000_000)
-    expect(overflow).toBeLessThanOrEqual(1_250_000)
+  it('approximates large counts within 1% by default, exact on demand', async () => {
+    const approx = tokenizer.count(SINGLE_TOKEN.repeat(1_000_000))
+    expect(approx).toBeGreaterThanOrEqual(990_000)
+    expect(approx).toBeLessThanOrEqual(1_010_000)
+    expect(tokenizer.count(SINGLE_TOKEN.repeat(1_000_000), { approximate: false })).toBe(1_000_000)
   })
 })
 
@@ -160,8 +165,10 @@ describe('truncate', () => {
       )
 
       expect(tokenizer.truncate(begin + SINGLE_TOKEN.repeat(1_000_000), 200_000)).toEqual(
-        // Not sure why this is 199_998 instead of 199_999
-        begin + SINGLE_TOKEN.repeat(199_998)
+        // BEGIN (1 token) + 199_999 TOKENs = exactly 200_000 tokens. The old chunked
+        // tiktoken implementation dropped one token at a chunk boundary (199_998); the
+        // new engine is boundary-exact.
+        begin + SINGLE_TOKEN.repeat(199_999)
       )
     })
 
@@ -197,6 +204,42 @@ describe('truncate', () => {
         // Not sure why this is 100_000 instead of 99_999
         begin + SINGLE_TOKEN.repeat(100_000)
       )
+    })
+  })
+
+  describe('modes (head/tail/middle)', () => {
+    it('head is the default', async () => {
+      expect(tokenizer.truncate('one two three four five', 2)).toEqual('one two')
+      expect(tokenizer.truncate('one two three four five', 2, 'head')).toEqual('one two')
+    })
+
+    it('tail keeps the last N tokens', async () => {
+      const short = tokenizer.truncate('one two three four five', 2, 'tail')
+      expect(short).toEqual(' four five')
+      expect(tokenizer.count(short, { approximate: false })).toEqual(2)
+
+      const long = tokenizer.truncate(SINGLE_TOKEN.repeat(100_000), 3, 'tail')
+      expect(long).toEqual(SINGLE_TOKEN.repeat(3))
+      expect(tokenizer.count(long, { approximate: false })).toEqual(3)
+    })
+
+    it('middle keeps both ends, dropping the center', async () => {
+      const kept = tokenizer.truncate('one two three four five', 4, 'middle')
+      expect(kept).toEqual('one two four five')
+      expect(tokenizer.count(kept, { approximate: false })).toEqual(4)
+
+      // large input: exactly N tokens survive, half from each end
+      const big = 'BEGIN' + SINGLE_TOKEN.repeat(100_000) + ' END'
+      const trimmed = tokenizer.truncate(big, 1_000, 'middle')
+      expect(tokenizer.count(trimmed, { approximate: false })).toEqual(1_000)
+      expect(trimmed.startsWith('BEGIN')).toBe(true)
+      expect(trimmed.endsWith(' END')).toBe(true)
+    })
+
+    it('modes return the whole text when maxTokens exceeds total', async () => {
+      const s = 'short text'
+      expect(tokenizer.truncate(s, 1000, 'tail')).toEqual(s)
+      expect(tokenizer.truncate(s, 1000, 'middle')).toEqual(s)
     })
   })
 })

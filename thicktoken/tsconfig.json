@@ -20,11 +20,12 @@
     "emitDecoratorMetadata": true,
     "useUnknownInCatchVariables": false,
     "forceConsistentCasingInFileNames": true,
+    "noUncheckedIndexedAccess": true,
     "outDir": "./dist",
-    "rootDir": "./src",
+    "rootDir": ".",
     "types": ["node"],
     "declarationDir": "./dist"
   },
-  "exclude": ["**/dist/", "**/node_modules/", "**/*.test.ts", "**/__tests"],
-  "include": ["./src/**/*"]
+  "exclude": ["**/dist/", "**/node_modules/", "**/*.test.ts", "**/__tests", "wasm/target"],
+  "include": ["./src/**/*", "./wasm/index.ts", "./wasm/wasm.d.ts"]
 }

@@ -3,48 +3,56 @@ const typesCode = `
 type JsonRequestBody = { requestBody?: { content: { 'application/json': {} } } }
 type BinaryRequestBody = { requestBody?: { content: { '*/*': {} } } }
 
-type RequestBody = JsonRequestBody | BinaryRequestBody
 type Responses = { responses: { default: { content: { 'application/json': {} } } } }
-type Parameters = { parameters?: {} }
 
-type GetPathParameters<T> = T extends { path?: any } ? NonNullable<T['path']> : {}
-type GetHeaderParameters<T> = T extends { header?: any } ? NonNullable<T['header']> : {}
-type GetCookieParameters<T> = T extends { cookie?: any } ? NonNullable<T['cookie']> : {}
-type GetQueryParameters<T> = T extends { query?: any } ? NonNullable<T['query']> : {}
+type HandleNever<T, Fallback = {}> = [Exclude<T, undefined>] extends [never] ? Fallback : NonNullable<T>
 
-type GetRequestBody<T> = T extends JsonRequestBody ? NonNullable<T['requestBody']>['content']['application/json'] : T extends BinaryRequestBody ? NonNullable<T['requestBody']>['content']['*/*'] : {}
-type GetParameters<T> = T extends Parameters
-  ? GetPathParameters<NonNullable<T['parameters']>> &
-      GetHeaderParameters<NonNullable<T['parameters']>> &
-      GetCookieParameters<NonNullable<T['parameters']>> &
-      GetQueryParameters<NonNullable<T['parameters']>>
+type GetPathParameters<T> = T extends { path?: infer P } ? HandleNever<P> : {}
+type GetHeaderParameters<T> = T extends { header?: infer H } ? HandleNever<H> : {}
+type GetCookieParameters<T> = T extends { cookie?: infer C } ? HandleNever<C> : {}
+type GetQueryParameters<T> = T extends { query?: infer Q } ? HandleNever<Q> : {}
+
+type GetRequestBody<T> = T extends { requestBody?: infer Body }
+  ? HandleNever<Body> extends infer SafeBody
+    ? SafeBody extends { content: { 'application/json': infer JsonBody } }
+      ? JsonBody
+      : SafeBody extends { content: { '*/*': infer BinaryBody } }
+        ? BinaryBody
+        : {}
+    : {}
+  : {}
+type GetParameters<T> = T extends { parameters?: infer Params }
+  ? GetPathParameters<HandleNever<Params>> &
+      GetHeaderParameters<HandleNever<Params>> &
+      GetCookieParameters<HandleNever<Params>> &
+      GetQueryParameters<HandleNever<Params>>
   : {}
 
 type HandleEmptyObject<T> = T extends Record<string, never> ? {} : T
 type GetOperationInput<T> = GetParameters<T> & HandleEmptyObject<GetRequestBody<T>>
 type GetOperationOutput<T extends Responses> = T['responses']['default']['content']['application/json']
 
-type Operation<K extends string> = {
-  [key in K]: RequestBody & Responses & Parameters
-}
-
-export type GetOperations<K extends string, O extends Operation<K>> = {
+export type GetOperations<K extends string, O extends Record<K, Responses>> = {
   [key in K]: (props: GetOperationInput<O[key]>, req: Request) => Promise<GetOperationOutput<O[key]>>
 }
 
-export type GetOperationsInputs<K extends string, O extends Operation<K>> = {
+export type GetOperationsInputs<K extends string, O extends Record<K, Responses>> = {
   [key in keyof O]: GetOperationInput<O[key]>
 }
 
-export type GetOperationsOutputs<K extends string, O extends Operation<K>> = {
+export type GetOperationsOutputs<K extends string, O extends Record<K, Responses>> = {
   [key in keyof O]: GetOperationOutput<O[key]>
 }
 
 type Paths<P extends string> = { [path in P]: { [key: string]: any } }
 
+type HandlerMethodKeys<T> = {
+  [K in keyof T]: K extends 'parameters' ? never : [Exclude<T[K], undefined>] extends [never] ? never : K
+}[keyof T]
+
 export type GetHandlers<PathKeys extends string, P extends Paths<PathKeys>> = {
   [path in PathKeys]: {
-    [method in keyof P[path]]: Handler
+    [method in HandlerMethodKeys<P[path]>]: Handler
   }
 }
 `

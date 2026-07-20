@@ -25,10 +25,6 @@ import type {
   Signal,
 } from "./types";
 
-const BOT_NAME = "control-loop[bot]";
-/** Committer email for the loop's commits when the git source doesn't specify one. */
-const DEFAULT_BOT_EMAIL = "control-loop@users.noreply.github.com";
-
 export class ControlLoop<TData = unknown> {
   constructor(private readonly options: ControlLoopOptions<TData>) {}
 
@@ -117,7 +113,8 @@ export class ControlLoop<TData = unknown> {
     try {
       await log.step(`cloning ${branch ?? config.git.branch} into ${REPO_PATH}`, async () => {
         await config.git.cloneInto(sandbox, REPO_PATH, branch);
-        await sandbox.git.configureUser(BOT_NAME, config.git.email ?? DEFAULT_BOT_EMAIL, "local", REPO_PATH);
+        const { name, email } = await config.git.committer();
+        await sandbox.git.configureUser(name, email, "local", REPO_PATH);
       });
 
       const ctx = makeAgentContext(sandbox);

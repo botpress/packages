@@ -2,6 +2,10 @@ import type { Sandbox } from "@daytona/sdk";
 import { createAppAuth } from "@octokit/auth-app";
 import { Octokit } from "octokit";
 
+/** Committer identity used when the git source can't derive an account-backed one. */
+const DEFAULT_BOT_NAME = "control-loop[bot]";
+const DEFAULT_BOT_EMAIL = "control-loop@users.noreply.github.com";
+
 /** A human comment on a PR. `file`/`line` are present for inline review comments only. */
 export interface PrComment {
   id: number;
@@ -25,6 +29,13 @@ export interface GitSource {
    * Optional — the loop falls back to a default no-reply address when unset.
    */
   readonly email?: string;
+  /**
+   * Resolved `{ name, email }` to stamp on the loop's commits. The email must be one GitHub
+   * can attribute to a real account, or downstream gates that verify commit authorship (e.g.
+   * Vercel's Git author verification) reject the PR's deploys. {@link GithubApp} overrides
+   * this with its App's own verified bot address; the base returns a plain no-reply default.
+   */
+  committer(): Promise<{ name: string; email: string }>;
   countOpenPrs(label: string): Promise<number>;
   /** Bodies of the open PRs carrying the loop's label; used to skip already-claimed signals. */
   listOpenPrBodies(label: string): Promise<string[]>;
@@ -91,6 +102,10 @@ export abstract class GithubBase implements GitSource {
    * A PAT-less {@link Github} can still clone and count PRs on a public repo but not push.
    */
   protected abstract get authenticated(): boolean;
+
+  async committer(): Promise<{ name: string; email: string }> {
+    return { name: DEFAULT_BOT_NAME, email: this.email ?? DEFAULT_BOT_EMAIL };
+  }
 
   async countOpenPrs(label: string): Promise<number> {
     return (await this.openPrIssues(label)).length;
@@ -412,6 +427,7 @@ export type GithubAppProps = GithubBaseProps & {
  */
 export class GithubApp extends GithubBase {
   protected readonly octokit: Octokit;
+  private botIdentity?: { name: string; email: string };
 
   constructor(props: GithubAppProps) {
     super(props);
@@ -423,6 +439,28 @@ export class GithubApp extends GithubBase {
         installationId: props.installationId,
       },
     });
+  }
+
+  /**
+   * The App's own bot identity: `<slug>[bot]` with the canonical
+   * `<user-id>+<slug>[bot]@users.noreply.github.com` no-reply email GitHub recognises.
+   * Committing under this makes GitHub attribute the commit to the App's bot account, which
+   * author-verification gates (e.g. Vercel) require — the base default's made-up address
+   * belongs to no account, so those gates block the resulting deploys. An explicit `email`
+   * prop still wins. Cached: the app/user lookups don't change within a run.
+   */
+  override async committer(): Promise<{ name: string; email: string }> {
+    if (this.email) return { name: DEFAULT_BOT_NAME, email: this.email };
+    if (!this.botIdentity) {
+      const { data: app } = await this.octokit.rest.apps.getAuthenticated();
+      const login = `${app!.slug}[bot]`;
+      const { data: user } = await this.octokit.rest.users.getByUsername({ username: login });
+      this.botIdentity = {
+        name: login,
+        email: `${user.id}+${login}@users.noreply.github.com`,
+      };
+    }
+    return this.botIdentity;
   }
 
   protected async gitToken(): Promise<string> {

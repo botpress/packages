@@ -1,6 +1,6 @@
 import type { Sandbox } from "@daytona/sdk";
 import { describe, expect, test } from "vitest";
-import { Github } from "./github";
+import { GithubApp, Github } from "./github";
 
 /**
  * A Sandbox stand-in whose `process.executeCommand` is driven by a router. The router
@@ -158,5 +158,105 @@ describe("Github.openPr", () => {
     const calls = stubOctokit(gh, Infinity);
     await expect(gh.openPr(params)).rejects.toThrow(/unlabeled orphan/);
     expect(calls.closePr).toBe(1);
+  });
+});
+
+describe("Github.committer", () => {
+  test("falls back to the default bot no-reply identity when no email is set", async () => {
+    await expect(github().committer()).resolves.toEqual({
+      name: "control-loop[bot]",
+      email: "control-loop@users.noreply.github.com",
+    });
+  });
+
+  test("uses the configured email while keeping the default bot name", async () => {
+    const gh = new Github({ repo: "https://github.com/o/r.git", branch: "main", email: "bot@x.com" });
+    await expect(gh.committer()).resolves.toEqual({ name: "control-loop[bot]", email: "bot@x.com" });
+  });
+});
+
+describe("GithubApp", () => {
+  const app = () =>
+    new GithubApp({
+      repo: "https://github.com/o/r.git",
+      branch: "main",
+      appId: 123,
+      privateKey: "-----BEGIN RSA PRIVATE KEY-----\nfake\n-----END RSA PRIVATE KEY-----",
+      installationId: 456,
+    });
+
+  /**
+   * Stubs the app/user lookups `committer()` makes, counting each so a test can assert the
+   * derivation is cached rather than re-fetched. `getAuthenticated` yields the App slug;
+   * `getByUsername` yields the bot account's numeric id.
+   */
+  function stubBotLookups(gh: GithubApp, slug: string, userId: number) {
+    const calls = { app: 0, user: 0 };
+    const rest = {
+      apps: {
+        getAuthenticated: async () => {
+          calls.app++;
+          return { data: { slug } };
+        },
+      },
+      users: {
+        getByUsername: async () => {
+          calls.user++;
+          return { data: { id: userId } };
+        },
+      },
+    };
+    (gh as unknown as { octokit: { rest: typeof rest } }).octokit = { rest };
+    return calls;
+  }
+
+  test("derives the verified bot no-reply identity from the App's account", async () => {
+    const gh = app();
+    stubBotLookups(gh, "overwatch", 98765);
+    await expect(gh.committer()).resolves.toEqual({
+      name: "overwatch[bot]",
+      email: "98765+overwatch[bot]@users.noreply.github.com",
+    });
+  });
+
+  test("caches the derivation so the app/user lookups run only once", async () => {
+    const gh = app();
+    const calls = stubBotLookups(gh, "overwatch", 1);
+    await gh.committer();
+    await gh.committer();
+    expect(calls).toEqual({ app: 1, user: 1 });
+  });
+
+  test("prefers an explicitly configured email over the derived one", async () => {
+    const gh = new GithubApp({
+      repo: "https://github.com/o/r.git",
+      branch: "main",
+      appId: 123,
+      privateKey: "-----BEGIN RSA PRIVATE KEY-----\nfake\n-----END RSA PRIVATE KEY-----",
+      installationId: 456,
+      email: "custom@x.com",
+    });
+    const calls = stubBotLookups(gh, "overwatch", 1);
+    await expect(gh.committer()).resolves.toEqual({ name: "control-loop[bot]", email: "custom@x.com" });
+    expect(calls).toEqual({ app: 0, user: 0 }); // no lookups when overridden
+  });
+
+  // A GithubApp is always authenticated (it only ever acts through an installation), so
+  // it mints a fresh installation token for git rather than carrying a static key.
+  test("mints an installation token per git operation and pushes with it", async () => {
+    const gh = app();
+    let authCalls = 0;
+    (gh as unknown as { octokit: { auth: (opts: unknown) => Promise<{ token: string }> } }).octokit = {
+      auth: async () => {
+        authCalls++;
+        return { token: "ghs_installation_token" };
+      },
+    };
+
+    const { sandbox, commands } = fakeSandbox(() => ok);
+    await gh.push(sandbox, "repo", "feat");
+
+    expect(authCalls).toBe(1);
+    expect(commands.filter((c) => c.startsWith("git push"))).toHaveLength(1);
   });
 });

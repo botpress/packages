@@ -1,15 +1,16 @@
-import { Codex, Github, type ControlLoopConfig } from "../index";
+import { Codex, Github, GithubApp, type ControlLoopConfig } from "../index";
 
 export const config: ControlLoopConfig = {
   // If this many PRs with the loop's label are already open, the run is skipped
   // before a sandbox is even created.
   maxOpenPrCount: 1,
   // The git source. Cloned into the sandbox's filesystem; the PR targets `branch`.
-  git: new Github({
+  git: new GithubApp({
     repo: "https://github.com/botpress/desk.git",
     branch: "master",
-    // optional for reading public repos, required to push and open the PR
-    key: process.env.GITHUB_TOKEN,
+    appId: process.env.GITHUB_OVERWATCH_APP_ID!,
+    installationId: process.env.GITHUB_OVERWATCH_INSTALLATION_ID!,
+    privateKey: process.env.GITHUB_OVERWATCH_PRIVATE_KEY!,
   }),
   // The agent that fixes anomalies inside the sandbox. Claude and Codex ship with
   // the lib; extend Agent to add others.

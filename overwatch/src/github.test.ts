@@ -1,6 +1,6 @@
 import type { Sandbox } from "@daytona/sdk";
 import { describe, expect, test } from "vitest";
-import { Github } from "./github";
+import { GithubApp, Github } from "./github";
 
 /**
  * A Sandbox stand-in whose `process.executeCommand` is driven by a router. The router
@@ -158,5 +158,35 @@ describe("Github.openPr", () => {
     const calls = stubOctokit(gh, Infinity);
     await expect(gh.openPr(params)).rejects.toThrow(/unlabeled orphan/);
     expect(calls.closePr).toBe(1);
+  });
+});
+
+describe("GithubApp", () => {
+  const app = () =>
+    new GithubApp({
+      repo: "https://github.com/o/r.git",
+      branch: "main",
+      appId: 123,
+      privateKey: "-----BEGIN RSA PRIVATE KEY-----\nfake\n-----END RSA PRIVATE KEY-----",
+      installationId: 456,
+    });
+
+  // A GithubApp is always authenticated (it only ever acts through an installation), so
+  // it mints a fresh installation token for git rather than carrying a static key.
+  test("mints an installation token per git operation and pushes with it", async () => {
+    const gh = app();
+    let authCalls = 0;
+    (gh as unknown as { octokit: { auth: (opts: unknown) => Promise<{ token: string }> } }).octokit = {
+      auth: async () => {
+        authCalls++;
+        return { token: "ghs_installation_token" };
+      },
+    };
+
+    const { sandbox, commands } = fakeSandbox(() => ok);
+    await gh.push(sandbox, "repo", "feat");
+
+    expect(authCalls).toBe(1);
+    expect(commands.filter((c) => c.startsWith("git push"))).toHaveLength(1);
   });
 });

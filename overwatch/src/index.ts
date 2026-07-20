@@ -7,7 +7,16 @@ export {
   type ClaudeProps,
   type CodexProps,
 } from "./agents";
-export { Github, type GitSource, type GithubProps, type PrComment } from "./github";
+export {
+  Github,
+  GithubApp,
+  GithubBase,
+  type GitSource,
+  type GithubAppProps,
+  type GithubBaseProps,
+  type GithubProps,
+  type PrComment,
+} from "./github";
 export { RepoHandle, type ExecResult, type GrepMatch } from "./repo-handle";
 
 export * as actuators from "./actuators";

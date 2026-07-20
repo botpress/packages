@@ -11,6 +11,9 @@ importers:
       '@daytona/sdk':
         specifier: ^0.195.0
         version: 0.195.0(ws@8.21.1)
+      '@octokit/auth-app':
+        specifier: ^8.2.0
+        version: 8.2.0
       commander:
         specifier: ^15.0.0
         version: 15.0.0

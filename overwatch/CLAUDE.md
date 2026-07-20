@@ -72,9 +72,13 @@ just reference material for authoring new loops.
 - **`src/agents.ts`** — `Agent` abstract class (`prepare`, `executeAgent`) plus the `Claude` and
   `Codex` implementations, each responsible for installing/authenticating its own CLI inside
   the sandbox and invoking it non-interactively.
-- **`src/github.ts`** — `GitSource` interface plus the `Github` implementation (Octokit-backed).
-  The interface exists so another forge could slot in later; don't add GitHub-specific methods
-  to `GitSource` itself.
+- **`src/github.ts`** — `GitSource` interface plus its Octokit-backed implementations: the
+  abstract `GithubBase` holds all logic that only needs `owner`/`name` + an `Octokit`, and the
+  two concrete subclasses differ only in auth — `Github` (personal access / installation token
+  string) and `GithubApp` (GitHub App installation, minting short-lived installation tokens for
+  git via the app auth strategy). Subclasses implement just `gitToken()` and the `authenticated`
+  getter. The `GitSource` interface exists so another forge could slot in later; don't add
+  GitHub-specific methods to `GitSource` itself.
 - **`src/repo-handle.ts`** — `RepoHandle`, the read-oriented proxy into the sandbox handed to
   host-side (`SensorFn`) sensors: `exec`, `readFile`, `glob`, `grep`.
 - **`src/log.ts`** — `RunLog`, a dependency-free stderr narrator for one run. Muted via

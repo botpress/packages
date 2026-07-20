@@ -1,4 +1,5 @@
 import type { Sandbox } from "@daytona/sdk";
+import { createAppAuth } from "@octokit/auth-app";
 import { Octokit } from "octokit";
 
 /** A human comment on a PR. `file`/`line` are present for inline review comments only. */
@@ -12,7 +13,8 @@ export interface PrComment {
 }
 
 /**
- * Where the code comes from and where the PR goes. Implemented by {@link Github};
+ * Where the code comes from and where the PR goes. Implemented by {@link Github}
+ * and {@link GithubApp} (both on the {@link GithubBase} that holds the shared logic);
  * the interface exists so other forges (GitLab, ...) can slot in later.
  */
 export interface GitSource {
@@ -39,15 +41,11 @@ export interface GitSource {
   listPrComments(prNumber: number): Promise<PrComment[]>;
 }
 
-export type GithubProps = {
+/** Fields common to every {@link GithubBase} subclass, regardless of how it authenticates. */
+export type GithubBaseProps = {
   /** e.g. "https://github.com/botpress/some-repo.git" */
   repo: string;
   branch: string;
-  /**
-   * GitHub token. Optional for cloning/counting PRs on public repos, but required to
-   * push and open PRs — a run that reaches the PR stage without one fails there.
-   */
-  key?: string;
   /**
    * Committer email stamped on the loop's commits. Optional; set it to attribute the
    * PR's commits to a specific bot/user account instead of the default no-reply address.
@@ -55,27 +53,44 @@ export type GithubProps = {
   email?: string;
 };
 
-export class Github implements GitSource {
+/**
+ * Shared GitHub logic — everything that only depends on `owner`/`name` and an
+ * {@link Octokit} instance, independent of *how* that Octokit is authenticated. The two
+ * concrete subclasses ({@link Github}, {@link GithubApp}) differ only in how they build
+ * the Octokit and hand out a git-over-HTTPS token; everything past that lives here.
+ */
+export abstract class GithubBase implements GitSource {
   readonly branch: string;
   readonly email?: string;
-  private readonly repoUrl: string;
-  private readonly owner: string;
-  private readonly name: string;
-  private readonly key?: string;
-  private readonly octokit: Octokit;
+  protected readonly repoUrl: string;
+  protected readonly owner: string;
+  protected readonly name: string;
+  /** Set by the subclass constructor with the auth strategy that subclass implements. */
+  protected abstract readonly octokit: Octokit;
 
-  constructor(props: GithubProps) {
+  constructor(props: GithubBaseProps) {
     this.repoUrl = props.repo;
     this.branch = props.branch;
     this.email = props.email || undefined;
-    this.key = props.key || undefined;
-    this.octokit = new Octokit({ auth: this.key });
 
     const match = props.repo.match(/github\.com[/:]([^/]+)\/([^/]+?)(?:\.git)?$/);
     if (!match) throw new Error(`could not parse owner/repo from "${props.repo}"`);
     this.owner = match[1]!;
     this.name = match[2]!;
   }
+
+  /**
+   * Token to embed as the `x-access-token` password for git over HTTPS (clone/push), or
+   * `undefined` when unauthenticated (an anonymous public-repo clone). For a GitHub App
+   * this mints a short-lived installation access token per call.
+   */
+  protected abstract gitToken(): Promise<string | undefined>;
+
+  /**
+   * Whether authenticated operations (push, open PR, resolved-thread lookup) are possible.
+   * A PAT-less {@link Github} can still clone and count PRs on a public repo but not push.
+   */
+  protected abstract get authenticated(): boolean;
 
   async countOpenPrs(label: string): Promise<number> {
     return (await this.openPrIssues(label)).length;
@@ -99,13 +114,14 @@ export class Github implements GitSource {
   }
 
   async cloneInto(sandbox: Sandbox, path: string, branch?: string): Promise<void> {
+    const token = await this.gitToken();
     await sandbox.git.clone(
       this.repoUrl,
       path,
       branch ?? this.branch,
       undefined,
-      this.key ? "x-access-token" : undefined,
-      this.key,
+      token ? "x-access-token" : undefined,
+      token,
     );
   }
 
@@ -163,7 +179,8 @@ export class Github implements GitSource {
   }
 
   async push(sandbox: Sandbox, path: string, branch: string): Promise<void> {
-    this.requireKey("push");
+    this.requireAuth("push");
+    const token = await this.gitToken();
     // Daytona's toolbox git is go-git, which rejects committed paths it deems invalid
     // (e.g. a file named `\` left behind by an agent) — pushing 500s with
     // `invalid path: "\\"`. The real git binary handles any filename, so push with it.
@@ -172,7 +189,7 @@ export class Github implements GitSource {
     const setup = await sandbox.process.executeCommand(
       `printf 'https://x-access-token:%s@github.com\\n' "$GIT_TOKEN" > ~/.git-credentials && git config --global credential.helper store`,
       path,
-      { GIT_TOKEN: this.key! },
+      { GIT_TOKEN: token! },
       60,
     );
     if (setup.exitCode !== 0) {
@@ -223,7 +240,7 @@ export class Github implements GitSource {
     body: string;
     label: string;
   }): Promise<string> {
-    this.requireKey("open a PR");
+    this.requireAuth("open a PR");
     await this.ensureLabel(params.label);
     const { data: pr } = await this.octokit.rest.pulls.create({
       owner: this.owner,
@@ -303,12 +320,12 @@ export class Github implements GitSource {
 
   /**
    * IDs of inline review comments whose thread has been resolved. Thread resolution
-   * is only exposed by GitHub's GraphQL API, which always requires auth — without a
-   * key, nothing is filtered.
+   * is only exposed by GitHub's GraphQL API, which always requires auth — when
+   * unauthenticated, nothing is filtered.
    */
   private async resolvedReviewCommentIds(prNumber: number): Promise<Set<number>> {
     const ids = new Set<number>();
-    if (!this.key) return ids;
+    if (!this.authenticated) return ids;
 
     const result = await this.octokit.graphql<{
       repository: {
@@ -343,8 +360,77 @@ export class Github implements GitSource {
     return ids;
   }
 
-  private requireKey(action: string): void {
-    if (!this.key)
-      throw new Error(`a Github key is required to ${action} on ${this.owner}/${this.name}`);
+  protected requireAuth(action: string): void {
+    if (!this.authenticated)
+      throw new Error(`Github authentication is required to ${action} on ${this.owner}/${this.name}`);
+  }
+}
+
+/**
+ * GitHub token. Optional for cloning/counting PRs on public repos, but required to
+ * push and open PRs — a run that reaches the PR stage without one fails there.
+ */
+export type GithubProps = GithubBaseProps & { key?: string };
+
+/** Authenticates as a user/bot via a personal access token (or installation token string). */
+export class Github extends GithubBase {
+  protected readonly octokit: Octokit;
+  private readonly key?: string;
+
+  constructor(props: GithubProps) {
+    super(props);
+    this.key = props.key || undefined;
+    this.octokit = new Octokit({ auth: this.key });
+  }
+
+  protected async gitToken(): Promise<string | undefined> {
+    return this.key;
+  }
+
+  protected get authenticated(): boolean {
+    return Boolean(this.key);
+  }
+}
+
+/**
+ * Credentials for a GitHub App installation. Unlike a PAT these are never optional —
+ * an App only ever acts through an installation, so it is always authenticated.
+ */
+export type GithubAppProps = GithubBaseProps & {
+  /** The App's numeric ID (Settings → Developer settings → GitHub Apps). */
+  appId: string | number;
+  /** The App's PEM private key, contents inline (not a file path). */
+  privateKey: string;
+  /** ID of the installation on the target account whose token the App should mint. */
+  installationId: string | number;
+};
+
+/**
+ * Authenticates as a GitHub App installation. Octokit's app auth strategy mints and
+ * refreshes short-lived installation access tokens on demand, so REST/GraphQL calls just
+ * work; {@link gitToken} pulls the current installation token out for git over HTTPS.
+ */
+export class GithubApp extends GithubBase {
+  protected readonly octokit: Octokit;
+
+  constructor(props: GithubAppProps) {
+    super(props);
+    this.octokit = new Octokit({
+      authStrategy: createAppAuth,
+      auth: {
+        appId: props.appId,
+        privateKey: props.privateKey,
+        installationId: props.installationId,
+      },
+    });
+  }
+
+  protected async gitToken(): Promise<string> {
+    const auth = (await this.octokit.auth({ type: "installation" })) as { token: string };
+    return auth.token;
+  }
+
+  protected get authenticated(): boolean {
+    return true;
   }
 }

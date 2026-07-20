@@ -15,13 +15,12 @@
     "codex"
   ],
   "license": "MIT",
-  "homepage": "https://github.com/botpress/overwatch#readme",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/botpress/overwatch.git"
+    "url": "git+https://github.com/botpress/packages.git"
   },
   "bugs": {
-    "url": "https://github.com/botpress/overwatch/issues"
+    "url": "https://github.com/botpress/packages/issues"
   },
   "main": "dist/index.js",
   "types": "dist/index.d.ts",

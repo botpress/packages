@@ -31,7 +31,7 @@
   "sideEffects": false,
   "packageManager": "pnpm@10.29.3",
   "engines": {
-    "node": ">=18",
+    "node": ">=20",
     "pnpm": ">=9"
   },
   "scripts": {

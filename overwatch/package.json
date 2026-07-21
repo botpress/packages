@@ -1,6 +1,6 @@
 {
   "name": "@bpinternal/overwatch",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "Headless library for building control loops: scheduled bots that scan a repo for a class of anomaly, fix a few instances with a coding agent, and open a PR — no server, UI, or persistent process.",
   "keywords": [
     "control-loop",

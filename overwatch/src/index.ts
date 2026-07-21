@@ -1,4 +1,5 @@
 export { ControlLoop } from "./control-loop";
+export { LoopOrchestrator } from "./orchestrator";
 export {
   Agent,
   Claude,
@@ -49,6 +50,7 @@ export {
   type ControlLoopConfig,
   type ControlLoopOptions,
   type ControlLoopRunResult,
+  type OrchestratorApplyResult,
   type Signal,
   type SignalPriority,
 } from "./types";

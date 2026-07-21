@@ -112,7 +112,10 @@ tsx my-loop.ts --help                 # usage (works on each subcommand too)
   exits `0`. The result is also printed as a one-line summary.
 - **`apply-comments <pr>`** reads comments newer than the PR's head commit and applies them to
   the PR's branch (see **PR review comments** above). Wire it to a `pull_request_review_comment`
-  trigger, passing the PR number.
+  trigger, passing the PR number. It first checks the PR carries this loop's label; if it
+  doesn't — a PR from another loop or a human — it does nothing and exits **non-zero**
+  (`wrong-loop`), so a mis-wired trigger fails loudly instead of pushing this loop's config
+  onto a foreign branch.
 
 Help and argument parsing are handled by [commander](https://github.com/tj/commander.js), so
 `--help`, unknown-command errors, and per-command usage all come for free.
@@ -155,6 +158,36 @@ jobs:
 ```
 
 Pass `config.maxOpenPrCount` to keep a scheduled `run` from piling up PRs faster than they merge.
+
+### Several loops, one entry point
+
+Running many loops means many near-identical workflows — and a `pull_request_review_comment`
+trigger can't know *which* loop opened the PR being commented on. **`LoopOrchestrator`** collapses
+them into a single script: register the loops, end with `orchestrator.run()`, and one CLI fronts
+them all.
+
+```ts
+import { LoopOrchestrator } from "@bpinternal/overwatch";
+import { nakedErrorLoop, reactDoctorLoop } from "./loops";
+
+new LoopOrchestrator()
+  .register(nakedErrorLoop)
+  .register(reactDoctorLoop)
+  .run();
+```
+
+```bash
+tsx loops.ts list                     # the registered loops and their routing slugs
+tsx loops.ts run react-doctor-issues  # one cycle of a specific loop (by slug)
+tsx loops.ts apply-comments 1234      # route the event to whichever loop owns PR #1234
+```
+
+`apply-comments` matches the PR against each loop's label and applies the comments on the one that
+owns it — so a single comment webhook serves every loop. If no registered loop owns the PR, it
+exits **non-zero** (`no-matching-loop`). Loops are keyed by their label slug, so their labels must
+be distinct (registering a collision throws), and they're expected to target the same repo (a
+comment webhook is per-repo). In the workflow above, point the two comment/schedule steps at
+`loops.ts apply-comments …` / `loops.ts run <slug>` instead of a per-loop script.
 
 ## Core concepts
 

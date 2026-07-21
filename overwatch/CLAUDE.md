@@ -38,10 +38,18 @@ just reference material for authoring new loops.
   Everything the loop/actuator hands an agent is behind the small `AgentContext` (`exec`,
   `writeFile`) — this is intentionally the only surface agents get (an actuator itself also
   receives the raw `Sandbox`, since it's the layer allowed to drive git and open PRs).
-- **`src/cli.ts`** — `runCli`, backing `ControlLoop.cli()`: a [commander](https://github.com/tj/commander.js)
-  program with `run` and `apply-comments <pr>` subcommands, result-summary printing, and CI-friendly
-  exit codes (non-zero on error or an unresolved `fix-failed`). Keep command wiring here, not in
-  `control-loop.ts`.
+- **`src/orchestrator.ts`** — `LoopOrchestrator`, a registry that fronts several `ControlLoop`s
+  behind one entry point so a single CI workflow drives them all (notably one shared
+  `pull_request_review_comment` handler). Loops are keyed by `ControlLoop.labelSlug`; `register`
+  rejects a slug collision. `applyPrComments(pr)` routes a comment event by probing each loop's
+  `applyPrComments` and taking the first non-`wrong-loop` result — the `wrong-loop` guard bails
+  out before provisioning a sandbox, so probing is cheap and, with unique slugs, at most one loop
+  acts. `run()` is its CLI entry point (see `runOrchestratorCli` in `src/cli.ts`).
+- **`src/cli.ts`** — `runCli` (backing `ControlLoop.cli()`) and `runOrchestratorCli` (backing
+  `LoopOrchestrator.run()`): [commander](https://github.com/tj/commander.js) programs with
+  `run`/`apply-comments` (+ `list` for the orchestrator) subcommands, result-summary printing, and
+  CI-friendly exit codes (non-zero on error, an unresolved `fix-failed`, or a comment event that
+  matched no loop). Keep command wiring here, not in `control-loop.ts`/`orchestrator.ts`.
 - **`src/types.ts`** — the core vocabulary: `Signal` (an anomaly), `Sensor`/`SensorFn`/
   `SensorScript`, `Picker`, `InstructionBuilder` (builds an agent prompt per signal),
   `CommentActuator`, and the `ControlLoopOptions`/`ControlLoopConfig` shapes. Read this file

@@ -99,8 +99,23 @@ export type ControlLoopRunResult<TData = unknown> =
   | { status: "pr-opened"; prUrl: string; fixed: Signal<TData>[] };
 
 export type ApplyCommentsResult =
+  /**
+   * The PR doesn't carry this loop's label, so it isn't one this loop opened — the loop
+   * refuses to touch it rather than push another loop's config (and pollute its memory).
+   */
+  | { status: "wrong-loop"; label: string; labels: string[] }
   /** Every comment predates the PR's head commit — nothing new to address. */
   | { status: "no-new-comments" }
   /** The agent ran but left the working tree untouched, so nothing was pushed. */
   | { status: "no-changes"; comments: PrComment[] }
   | { status: "comments-applied"; branch: string; comments: PrComment[] };
+
+/** Outcome of routing a PR comment event through a `LoopOrchestrator`. */
+export type OrchestratorApplyResult =
+  /**
+   * The PR belonged to `loop`; `result` is that loop's own apply outcome. It can never be
+   * `wrong-loop` — that's the signal the orchestrator used to rule a loop *out*.
+   */
+  | { status: "dispatched"; loop: string; result: Exclude<ApplyCommentsResult, { status: "wrong-loop" }> }
+  /** No registered loop carries the PR's label — the comment event was routed to the wrong place. */
+  | { status: "no-matching-loop"; prNumber: number };

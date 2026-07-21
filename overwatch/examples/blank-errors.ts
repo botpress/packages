@@ -1,7 +1,7 @@
 import { ControlLoop, pickers, sensors, actuators } from "../index";
 import * as common from "./common";
 
-const loop = new ControlLoop({
+export const nakedErrorLoop2 = new ControlLoop({
   // Label of the control loop. Its slug ("my-control-loop-label") is applied to
   // every PR this loop opens, and is what maxOpenPrCount counts against.
   label: "Naked Error Should be ServiceError",
@@ -42,7 +42,5 @@ const loop = new ControlLoop({
   }),
 });
 
-// Expose the built-in CLI so CI can drive it:
-//   bun examples/blank-errors.ts run
-//   bun examples/blank-errors.ts apply-comments <pr>
-loop.cli();
+// This loop is driven through the shared `LoopOrchestrator` in `orchestrator.ts`, not its own
+// CLI — the orchestrator is the single entry point CI wires the comment webhook to.

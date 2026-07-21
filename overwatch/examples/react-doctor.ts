@@ -1,7 +1,7 @@
 import { ControlLoop, pickers, sensors, actuators } from "../index";
 import * as common from "./common";
 
-const loop = new ControlLoop({
+export const reactDoctorLoop = new ControlLoop({
   label: "React Doctor Issues",
   config: common.config,
   sensor: sensors.reactDoctor({
@@ -14,5 +14,3 @@ const loop = new ControlLoop({
   // `actuators.fromSignal()`, so no `instructions` needed here.
   actuator: new actuators.AgentPrActuator(),
 });
-
-loop.cli();

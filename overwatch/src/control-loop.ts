@@ -28,6 +28,20 @@ import type {
 export class ControlLoop<TData = unknown> {
   constructor(private readonly options: ControlLoopOptions<TData>) {}
 
+  /** The human-readable label this loop was constructed with. */
+  get label(): string {
+    return this.options.label;
+  }
+
+  /**
+   * Slug applied to every PR this loop opens (see {@link ControlLoopOptions.label}). It's the
+   * loop's identity for claim-matching and, under a {@link LoopOrchestrator}, the key comment
+   * events route on — so it must be unique across loops sharing an orchestrator.
+   */
+  get labelSlug(): string {
+    return slugify(this.options.label);
+  }
+
   /**
    * Executes one full cycle: sense -> pick -> run actuator -> verify -> PR.
    * Invoke this from whatever scheduler you use (cron, CI); the loop itself
@@ -166,6 +180,17 @@ export class ControlLoop<TData = unknown> {
     const log = new RunLog(`${this.options.label} · PR #${prNumber}`);
 
     const pr = await config.git.getPr(prNumber);
+
+    // A PR opened by this loop always carries its label (see `openPr` in github.ts, which
+    // closes any PR it can't label). A PR without it belongs to another loop or a human, so
+    // refuse it — otherwise we'd push this loop's agent config onto a foreign branch and
+    // fold its `/feedback` into the wrong loop's memory. This runs before the sandbox is
+    // provisioned, so a misfired trigger costs nothing.
+    if (!pr.labels.includes(label)) {
+      log.skip(`PR #${prNumber} is not labeled "${label}" — not this loop's PR`);
+      return { status: "wrong-loop", label, labels: pr.labels };
+    }
+
     const newComments = (await config.git.listPrComments(prNumber)).filter(
       (comment) => new Date(comment.createdAt) > new Date(pr.headCommittedAt),
     );

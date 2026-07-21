@@ -43,8 +43,11 @@ export interface GitSource {
   cloneInto(sandbox: Sandbox, path: string, branch?: string): Promise<void>;
   push(sandbox: Sandbox, path: string, branch: string): Promise<void>;
   openPr(params: { branch: string; title: string; body: string; label: string }): Promise<string>;
-  /** Head branch of the PR and the commit date of its tip, used to skip already-addressed comments. */
-  getPr(prNumber: number): Promise<{ branch: string; headCommittedAt: string }>;
+  /**
+   * Head branch of the PR, the commit date of its tip (used to skip already-addressed
+   * comments), and its labels (used to verify the PR belongs to the loop before acting).
+   */
+  getPr(prNumber: number): Promise<{ branch: string; headCommittedAt: string; labels: string[] }>;
   /**
    * Comments on the PR — inline review comments and PR-level comments — oldest first.
    * Inline comments whose review thread has been resolved are excluded.
@@ -140,7 +143,9 @@ export abstract class GithubBase implements GitSource {
     );
   }
 
-  async getPr(prNumber: number): Promise<{ branch: string; headCommittedAt: string }> {
+  async getPr(
+    prNumber: number,
+  ): Promise<{ branch: string; headCommittedAt: string; labels: string[] }> {
     const { data: pr } = await this.octokit.rest.pulls.get({
       owner: this.owner,
       repo: this.name,
@@ -152,7 +157,8 @@ export abstract class GithubBase implements GitSource {
       ref: pr.head.sha,
     });
     const headCommittedAt = commit.commit.committer?.date ?? pr.created_at;
-    return { branch: pr.head.ref, headCommittedAt };
+    const labels = pr.labels.map((label) => label.name).filter((name): name is string => !!name);
+    return { branch: pr.head.ref, headCommittedAt, labels };
   }
 
   async listPrComments(prNumber: number): Promise<PrComment[]> {

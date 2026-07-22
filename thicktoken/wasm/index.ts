@@ -21,7 +21,19 @@ import wasmBinary from './pkg/thicktoken_wasm_bg.wasm'
 let initialized = false
 const ensureInit = (wasmModule?: WebAssembly.Module) => {
   if (!initialized) {
-    initSync({ module: wasmModule ?? wasmBinary })
+    const module = wasmModule ?? wasmBinary
+    if (typeof (module as unknown) === 'string') {
+      // A bundler lowered the .wasm import to an asset-path string (e.g. esbuild's
+      // `file` loader). Fail with a clear message instead of the cryptic type error
+      // `new WebAssembly.Module(<string>)` would produce.
+      throw new Error(
+        'thicktoken: the engine .wasm import resolved to a path string instead of bytes or a ' +
+          'precompiled WebAssembly.Module. Configure your bundler to inline .wasm imports as ' +
+          'bytes or keep them as native wasm module imports (as workerd does), or inject a ' +
+          'precompiled module explicitly: getWasmTokenizer({ wasmModule }).'
+      )
+    }
+    initSync({ module })
     initialized = true
   }
 }

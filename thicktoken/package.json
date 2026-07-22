@@ -1,6 +1,6 @@
 {
   "name": "@bpinternal/thicktoken",
-  "version": "3.0.0",
+  "version": "3.1.0",
   "description": "A bundled cl100k tokenizer (Rust→WASM) with count/truncate/split helpers",
   "repository": {
     "url": "https://github.com/botpress/packages"
@@ -15,19 +15,29 @@
   "exports": {
     ".": {
       "types": "./dist/tokenizer.d.ts",
+      "workerd": "./dist/micro.workerd.mjs",
       "import": "./dist/tokenizer.mjs",
       "require": "./dist/tokenizer.js"
     },
     "./lite": {
       "types": "./dist/lite.d.ts",
+      "workerd": "./dist/lite.workerd.mjs",
       "import": "./dist/lite.mjs",
       "require": "./dist/lite.js"
     },
     "./micro": {
       "types": "./dist/micro.d.ts",
+      "workerd": "./dist/micro.workerd.mjs",
       "import": "./dist/micro.mjs",
       "require": "./dist/micro.js"
-    }
+    },
+    "./full": {
+      "types": "./dist/tokenizer.d.ts",
+      "workerd": "./dist/tokenizer.workerd.mjs",
+      "import": "./dist/tokenizer.mjs",
+      "require": "./dist/tokenizer.js"
+    },
+    "./engine.wasm": "./dist/thicktoken_wasm_bg.wasm"
   },
   "keywords": [],
   "author": "",

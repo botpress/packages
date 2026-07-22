@@ -26,6 +26,33 @@ Truncated variants only ever **overcount** — safe for budget enforcement (they
 more, never overflow a window). Do **not** use them for billing math or exact window
 packing; inflation is content-dependent (worst on emoji/unicode-dense text).
 
+## Cloudflare Workers (workerd)
+
+workerd bans runtime WASM compilation (`new WebAssembly.Module(bytes)`), so the default
+builds — which inline the engine WASM as base64 and compile it at import time — can't run
+there. Two mechanisms handle this:
+
+1. **`workerd` export condition (zero-config).** Bundlers/runtimes that honor the
+   `workerd` condition (wrangler does) resolve every entry to a `*.workerd.mjs` build in
+   which the engine `.wasm` ships as a **separate dist file** and stays a **static
+   import** — workerd compiles it at deploy time and hands the module to `initSync`
+   precompiled. On workerd, the root `@bpinternal/thicktoken` entry resolves to the
+   **micro** (cl25k) asset — the smallest footprint, and prompt budgeting doesn't need
+   exact cl100k counts. Use `@bpinternal/thicktoken/full` if you really need exact cl100k
+   counts on Workers.
+
+2. **`getWasmTokenizer({ wasmModule })` (explicit injection).** Pass your own precompiled
+   `WebAssembly.Module` (e.g. from a static `.wasm` import) and the engine skips runtime
+   compilation entirely:
+
+   ```ts
+   import { getWasmTokenizer } from '@bpinternal/thicktoken/micro'
+   import wasmModule from '@bpinternal/thicktoken/engine.wasm' // static import
+   const tokenizer = await getWasmTokenizer({ wasmModule })
+   ```
+
+The vocab `.gz` assets are plain data (inflated inside the WASM engine) and stay inlined
+in every build — only the engine `.wasm` needs the special handling.
 
 ## Disclaimer ⚠️
 

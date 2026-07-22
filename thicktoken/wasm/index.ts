@@ -11,16 +11,41 @@
  * ../NOTICE. cl100k_base encoding.
  */
 import { initSync, WasmTokenizer as RawTokenizer } from './pkg/thicktoken_wasm.js'
-// Inlined by the build tooling (tsup/vitest inline-wasm plugin) as raw bytes.
+// Default build: inlined by the build tooling (tsup/vitest inline-wasm plugin) as raw
+// bytes, compiled at runtime. Workerd build: emitted as a separate dist .wasm file and
+// statically imported, so the runtime hands us a precompiled WebAssembly.Module
+// (runtime WASM compilation is banned on Cloudflare Workers). initSync accepts both.
 // @ts-ignore - resolved by the *.wasm module declaration
-import wasmBytes from './pkg/thicktoken_wasm_bg.wasm'
+import wasmBinary from './pkg/thicktoken_wasm_bg.wasm'
 
 let initialized = false
-const ensureInit = () => {
+const ensureInit = (wasmModule?: WebAssembly.Module) => {
   if (!initialized) {
-    initSync({ module: wasmBytes })
+    const module = wasmModule ?? wasmBinary
+    if (typeof (module as unknown) === 'string') {
+      // A bundler lowered the .wasm import to an asset-path string (e.g. esbuild's
+      // `file` loader). Fail with a clear message instead of the cryptic type error
+      // `new WebAssembly.Module(<string>)` would produce.
+      throw new Error(
+        'thicktoken: the engine .wasm import resolved to a path string instead of bytes or a ' +
+          'precompiled WebAssembly.Module. Configure your bundler to inline .wasm imports as ' +
+          'bytes or keep them as native wasm module imports (as workerd does), or inject a ' +
+          'precompiled module explicitly: getWasmTokenizer({ wasmModule }).'
+      )
+    }
+    initSync({ module })
     initialized = true
   }
+}
+
+export interface CreateOptions {
+  /**
+   * Precompiled engine module, for runtimes that ban runtime WASM compilation
+   * (`new WebAssembly.Module(bytes)`), e.g. Cloudflare Workers. Build it from a
+   * statically imported `.wasm` file and inject it here. Ignored if the engine
+   * is already initialized.
+   */
+  wasmModule?: WebAssembly.Module
 }
 
 /** Which part of the text to preserve when truncating. */
@@ -42,8 +67,8 @@ export class WasmTokenizer {
    * Build a tokenizer from a gzip'd merges-only asset (one of wasm/assets/*.gz —
    * full cl100k, lite cl50k, or micro cl25k; see wasm/scripts/gen-assets.mjs).
    */
-  static create(assetGz: Uint8Array): WasmTokenizer {
-    ensureInit()
+  static create(assetGz: Uint8Array, options: CreateOptions = {}): WasmTokenizer {
+    ensureInit(options.wasmModule)
     return new WasmTokenizer(new RawTokenizer(assetGz))
   }
 

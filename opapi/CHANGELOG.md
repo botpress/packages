@@ -15,6 +15,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - **Breaking**: The generated `to-axios.ts` file is now `to-request.ts`, `toAxiosRequest` is now `toRequest` (returning a `RequestConfig` instead of an `AxiosRequestConfig`), and the `ClientProps.toAxiosRequest` override is now `ClientProps.toRequest`.
 - **Breaking**: The generated handler no longer imports `isAxiosError` from axios; it detects http errors structurally (any `Error` with a `response` property).
 - The generated `toApiError` detects http errors structurally (`err.response.data`) instead of using `axios.isAxiosError`, so it works with any transport including axios.
+- The generated `errors.ts` no longer imports the node `crypto` module: it uses `globalThis.crypto` when available (browsers, web workers, node >= 19, edge runtimes) and falls back to a `Math.random`-based polyfill otherwise, so generated clients have no node builtin dependencies.
 
 #### Examples
 

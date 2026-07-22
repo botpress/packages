@@ -1,7 +1,6 @@
 import fs from 'fs/promises'
 
 const CONTENT = `import qs from 'qs'
-import { isAxiosError } from 'axios'
 import { isApiError } from './errors'
 import * as types from './typings'
 
@@ -101,8 +100,11 @@ export class Router {
   }
 }
 
+type HttpErrorLike = Error & { response?: { data?: any; status?: number } }
+const isHttpErrorLike = (thrown: unknown): thrown is HttpErrorLike => thrown instanceof Error && 'response' in thrown
+
 const getErrorBody = (thrown: unknown) => {
-  if (isAxiosError(thrown)) {
+  if (isHttpErrorLike(thrown)) {
     const data = thrown.response?.data
     const statusCode = thrown.response?.status
 

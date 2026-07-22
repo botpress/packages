@@ -157,7 +157,7 @@ export const generateClientWithOpapi = async (state: State<string, string, strin
   const errorsFile = pathlib.join(dir, 'errors.ts')
   const indexFile = pathlib.join(dir, 'index.ts')
   const operationsDir = pathlib.join(dir, 'operations')
-  const toAxiosFile = pathlib.join(dir, 'to-axios.ts')
+  const toRequestFile = pathlib.join(dir, 'to-request.ts')
   fslib.mkdirSync(operationsDir, { recursive: true })
 
   log.info('Generating models')
@@ -170,8 +170,8 @@ export const generateClientWithOpapi = async (state: State<string, string, strin
   const errorsFileContent = generateErrors(state.errors ?? [])
   await fslib.promises.writeFile(errorsFile, errorsFileContent)
 
-  log.info('Generating to-axios file')
-  await clientNode.generateToAxios(toAxiosFile)
+  log.info('Generating to-request file')
+  await clientNode.generateToRequest(toRequestFile)
 
   log.info('Generating index file')
   await clientNode.generateIndex(state, indexFile)

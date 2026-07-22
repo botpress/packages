@@ -7,6 +7,36 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+## [2.0.0] - 2026-07-22
+
+### Changed
+
+- **Breaking**: The `opapi` client generator no longer emits axios-based code. The generated `Client` now takes any transport implementing the generated `HttpClient` interface (`{ request: <T>(config: RequestConfig) => Promise<{ data: T }> }`) instead of an `AxiosInstance`.
+- **Breaking**: The generated `to-axios.ts` file is now `to-request.ts`, `toAxiosRequest` is now `toRequest` (returning a `RequestConfig` instead of an `AxiosRequestConfig`), and the `ClientProps.toAxiosRequest` override is now `ClientProps.toRequest`.
+- **Breaking**: The generated handler no longer imports `isAxiosError` from axios; it detects http errors structurally (any `Error` with a `response` property).
+- The generated `toApiError` detects http errors structurally (`err.response.data`) instead of using `axios.isAxiosError`, so it works with any transport including axios.
+
+#### Examples
+
+```ts
+// Generated clients are now transport-agnostic. Bring any http client that
+// implements the generated `HttpClient` interface — for example a fetch-based one:
+import { Client } from './gen'
+
+const httpClient = {
+  request: async <T>(config: { method: string; url: string; headers: Record<string, string>; data?: any }) => {
+    const res = await fetch(`https://api.example.com${config.url}`, {
+      method: config.method,
+      headers: config.headers,
+      body: config.data ? JSON.stringify(config.data) : undefined,
+    })
+    return { data: (await res.json()) as T }
+  },
+}
+
+const client = new Client(httpClient)
+```
+
 ### Fixed
 
 - Fixed spelling mistakes in package files.

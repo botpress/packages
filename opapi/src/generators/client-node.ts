@@ -45,10 +45,11 @@ const HEADER = `// this file was automatically generated, do not edit
 /* eslint-disable */
 `
 
-const GET_ERROR_FUNCTION = `// maps axios error to api error type
+const GET_ERROR_FUNCTION = `// maps http error to api error type
 function toApiError(err: unknown): Error {
-  if (axios.isAxiosError(err) && err.response?.data) {
-    return errorFrom(err.response.data)
+  const data = (err as { response?: { data?: unknown } } | null)?.response?.data
+  if (data) {
+    return errorFrom(data)
   }
   return errorFrom(err)
 }
@@ -65,8 +66,7 @@ function toApiError(err: unknown): Error {
  * { limit: 10 }                         ->  ?limit=10
  */
 
-const GET_AXIOS_REQ_FUNCTION = `
-import { AxiosRequestConfig } from "axios"
+const GET_REQUEST_FUNCTION = `
 import qs from "qs"
 
 export type Primitive = string | number | boolean
@@ -84,9 +84,16 @@ export type ParsedRequest = {
   body: AnyBodyParams
 }
 
+export type RequestConfig = {
+  method: string
+  url: string
+  headers: Record<string, string>
+  data?: any
+}
+
 const isDefined = <T>(pair: [string, T | undefined]): pair is [string, T] => pair[1] !== undefined
 
-export const toAxiosRequest = (req: ParsedRequest): AxiosRequestConfig => {
+export const toRequest = (req: ParsedRequest): RequestConfig => {
   const { method, path, query, headers: headerParams, body } = req
 
   // prepare headers
@@ -235,8 +242,8 @@ export const generateOperations = async (state: State<string, string, string>, o
   }
 }
 
-export const generateToAxios = async (toAxiosFile: string) => {
-  await writeTs(toAxiosFile, GET_AXIOS_REQ_FUNCTION)
+export const generateToRequest = async (toRequestFile: string) => {
+  await writeTs(toRequestFile, GET_REQUEST_FUNCTION)
 }
 
 export const generateIndex = async (state: State<string, string, string>, indexFile: string) => {
@@ -244,9 +251,8 @@ export const generateIndex = async (state: State<string, string, string>, indexF
 
   let indexCode = [
     `${HEADER}`,
-    "import axios, { AxiosInstance } from 'axios'",
     "import { errorFrom } from './errors'",
-    "import { toAxiosRequest } from './to-axios'",
+    "import { toRequest, RequestConfig } from './to-request'",
     '',
   ].join('\n')
 
@@ -264,8 +270,21 @@ export const generateIndex = async (state: State<string, string, string>, indexF
   indexCode += `export const apiVersion = '${state.metadata.version}'\n\n`
 
   indexCode += [
+    // minimal transport interface the client depends on; any http client
+    // returning a response with a parsed json body under `data` works
+    'export type HttpResponse<T> = {',
+    '  data: T',
+    '}',
+    '',
+    'export type HttpClient = {',
+    '  request: <T>(config: RequestConfig) => Promise<HttpResponse<T>>',
+    '}',
+  ].join('\n')
+  indexCode += '\n\n'
+
+  indexCode += [
     'export type ClientProps = {',
-    '  toAxiosRequest: typeof toAxiosRequest', // allows to override the toAxiosRequest function
+    '  toRequest: typeof toRequest', // allows to override the toRequest function
     '  toApiError: typeof toApiError', // allows to override the toApiError function
     '}',
   ].join('\n')
@@ -273,24 +292,24 @@ export const generateIndex = async (state: State<string, string, string>, indexF
 
   indexCode += 'export class Client {\n\n'
   indexCode +=
-    '  public constructor(private axiosInstance: AxiosInstance, private props: Partial<ClientProps> = {}) {}\n\n'
+    '  public constructor(private httpClient: HttpClient, private props: Partial<ClientProps> = {}) {}\n\n'
   for (const [name, operation] of Object.entries(operationsByName)) {
     const { inputName, resName } = Names.of(name)
     indexCode += [
       `  public readonly ${name} = async (input: ${name}.${inputName}): Promise<${name}.${resName}> => {`,
       `    const { path, headers, query, body } = ${name}.parseReq(input)`,
       '',
-      `    const mapRequest = this.props.toAxiosRequest ?? toAxiosRequest`,
+      `    const mapRequest = this.props.toRequest ?? toRequest`,
       `    const mapErrorResponse = this.props.toApiError ?? toApiError`,
       '',
-      `    const axiosReq = mapRequest({`,
+      `    const httpReq = mapRequest({`,
       `        method: "${operation.method}",`,
       '        path,',
       '        headers: { ...headers },',
       '        query: { ...query },',
       '        body,',
       '    })',
-      `    return this.axiosInstance.request<${name}.${resName}>(axiosReq)`,
+      `    return this.httpClient.request<${name}.${resName}>(httpReq)`,
       `      .then((res) => res.data)`,
       `      .catch((e) => { throw mapErrorResponse(e) })`,
       '  }\n\n',

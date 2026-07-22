@@ -291,8 +291,7 @@ export const generateIndex = async (state: State<string, string, string>, indexF
   indexCode += '\n\n'
 
   indexCode += 'export class Client {\n\n'
-  indexCode +=
-    '  public constructor(private httpClient: HttpClient, private props: Partial<ClientProps> = {}) {}\n\n'
+  indexCode += '  public constructor(private httpClient: HttpClient, private props: Partial<ClientProps> = {}) {}\n\n'
   for (const [name, operation] of Object.entries(operationsByName)) {
     const { inputName, resName } = Names.of(name)
     indexCode += [

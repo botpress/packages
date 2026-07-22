@@ -8,4 +8,11 @@ import { makeGetTokenizer } from './core'
 
 export const getWasmTokenizer = makeGetTokenizer(cl50k)
 
-export { TextTokenizer, TokenCollection, WasmTokenizer, type CountOptions, type TruncateMode } from './core'
+export {
+  TextTokenizer,
+  TokenCollection,
+  WasmTokenizer,
+  type CountOptions,
+  type GetTokenizerOptions,
+  type TruncateMode,
+} from './core'

@@ -252,7 +252,7 @@ export const generateIndex = async (state: State<string, string, string>, indexF
   let indexCode = [
     `${HEADER}`,
     "import { errorFrom } from './errors'",
-    "import { toRequest, RequestConfig } from './to-request'",
+    "import { toRequest, type RequestConfig } from './to-request'",
     '',
   ].join('\n')
 
@@ -270,12 +270,16 @@ export const generateIndex = async (state: State<string, string, string>, indexF
   indexCode += `export const apiVersion = '${state.metadata.version}'\n\n`
 
   indexCode += [
-    // minimal transport interface the client depends on; any http client
-    // returning a response with a parsed json body under `data` works
     'export type HttpResponse<T> = {',
     '  data: T',
     '}',
     '',
+    '/**',
+    ' * Minimal http transport the generated client depends on. Implementations',
+    ' * MUST reject (throw) on unsuccessful http statuses — exposing the parsed',
+    ' * error body under `response.data` on the thrown error so it can be mapped',
+    ' * to an api error — and resolve with the parsed response body under `data`.',
+    ' */',
     'export type HttpClient = {',
     '  request: <T>(config: RequestConfig) => Promise<HttpResponse<T>>',
     '}',

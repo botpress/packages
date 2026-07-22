@@ -11,7 +11,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ### Changed
 
-- **Breaking**: The `opapi` client generator no longer emits axios-based code. The generated `Client` now takes any transport implementing the generated `HttpClient` interface (`{ request: <T>(config: RequestConfig) => Promise<{ data: T }> }`) instead of an `AxiosInstance`.
+- **Breaking**: The `opapi` client generator no longer emits axios-based code. The generated `Client` now takes any transport implementing the generated `HttpClient` interface (`{ request: <T>(config: RequestConfig) => Promise<{ data: T }> }`) instead of an `AxiosInstance`. Like axios, the transport must reject on unsuccessful http statuses, exposing the parsed error body under `response.data` on the thrown error so the generated client can map it to an api error.
 - **Breaking**: The generated `to-axios.ts` file is now `to-request.ts`, `toAxiosRequest` is now `toRequest` (returning a `RequestConfig` instead of an `AxiosRequestConfig`), and the `ClientProps.toAxiosRequest` override is now `ClientProps.toRequest`.
 - **Breaking**: The generated handler no longer imports `isAxiosError` from axios; it detects http errors structurally (any `Error` with a `response` property).
 - The generated `toApiError` detects http errors structurally (`err.response.data`) instead of using `axios.isAxiosError`, so it works with any transport including axios.
@@ -30,7 +30,14 @@ const httpClient = {
       headers: config.headers,
       body: config.data ? JSON.stringify(config.data) : undefined,
     })
-    return { data: (await res.json()) as T }
+    const data = await res.json()
+    if (!res.ok) {
+      // the generated client maps rejections carrying `response.data` to api errors
+      throw Object.assign(new Error(`Request failed with status code ${res.status}`), {
+        response: { status: res.status, data },
+      })
+    }
+    return { data: data as T }
   },
 }
 

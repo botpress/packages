@@ -100,8 +100,9 @@ export class Router {
   }
 }
 
-type HttpErrorLike = Error & { response?: { data?: any; status?: number } }
-const isHttpErrorLike = (thrown: unknown): thrown is HttpErrorLike => thrown instanceof Error && 'response' in thrown
+type HttpErrorLike = { message?: string; response?: { data?: any; status?: number } }
+const isHttpErrorLike = (thrown: unknown): thrown is HttpErrorLike =>
+  typeof thrown === 'object' && thrown !== null && 'response' in thrown && (thrown as HttpErrorLike).response !== undefined
 
 const getErrorBody = (thrown: unknown) => {
   if (isHttpErrorLike(thrown)) {

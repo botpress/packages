@@ -39,7 +39,10 @@ export async function runCli<TData>(
       }
       const result = await loop.applyPrComments(prNumber);
       printApplyResult(result);
-      if (result.status === "wrong-loop") process.exitCode = 1;
+      // Every apply outcome — including `wrong-loop` (not this loop's PR) and
+      // `no-new-comments` — is a normal result, not a failure: a comment webhook fires
+      // this command on every PR, so a non-match is expected and must exit zero. Only a
+      // thrown error (caught below) exits non-zero.
     });
 
   program.addHelpText(
@@ -66,8 +69,9 @@ export async function runCli<TData>(
  * program fronts every registered loop, so one CI workflow can drive them all: `run <loop>` for
  * a scheduled cycle, `apply-comments <pr>` for a shared comment webhook, `list` to discover slugs.
  *
- * Exits non-zero on a thrown error, an unresolved fix (`fix-failed`), or a comment event that
- * matched no registered loop — so a mis-wired trigger fails loudly.
+ * Exits non-zero on a thrown error or an unresolved fix (`fix-failed`). A comment event that
+ * matches no registered loop exits zero — a shared webhook fires on every PR in the repo, so a
+ * non-match is expected, not a mis-wired trigger.
  */
 export async function runOrchestratorCli(
   orchestrator: LoopOrchestrator,
@@ -100,8 +104,9 @@ export async function runOrchestratorCli(
       }
       const dispatch = await orchestrator.applyPrComments(prNumber);
       if (dispatch.status === "no-matching-loop") {
+        // A shared comment webhook fires on every PR in the repo, including human PRs no
+        // loop owns — so no matching loop is a normal outcome, not a mis-route. Exit zero.
         console.log(`no registered loop owns PR #${dispatch.prNumber} — nothing applied`);
-        process.exitCode = 1;
         return;
       }
       console.log(`→ ${dispatch.loop}`);

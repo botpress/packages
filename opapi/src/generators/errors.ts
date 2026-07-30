@@ -27,8 +27,6 @@ export function generateErrors(errors: ApiError[]) {
   const types = errors.map((error) => error.type)
 
   return `
-import crypto from 'crypto'
-
 const codes = {
 ${Object.entries(codes)
   .map(([name, code]) => `  ${name}: ${code},`)
@@ -41,19 +39,15 @@ declare const window: any
 type CryptoLib = { getRandomValues(array: Uint8Array): Uint8Array }
 
 const cryptoLibPolyfill: CryptoLib = {
-  // Fallback when crypto isn't available.
+  // Fallback in environments without a web crypto implementation.
   getRandomValues: (array: Uint8Array) => new Uint8Array(array.map(() => Math.floor(Math.random() * 256))),
 }
 
-let cryptoLib: CryptoLib =
-  typeof window !== 'undefined' && typeof window.document !== 'undefined'
-    ? window.crypto // Note: On browsers we need to use window.crypto instead of the imported crypto module as the latter is externalized and doesn't have getRandomValues().
-    : crypto
-
-if (!cryptoLib.getRandomValues) {
-  // Use a polyfill in older environments that have a crypto implementation missing getRandomValues()
-  cryptoLib = cryptoLibPolyfill
-}
+// globalThis.crypto covers browsers, web workers, node >= 19 and most edge runtimes
+const cryptoLib: CryptoLib =
+  typeof globalThis.crypto !== 'undefined' && typeof globalThis.crypto.getRandomValues === 'function'
+    ? globalThis.crypto
+    : cryptoLibPolyfill
 
 abstract class BaseApiError<Code extends ErrorCode, Type extends string, Description extends string> extends Error {
   public readonly isApiError = true

@@ -7,6 +7,44 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+## [2.0.0] - 2026-07-22
+
+### Changed
+
+- **Breaking**: The `opapi` client generator no longer emits axios-based code. The generated `Client` now takes any transport implementing the generated `HttpClient` interface (`{ request: <T>(config: RequestConfig) => Promise<{ data: T }> }`) instead of an `AxiosInstance`. Like axios, the transport must reject on unsuccessful http statuses, exposing the parsed error body under `response.data` on the thrown error so the generated client can map it to an api error.
+- **Breaking**: The generated `to-axios.ts` file is now `to-request.ts`, `toAxiosRequest` is now `toRequest` (returning a `RequestConfig` instead of an `AxiosRequestConfig`), and the `ClientProps.toAxiosRequest` override is now `ClientProps.toRequest`.
+- **Breaking**: The generated handler no longer imports `isAxiosError` from axios; it detects http errors structurally (any `Error` with a `response` property).
+- The generated `toApiError` detects http errors structurally (`err.response.data`) instead of using `axios.isAxiosError`, so it works with any transport including axios.
+- The generated `errors.ts` no longer imports the node `crypto` module: it uses `globalThis.crypto` when available (browsers, web workers, node >= 19, edge runtimes) and falls back to a `Math.random`-based polyfill otherwise, so generated clients have no node builtin dependencies.
+
+#### Examples
+
+```ts
+// Generated clients are now transport-agnostic. Bring any http client that
+// implements the generated `HttpClient` interface — for example a fetch-based one:
+import { Client } from './gen'
+
+const httpClient = {
+  request: async <T>(config: { method: string; url: string; headers: Record<string, string>; data?: any }) => {
+    const res = await fetch(`https://api.example.com${config.url}`, {
+      method: config.method,
+      headers: config.headers,
+      body: config.data ? JSON.stringify(config.data) : undefined,
+    })
+    const data = await res.json()
+    if (!res.ok) {
+      // the generated client maps rejections carrying `response.data` to api errors
+      throw Object.assign(new Error(`Request failed with status code ${res.status}`), {
+        response: { status: res.status, data },
+      })
+    }
+    return { data: data as T }
+  },
+}
+
+const client = new Client(httpClient)
+```
+
 ### Fixed
 
 - Fixed spelling mistakes in package files.

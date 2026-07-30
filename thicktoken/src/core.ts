@@ -1,4 +1,4 @@
-import { WasmTokenizer, type CountOptions, type TruncateMode } from '../wasm/index'
+import { WasmTokenizer, type CountOptions, type CreateOptions, type TruncateMode } from '../wasm/index'
 import { deepClone, mapValues, uniq } from './utils'
 
 export class TokenCollection {
@@ -141,6 +141,8 @@ export class TextTokenizer {
   }
 }
 
+export type GetTokenizerOptions = CreateOptions
+
 /**
  * Builds a memoized async `getWasmTokenizer` for a specific vocab asset. Each
  * package entry (`.` full cl100k, `./lite` cl50k, `./micro` cl25k) bundles its
@@ -148,12 +150,12 @@ export class TextTokenizer {
  */
 export const makeGetTokenizer = (assetGz: Uint8Array) => {
   let tokenizer: TextTokenizer | null = null
-  return async (): Promise<TextTokenizer> => {
+  return async (options: GetTokenizerOptions = {}): Promise<TextTokenizer> => {
     if (!tokenizer) {
-      tokenizer = new TextTokenizer(WasmTokenizer.create(assetGz))
+      tokenizer = new TextTokenizer(WasmTokenizer.create(assetGz, options))
     }
     return tokenizer
   }
 }
 
-export { WasmTokenizer, type CountOptions, type TruncateMode }
+export { WasmTokenizer, type CountOptions, type CreateOptions, type TruncateMode }

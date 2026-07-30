@@ -269,8 +269,9 @@ export class ControlLoop<TData = unknown> {
 const HIGH_RESOURCES = { cpu: 4, memory: 8, disk: 10 };
 
 async function createSandbox(config: ControlLoopConfig): Promise<Sandbox> {
-  // Reads DAYTONA_API_KEY / DAYTONA_API_URL / DAYTONA_TARGET from the environment.
-  const daytona = new Daytona();
+  // A per-loop key wins; when unset the SDK falls back to DAYTONA_API_KEY (and reads
+  // DAYTONA_API_URL / DAYTONA_TARGET) from the environment.
+  const daytona = new Daytona({ apiKey: config.sandbox?.apiKey });
 
   if (config.sandbox?.snapshot) {
     // Daytona rejects resources when creating from a snapshot ("Cannot specify Sandbox

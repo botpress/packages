@@ -48,8 +48,10 @@ just reference material for authoring new loops.
 - **`src/cli.ts`** — `runCli` (backing `ControlLoop.cli()`) and `runOrchestratorCli` (backing
   `LoopOrchestrator.run()`): [commander](https://github.com/tj/commander.js) programs with
   `run`/`apply-comments` (+ `list` for the orchestrator) subcommands, result-summary printing, and
-  CI-friendly exit codes (non-zero on error, an unresolved `fix-failed`, or a comment event that
-  matched no loop). Keep command wiring here, not in `control-loop.ts`/`orchestrator.ts`.
+  CI-friendly exit codes (non-zero only on error or an unresolved `fix-failed`). `apply-comments`
+  always exits zero for a non-match (`wrong-loop`/`no-matching-loop`) — a comment webhook fires on
+  every PR, so a non-match is a normal outcome, not a failure. Keep command wiring here, not in
+  `control-loop.ts`/`orchestrator.ts`.
 - **`src/types.ts`** — the core vocabulary: `Signal` (an anomaly), `Sensor`/`SensorFn`/
   `SensorScript`, `Picker`, `InstructionBuilder` (builds an agent prompt per signal),
   `CommentActuator`, and the `ControlLoopOptions`/`ControlLoopConfig` shapes. Read this file

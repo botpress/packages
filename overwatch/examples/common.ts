@@ -1,6 +1,21 @@
-import { Codex, Github, GithubApp, type ControlLoopConfig } from "../index";
+import { Codex, GithubApp, Slack, type ControlLoopConfig } from "../index";
 
 export const config: ControlLoopConfig = {
+  // Where the loop reports its outcomes. Each handler decides the wording, and returning
+  // nothing sends nothing — so a destination only speaks up about the events it has a handler
+  // for. Runs that find nothing (or bow out early) are never announced.
+  notifications: [
+    new Slack({
+      auth: { token: process.env.SLACK_BOT_TOKEN! },
+      channel: "<channel_id>",
+      onSuccess: (context) => {
+        return `A new PR was open: ${context.url}`;
+      },
+      onFailure: (reason) => {
+        return reason;
+      },
+    }),
+  ],
   // If this many PRs with the loop's label are already open, the run is skipped
   // before a sandbox is even created.
   maxOpenPrCount: 1,

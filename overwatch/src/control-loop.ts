@@ -3,6 +3,7 @@ import type { AgentContext } from "./agents";
 import type { PrComment } from "./github";
 import { RepoHandle } from "./repo-handle";
 import { RunLog } from "./log";
+import type { Notification } from "./notifications";
 import * as actuators from "./actuators";
 import * as pickers from "./pickers";
 import { runCli } from "./cli";
@@ -48,9 +49,26 @@ export class ControlLoop<TData = unknown> {
    * does not stay resident.
    */
   async run(): Promise<ControlLoopRunResult<TData>> {
+    const log = new RunLog(this.options.label);
+
+    try {
+      const result = await this.runCycle(log);
+      await this.notifyRunResult(result, log);
+      return result;
+    } catch (error) {
+      // A run that throws failed just as surely as one that couldn't fix its signals, and for a
+      // scheduled loop the notification may be the only place anyone sees it — so report it
+      // before handing the error to the caller.
+      await this.notify(log, (notification) =>
+        notification.notifyFailure(`${this.options.label} — run failed: ${describeError(error)}`),
+      );
+      throw error;
+    }
+  }
+
+  private async runCycle(log: RunLog): Promise<ControlLoopRunResult<TData>> {
     const { config, sensor, picker } = this.options;
     const label = slugify(this.options.label);
-    const log = new RunLog(this.options.label);
 
     const maxOpenPrCount = config.maxOpenPrCount;
     if (maxOpenPrCount !== undefined) {
@@ -107,6 +125,49 @@ export class ControlLoop<TData = unknown> {
         log,
       });
     });
+  }
+
+  /**
+   * Reports a finished cycle to the configured destinations. Only `pr-opened` and `fix-failed`
+   * say anything: `clean` and `skipped` are what a scheduled loop returns on most ticks, so
+   * announcing them would drown out the runs worth looking at.
+   */
+  private async notifyRunResult(result: ControlLoopRunResult<TData>, log: RunLog): Promise<void> {
+    if (result.status === "pr-opened") {
+      await this.notify(log, (notification) =>
+        notification.notifySuccess({
+          label: this.options.label,
+          url: result.prUrl,
+          signals: result.fixed,
+        }),
+      );
+      return;
+    }
+
+    if (result.status === "fix-failed") {
+      await this.notify(log, (notification) =>
+        notification.notifyFailure(fixFailedReason(this.options.label, result.unresolved)),
+      );
+    }
+  }
+
+  /**
+   * Fans one event out to every configured destination, each isolated from the others: a
+   * destination that throws (revoked token, network down, bot not in the channel) is logged
+   * and skipped. Notifying is a side report on the run, so it must never be able to turn a
+   * successful run into a failed one.
+   */
+  private async notify(
+    log: RunLog,
+    send: (notification: Notification) => Promise<void>,
+  ): Promise<void> {
+    for (const notification of this.options.config.notifications ?? []) {
+      try {
+        await send(notification);
+      } catch (error) {
+        log.warn(`notification (${notification.name}) failed: ${describeError(error)}`);
+      }
+    }
   }
 
   /**
@@ -175,9 +236,35 @@ export class ControlLoop<TData = unknown> {
    * makes repeated triggers for the same comment thread safe.
    */
   async applyPrComments(prNumber: number): Promise<ApplyCommentsResult> {
+    const log = new RunLog(`${this.options.label} · PR #${prNumber}`);
+
+    try {
+      const result = await this.applyPrCommentsCycle(prNumber, log);
+      if (result.status === "comments-applied") {
+        await this.notify(log, (notification) =>
+          notification.notifyCommentsApplied({
+            label: this.options.label,
+            branch: result.branch,
+            comments: result.comments,
+          }),
+        );
+      }
+      // `wrong-loop` (and the two no-op outcomes) stay silent: under a `LoopOrchestrator` every
+      // loop is probed on every comment event, so a non-match is routine, not news.
+      return result;
+    } catch (error) {
+      await this.notify(log, (notification) =>
+        notification.notifyFailure(
+          `${this.options.label} — applying comments to PR #${prNumber} failed: ${describeError(error)}`,
+        ),
+      );
+      throw error;
+    }
+  }
+
+  private async applyPrCommentsCycle(prNumber: number, log: RunLog): Promise<ApplyCommentsResult> {
     const { config, commentActuator } = this.options;
     const label = slugify(this.options.label);
-    const log = new RunLog(`${this.options.label} · PR #${prNumber}`);
 
     const pr = await config.git.getPr(prNumber);
 
@@ -349,6 +436,25 @@ function makeSensorRunner<TData>(
     const raw = await sandbox.fs.downloadFile(`${REPO_PATH}/${signalsPath}`);
     return JSON.parse(raw.toString("utf-8")) as Signal<TData>[];
   };
+}
+
+/**
+ * The failure text handed to `onFailure` for an unresolved fix. It leads with the loop's label
+ * because a notification lands somewhere shared (a channel watched by several loops), where a
+ * bare "fix failed" says nothing — which is what makes `(reason) => reason` a usable handler.
+ */
+function fixFailedReason(label: string, unresolved: Signal[]): string {
+  const lines = unresolved.map(
+    (signal) => `- ${signal.location ? `\`${signal.location.file}\` — ` : ""}${signal.message}`,
+  );
+  return [
+    `${label} — fix failed: ${unresolved.length} signal(s) still present after the agent's attempts:`,
+    ...lines,
+  ].join("\n");
+}
+
+function describeError(error: unknown): string {
+  return error instanceof Error ? error.message : String(error);
 }
 
 function isFeedback(comment: PrComment): boolean {

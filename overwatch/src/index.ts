@@ -33,6 +33,18 @@ export {
 export * as pickers from "./pickers";
 export { type Picker } from "./pickers";
 
+export * as notifications from "./notifications";
+export {
+  Notification,
+  Slack,
+  type NotificationCommentsContext,
+  type NotificationHandler,
+  type NotificationMessage,
+  type NotificationProps,
+  type NotificationSuccessContext,
+  type SlackProps,
+} from "./notifications";
+
 export * as sensors from "./sensors";
 export {
   type AstGrepMatch,

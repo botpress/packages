@@ -258,6 +258,40 @@ file is read on every future run of the same loop and appended to every agent in
 standing guidance — this is how you correct a loop's behavior once and have it stick, since the
 memory file ships with the PR that recorded it.
 
+### Notifications
+
+`config.notifications` is a list of destinations the loop reports its terminal outcomes to.
+`Slack` ships with the lib; subclass the abstract `Notification` (one `send(text)` method) for
+anything else.
+
+```ts
+import { Slack } from "@bpinternal/overwatch";
+
+notifications: [
+  new Slack({
+    auth: { token: process.env.SLACK_BOT_TOKEN! }, // bot token with chat:write
+    channel: "#overwatch",
+    onSuccess: (context) => `A new PR was open: ${context.url}`,
+    onFailure: (reason) => reason,
+  }),
+],
+```
+
+The wording is entirely yours — each handler returns the message to post, and returning
+`null`/`undefined` (or nothing) posts nothing, so a destination only speaks up about the events
+it has a handler for:
+
+| Handler | Fires on | Receives |
+| --- | --- | --- |
+| `onSuccess` | `run()` opened a PR | `{ label, url, signals }` |
+| `onFailure` | `run()` returned `fix-failed`, or either entry point threw | `reason: string` (already names the loop) |
+| `onCommentsApplied` | `applyPrComments()` pushed to the PR's branch | `{ label, branch, comments }` |
+
+`clean` and `skipped` runs — and comment events meant for another loop — notify nothing: those
+are what a scheduled loop returns on most ticks, and announcing them buries the runs worth
+looking at. A destination that can't be reached (revoked token, bot not in the channel) is
+logged as a warning and skipped; it never fails a run, and never replaces the run's own error.
+
 ### Claiming (safe concurrency)
 
 Every opened PR embeds an invisible marker listing the signal keys it fixes. On the next run,
@@ -441,6 +475,8 @@ The static, per-loop settings passed as `config`:
   (`prepare`, `executeAgent`) to plug in another CLI.
 - **`maxOpenPrCount`** — skip the run outright if this many PRs with the loop's label are
   already open.
+- **`notifications`** (`Notification[]`) — destinations told about the run's outcome; see
+  **Notifications** above.
 - **`branchPrefix`** — default `"control-loop"`; pushed branches look like
   `<prefix>/<label-slug>-<run-id>`.
 - **`hooks.setup`** — shell command run right after cloning (e.g. `"bun install"`). Non-zero
@@ -474,6 +510,9 @@ running a loop manually. Set `CONTROL_LOOP_SILENT=1` to mute it; colors otherwis
 - **New actuator kind** (doesn't open a PR / doesn't run an agent): add a file to `src/actuators/`
   with a class that subclasses the abstract `Actuator`, re-exported from `src/actuators/index.ts`.
 - **New agent CLI**: extend the abstract `Agent` class in `src/agents.ts`.
+- **New notification destination**: add a file to `src/notifications/` with a class that
+  subclasses the abstract `Notification` and implements `send(text)`, re-exported from
+  `src/notifications/index.ts`. The base handles which events fire and what they say.
 - **New forge** (GitLab, etc.): implement the `GitSource` interface from `src/github.ts`.
 
 ## Disclaimer ⚠️

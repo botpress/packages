@@ -58,6 +58,7 @@
   "dependencies": {
     "@daytona/sdk": "^0.195.0",
     "@octokit/auth-app": "^8.2.0",
+    "@slack/web-api": "^8.0.0",
     "commander": "^15.0.0",
     "octokit": "^5.0.5"
   }

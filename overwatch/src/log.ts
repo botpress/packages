@@ -64,6 +64,11 @@ export class RunLog {
     this.line(yellow("⏭"), yellow(message));
   }
 
+  /** Something off to the side failed (a notification, say) and the run carried on regardless. */
+  warn(message: string): void {
+    this.line(yellow("⚠"), yellow(message));
+  }
+
   /** The run's terminal outcome. */
   finish(message: string): void {
     this.line(green("●"), bold(message));

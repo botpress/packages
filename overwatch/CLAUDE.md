@@ -71,6 +71,10 @@ just reference material for authoring new loops.
     `ast-grep.ts`, `react-doctor.ts`, `script.ts` (each also owns its own option/result types).
   - `pickers/`: `index.ts` = the `Picker` type plus `chain` (the combinator). Defaults:
     `count.ts`, `busiest-file.ts`.
+  - `notifications/`: `index.ts` = the handler/context types (`NotificationProps` et al.) and
+    re-exports; the abstract `Notification` sits in `notification.ts` for the same require-cycle
+    reason as `Actuator`. Default: `slack.ts`. The base owns *when* an event fires and *what* it
+    says (it holds the caller's handlers); a subclass implements only `send(text)`.
   - Adding a new built-in = a new sibling file re-exported from that folder's `index.ts`, not a
     new abstraction. Implementations import the part's types from their `index.ts` and `Signal`
     et al. from `../types`.
@@ -114,6 +118,11 @@ just reference material for authoring new loops.
 - **Every sandbox is created at `HIGH_RESOURCES`** (4 vCPU / 8 GiB / 10 GiB disk) unless a
   snapshot is configured — the default tier OOM-kills dependency installs on real repos. Don't
   drop this default without a reason.
+- **A notification must never change a run's outcome.** Only terminal, actionable results are
+  reported (`pr-opened`, `fix-failed`, a throw, `comments-applied`) — `clean`/`skipped`/
+  `wrong-loop` stay silent because a scheduled loop hits those on most ticks. Sends are caught
+  per destination and logged via `RunLog.warn`, so an unreachable Slack can't fail a green run
+  or mask the run's real error.
 - Doc comments (`/** ... */`) on exported symbols explain *why*, not *what* — match that style
   rather than restating the type signature in prose.
 - Tests run under `vitest` (`pnpm test`); `src/pickers.test.ts` is the current suite. If you

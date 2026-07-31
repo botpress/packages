@@ -2,6 +2,7 @@ import type { Agent } from "./agents";
 import type { Actuator, CommentActuator } from "./actuators";
 import type { Sensor } from "./sensors";
 import type { Picker } from "./pickers";
+import type { Notification } from "./notifications";
 import type { GitSource, PrComment } from "./github";
 
 export type SignalPriority = "low" | "medium" | "high";
@@ -54,6 +55,12 @@ export interface ControlLoopOptions<TData = unknown> {
 }
 
 export interface ControlLoopConfig {
+  /**
+   * Where the loop reports its terminal outcomes (PR opened, fix failed, run threw). Each
+   * destination decides what to say through its own handlers; a destination that can't be
+   * reached is logged and skipped, never failing the run. See {@link Notification}.
+   */
+  notifications?: Notification[];
   /** Skip the run entirely if this many PRs with the loop's label are already open. */
   maxOpenPrCount?: number;
   /**

@@ -91,6 +91,12 @@ export interface ControlLoopConfig {
   maxFixAttempts?: number;
   sandbox?: {
     /**
+     * Daytona API key used to create the sandbox, so a process hosting several loops
+     * (e.g. an orchestrator) can point them at different Daytona accounts. Falls back to
+     * the `DAYTONA_API_KEY` env var when omitted.
+     */
+    apiKey?: string;
+    /**
      * Daytona snapshot to create the sandbox from. Pre-bake your toolchain and the
      * agent's CLI into it to skip per-run installs. Defaults to Daytona's typescript
      * sandbox, with the agent CLI installed at run start.

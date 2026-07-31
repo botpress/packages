@@ -49,4 +49,7 @@ export const config: ControlLoopConfig = {
   },
   // Environment variables set on the sandbox at creation.
   env: { NPM_TOKEN: process.env.NPM_TOKEN! },
+  // Sandboxes are created with this key. Optional — omitting it falls back to the
+  // DAYTONA_API_KEY env var — but passing it per loop keeps multi-loop hosts explicit.
+  sandbox: { apiKey: process.env.DAYTONA_API_KEY! },
 };

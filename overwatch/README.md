@@ -26,8 +26,9 @@ Ships as a compiled build (CommonJS, with type declarations) that works from bot
 
 You'll need, at minimum:
 
-- `DAYTONA_API_KEY` (and optionally `DAYTONA_API_URL` / `DAYTONA_TARGET`) — sandbox creation
-- `ANTHROPIC_API_KEY` or `OPENAI_API_KEY` — whichever agent you use
+- A Daytona API key — passed as `config.sandbox.apiKey` per loop, or via the `DAYTONA_API_KEY`
+  env var (`DAYTONA_API_URL` / `DAYTONA_TARGET` also work as env vars if you need them)
+- An Anthropic or OpenAI API key — whichever agent you use
 - A GitHub token with push + PR permissions on the target repo, if you want the loop to open
   PRs rather than just report
 
@@ -53,6 +54,7 @@ const loop = new ControlLoop({
       setup: "bun install",
       preCommit: "bun run fix:format",
     },
+    sandbox: { apiKey: process.env.DAYTONA_API_KEY! },
   },
 
   // Detects anomalies. Scans src/ for raw `throw new Error(...)`.
@@ -486,6 +488,9 @@ The static, per-loop settings passed as `config`:
   passes formatting CI. Non-zero exit aborts the run.
 - **`env`** — env vars set on the sandbox at creation (available to `hooks` and the agent).
 - **`maxFixAttempts`** — default 3; see step 6 above.
+- **`sandbox.apiKey`** — the Daytona API key sandboxes are created with, so loops hosted in
+  one process can use different Daytona accounts. Falls back to the `DAYTONA_API_KEY` env var
+  when omitted.
 - **`sandbox.snapshot`** — a Daytona snapshot to create the sandbox from instead of the default
   image. Pre-bake your toolchain and the agent CLI here to skip per-run installs. Note:
   resource sizing must be baked into the snapshot itself — it can't be requested at creation

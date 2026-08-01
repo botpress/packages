@@ -3,7 +3,19 @@ import WebSocket from 'isomorphic-ws'
 import * as errors from './errors'
 import { EventEmitter } from './event-emitter'
 import * as rooting from './rooting'
-import { Hello, TunnelRequest, TunnelResponse, headSchema, tailSchema } from './types'
+import {
+  Hello,
+  TunnelRequest,
+  TunnelResponse,
+  TunnelWsAccept,
+  TunnelWsClose,
+  TunnelWsFrame,
+  TunnelWsOpen,
+  TunnelWsReject,
+  WS_CAPABILITY,
+  headSchema,
+  tailSchema
+} from './types'
 
 export type ClientCloseEvent = WebSocket.CloseEvent
 export type ClientErrorEvent = WebSocket.Event
@@ -18,7 +30,12 @@ export abstract class TunnelClient {
     open: WebSocket.Event
     request: TunnelRequest
     response: TunnelResponse
-    hello: {}
+    hello: Hello
+    ws_open: TunnelWsOpen
+    ws_accept: TunnelWsAccept
+    ws_reject: TunnelWsReject
+    ws_frame: TunnelWsFrame
+    ws_close: TunnelWsClose
   }>()
 
   public get closed() {
@@ -61,10 +78,29 @@ export abstract class TunnelClient {
     this._ws.close(code ?? errors.CLOSE_CODES.NORMAL_CLOSURE, reason)
   }
 
-  public readonly hello = () => {
+  public readonly hello = (capabilities?: string[]) => {
     this._throwIfClosed()
-    const hello: Hello = { type: 'hello' }
+    const hello: Hello = { type: 'hello', ...(capabilities?.length && { capabilities }) }
     this._ws.send(JSON.stringify(hello))
+  }
+
+  /** Relay one WebSocket frame of the bridged connection `id`. */
+  public readonly sendWebSocketFrame = (id: string, data: string, binary?: boolean) => {
+    this._throwIfClosed()
+    const frame: TunnelWsFrame = { type: 'ws_frame', id, data, ...(binary && { binary }) }
+    this._ws.send(JSON.stringify(frame))
+  }
+
+  /** Close the bridged WebSocket connection `id` on the other end. */
+  public readonly closeWebSocket = (id: string, code?: number, reason?: string) => {
+    this._throwIfClosed()
+    const close: TunnelWsClose = {
+      type: 'ws_close',
+      id,
+      ...(code !== undefined && { code }),
+      ...(reason !== undefined && { reason })
+    }
+    this._ws.send(JSON.stringify(close))
   }
 
   protected _throwIfClosed = () => {
@@ -88,7 +124,10 @@ export class TunnelTail extends TunnelClient {
     error: ClientErrorEvent
     request: TunnelRequest
     open: ClientOpenEvent
-    hello: {}
+    hello: Hello
+    ws_open: TunnelWsOpen
+    ws_frame: TunnelWsFrame
+    ws_close: TunnelWsClose
   }> = this._ev
 
   public static new(host: string, tunnelId: string): Promise<TunnelTail> {
@@ -103,11 +142,30 @@ export class TunnelTail extends TunnelClient {
     const url = rooting.formatUrl(host, tunnelId)
 
     const headers = { 'User-Agent': 'tunnel-client' } // for firewall
+    // The bundled `ws` client throws "Unexpected server response: 101" under
+    // Bun; Bun's native WebSocket handles the upgrade correctly and accepts a
+    // `{ headers }` option, so prefer it there. Keep `ws` under Node.
+    type AnyWebSocketConstructor = new (url: string, options?: unknown) => WebSocket
+    const runtime = globalThis as unknown as { Bun?: unknown; WebSocket?: AnyWebSocketConstructor }
+    const TunnelWS: AnyWebSocketConstructor =
+      runtime.Bun !== undefined && runtime.WebSocket
+        ? runtime.WebSocket
+        : (WebSocket as unknown as AnyWebSocketConstructor)
     const socket = isBrowser
-      ? new WebSocket(url) // headers are not supported in browser, but the browser will add the User-Agent header automatically
-      : new WebSocket(url, { headers })
+      ? new TunnelWS(url) // headers are not supported in browser, but the browser will add the User-Agent header automatically
+      : new TunnelWS(url, { headers })
 
     super(socket)
+
+    // Advertise protocol extensions as soon as the tunnel opens — the head
+    // only bridges visitor WebSockets to tails that declared support.
+    this._ev.once('open', () => {
+      try {
+        this.hello([WS_CAPABILITY])
+      } catch {
+        // The tunnel closed between open and hello — nothing to advertise.
+      }
+    })
 
     this._ev.on('message', (ev: WebSocket.MessageEvent) => {
       const message = this._parseMessage(ev)
@@ -116,10 +174,14 @@ export class TunnelTail extends TunnelClient {
         return
       }
       if (message.type === 'hello') {
-        this.events.emit('hello', {})
+        this.events.emit('hello', message.hello)
         return
       }
-      this.events.emit('request', message.request)
+      if (message.type === 'request') {
+        this.events.emit('request', message.request)
+        return
+      }
+      this.events.emit(message.message.type, message.message as never)
     })
   }
 
@@ -130,9 +192,27 @@ export class TunnelTail extends TunnelClient {
     this._ws.send(JSON.stringify(res))
   }
 
+  /** Confirm a `ws_open` — frames may flow for this connection from now on. */
+  public readonly acceptWebSocket = (id: string) => {
+    this._throwIfClosed()
+    const accept: TunnelWsAccept = { type: 'ws_accept', id }
+    this._ws.send(JSON.stringify(accept))
+  }
+
+  /** Refuse a `ws_open` — the head closes the visitor's socket. */
+  public readonly rejectWebSocket = (id: string, reason?: string) => {
+    this._throwIfClosed()
+    const reject: TunnelWsReject = { type: 'ws_reject', id, ...(reason !== undefined && { reason }) }
+    this._ws.send(JSON.stringify(reject))
+  }
+
   private _parseMessage = (
     ev: WebSocket.MessageEvent
-  ): { type: 'hello' } | { type: 'request'; request: TunnelRequest } | undefined => {
+  ):
+    | { type: 'hello'; hello: Hello }
+    | { type: 'request'; request: TunnelRequest }
+    | { type: 'ws'; message: TunnelWsOpen | TunnelWsFrame | TunnelWsClose }
+    | undefined => {
     const data = JSON.parse(ev.data.toString())
 
     const parseResult = tailSchema.safeParse(data)
@@ -141,7 +221,15 @@ export class TunnelTail extends TunnelClient {
     }
 
     if (parseResult.data.type === 'hello') {
-      return { type: 'hello' }
+      return { type: 'hello', hello: parseResult.data }
+    }
+
+    if (
+      parseResult.data.type === 'ws_open' ||
+      parseResult.data.type === 'ws_frame' ||
+      parseResult.data.type === 'ws_close'
+    ) {
+      return { type: 'ws', message: parseResult.data }
     }
 
     return { type: 'request', request: parseResult.data }
@@ -149,12 +237,18 @@ export class TunnelTail extends TunnelClient {
 }
 
 export class TunnelHead extends TunnelClient {
+  private _capabilities: Set<string> = new Set()
+
   public readonly events: EventEmitter<{
     close: ClientCloseEvent
     error: ClientErrorEvent
     response: TunnelResponse
     open: ClientOpenEvent
-    hello: {}
+    hello: Hello
+    ws_accept: TunnelWsAccept
+    ws_reject: TunnelWsReject
+    ws_frame: TunnelWsFrame
+    ws_close: TunnelWsClose
   }> = this._ev
 
   public constructor(public readonly tunnelId: string, ws: WebSocket) {
@@ -167,11 +261,23 @@ export class TunnelHead extends TunnelClient {
         return
       }
       if (message.type === 'hello') {
-        this.events.emit('hello', {})
+        for (const capability of message.hello.capabilities ?? []) {
+          this._capabilities.add(capability)
+        }
+        this.events.emit('hello', message.hello)
         return
       }
-      this.events.emit('response', message.response)
+      if (message.type === 'response') {
+        this.events.emit('response', message.response)
+        return
+      }
+      this.events.emit(message.message.type, message.message as never)
     })
+  }
+
+  /** True once the tail advertised WebSocket bridging (hello capabilities). */
+  public get supportsWebSockets(): boolean {
+    return this._capabilities.has(WS_CAPABILITY)
   }
 
   public readonly send = (request: Omit<TunnelRequest, 'type'>) => {
@@ -181,9 +287,20 @@ export class TunnelHead extends TunnelClient {
     this._ws.send(JSON.stringify(req))
   }
 
+  /** Ask the tail to open a bridged WebSocket connection; answered by ws_accept / ws_reject. */
+  public readonly openWebSocket = (open: Omit<TunnelWsOpen, 'type'>) => {
+    this._throwIfClosed()
+    const req: TunnelWsOpen = { type: 'ws_open', ...open }
+    this._ws.send(JSON.stringify(req))
+  }
+
   private _parseMessage = (
     ev: WebSocket.MessageEvent
-  ): { type: 'hello' } | { type: 'response'; response: TunnelResponse } | undefined => {
+  ):
+    | { type: 'hello'; hello: Hello }
+    | { type: 'response'; response: TunnelResponse }
+    | { type: 'ws'; message: TunnelWsAccept | TunnelWsReject | TunnelWsFrame | TunnelWsClose }
+    | undefined => {
     const data = JSON.parse(ev.data.toString())
 
     const parseResult = headSchema.safeParse(data)
@@ -192,7 +309,16 @@ export class TunnelHead extends TunnelClient {
     }
 
     if (parseResult.data.type === 'hello') {
-      return { type: 'hello' }
+      return { type: 'hello', hello: parseResult.data }
+    }
+
+    if (
+      parseResult.data.type === 'ws_accept' ||
+      parseResult.data.type === 'ws_reject' ||
+      parseResult.data.type === 'ws_frame' ||
+      parseResult.data.type === 'ws_close'
+    ) {
+      return { type: 'ws', message: parseResult.data }
     }
 
     return { type: 'response', response: parseResult.data }

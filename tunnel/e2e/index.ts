@@ -30,6 +30,11 @@ const tests = [
     name: 'websocket-unsupported',
     port: 9084,
     test: websocket.testWebSocketUnsupported
+  },
+  {
+    name: 'websocket-pending-cap',
+    port: 9085,
+    test: websocket.testWebSocketPendingCap
   }
 ]
 

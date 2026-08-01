@@ -21,12 +21,23 @@ export type ServerDisconnectionEvent = { tunnelId: string }
 /** How long a visitor socket waits for the tail's ws_accept before giving up. */
 const VISITOR_ACCEPT_TIMEOUT_MS = 10_000
 
-/** Headers a bridged ws_open forwards to the tail (auth cookies, negotiated subprotocols, origin checks). */
-const FORWARDED_VISITOR_HEADERS = ['cookie', 'origin', 'user-agent', 'sec-websocket-protocol', 'x-forwarded-for']
+/**
+ * Frames a visitor sends before the tail accepts are buffered (the visitor's
+ * upgrade already completed — it cannot know the handshake is in flight).
+ * The visitor is unauthenticated at this point, so the buffer is hard-capped;
+ * exceeding it closes the socket instead of holding attacker-controlled bytes.
+ */
+const MAX_PENDING_FRAMES = 64
+const MAX_PENDING_BYTES = 256 * 1024
 
-/** ws' close() only accepts 1000 or 3000-4999 — anything else (1001, 1006, …) becomes a normal closure. */
+/** Headers a bridged ws_open forwards to the tail (auth cookies, origin checks). */
+const FORWARDED_VISITOR_HEADERS = ['cookie', 'origin', 'user-agent', 'x-forwarded-for']
+
+/** Only codes an endpoint may SEND (RFC 6455): reserved ones (1005, 1006, …) become a normal closure. */
 const sendableCloseCode = (code: number | undefined): number =>
-  code !== undefined && (code === 1000 || (code >= 3000 && code <= 4999)) ? code : 1000
+  code !== undefined && ((code >= 1000 && code <= 1003) || (code >= 1007 && code <= 1011) || (code >= 3000 && code <= 4999))
+    ? code
+    : 1000
 
 const visitorConnectionId = (): string =>
   `wsc_${Date.now().toString(36)}${Math.random().toString(36).slice(2, 12)}`
@@ -162,9 +173,39 @@ export class TunnelServer {
 
     let accepted = false
     let finished = false
+    let pendingBytes = 0
     const pendingFrames: { data: string; binary: boolean }[] = []
 
-    const acceptTimeout = setTimeout(() => finish(1011, 'tunnel websocket accept timed out'), VISITOR_ACCEPT_TIMEOUT_MS)
+    const teardown = (opts: { visitorCode?: number; visitorReason?: string; notifyTail: boolean }) => {
+      if (finished) return
+      finished = true
+      clearTimeout(acceptTimeout)
+      pendingFrames.length = 0
+      visitors.delete(id)
+      tunnel.events.off('ws_accept', onAccept)
+      tunnel.events.off('ws_reject', onReject)
+      tunnel.events.off('ws_frame', onFrame)
+      tunnel.events.off('ws_close', onClose)
+      tunnel.events.off('close', onTunnelClose)
+      if (opts.notifyTail && !tunnel.closed) {
+        try {
+          tunnel.closeWebSocket(id, opts.visitorCode, opts.visitorReason)
+        } catch {
+          // tunnel raced shut — nothing to notify
+        }
+      }
+      try {
+        ws.close(sendableCloseCode(opts.visitorCode), opts.visitorReason)
+      } catch {
+        // already closing
+      }
+    }
+
+    const acceptTimeout = setTimeout(
+      // Notify the tail: a late accept would otherwise stream into the void.
+      () => teardown({ visitorCode: 1011, visitorReason: 'tunnel websocket accept timed out', notifyTail: true }),
+      VISITOR_ACCEPT_TIMEOUT_MS
+    )
 
     const onAccept = (msg: { id: string }) => {
       if (msg.id !== id || finished) return
@@ -173,10 +214,11 @@ export class TunnelServer {
       for (const frame of pendingFrames.splice(0)) {
         tunnel.sendWebSocketFrame(id, frame.data, frame.binary)
       }
+      pendingBytes = 0
     }
     const onReject = (msg: { id: string; reason?: string }) => {
       if (msg.id !== id) return
-      finish(1011, msg.reason ?? 'tunnel websocket rejected')
+      teardown({ visitorCode: 1011, visitorReason: msg.reason ?? 'tunnel websocket rejected', notifyTail: false })
     }
     const onFrame = (msg: { id: string; data: string; binary?: boolean }) => {
       if (msg.id !== id || finished) return
@@ -184,26 +226,9 @@ export class TunnelServer {
     }
     const onClose = (msg: { id: string; code?: number; reason?: string }) => {
       if (msg.id !== id) return
-      finish(msg.code, msg.reason)
+      teardown({ visitorCode: msg.code, visitorReason: msg.reason, notifyTail: false })
     }
-    const onTunnelClose = () => finish(1001, 'tunnel closed')
-
-    const finish = (code?: number, reason?: string) => {
-      if (finished) return
-      finished = true
-      clearTimeout(acceptTimeout)
-      visitors.delete(id)
-      tunnel.events.off('ws_accept', onAccept)
-      tunnel.events.off('ws_reject', onReject)
-      tunnel.events.off('ws_frame', onFrame)
-      tunnel.events.off('ws_close', onClose)
-      tunnel.events.off('close', onTunnelClose)
-      try {
-        ws.close(sendableCloseCode(code), reason)
-      } catch {
-        // already closing
-      }
-    }
+    const onTunnelClose = () => teardown({ visitorCode: 1001, visitorReason: 'tunnel closed', notifyTail: false })
 
     tunnel.events.on('ws_accept', onAccept)
     tunnel.events.on('ws_reject', onReject)
@@ -216,6 +241,12 @@ export class TunnelServer {
       const binary = typeof ev.data !== 'string'
       const data = binary ? Buffer.from(ev.data as Buffer).toString('base64') : (ev.data as string)
       if (!accepted) {
+        // Unauthenticated bytes: hard-capped, never held indefinitely.
+        if (pendingFrames.length >= MAX_PENDING_FRAMES || pendingBytes + data.length > MAX_PENDING_BYTES) {
+          teardown({ visitorCode: 1009, visitorReason: 'too much data before tunnel accept', notifyTail: true })
+          return
+        }
+        pendingBytes += data.length
         pendingFrames.push({ data, binary })
         return
       }
@@ -225,6 +256,7 @@ export class TunnelServer {
       if (finished) return
       finished = true
       clearTimeout(acceptTimeout)
+      pendingFrames.length = 0
       visitors.delete(id)
       tunnel.events.off('ws_accept', onAccept)
       tunnel.events.off('ws_reject', onReject)

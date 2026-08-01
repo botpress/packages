@@ -66,6 +66,31 @@ export const testWebSocketBridge = async (port: number, logger: Logger) => {
   server.close()
 }
 
+/** Pre-accept frames are hard-capped: a visitor flooding before the tail accepts is closed with 1009. */
+export const testWebSocketPendingCap = async (port: number, _logger: Logger) => {
+  const server = await TunnelServer.new({ port })
+  const tunnelTail = await TunnelTail.new(`ws://localhost:${port}`, TUNNEL_ID)
+  // Never accept — every visitor frame lands in the pre-accept buffer.
+  tunnelTail.events.on('ws_open', () => {})
+
+  const head = server.getTunnel(TUNNEL_ID)
+  if (!head) throw new Error(`Tunnel ${TUNNEL_ID} not found`)
+  for (let i = 0; i < 50 && !head.supportsWebSockets; i++) {
+    await new Promise((r) => setTimeout(r, 20))
+  }
+
+  const visitor = new WebSocket(`ws://localhost:${port}/${TUNNEL_ID}/flood`)
+  const closed = new Promise<WebSocket.CloseEvent>((resolve) => visitor.addEventListener('close', resolve))
+  visitor.addEventListener('open', () => {
+    for (let i = 0; i < 100; i++) visitor.send(`frame-${i}`)
+  })
+  const { code } = await closed
+  expect(String(code)).toBe('1009')
+
+  tunnelTail.close()
+  server.close()
+}
+
 /** A visitor upgrading against a tail that never advertised `ws` is refused cleanly. */
 export const testWebSocketUnsupported = async (port: number, _logger: Logger) => {
   const server = await TunnelServer.new({ port })

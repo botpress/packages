@@ -193,9 +193,9 @@ export class TunnelTail extends TunnelClient {
   }
 
   /** Confirm a `ws_open` — frames may flow for this connection from now on. */
-  public readonly acceptWebSocket = (id: string, subprotocol?: string) => {
+  public readonly acceptWebSocket = (id: string) => {
     this._throwIfClosed()
-    const accept: TunnelWsAccept = { type: 'ws_accept', id, ...(subprotocol && { subprotocol }) }
+    const accept: TunnelWsAccept = { type: 'ws_accept', id }
     this._ws.send(JSON.stringify(accept))
   }
 

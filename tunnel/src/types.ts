@@ -49,11 +49,13 @@ export const tunnelWsOpenSchema = z.object({
   headers: z.record(tunnelHeaderSchema).optional()
 })
 
+// No subprotocol on ws_accept: the visitor's upgrade completes (without one)
+// before the tail answers, so a tail-selected subprotocol could never be
+// honored — offering the field would only discard it silently.
 export type TunnelWsAccept = z.infer<typeof tunnelWsAcceptSchema>
 export const tunnelWsAcceptSchema = z.object({
   type: z.literal('ws_accept'),
-  id: z.string(),
-  subprotocol: z.string().optional()
+  id: z.string()
 })
 
 export type TunnelWsReject = z.infer<typeof tunnelWsRejectSchema>

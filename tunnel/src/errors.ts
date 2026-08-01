@@ -6,6 +6,7 @@ export const CLOSE_CODES = {
   INVALID_REQUEST_PAYLOAD: 4003,
   INTERNAL_TAIL_ERROR: 4004,
   INTERNAL_HEAD_ERROR: 4005,
+  WS_UNSUPPORTED: 4006,
 } as const
 
 export class TunnelError extends Error {

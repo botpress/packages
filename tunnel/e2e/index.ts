@@ -2,6 +2,7 @@ import { Logger } from '@bpinternal/log4bot'
 import yargs, { YargsArgv, YargsSchema } from '@bpinternal/yargs-extra'
 import * as browser from './browser'
 import * as nodejs from './nodejs'
+import * as websocket from './websocket'
 import { sleep } from './utils'
 
 const tests = [
@@ -19,6 +20,16 @@ const tests = [
     name: 'nodejs-invalid-request',
     port: 9082,
     test: nodejs.testInvalidRequest
+  },
+  {
+    name: 'websocket-bridge',
+    port: 9083,
+    test: websocket.testWebSocketBridge
+  },
+  {
+    name: 'websocket-unsupported',
+    port: 9084,
+    test: websocket.testWebSocketUnsupported
   }
 ]
 

@@ -43,17 +43,22 @@ export interface AstGrepOptions {
  */
 export const astGrep = (options: AstGrepOptions): SensorFn<AstGrepMatch> => {
   return async (repo) => {
-    const install = await repo.exec("command -v ast-grep || npm install -g @ast-grep/cli", { timeoutSec: 600 });
+    const install = await repo.exec("command -v ast-grep || npm install -g @ast-grep/cli", {
+      timeoutSec: 600,
+    });
     if (install.exitCode !== 0) {
       throw new Error(`failed to install ast-grep: ${install.output}`);
     }
 
     const lang = options.language ? ` --lang ${options.language}` : "";
     const paths = ` ${options.paths.map(shellQuote).join(" ")}`;
-    const run = await repo.exec(`ast-grep run --pattern ${shellQuote(options.pattern)}${lang} --json${paths}`, {
-      timeoutSec: 600,
-    });
-    if (run.exitCode !== 0) {
+    const run = await repo.exec(
+      `ast-grep run --pattern ${shellQuote(options.pattern)}${lang} --json${paths}`,
+      {
+        timeoutSec: 600,
+      },
+    );
+    if (run.exitCode !== 0 && run.output.trim() !== "[]") {
       throw new Error(`ast-grep exited ${run.exitCode}: ${run.output}`);
     }
 

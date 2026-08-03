@@ -3,7 +3,8 @@ import type { AgentContext } from "./agents";
 import type { PrComment } from "./github";
 import { RepoHandle } from "./repo-handle";
 import { RunLog } from "./log";
-import type { Notification } from "./notifications";
+import type { Notification, NotifyState } from "./notifications";
+import { type NotifyStates, parseNotifyState, withNotifyState } from "./notify-state";
 import * as actuators from "./actuators";
 import * as pickers from "./pickers";
 import { runCli } from "./cli";
@@ -134,13 +135,18 @@ export class ControlLoop<TData = unknown> {
    */
   private async notifyRunResult(result: ControlLoopRunResult<TData>, log: RunLog): Promise<void> {
     if (result.status === "pr-opened") {
-      await this.notify(log, (notification) =>
+      const states = await this.notify(log, (notification) =>
         notification.notifySuccess({
           label: this.options.label,
           url: result.prUrl,
           signals: result.fixed,
         }),
       );
+      // Recorded on the PR itself: the comment webhook that later reports on this PR runs in
+      // its own process, sharing nothing with this run but the PR.
+      if (result.prNumber !== undefined) {
+        await this.saveNotifyState(result.prNumber, states, {}, log);
+      }
       return;
     }
 
@@ -156,17 +162,78 @@ export class ControlLoop<TData = unknown> {
    * destination that throws (revoked token, network down, bot not in the channel) is logged
    * and skipped. Notifying is a side report on the run, so it must never be able to turn a
    * successful run into a failed one.
+   *
+   * Each destination is handed its own stored {@link NotifyState} and can return a new one;
+   * the merged map comes back for the caller to persist. A destination that returns nothing
+   * keeps whatever it had, and one that threw keeps it too — a failed send must not lose the
+   * thread the next event would have joined.
    */
   private async notify(
     log: RunLog,
-    send: (notification: Notification) => Promise<void>,
-  ): Promise<void> {
+    send: (
+      notification: Notification,
+      state: NotifyState | undefined,
+    ) => Promise<NotifyState | undefined>,
+    states: NotifyStates = {},
+  ): Promise<NotifyStates> {
+    const updated: NotifyStates = { ...states };
     for (const notification of this.options.config.notifications ?? []) {
       try {
-        await send(notification);
+        const state = await send(notification, states[notification.stateKey]);
+        if (state) updated[notification.stateKey] = state;
       } catch (error) {
         log.warn(`notification (${notification.name}) failed: ${describeError(error)}`);
       }
+    }
+    return updated;
+  }
+
+  /**
+   * {@link notify} for an event about an existing PR: loads the state the earlier events left on
+   * it, so a destination can group this message with them (Slack replies in the PR's thread),
+   * and writes back anything new.
+   */
+  private async notifyAboutPr(
+    prNumber: number,
+    log: RunLog,
+    send: (
+      notification: Notification,
+      state: NotifyState | undefined,
+    ) => Promise<NotifyState | undefined>,
+  ): Promise<void> {
+    const stored = await this.loadNotifyState(prNumber, log);
+    const updated = await this.notify(log, send, stored);
+    await this.saveNotifyState(prNumber, updated, stored, log);
+  }
+
+  private async loadNotifyState(prNumber: number, log: RunLog): Promise<NotifyStates> {
+    // Without destinations there's nothing to group, so don't spend an API call.
+    if (!this.options.config.notifications?.length) return {};
+    try {
+      return parseNotifyState((await this.options.config.git.getPr(prNumber)).body);
+    } catch (error) {
+      log.warn(`could not read notification state from PR #${prNumber}: ${describeError(error)}`);
+      return {};
+    }
+  }
+
+  /**
+   * Writes `states` into the PR body, and only when they changed — a body edit shows up in the
+   * PR's timeline, so an unchanged one is noise. Failures are logged, never thrown: notification
+   * bookkeeping falls under the same rule as the sends themselves.
+   */
+  private async saveNotifyState(
+    prNumber: number,
+    states: NotifyStates,
+    previous: NotifyStates,
+    log: RunLog,
+  ): Promise<void> {
+    if (JSON.stringify(states) === JSON.stringify(previous)) return;
+    try {
+      const { body } = await this.options.config.git.getPr(prNumber);
+      await this.options.config.git.updatePrBody(prNumber, withNotifyState(body, states));
+    } catch (error) {
+      log.warn(`could not record notification state on PR #${prNumber}: ${describeError(error)}`);
     }
   }
 
@@ -241,21 +308,25 @@ export class ControlLoop<TData = unknown> {
     try {
       const result = await this.applyPrCommentsCycle(prNumber, log);
       if (result.status === "comments-applied") {
-        await this.notify(log, (notification) =>
-          notification.notifyCommentsApplied({
-            label: this.options.label,
-            branch: result.branch,
-            comments: result.comments,
-          }),
+        await this.notifyAboutPr(prNumber, log, (notification, state) =>
+          notification.notifyCommentsApplied(
+            {
+              label: this.options.label,
+              branch: result.branch,
+              comments: result.comments,
+            },
+            state,
+          ),
         );
       }
       // `wrong-loop` (and the two no-op outcomes) stay silent: under a `LoopOrchestrator` every
       // loop is probed on every comment event, so a non-match is routine, not news.
       return result;
     } catch (error) {
-      await this.notify(log, (notification) =>
+      await this.notifyAboutPr(prNumber, log, (notification, state) =>
         notification.notifyFailure(
           `${this.options.label} — applying comments to PR #${prNumber} failed: ${describeError(error)}`,
+          state,
         ),
       );
       throw error;

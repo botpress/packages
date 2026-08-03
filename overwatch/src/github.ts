@@ -42,12 +42,26 @@ export interface GitSource {
   /** Clones `branch` (defaults to the base branch) into the sandbox at `path`. */
   cloneInto(sandbox: Sandbox, path: string, branch?: string): Promise<void>;
   push(sandbox: Sandbox, path: string, branch: string): Promise<void>;
-  openPr(params: { branch: string; title: string; body: string; label: string }): Promise<string>;
+  /** Both the url (for humans) and the number, which later PR-scoped calls key on. */
+  openPr(params: {
+    branch: string;
+    title: string;
+    body: string;
+    label: string;
+  }): Promise<{ url: string; number: number }>;
   /**
    * Head branch of the PR, the commit date of its tip (used to skip already-addressed
-   * comments), and its labels (used to verify the PR belongs to the loop before acting).
+   * comments), its labels (used to verify the PR belongs to the loop before acting), and its
+   * body (which carries the loop's markers — claimed signals, notification state).
    */
-  getPr(prNumber: number): Promise<{ branch: string; headCommittedAt: string; labels: string[] }>;
+  getPr(
+    prNumber: number,
+  ): Promise<{ branch: string; headCommittedAt: string; labels: string[]; body: string }>;
+  /**
+   * Replaces the PR's body. Used only to keep the loop's own markers up to date, so pass a
+   * body derived from the current one rather than a fresh one.
+   */
+  updatePrBody(prNumber: number, body: string): Promise<void>;
   /**
    * Comments on the PR — inline review comments and PR-level comments — oldest first.
    * Inline comments whose review thread has been resolved are excluded.
@@ -145,7 +159,7 @@ export abstract class GithubBase implements GitSource {
 
   async getPr(
     prNumber: number,
-  ): Promise<{ branch: string; headCommittedAt: string; labels: string[] }> {
+  ): Promise<{ branch: string; headCommittedAt: string; labels: string[]; body: string }> {
     const { data: pr } = await this.octokit.rest.pulls.get({
       owner: this.owner,
       repo: this.name,
@@ -158,7 +172,17 @@ export abstract class GithubBase implements GitSource {
     });
     const headCommittedAt = commit.commit.committer?.date ?? pr.created_at;
     const labels = pr.labels.map((label) => label.name).filter((name): name is string => !!name);
-    return { branch: pr.head.ref, headCommittedAt, labels };
+    return { branch: pr.head.ref, headCommittedAt, labels, body: pr.body ?? "" };
+  }
+
+  async updatePrBody(prNumber: number, body: string): Promise<void> {
+    this.requireAuth("update a PR body");
+    await this.octokit.rest.pulls.update({
+      owner: this.owner,
+      repo: this.name,
+      pull_number: prNumber,
+      body,
+    });
   }
 
   async listPrComments(prNumber: number): Promise<PrComment[]> {
@@ -260,7 +284,7 @@ export abstract class GithubBase implements GitSource {
     title: string;
     body: string;
     label: string;
-  }): Promise<string> {
+  }): Promise<{ url: string; number: number }> {
     this.requireAuth("open a PR");
     await this.ensureLabel(params.label);
     const { data: pr } = await this.octokit.rest.pulls.create({
@@ -294,7 +318,7 @@ export abstract class GithubBase implements GitSource {
           `unlabeled orphan the loop can't count or claim. Cause: ${(error as Error).message ?? String(error)}`,
       );
     }
-    return pr.html_url;
+    return { url: pr.html_url, number: pr.number };
   }
 
   /** Retries a request a few times; the label call must not be abandoned over a transient error. */

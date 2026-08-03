@@ -137,10 +137,13 @@ function stubOctokit(gh: Github, labelFailures: number) {
 describe("Github.openPr", () => {
   const params = { branch: "feat", title: "t", body: "b", label: "loop" };
 
-  test("labels the PR and returns its url on success", async () => {
+  test("labels the PR and returns its url and number on success", async () => {
     const gh = github();
     const calls = stubOctokit(gh, 0);
-    await expect(gh.openPr(params)).resolves.toBe("https://github.com/o/r/pull/7");
+    await expect(gh.openPr(params)).resolves.toEqual({
+      url: "https://github.com/o/r/pull/7",
+      number: 7,
+    });
     expect(calls.addLabels).toBe(1);
     expect(calls.closePr).toBe(0);
   });
@@ -148,7 +151,10 @@ describe("Github.openPr", () => {
   test("retries a transient labeling failure without closing the PR", async () => {
     const gh = github();
     const calls = stubOctokit(gh, 2); // fails twice, third attempt succeeds
-    await expect(gh.openPr(params)).resolves.toBe("https://github.com/o/r/pull/7");
+    await expect(gh.openPr(params)).resolves.toEqual({
+      url: "https://github.com/o/r/pull/7",
+      number: 7,
+    });
     expect(calls.addLabels).toBe(3);
     expect(calls.closePr).toBe(0);
   });

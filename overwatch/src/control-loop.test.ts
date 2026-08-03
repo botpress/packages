@@ -1,7 +1,8 @@
 import { beforeAll, describe, expect, it } from "vitest";
 import { ControlLoop } from "./control-loop";
 import type { GitSource, PrComment } from "./github";
-import { Notification } from "./notifications";
+import { Notification, type NotifyState } from "./notifications";
+import { parseNotifyState } from "./notify-state";
 import type { ControlLoopConfig, ControlLoopOptions } from "./types";
 
 beforeAll(() => {
@@ -28,6 +29,10 @@ function loopWith(git: Partial<GitSource>, config: Partial<ControlLoopConfig> = 
 class SpyNotification extends Notification {
   readonly name = "spy";
   readonly sent: string[] = [];
+  /** The state the loop handed back for each send — how a transport would find its thread. */
+  readonly states: (NotifyState | undefined)[] = [];
+  /** Recorded by every send, standing in for a transport's "remember this message" step. */
+  nextState?: NotifyState;
 
   constructor(private readonly failWith?: Error) {
     super({
@@ -37,9 +42,11 @@ class SpyNotification extends Notification {
     });
   }
 
-  protected async send(text: string): Promise<void> {
+  protected async send(text: string, state?: NotifyState): Promise<NotifyState | void> {
     if (this.failWith) throw this.failWith;
     this.sent.push(text);
+    this.states.push(state);
+    return this.nextState;
   }
 }
 
@@ -47,7 +54,7 @@ describe("applyPrComments label guard", () => {
   it("refuses a PR that doesn't carry the loop's label", async () => {
     let listed = false;
     const loop = loopWith({
-      getPr: async () => ({ branch: "feature", headCommittedAt: "2026-01-01T00:00:00Z", labels: ["other-loop"] }),
+      getPr: async () => ({ branch: "feature", headCommittedAt: "2026-01-01T00:00:00Z", labels: ["other-loop"], body: "" }),
       listPrComments: async () => {
         listed = true;
         return [];
@@ -63,7 +70,7 @@ describe("applyPrComments label guard", () => {
 
   it("proceeds past the guard when the PR carries the loop's label", async () => {
     const loop = loopWith({
-      getPr: async () => ({ branch: "feature", headCommittedAt: "2026-01-01T00:00:00Z", labels: ["my-loop"] }),
+      getPr: async () => ({ branch: "feature", headCommittedAt: "2026-01-01T00:00:00Z", labels: ["my-loop"], body: "" }),
       // No comments newer than the head -> returns before provisioning a sandbox, proving
       // the guard let a correctly-labeled PR through.
       listPrComments: async (): Promise<PrComment[]> => [],
@@ -101,6 +108,7 @@ describe("notifications", () => {
           branch: "feature",
           headCommittedAt: "2026-01-01T00:00:00Z",
           labels: ["other-loop"],
+          body: "",
         }),
       },
       { notifications: [spy] },
@@ -139,6 +147,111 @@ describe("notifications", () => {
 
     await expect(loop.applyPrComments(1234)).rejects.toThrow("not found");
     expect(spy.sent).toEqual(["My Loop — applying comments to PR #1234 failed: not found"]);
+  });
+
+  it("hands a destination the state stored on the PR it's reporting about", async () => {
+    const spy = new SpyNotification();
+    let updates = 0;
+    const loop = loopWith(
+      {
+        getPr: async () => ({
+          branch: "feature",
+          headCommittedAt: "2026-01-01T00:00:00Z",
+          labels: ["my-loop"],
+          body: `Automated fix.\n\n<!-- control-loop:notify-state {"spy":{"ts":"111.0"}} -->`,
+        }),
+        listPrComments: async () => {
+          throw new Error("rate limited");
+        },
+        updatePrBody: async () => {
+          updates++;
+        },
+      },
+      { notifications: [spy] },
+    );
+
+    await expect(loop.applyPrComments(1234)).rejects.toThrow("rate limited");
+
+    expect(spy.states).toEqual([{ ts: "111.0" }]);
+    // The destination recorded nothing new, so the PR body is left alone — an edit shows up in
+    // the PR's timeline.
+    expect(updates).toBe(0);
+  });
+
+  it("records new state on the PR so the next event can be grouped with this one", async () => {
+    const spy = new SpyNotification();
+    spy.nextState = { ts: "222.0" };
+    let written: string | undefined;
+    const loop = loopWith(
+      {
+        getPr: async () => ({
+          branch: "feature",
+          headCommittedAt: "2026-01-01T00:00:00Z",
+          labels: ["my-loop"],
+          body: "Automated fix.",
+        }),
+        listPrComments: async () => {
+          throw new Error("rate limited");
+        },
+        updatePrBody: async (_prNumber, body) => {
+          written = body;
+        },
+      },
+      { notifications: [spy] },
+    );
+
+    await expect(loop.applyPrComments(1234)).rejects.toThrow("rate limited");
+
+    expect(spy.states).toEqual([undefined]);
+    expect(parseNotifyState(written ?? "")).toEqual({ spy: { ts: "222.0" } });
+  });
+
+  it("keeps a PR's stored state when a destination can't be reached", async () => {
+    // A failed send must not drop the thread the next event would have joined.
+    const broken = new SpyNotification(new Error("invalid_auth"));
+    let updates = 0;
+    const loop = loopWith(
+      {
+        getPr: async () => ({
+          branch: "feature",
+          headCommittedAt: "2026-01-01T00:00:00Z",
+          labels: ["my-loop"],
+          body: `<!-- control-loop:notify-state {"spy":{"ts":"111.0"}} -->`,
+        }),
+        listPrComments: async () => {
+          throw new Error("rate limited");
+        },
+        updatePrBody: async () => {
+          updates++;
+        },
+      },
+      { notifications: [broken] },
+    );
+
+    await expect(loop.applyPrComments(1234)).rejects.toThrow("rate limited");
+    expect(updates).toBe(0);
+  });
+
+  it("doesn't look for stored state when there is nowhere to report", async () => {
+    let reads = 0;
+    const loop = loopWith({
+      getPr: async () => {
+        reads++;
+        return {
+          branch: "feature",
+          headCommittedAt: "2026-01-01T00:00:00Z",
+          labels: ["my-loop"],
+          body: "",
+        };
+      },
+      listPrComments: async () => {
+        throw new Error("rate limited");
+      },
+    });
+
+    await expect(loop.applyPrComments(1234)).rejects.toThrow("rate limited");
+    // Only the cycle's own lookup; the notify path added none.
+    expect(reads).toBe(1);
   });
 
   it("lets a destination that can't be reached fail on its own", async () => {

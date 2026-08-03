@@ -11,6 +11,19 @@ export type NotificationHandler<TContext> = (
   context: TContext,
 ) => NotificationMessage | Promise<NotificationMessage>;
 
+/**
+ * Whatever a transport wants to remember about a message it already delivered, so a later
+ * event on the same PR can build on it instead of starting over — {@link Slack} keeps the
+ * message `ts` and replies in its thread.
+ *
+ * Opaque to the loop, which only stores it (in the PR body, alongside the claim marker) and
+ * hands it back to the same transport: it must be JSON-serializable, and a transport must
+ * cope with reading back one it wrote arbitrarily long ago, or none at all. It never reaches
+ * the caller's handlers — the wording of a message is theirs, delivery mechanics are the
+ * transport's.
+ */
+export type NotifyState = Record<string, unknown>;
+
 /** Handed to `onSuccess` once a run has opened its PR. */
 export interface NotificationSuccessContext {
   /** The loop's human-readable label. */

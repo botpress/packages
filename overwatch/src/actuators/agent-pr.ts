@@ -62,7 +62,7 @@ export class AgentPrActuator<TData = unknown> extends Actuator<TData> {
       await config.git.push(sandbox, REPO_PATH, branch);
     });
 
-    const prUrl = await log.step("opening pull request", () =>
+    const pr = await log.step("opening pull request", () =>
       config.git.openPr({
         branch,
         label,
@@ -70,8 +70,8 @@ export class AgentPrActuator<TData = unknown> extends Actuator<TData> {
         body: prBody(displayLabel, picked),
       }),
     );
-    log.finish(`PR opened → ${prUrl}`);
-    return { status: "pr-opened", prUrl, fixed: picked };
+    log.finish(`PR opened → ${pr.url}`);
+    return { status: "pr-opened", prUrl: pr.url, prNumber: pr.number, fixed: picked };
   }
 
   /**

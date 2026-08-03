@@ -74,15 +74,22 @@ just reference material for authoring new loops.
   - `notifications/`: `index.ts` = the handler/context types (`NotificationProps` et al.) and
     re-exports; the abstract `Notification` sits in `notification.ts` for the same require-cycle
     reason as `Actuator`. Default: `slack.ts`. The base owns *when* an event fires and *what* it
-    says (it holds the caller's handlers); a subclass implements only `send(text)`.
+    says (it holds the caller's handlers); a subclass implements only `send(text, state?)` and
+    returns the `NotifyState` it wants handed back on the next event about that PR (Slack: the
+    thread root's `ts`, so later events reply in-thread).
   - Adding a new built-in = a new sibling file re-exported from that folder's `index.ts`, not a
     new abstraction. Implementations import the part's types from their `index.ts` and `Signal`
     et al. from `../types`.
-- **`src/sandbox.ts`**, **`src/claims.ts`** — internal (not re-exported) shared helpers.
-  `sandbox.ts` holds the sandbox-execution helpers used by both `control-loop.ts` and the
-  actuator (`REPO_PATH`/`SCRATCH_DIR`, `commitAll`, `runConfiguredCommand`, the memory helpers);
-  `claims.ts` holds the claim-marker mechanism (`signalKey`, `claimMarker`, `parseClaimedKeys`) —
-  the actuator writes the marker into a PR body, the loop reads it to skip already-claimed signals.
+- **`src/sandbox.ts`**, **`src/claims.ts`**, **`src/notify-state.ts`** — internal (not
+  re-exported) shared helpers. `sandbox.ts` holds the sandbox-execution helpers used by both
+  `control-loop.ts` and the actuator (`REPO_PATH`/`SCRATCH_DIR`, `commitAll`,
+  `runConfiguredCommand`, the memory helpers); `claims.ts` holds the claim-marker mechanism
+  (`signalKey`, `claimMarker`, `parseClaimedKeys`) — the actuator writes the marker into a PR
+  body, the loop reads it to skip already-claimed signals. `notify-state.ts` is the second PR-body
+  marker (`withNotifyState`/`parseNotifyState`): per-destination `NotifyState` keyed by
+  `Notification.stateKey`, which is how a destination groups the events of one PR across the
+  separate processes that produce them. Both markers coexist in one body — write either through
+  its own helper, never by hand.
 - **`src/agents.ts`** — `Agent` abstract class (`prepare`, `executeAgent`) plus the `Claude` and
   `Codex` implementations, each responsible for installing/authenticating its own CLI inside
   the sandbox and invoking it non-interactively.
@@ -122,7 +129,9 @@ just reference material for authoring new loops.
   reported (`pr-opened`, `fix-failed`, a throw, `comments-applied`) — `clean`/`skipped`/
   `wrong-loop` stay silent because a scheduled loop hits those on most ticks. Sends are caught
   per destination and logged via `RunLog.warn`, so an unreachable Slack can't fail a green run
-  or mask the run's real error.
+  or mask the run's real error. The same holds for the `NotifyState` bookkeeping around them:
+  reading or writing the PR-body marker is best-effort — a failure warns, and the state of a
+  destination whose send threw is left as it was, so the next event still finds its thread.
 - Doc comments (`/** ... */`) on exported symbols explain *why*, not *what* — match that style
   rather than restating the type signature in prose.
 - Tests run under `vitest` (`pnpm test`); `src/pickers.test.ts` is the current suite. If you

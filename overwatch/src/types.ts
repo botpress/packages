@@ -109,7 +109,17 @@ export type ControlLoopRunResult<TData = unknown> =
   | { status: "skipped"; reason: string }
   | { status: "clean" }
   | { status: "fix-failed"; unresolved: Signal<TData>[] }
-  | { status: "pr-opened"; prUrl: string; fixed: Signal<TData>[] };
+  | {
+      status: "pr-opened";
+      prUrl: string;
+      /**
+       * Optional so an actuator that opens PRs some other way needn't produce one — but without
+       * it the loop can't record notification state on the PR, so later events about that PR
+       * (comments applied) can't be grouped with this one.
+       */
+      prNumber?: number;
+      fixed: Signal<TData>[];
+    };
 
 export type ApplyCommentsResult =
   /**

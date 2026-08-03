@@ -42,6 +42,7 @@ export {
   type NotificationMessage,
   type NotificationProps,
   type NotificationSuccessContext,
+  type NotifyState,
   type SlackProps,
 } from "./notifications";
 

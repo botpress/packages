@@ -263,8 +263,8 @@ memory file ships with the PR that recorded it.
 ### Notifications
 
 `config.notifications` is a list of destinations the loop reports its terminal outcomes to.
-`Slack` ships with the lib; subclass the abstract `Notification` (one `send(text)` method) for
-anything else.
+`Slack` ships with the lib; subclass the abstract `Notification` (one `send(text, state?)`
+method) for anything else.
 
 ```ts
 import { Slack } from "@bpinternal/overwatch";
@@ -293,6 +293,18 @@ it has a handler for:
 are what a scheduled loop returns on most ticks, and announcing them buries the runs worth
 looking at. A destination that can't be reached (revoked token, bot not in the channel) is
 logged as a warning and skipped; it never fails a run, and never replaces the run's own error.
+
+Every message about the same PR after the first is grouped with it: `Slack` posts the
+"comments applied" update (and any later failure) as a **reply in the thread** of the message
+that announced the PR, so a PR reads as one conversation.
+
+That works across processes — the run that opens the PR and the comment webhook that updates it
+share nothing but the PR — because each destination gets a `NotifyState`: whatever `send`
+returns is stored in an invisible marker in the PR body (next to the claim marker) and handed
+back to that same destination on the next event. Slack's is just the first message's `ts`.
+It never reaches your handlers; it's delivery mechanics, not wording. For a transport of your
+own: return state to record it, return nothing to keep what's already stored (that's how Slack
+keeps replying to the thread's root rather than to its own last reply).
 
 ### Claiming (safe concurrency)
 
@@ -516,8 +528,9 @@ running a loop manually. Set `CONTROL_LOOP_SILENT=1` to mute it; colors otherwis
   with a class that subclasses the abstract `Actuator`, re-exported from `src/actuators/index.ts`.
 - **New agent CLI**: extend the abstract `Agent` class in `src/agents.ts`.
 - **New notification destination**: add a file to `src/notifications/` with a class that
-  subclasses the abstract `Notification` and implements `send(text)`, re-exported from
-  `src/notifications/index.ts`. The base handles which events fire and what they say.
+  subclasses the abstract `Notification` and implements `send(text, state?)`, re-exported from
+  `src/notifications/index.ts`. The base handles which events fire and what they say; return a
+  `NotifyState` from `send` to have the loop hand it back on the next event about that PR.
 - **New forge** (GitLab, etc.): implement the `GitSource` interface from `src/github.ts`.
 
 ## Disclaimer ⚠️

@@ -30,7 +30,7 @@ function loop(label: string, git: Partial<GitSource> = {}): ControlLoop {
  */
 function repoWithPrLabels(labels: string[]): Partial<GitSource> {
   return {
-    getPr: async () => ({ branch: "feature", headCommittedAt: "2026-01-01T00:00:00Z", labels }),
+    getPr: async () => ({ branch: "feature", headCommittedAt: "2026-01-01T00:00:00Z", labels, body: "" }),
     listPrComments: async (): Promise<PrComment[]> => [],
   };
 }

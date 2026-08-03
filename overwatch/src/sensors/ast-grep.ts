@@ -58,7 +58,7 @@ export const astGrep = (options: AstGrepOptions): SensorFn<AstGrepMatch> => {
         timeoutSec: 600,
       },
     );
-    if (run.exitCode !== 0 && run.output.trim() !== "[]") {
+    if (run.exitCode !== 0 && run.exitCode !== 1) {
       throw new Error(`ast-grep exited ${run.exitCode}: ${run.output}`);
     }
 

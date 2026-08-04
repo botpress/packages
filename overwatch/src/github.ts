@@ -4,14 +4,6 @@ import { Octokit as OctokitCore } from "@octokit/core";
 import { paginateRest } from "@octokit/plugin-paginate-rest";
 import { restEndpointMethods } from "@octokit/plugin-rest-endpoint-methods";
 
-/**
- * Composed by hand instead of using the batteries-included `octokit` package, which can't be
- * loaded from CommonJS: it eagerly imports `@octokit/app`, whose exports map exposes only
- * `import` conditions (no `require`-resolvable target), so a `require()` anywhere in the chain
- * — this package's own CJS build, or a loop file that tsx transpiles to CJS — dies with
- * `ERR_PACKAGE_PATH_NOT_EXPORTED`. Core plus these two plugins covers everything used below
- * (`rest`, `paginate`, `graphql`, `auth`) and never pulls `@octokit/app` in.
- */
 const Octokit = OctokitCore.plugin(restEndpointMethods, paginateRest);
 type Octokit = InstanceType<typeof Octokit>;
 
@@ -420,7 +412,9 @@ export abstract class GithubBase implements GitSource {
 
   protected requireAuth(action: string): void {
     if (!this.authenticated)
-      throw new Error(`Github authentication is required to ${action} on ${this.owner}/${this.name}`);
+      throw new Error(
+        `Github authentication is required to ${action} on ${this.owner}/${this.name}`,
+      );
   }
 }
 

@@ -1,6 +1,11 @@
 import type { Sandbox } from "@daytona/sdk";
 import { createAppAuth } from "@octokit/auth-app";
-import { Octokit } from "octokit";
+import { Octokit as OctokitCore } from "@octokit/core";
+import { paginateRest } from "@octokit/plugin-paginate-rest";
+import { restEndpointMethods } from "@octokit/plugin-rest-endpoint-methods";
+
+const Octokit = OctokitCore.plugin(restEndpointMethods, paginateRest);
+type Octokit = InstanceType<typeof Octokit>;
 
 /** Committer identity used when the git source can't derive an account-backed one. */
 const DEFAULT_BOT_NAME = "control-loop[bot]";
@@ -407,7 +412,9 @@ export abstract class GithubBase implements GitSource {
 
   protected requireAuth(action: string): void {
     if (!this.authenticated)
-      throw new Error(`Github authentication is required to ${action} on ${this.owner}/${this.name}`);
+      throw new Error(
+        `Github authentication is required to ${action} on ${this.owner}/${this.name}`,
+      );
   }
 }
 

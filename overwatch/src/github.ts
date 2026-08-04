@@ -1,6 +1,19 @@
 import type { Sandbox } from "@daytona/sdk";
 import { createAppAuth } from "@octokit/auth-app";
-import { Octokit } from "octokit";
+import { Octokit as OctokitCore } from "@octokit/core";
+import { paginateRest } from "@octokit/plugin-paginate-rest";
+import { restEndpointMethods } from "@octokit/plugin-rest-endpoint-methods";
+
+/**
+ * Composed by hand instead of using the batteries-included `octokit` package, which can't be
+ * loaded from CommonJS: it eagerly imports `@octokit/app`, whose exports map exposes only
+ * `import` conditions (no `require`-resolvable target), so a `require()` anywhere in the chain
+ * — this package's own CJS build, or a loop file that tsx transpiles to CJS — dies with
+ * `ERR_PACKAGE_PATH_NOT_EXPORTED`. Core plus these two plugins covers everything used below
+ * (`rest`, `paginate`, `graphql`, `auth`) and never pulls `@octokit/app` in.
+ */
+const Octokit = OctokitCore.plugin(restEndpointMethods, paginateRest);
+type Octokit = InstanceType<typeof Octokit>;
 
 /** Committer identity used when the git source can't derive an account-backed one. */
 const DEFAULT_BOT_NAME = "control-loop[bot]";

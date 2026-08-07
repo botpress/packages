@@ -17,6 +17,7 @@ import {
   memoryNote,
   readMemory,
   runConfiguredCommand,
+  withDeadline,
 } from "./sandbox";
 import type { Sensor } from "./sensors";
 import type {
@@ -450,11 +451,11 @@ async function createSandbox(config: ControlLoopConfig): Promise<Sandbox> {
 function makeAgentContext(sandbox: Sandbox): AgentContext {
   return {
     exec: async (command, options) => {
-      const response = await sandbox.process.executeCommand(
+      const timeoutSec = options?.timeoutSec ?? 300;
+      const response = await withDeadline(
+        sandbox.process.executeCommand(command, REPO_PATH, options?.env, timeoutSec),
+        timeoutSec,
         command,
-        REPO_PATH,
-        options?.env,
-        options?.timeoutSec ?? 300,
       );
       return { exitCode: response.exitCode, output: response.result };
     },

@@ -1,4 +1,4 @@
-import { describe, expect, test } from "vitest";
+import { afterEach, describe, expect, test, vi } from "vitest";
 import {
   appendMemory,
   commitAll,
@@ -6,6 +6,7 @@ import {
   memoryPath,
   readMemory,
   runConfiguredCommand,
+  withDeadline,
 } from "./sandbox";
 import type { RunLog } from "./log";
 import type { AgentContext } from "./agents";
@@ -36,6 +37,53 @@ function fakeCtx(execImpl?: (command: string) => { exitCode: number; output: str
 // keeps the test off stderr.
 const silentLog = () =>
   ({ step: async <T>(_label: string, fn: () => Promise<T>) => fn() }) as unknown as RunLog;
+
+describe("withDeadline", () => {
+  afterEach(() => {
+    vi.useRealTimers();
+  });
+
+  test("passes through a result that arrives in time", async () => {
+    await expect(withDeadline(Promise.resolve("ok"), 900, "ls")).resolves.toBe("ok");
+  });
+
+  test("passes through a rejection instead of waiting for the deadline", async () => {
+    await expect(withDeadline(Promise.reject(new Error("boom")), 900, "ls")).rejects.toThrow("boom");
+  });
+
+  test("rejects with the command once the grace window past the timeout elapses", async () => {
+    vi.useFakeTimers();
+    const hung = withDeadline(new Promise(() => {}), 900, "codex exec");
+    const asserted = expect(hung).rejects.toThrow(/no response within 960s: codex exec/);
+    await vi.advanceTimersByTimeAsync(960_000);
+    await asserted;
+  });
+
+  test("holds on past the command's own timeout, leaving room for a server-side error", async () => {
+    vi.useFakeTimers();
+    let settled = false;
+    const hung = withDeadline(new Promise(() => {}), 900, "codex exec").catch(() => {
+      settled = true;
+    });
+    await vi.advanceTimersByTimeAsync(900_000);
+    expect(settled).toBe(false);
+    await vi.advanceTimersByTimeAsync(60_000);
+    await hung;
+    expect(settled).toBe(true);
+  });
+
+  test("treats a non-positive timeout as no timeout", async () => {
+    vi.useFakeTimers();
+    let settled = false;
+    const forever = withDeadline(new Promise(() => {}), 0, "sleep").then(() => {
+      settled = true;
+    });
+    await vi.advanceTimersByTimeAsync(3_600_000);
+    expect(settled).toBe(false);
+    expect(vi.getTimerCount()).toBe(0);
+    void forever;
+  });
+});
 
 describe("memoryPath", () => {
   test("namespaces the memory file by loop label", () => {

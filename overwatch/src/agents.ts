@@ -26,6 +26,7 @@ export abstract class Agent {
 }
 
 const PROMPT_FILE = ".control-loop/prompt.txt";
+const LOG_FILE = ".control-loop/agent.log";
 
 /**
  * Writes the prompt to a scratch file and returns a shell fragment that expands to its
@@ -35,6 +36,33 @@ const PROMPT_FILE = ".control-loop/prompt.txt";
 async function stagePrompt(instructions: string, ctx: AgentContext): Promise<string> {
   await ctx.writeFile(PROMPT_FILE, instructions);
   return `"$(cat ${PROMPT_FILE})"`;
+}
+
+/**
+ * Runs an agent CLI with all three standard streams detached from the exec's own pipes,
+ * then reads the output back from the file.
+ *
+ * The sandbox reads a command's output until EOF, and EOF arrives only once every process
+ * holding the write end has exited — not just the one that was launched. Agents routinely
+ * leave descendants behind (a package-manager daemon, a server started to check something),
+ * and those inherit the pipe and hold the exec open long after the agent has finished its
+ * work and exited. Redirecting to a file leaves the shell as the pipe's only owner, so the
+ * command ends when the agent does.
+ *
+ * `</dev/null` is part of the same story from the other end: it stops a CLI that decides to
+ * consult stdin (an approval prompt, a login it thinks is expired) from blocking on input
+ * that is never coming.
+ */
+async function runAgentCli(
+  command: string,
+  ctx: AgentContext,
+  options: { env?: Record<string, string>; timeoutSec?: number },
+): Promise<{ exitCode: number; output: string }> {
+  const run = await ctx.exec(`${command} </dev/null >${LOG_FILE} 2>&1`, options);
+  const log = await ctx.exec(`cat ${LOG_FILE}`);
+  // A missing log means the redirect itself never happened; the exec's own output is
+  // then the only account of what went wrong.
+  return { exitCode: run.exitCode, output: log.exitCode === 0 ? log.output : run.output };
 }
 
 export type ClaudeProps = {
@@ -62,7 +90,7 @@ export class Claude extends Agent {
   override async executeAgent(instructions: string, ctx: AgentContext): Promise<void> {
     const prompt = await stagePrompt(instructions, ctx);
     const model = this.props.model ? ` --model ${this.props.model}` : "";
-    const result = await ctx.exec(`claude -p ${prompt}${model} --dangerously-skip-permissions`, {
+    const result = await runAgentCli(`claude -p ${prompt}${model} --dangerously-skip-permissions`, ctx, {
       env: { ANTHROPIC_API_KEY: this.props.apiKey },
       timeoutSec: this.props.timeoutSec ?? 900,
     });
@@ -113,10 +141,10 @@ export class Codex extends Agent {
     const model = this.props.model ? ` --model ${this.props.model}` : "";
     // Codex's own sandbox (--sandbox workspace-write) relies on Landlock/seccomp, which
     // fails inside containers — and the Daytona sandbox already isolates everything, so
-    // bypassing it is what Codex documents for CI/container use. </dev/null stops
-    // `codex exec` from waiting on extra stdin input.
-    const result = await ctx.exec(
-      `codex exec ${prompt}${model} --dangerously-bypass-approvals-and-sandbox --skip-git-repo-check </dev/null`,
+    // bypassing it is what Codex documents for CI/container use.
+    const result = await runAgentCli(
+      `codex exec ${prompt}${model} --dangerously-bypass-approvals-and-sandbox --skip-git-repo-check`,
+      ctx,
       {
         env: { OPENAI_API_KEY: this.props.apiKey },
         timeoutSec: this.props.timeoutSec ?? 900,

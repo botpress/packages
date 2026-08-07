@@ -31,6 +31,39 @@ function shellQuote(value: string): string {
 }
 
 /**
+ * Extra seconds allowed past a command's own timeout before the client gives up on it.
+ * Wide enough that a server-side timeout, which produces a real error mentioning the
+ * command's output, always wins the race over this comparatively blind one.
+ */
+const DEADLINE_GRACE_SEC = 60;
+
+/**
+ * Arms a client-side deadline on a sandbox command.
+ *
+ * The sandbox SDK sends `timeout` as a field in the request body and never arms one
+ * locally — no axios timeout, no abort signal — so the promise settles only when the
+ * server sends a response. When it doesn't (a connection dropped mid-command, a process
+ * that never releases the exec) the run hangs indefinitely with no way back. Racing the
+ * call against a timer turns that into an ordinary failure the loop can report.
+ *
+ * A non-positive `timeoutSec` means "no timeout" and is passed through untouched.
+ */
+export function withDeadline<T>(work: Promise<T>, timeoutSec: number, command: string): Promise<T> {
+  if (timeoutSec <= 0) return work;
+  const limit = timeoutSec + DEADLINE_GRACE_SEC;
+  let timer: ReturnType<typeof setTimeout> | undefined;
+  const deadline = new Promise<never>((_resolve, reject) => {
+    timer = setTimeout(() => {
+      reject(new Error(`command produced no response within ${limit}s: ${command}`));
+    }, limit * 1000);
+  });
+  // The losing promise keeps running; unref'ing the timer keeps a pending deadline from
+  // holding the process open once the run itself is done.
+  timer?.unref?.();
+  return Promise.race([work, deadline]).finally(() => clearTimeout(timer));
+}
+
+/**
  * Runs one of the configured lifecycle hooks (`config.hooks`) from the repo root,
  * as a logged step. A missing hook is a no-op; a non-zero exit aborts the run.
  */

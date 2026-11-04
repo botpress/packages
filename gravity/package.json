@@ -1,18 +1,27 @@
 {
   "name": "@bpinternal/gravity",
-  "version": "0.1.1",
+  "version": "0.2.0",
   "description": "Generic density-based clustering (UMAP + HDBSCAN), compiled from Rust to WebAssembly.",
   "main": "./dist/node/index.js",
   "module": "./dist/web/index.js",
   "types": "./dist/types/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/types/index.d.ts",
+      "workerd": "./dist/worker/index.js",
+      "module": "./dist/web/index.js",
+      "default": "./dist/node/index.js"
+    }
+  },
   "repository": {
     "url": "https://github.com/botpress/packages"
   },
   "scripts": {
     "build:node": "ts-node -T ./build.ts nodejs",
     "build:web": "ts-node -T ./build.ts web",
+    "build:worker": "ts-node -T ./build.ts worker",
     "build:type": "tsc -p tsconfig.build.json --noCheck",
-    "build": "pnpm run build:node && pnpm run build:web && pnpm run build:type",
+    "build": "pnpm run build:node && pnpm run build:web && pnpm run build:worker && pnpm run build:type",
     "check:type": "tsc --noEmit",
     "check:format": "prettier --check .",
     "fix:format": "prettier --write .",

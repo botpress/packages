@@ -9,6 +9,7 @@
     ".": {
       "types": "./dist/types/index.d.ts",
       "workerd": "./dist/worker/index.js",
+      "node": "./dist/node/index.js",
       "module": "./dist/web/index.js",
       "default": "./dist/node/index.js"
     }
@@ -29,7 +30,7 @@
     "fix": "pnpm fix:format",
     "test:rust": "cargo test --lib",
     "test:unit": "vitest run",
-    "test": "pnpm run test:rust && pnpm run build:node && pnpm run test:unit"
+    "test": "pnpm run test:rust && pnpm run build:node && pnpm run build:worker && pnpm run test:unit"
   },
   "keywords": [
     "clustering",
@@ -48,6 +49,7 @@
     "@types/node": "^22.16.4",
     "esbuild": "^0.25.0",
     "lodash": "^4.17.21",
+    "miniflare": "4.20260730.0",
     "prettier": "^3.3.3",
     "ts-node": "^10.9.2",
     "typescript": "5.8.3",

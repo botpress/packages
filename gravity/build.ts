@@ -45,6 +45,7 @@ const srcEntryPoint = pathlib.join(srcDir, 'index.ts')
 const pkgDir = pathlib.join(rootDir, 'pkg')
 const pkgNodeDir = pathlib.join(pkgDir, 'node')
 const pkgWebDir = pathlib.join(pkgDir, 'web')
+const pkgWorkerDir = pathlib.join(pkgDir, 'worker')
 const wasmFileName = 'gravity_bg.wasm'
 const gitIgnoreFileName = '.gitignore'
 const indexJsFileName = 'index.js'
@@ -53,6 +54,7 @@ const typeDeclarationFileName = 'gravity.d.ts'
 const distDir = pathlib.join(rootDir, 'dist')
 const distNodeDir = pathlib.join(distDir, 'node')
 const distWebDir = pathlib.join(distDir, 'web')
+const distWorkerDir = pathlib.join(distDir, 'worker')
 
 const buildNodeJs = async () => {
   wasmPack({ outdir: pkgNodeDir, target: 'nodejs' })
@@ -128,6 +130,50 @@ const buildWeb = async () => {
   })
 }
 
+const buildWorker = async () => {
+  wasmPack({ outdir: pkgWorkerDir, target: 'web' })
+
+  // Workers cannot compile WebAssembly from bytes at runtime; their bundlers (wrangler, the
+  // Cloudflare Vite plugin) compile an imported .wasm file ahead of time and hand it over as a
+  // WebAssembly.Module, so the binary ships next to the bundle and is instantiated on import.
+  const entryPointContent = [
+    "import { initSync } from './gravity.js'",
+    `import wasmModule from './${wasmFileName}'`,
+    '',
+    'initSync({ module: wasmModule })',
+    '',
+    '// instantiated above, on import',
+    'export const init = () => {}',
+    '',
+    "export * from './gravity.js'"
+  ].join('\n')
+
+  fs.mkdirSync(pkgWorkerDir, { recursive: true })
+  fs.rmSync(pathlib.join(pkgWorkerDir, gitIgnoreFileName), { force: true })
+  fs.writeFileSync(pathlib.join(pkgWorkerDir, indexJsFileName), entryPointContent)
+
+  await esbuild.build({
+    entryPoints: [srcEntryPoint],
+    bundle: true,
+    platform: 'browser',
+    format: 'esm',
+    outfile: pathlib.join(distWorkerDir, indexJsFileName),
+    external: ['*.wasm'],
+    plugins: [
+      // src/index.ts imports '../pkg', which resolves to the web glue
+      {
+        name: 'worker-pkg',
+        setup: (build) => {
+          build.onResolve({ filter: /^\.\.\/pkg$/ }, () => ({ path: pathlib.join(pkgWorkerDir, indexJsFileName) }))
+        }
+      }
+    ],
+    sourcemap: false
+  })
+
+  fs.copyFileSync(pathlib.join(pkgWorkerDir, wasmFileName), pathlib.join(distWorkerDir, wasmFileName))
+}
+
 const main = async (argv: string[]) => {
   const [target] = argv
   if (target === 'nodejs') {
@@ -136,6 +182,10 @@ const main = async (argv: string[]) => {
   }
   if (target === 'web') {
     await buildWeb()
+    return
+  }
+  if (target === 'worker') {
+    await buildWorker()
     return
   }
   throw new Error(`Unsupported target: ${target}`)

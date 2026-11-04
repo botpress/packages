@@ -94,14 +94,19 @@ Building requires the Rust toolchain (the wasm target is added automatically by
 pnpm build        # wasm-pack (node + web) + esbuild bundles + type declarations
 pnpm build:node   # just the Node target
 pnpm build:web    # just the browser target
+pnpm build:worker # just the Cloudflare Workers target
 pnpm test         # run the Rust tests, then build the node target and run the wrapper tests
 pnpm test:rust    # just the Rust unit tests (cargo)
 pnpm test:unit    # just the TS wrapper tests (vitest)
 pnpm check        # format + type check
 ```
 
-The build emits `dist/node` (CommonJS), `dist/web` (ESM), and `dist/types`; the wasm is
-inlined into the bundles, so there is no separate `.wasm` file to ship.
+The build emits `dist/node` (CommonJS), `dist/web` (ESM), `dist/worker` (ESM), and
+`dist/types`. The node and web bundles inline the wasm as base64. Cloudflare Workers cannot
+compile WebAssembly from bytes, so `dist/worker` imports `gravity_bg.wasm` as a module, which
+wrangler and the Cloudflare Vite plugin compile at build time. The package's `workerd` export
+condition selects it, so `import { cluster } from '@bpinternal/gravity'` works in a Worker
+with no setup.
 
 ## Disclaimer ⚠️
 

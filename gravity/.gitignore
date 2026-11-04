@@ -3,6 +3,7 @@ dist
 /target
 pkg/node
 pkg/web
+pkg/worker
 **/*.rs.bk
 wasm-pack.log
 *.log

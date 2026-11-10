@@ -13,10 +13,10 @@ dependencies:
     version: 2.1.1
   isomorphic-ws:
     specifier: ^5.0.0
-    version: 5.0.0(ws@8.18.1)
+    version: 5.0.0(ws@8.21.0)
   ws:
-    specifier: ^8.13.0
-    version: 8.18.1
+    specifier: ^8.21.0
+    version: 8.21.0
   zod:
     specifier: ^3.20.6
     version: 3.22.4
@@ -850,12 +850,12 @@ packages:
     engines: {node: '>=8'}
     dev: true
 
-  /isomorphic-ws@5.0.0(ws@8.18.1):
+  /isomorphic-ws@5.0.0(ws@8.21.0):
     resolution: {integrity: sha512-muId7Zzn9ywDsyXgTIafTry2sV3nySZeUDe6YedVd1Hvuuep5AsIlqK+XefWpYTyJG5e503F2xIuT2lcU6rCSw==}
     peerDependencies:
       ws: '*'
     dependencies:
-      ws: 8.18.1
+      ws: 8.21.0
     dev: false
 
   /js-tokens@4.0.0:
@@ -1284,8 +1284,8 @@ packages:
         optional: true
     dev: true
 
-  /ws@8.18.1:
-    resolution: {integrity: sha512-RKW2aJZMXeMxVpnZ6bck+RswznaxmzdULiBr6KY7XkTnW8uvt0iT9H5DkHUChXrc+uurzwa0rVI16n/Xzjdz1w==}
+  /ws@8.21.0:
+    resolution: {integrity: sha512-Vsp28b7DRcimFQvrqu2Wek3z1iYxDCWqHYB8Qsnk/S4RfaCQzPGPyBNuVjJV3cd6UiKtUtp6sNM77gWvzcCH+g==}
     engines: {node: '>=10.0.0'}
     peerDependencies:
       bufferutil: ^4.0.1

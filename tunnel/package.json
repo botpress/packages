@@ -1,6 +1,6 @@
 {
   "name": "@bpinternal/tunnel",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "Tunneling logic for client and server",
   "main": "./dist/index.cjs",
   "browser": "./dist/index.mjs",
@@ -11,7 +11,7 @@
   },
   "scripts": {
     "check:type": "tsc --noEmit",
-    "build:nodejs": "esbuild src/index.ts --bundle --platform=node --target=node16 --outfile=dist/index.cjs",
+    "build:nodejs": "esbuild src/index.ts --bundle --platform=node --target=node16 --external:ws --outfile=dist/index.cjs",
     "build:browser": "esbuild src/index.ts --bundle --platform=browser --target=es2017 --format=esm --outfile=dist/index.mjs",
     "build": "npm run build:nodejs && npm run build:browser",
     "test:e2e": "esbuild --bundle --external:esbuild --platform=node --outfile=custom-e2e/index.js e2e/index.ts && node custom-e2e/index.js",
@@ -21,7 +21,7 @@
     "@types/ws": "^8.5.5",
     "browser-or-node": "^2.1.1",
     "isomorphic-ws": "^5.0.0",
-    "ws": "^8.13.0",
+    "ws": "^8.21.0",
     "zod": "^3.20.6"
   },
   "devDependencies": {

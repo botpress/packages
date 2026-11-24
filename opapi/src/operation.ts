@@ -1,6 +1,6 @@
-import { extendApi } from '@anatine/zod-openapi'
 import { VError } from 'verror'
 import { generateSchemaFromZod } from './jsonschema'
+import { schema } from './opapi'
 import { objects } from './objects'
 import {
   Operation,
@@ -50,7 +50,7 @@ export const addOperation = <
     description: operationProps.response.description,
     status: operationProps.response.status,
     schema: generateSchemaFromZod(
-      extendApi(operationProps.response.schema, { title: responseName, format: operationProps.response.format }),
+      schema(operationProps.response.schema, { title: responseName, format: operationProps.response.format }),
       state.options,
     ),
   }
@@ -66,7 +66,7 @@ export const addOperation = <
       requestBody: {
         description: operationProps.requestBody.description,
         schema: generateSchemaFromZod(
-          extendApi(operationProps.requestBody.schema, { title: bodyName, format: operationProps.requestBody?.format }),
+          schema(operationProps.requestBody.schema, { title: bodyName, format: operationProps.requestBody?.format }),
           state.options,
         ),
       },

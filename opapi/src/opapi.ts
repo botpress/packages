@@ -1,4 +1,5 @@
-import { extendApi, OpenApiZodAny } from '@anatine/zod-openapi'
+import type { SchemaObject } from 'openapi3-ts'
+import type { z } from 'zod'
 import {
   generateClientWithOpenapiGenerator,
   generateClientWithOpapi,
@@ -14,16 +15,12 @@ import { applyExportOptions, ExportStateOptions } from './export-options'
 import { addOperation } from './operation'
 export { Operation, Parameter } from './state'
 
-type AnatineSchemaObject = NonNullable<Parameters<typeof extendApi>[1]>
-
-export const schema = <T extends OpenApiZodAny>(
-  schema: T,
-  schemaObject?: AnatineSchemaObject & { $ref?: string },
-): T => {
-  const This = (schema as any).constructor
-  const copy = new This(schema._def) as T
-  return extendApi(copy, schemaObject)
-}
+/**
+ * Returns a copy of the schema that carries OpenAPI properties, such as a
+ * description, merged over the ones it already carries.
+ */
+export const schema = <T extends z.ZodType>(schema: T, schemaObject?: SchemaObject & { $ref?: string }): T =>
+  schema.meta({ ...schemaObject }) as T
 
 export class OpenApi<SchemaName extends string, DefaultParameterName extends string, SectionName extends string> {
   private _state: State<SchemaName, DefaultParameterName, SectionName>
@@ -40,7 +37,7 @@ export class OpenApi<SchemaName extends string, DefaultParameterName extends str
     return openapi
   }
 
-  getModelRef(name: SchemaName): OpenApiZodAny {
+  getModelRef(name: SchemaName): z.ZodType {
     return getRef(this._state, ComponentType.SCHEMAS, name)
   }
 

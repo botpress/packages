@@ -9,6 +9,7 @@ const fooSchema = z.object({
 const Bar = schema(
   z.object({
     tags: z.record(
+      z.string(),
       schema(
         z.object({
           title: schema(z.string().max(20).optional(), { description: 'Title of the tag' }),
@@ -116,7 +117,7 @@ export const getMockApi = () => {
     },
     requestBody: {
       description: 'Foo information',
-      schema: schema(z.record(z.any()), { description: 'Foo information' }),
+      schema: schema(z.record(z.string(), z.any()), { description: 'Foo information' }),
     },
     section: 'foo',
     response: {

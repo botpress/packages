@@ -7,6 +7,19 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+## [3.0.0] - 2026-11-24
+
+### Changed
+
+- **Breaking**: opapi takes zod 4 schemas instead of zod 3 schemas. `zod` (`^4.6.6`) is a peer dependency instead of a dependency, so the caller's zod is used.
+- **Breaking**: schemas are converted to OpenAPI 3.0 with zod's own `z.toJSONSchema` instead of `@anatine/zod-openapi`, which has been removed. The generated specs keep their form for `getModelRef`, unions (`oneOf`), `z.date()` (a `date-time` string), `.int()` (no added bounds) and `.passthrough()` (`additionalProperties: true`). A string format such as `z.uuid()` or `z.iso.datetime()` keeps its `format` and also gets the `pattern` zod checks it with, so the validators that read the spec apply zod's definition of the format: for example, a date-time without `{ offset: true }` accepts only UTC (`Z`).
+- **Breaking**: `schema()` stores its OpenAPI properties as zod metadata (`.meta()`), merged over the metadata the schema already carries. `OpenApiZodAny` is no longer exported; use `z.ZodType`.
+- `exportZodSchemas` and `exportJsonSchemas` generate zod 4 code.
+
+### Fixed
+
+- The generated `errors.ts` type-checks with TypeScript 5.7 and later, whose `crypto.getRandomValues` only accepts arrays backed by an `ArrayBuffer`, and in projects that load neither the DOM nor the node type definitions.
+
 ## [2.0.0] - 2026-07-22
 
 ### Changed

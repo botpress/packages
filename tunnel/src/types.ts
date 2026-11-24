@@ -1,7 +1,11 @@
 import { z } from 'zod'
 
 export type TunnelHeader = z.infer<typeof tunnelHeaderSchema>
-export const tunnelHeaderSchema = z.union([z.undefined(), z.string(), z.string().array()])
+/**
+ * Node accepts at most 2 000 headers per message (`maxHeadersCount`), so no
+ * header carries more values than that.
+ */
+export const tunnelHeaderSchema = z.union([z.undefined(), z.string(), z.string().array().max(2_000)])
 
 export type TunnelRequest = z.infer<typeof tunnelRequestSchema>
 export const tunnelRequestSchema = z.object({
@@ -10,7 +14,7 @@ export const tunnelRequestSchema = z.object({
   method: z.string(),
   path: z.string(),
   query: z.string().optional(),
-  headers: z.record(tunnelHeaderSchema).optional(),
+  headers: z.record(z.string(), tunnelHeaderSchema).optional(),
   body: z.string().optional()
 })
 
@@ -19,7 +23,7 @@ export const tunnelResponseSchema = z.object({
   type: z.literal('response').optional(), // optional for backwards compatibility
   requestId: z.string(),
   status: z.number(),
-  headers: z.record(tunnelHeaderSchema).optional(),
+  headers: z.record(z.string(), tunnelHeaderSchema).optional(),
   body: z.string().optional()
 })
 
@@ -46,7 +50,7 @@ export const tunnelWsOpenSchema = z.object({
   id: z.string(),
   path: z.string(),
   query: z.string().optional(),
-  headers: z.record(tunnelHeaderSchema).optional()
+  headers: z.record(z.string(), tunnelHeaderSchema).optional()
 })
 
 // No subprotocol on ws_accept: the visitor's upgrade completes (without one)

@@ -39,14 +39,14 @@ const zodToJsonSchema = (zodSchema: z.ZodType): JSONSchema7 => {
 }
 
 /**
- * Exported zod schemas keep accepting objects with keys the schema does not
- * list, so an object closed with `additionalProperties: false` is opened before
- * the zod code is generated, and the code holds no `.strict()`.
+ * Removes every `additionalProperties: false` from the schema, so the zod code
+ * generated from it accepts objects with keys the schema does not list and
+ * holds no `.strict()`.
  */
-const _openClosedObjects = (schema: JSONSchema7) =>
+const _allowUnknownKeys = (schema: JSONSchema7) =>
   jsonschema.mapJsonSchemaNodes({
     schema,
-    mapSchema: (node) => (node.additionalProperties === false ? _.omit(node, 'additionalProperties') : node),
+    mapNode: (node) => (node.additionalProperties === false ? _.omit(node, 'additionalProperties') : node),
   })
 
 const DEFAULT_OPTIONS: ExportSchemasOptions = {
@@ -92,7 +92,7 @@ export const exportJsonSchemas =
       // zod file
       if (options.includeZodSchemas) {
         const zodFileName = `${name}.z`
-        const zodCode = jsonSchemaToZod(_openClosedObjects(jsonSchema) as jsonSchemaToZodInput, {
+        const zodCode = jsonSchemaToZod(_allowUnknownKeys(jsonSchema) as jsonSchemaToZodInput, {
           module: 'esm',
           zodVersion: 4,
         })

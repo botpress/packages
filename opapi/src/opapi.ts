@@ -16,8 +16,8 @@ import { addOperation } from './operation'
 export { Operation, Parameter } from './state'
 
 /**
- * Returns a copy of the schema that carries OpenAPI properties, such as a
- * description, merged over the ones it already carries.
+ * Returns a copy of `schema` whose metadata holds the given OpenAPI properties,
+ * such as a description, merged over the ones `schema` already carries.
  */
 export const schema = <T extends z.ZodType>(schema: T, schemaObject?: SchemaObject & { $ref?: string }): T =>
   schema.meta({ ...schemaObject }) as T

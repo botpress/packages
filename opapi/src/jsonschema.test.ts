@@ -254,28 +254,38 @@ describe.sequential(generateSchemaFromZod, () => {
   })
 
   it.each([
-    { case: 'a date', field: z.date(), allowUnions: false, expected: { type: 'string', format: 'date-time' } },
-    { case: 'an integer', field: z.number().int(), allowUnions: false, expected: { type: 'integer' } },
+    {
+      case: 'a date as a date-time string',
+      field: z.date(),
+      allowUnions: false,
+      expected: { type: 'string', format: 'date-time' },
+    },
+    {
+      case: 'an integer without added bounds',
+      field: z.number().int(),
+      allowUnions: false,
+      expected: { type: 'integer' },
+    },
     {
       case: 'an object accepting unknown keys',
       field: z.object({}).passthrough(),
       allowUnions: false,
       expected: { type: 'object', additionalProperties: true },
     },
-    { case: 'any value', field: z.any(), allowUnions: false, expected: { nullable: true } },
+    { case: 'any value as nullable', field: z.any(), allowUnions: false, expected: { nullable: true } },
     {
-      case: 'a union',
+      case: 'a union as a oneOf',
       field: z.union([z.string(), z.number()]),
       allowUnions: true,
       expected: { oneOf: [{ type: 'string' }, { type: 'number' }] },
     },
     {
-      case: 'an optional reference',
+      case: 'an optional reference without allOf',
       field: z.string().meta({ $ref: '#/components/schemas/Bot' }).optional(),
       allowUnions: false,
       expected: { $ref: '#/components/schemas/Bot' },
     },
-  ])('writes $case in the form opapi has always produced', ({ field, allowUnions, expected }) => {
+  ])('writes $case', ({ field, allowUnions, expected }) => {
     // Arrange
     const schema = z.object({ value: field })
 
@@ -335,7 +345,7 @@ describe.sequential(generateSchemaFromZod, () => {
     }).toStrictEqual({ acceptsValidValue: true, acceptsInvalidValue: false })
   })
 
-  it('keeps a default and an example shaped like a reference wrapper as written', () => {
+  it('keeps as written a default and an example that hold an allOf with one item', () => {
     // Arrange
     const schema = z.object({
       value: z

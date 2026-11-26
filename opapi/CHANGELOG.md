@@ -11,11 +11,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ### Changed
 
-- **Breaking**: opapi takes zod 4 schemas instead of zod 3 schemas. `zod` (`^4.6.6`) is a peer dependency instead of a dependency, so the caller's zod is used.
-- **Breaking**: schemas are converted to OpenAPI 3.0 with zod's own `z.toJSONSchema` instead of `@anatine/zod-openapi`, which has been removed. The generated specs keep their form for `getModelRef`, unions (`oneOf`), `z.date()` (a `date-time` string), `.int()` (no added bounds) and `.passthrough()` (`additionalProperties: true`). A string format such as `z.uuid()` or `z.iso.datetime()` keeps its `format` and also gets the `pattern` zod checks it with, so the validators that read the spec apply zod's definition of the format: for example, a date-time without `{ offset: true }` accepts only UTC (`Z`).
-- **Breaking**: `schema()` stores its OpenAPI properties as zod metadata (`.meta()`), merged over the metadata the schema already carries. `OpenApiZodAny` is no longer exported; use `z.ZodType`.
+- **Breaking**: opapi takes zod 4 schemas instead of zod 3 schemas. `zod` (`^4.6.6`) is a peer dependency instead of a dependency, so opapi uses the caller's zod.
+- **Breaking**: schemas are converted to OpenAPI 3.0 with zod's own `z.toJSONSchema` instead of `@anatine/zod-openapi`, which has been removed. The generated specs are unchanged for `getModelRef`, unions (`oneOf`), `z.date()` (a `date-time` string), `.int()` (no added bounds) and `.passthrough()` (`additionalProperties: true`). For a string format such as `z.uuid()` or `z.iso.datetime()`, the spec holds both the `format` and the `pattern` zod checks it with, so the validators that read the spec apply zod's definition of the format: for example, a date-time without `{ offset: true }` accepts only UTC (`Z`).
+- **Breaking**: `schema()` stores the OpenAPI properties it receives as zod metadata (`.meta()`), merged over the metadata the schema already carries. `OpenApiZodAny` is no longer exported; use `z.ZodType`.
 - `exportZodSchemas` and `exportJsonSchemas` generate zod 4 code.
-- In a response schema, a field declared with `.prefault()` documents as its `default` the value the field takes when it is absent, which `z.toJSONSchema` leaves out.
+- In a response schema, the `default` of a field declared with `.prefault()` is the value the field takes when it is absent, which `z.toJSONSchema` leaves out.
 
 ### Fixed
 

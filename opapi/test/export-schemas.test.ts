@@ -116,7 +116,7 @@ describe.concurrent(exportJsonSchemas, () => {
   it('generates zod code that accepts unknown keys in nested objects', async ({ expect }) => {
     // Arrange
     const genFolder = join(__dirname, 'gen/nested-unknown-keys')
-    const closedAddress = {
+    const addressRejectingUnknownKeys = {
       type: 'object',
       properties: { city: { type: 'string' } },
       additionalProperties: false,
@@ -125,9 +125,9 @@ describe.concurrent(exportJsonSchemas, () => {
       customer: {
         type: 'object',
         properties: {
-          billingAddress: { type: ['object', 'null'], properties: { address: closedAddress } },
-          addressesByLabel: { type: 'object', patternProperties: { '^home': closedAddress } },
-          shippingAddress: { anyOf: [closedAddress, { type: 'null' }] },
+          billingAddress: { type: ['object', 'null'], properties: { address: addressRejectingUnknownKeys } },
+          addressesByLabel: { type: 'object', patternProperties: { '^home': addressRejectingUnknownKeys } },
+          shippingAddress: { anyOf: [addressRejectingUnknownKeys, { type: 'null' }] },
         },
         additionalProperties: false,
       },

@@ -43,8 +43,9 @@ const cryptoLibPolyfill: CryptoLib = {
   getRandomBytes: (byteLength: number) => new Uint8Array(byteLength).map(() => Math.floor(Math.random() * 256)),
 }
 
-// globalThis.crypto covers browsers, web workers, node >= 19 and most edge runtimes. It is
-// read through a local type so the file compiles without the DOM or node type definitions.
+// globalThis.crypto covers browsers, web workers, node >= 19 and most edge
+// runtimes. globalThis.crypto is read through a local type so the file
+// compiles without the DOM or node type definitions:
 const webCrypto = (globalThis as unknown as { crypto?: { getRandomValues?(array: Uint8Array): Uint8Array } }).crypto
 const getRandomValues = webCrypto?.getRandomValues?.bind(webCrypto)
 const cryptoLib: CryptoLib = getRandomValues

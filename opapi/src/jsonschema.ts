@@ -40,8 +40,8 @@ export const generateSchemaFromZod = (zodSchema: z.ZodType, opts?: GenerateSchem
     target: 'openapi-3.0',
     io: opts?.useOutput ? 'output' : 'input',
     unrepresentable: 'any',
-    override: ({ zodSchema, jsonSchema }) =>
-      _overrideJsonSchema({ zodSchema, jsonSchema, isOutputSchema: opts?.useOutput === true }),
+    override: ({ zodSchema: zodNode, jsonSchema: jsonNode }) =>
+      _overrideJsonSchema({ zodSchema: zodNode, jsonSchema: jsonNode, isOutputSchema: opts?.useOutput === true }),
   }) as SchemaObject
   const unwrappedSchema = _unwrapSingleAllOf(jsonSchema) as SchemaObject
   formatJsonSchema(unwrappedSchema, opts?.allowUnions ?? false)
@@ -49,39 +49,39 @@ export const generateSchemaFromZod = (zodSchema: z.ZodType, opts?: GenerateSchem
 }
 
 /**
- * Returns a copy of `schema` where `mapSchema` has replaced every schema it
- * contains, itself included, parents before children. Only the keys that hold
- * schemas are visited, so a default, an example or an enum value is kept as
- * its author wrote it, whatever its shape.
+ * Returns a copy of `schema` in which `mapNode` has replaced every node:
+ * `schema` itself and every schema nested in it, parents before children. Only
+ * the keys that hold schemas are visited, so a default, an example or an enum
+ * value is kept as its author wrote it, whatever its shape.
  */
 export const mapJsonSchemaNodes = ({
   schema,
-  mapSchema,
+  mapNode,
 }: {
   schema: unknown
-  mapSchema: (schema: SchemaObject) => unknown
+  mapNode: (node: SchemaObject) => unknown
 }): unknown => {
   if (Array.isArray(schema)) {
-    return schema.map((item) => mapJsonSchemaNodes({ schema: item, mapSchema }))
+    return schema.map((item) => mapJsonSchemaNodes({ schema: item, mapNode }))
   }
 
   if (typeof schema !== 'object' || schema === null) {
     return schema
   }
 
-  const mappedSchema = mapSchema(schema)
+  const mappedNode = mapNode(schema)
 
-  if (typeof mappedSchema !== 'object' || mappedSchema === null) {
-    return mappedSchema
+  if (typeof mappedNode !== 'object' || mappedNode === null) {
+    return mappedNode
   }
 
-  return _.mapValues(mappedSchema, (value, key) => {
+  return _.mapValues(mappedNode, (value, key) => {
     if (KEYS_HOLDING_SCHEMA_MAPS.has(key)) {
-      return _.mapValues(value, (childSchema) => mapJsonSchemaNodes({ schema: childSchema, mapSchema }))
+      return _.mapValues(value, (childSchema) => mapJsonSchemaNodes({ schema: childSchema, mapNode }))
     }
 
     if (KEYS_HOLDING_SCHEMAS.has(key)) {
-      return mapJsonSchemaNodes({ schema: value, mapSchema })
+      return mapJsonSchemaNodes({ schema: value, mapNode })
     }
 
     return value
@@ -89,7 +89,7 @@ export const mapJsonSchemaNodes = ({
 }
 
 /**
- * Keeps the generated specs in the form opapi has always produced:
+ * Rewrites, in place, the JSON schema zod generates for one zod schema:
  * - a schema returned by `getModelRef` carries a `$ref` in its metadata, and
  *   becomes that reference alone so the component is not inlined;
  * - a date has no JSON form, so it is documented as the ISO 8601 string it is
@@ -100,9 +100,9 @@ export const mapJsonSchemaNodes = ({
  * - a property typed `z.any()` or `z.unknown()` is optional, as zod 3 inferred;
  * - `.int()` adds no bounds beyond the ones the caller set;
  * - an object that accepts unknown keys has `additionalProperties: true`;
- * - in an output schema, a field with a `.prefault()` documents as its default
- *   the value the schema produces when the field is absent, which zod leaves
- *   out because a prefault value is an input.
+ * - in an output schema, the default of a field with a `.prefault()` is the
+ *   value the schema produces when the field is absent, which zod leaves out
+ *   because a prefault value is an input.
  */
 const _overrideJsonSchema = ({
   zodSchema,
@@ -160,7 +160,7 @@ const _overrideJsonSchema = ({
 
   if (typedZodSchema._zod.def.type === 'object' && Array.isArray(jsonSchema.required)) {
     const shape = (typedZodSchema as z.ZodObject).shape
-    jsonSchema.required = jsonSchema.required.filter((key) => !_acceptsUndefined(shape[key]))
+    jsonSchema.required = jsonSchema.required.filter((key) => !_isAnyOrUnknown(shape[key]))
   }
 
   const { additionalProperties } = jsonSchema
@@ -175,19 +175,21 @@ const _overrideJsonSchema = ({
   }
 }
 
-const _acceptsUndefined = (zodSchema: z.ZodType | undefined): boolean => {
+const _isAnyOrUnknown = (zodSchema: z.ZodType | undefined): boolean => {
   const type = zodSchema?._zod.def.type
   return type === 'any' || type === 'unknown'
 }
 
 /**
- * zod wraps a reference in `allOf` when a wrapper such as `.optional()` adds
- * nothing to it, so the reference is lifted back to stay a plain `$ref`.
+ * Replaces each node that holds nothing but an `allOf` of one schema with that
+ * schema. zod writes a reference under a wrapper that adds nothing to it, such
+ * as `.optional()`, as such an `allOf`; replacing it keeps the reference a
+ * plain `$ref` in the spec.
  */
 const _unwrapSingleAllOf = (schema: SchemaObject): unknown =>
   mapJsonSchemaNodes({
     schema,
-    mapSchema: (node) => {
+    mapNode: (node) => {
       let unwrappedNode = node
 
       while (Object.keys(unwrappedNode).length === 1 && unwrappedNode.allOf?.length === 1) {
@@ -330,7 +332,7 @@ export const replaceNullableWithUnion = (schema: NullableJsonSchema): JSONSchema
 }
 
 /**
- * zod transforms discriminated unions to json-schema oneOf.
+ * `generateSchemaFromZod` writes zod unions as json-schema oneOf.
  * This is a mistake as a union does not enforce that only one of the types is present.
  * This function replaces all occurrences of { oneOf: [{ type: T1 }, { type: T2 }] } with { anyOf: [{ type: T1 }, { type: T2 }] }
  */

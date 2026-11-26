@@ -4,7 +4,7 @@ import { generateSchemaFromZod } from './jsonschema'
 import { schema } from './opapi'
 
 describe.concurrent(schema, () => {
-  it('merges its OpenAPI properties over the ones the schema already carries', ({ expect }) => {
+  it('merges the given OpenAPI properties over the ones the schema already carries', ({ expect }) => {
     // Arrange
     const botName = z.string().describe('Name of the bot')
 

@@ -5,7 +5,8 @@ import * as utils from './utils'
 import pathlib from 'path'
 import fs from 'fs/promises'
 import { jsonSchemaToZod } from 'json-schema-to-zod'
-import { OpenApiZodAny } from '@anatine/zod-openapi'
+import type { z } from 'zod'
+import _ from 'lodash'
 
 type jsonSchemaToZodInput = Parameters<typeof jsonSchemaToZod>[0]
 type jsonSchemaToTsInput = Parameters<typeof compile>[0]
@@ -30,12 +31,23 @@ const jsonSchemaToTs = async (originalSchema: JSONSchema7, name: string): Promis
   return `${typeCode}\n`
 }
 
-const zodToJsonSchema = (zodSchema: OpenApiZodAny): JSONSchema7 => {
+const zodToJsonSchema = (zodSchema: z.ZodType): JSONSchema7 => {
   let jsonSchema = jsonschema.generateSchemaFromZod(zodSchema, { allowUnions: true }) as JSONSchema7
   jsonSchema = jsonschema.replaceNullableWithUnion(jsonSchema)
   jsonSchema = jsonschema.replaceOneOfWithAnyOf(jsonSchema)
   return jsonSchema
 }
+
+/**
+ * Removes every `additionalProperties: false` from the schema, so the zod code
+ * generated from it accepts objects with keys the schema does not list and
+ * holds no `.strict()`.
+ */
+const _allowUnknownKeys = (schema: JSONSchema7) =>
+  jsonschema.mapJsonSchemaNodes({
+    schema,
+    mapNode: (node) => (node.additionalProperties === false ? _.omit(node, 'additionalProperties') : node),
+  })
 
 const DEFAULT_OPTIONS: ExportSchemasOptions = {
   includeJsonSchemas: true,
@@ -80,7 +92,10 @@ export const exportJsonSchemas =
       // zod file
       if (options.includeZodSchemas) {
         const zodFileName = `${name}.z`
-        const zodCode = jsonSchemaToZod(jsonSchema as jsonSchemaToZodInput).replace(/\.catchall\(z\.never\(\)\)/g, '')
+        const zodCode = jsonSchemaToZod(_allowUnknownKeys(jsonSchema) as jsonSchemaToZodInput, {
+          module: 'esm',
+          zodVersion: 4,
+        })
         const zodFilePath = pathlib.join(outDir, `${zodFileName}.ts`)
         await fs.writeFile(zodFilePath, zodCode)
         zodFiles.push({ name, filename: zodFileName })
@@ -127,7 +142,7 @@ export const exportJsonSchemas =
  *
  * allows fully separating build time schemas from the ones used at runtime
  */
-export const exportZodSchemas = (schemas: Record<string, OpenApiZodAny>) => {
+export const exportZodSchemas = (schemas: Record<string, z.ZodType>) => {
   const jsonSchemas = Object.entries(schemas).reduce(
     (acc, [name, zodSchema]) => {
       return {

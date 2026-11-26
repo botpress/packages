@@ -36,18 +36,21 @@ ${Object.entries(codes)
 type ErrorCode = typeof codes[keyof typeof codes]
 
 declare const window: any
-type CryptoLib = { getRandomValues(array: Uint8Array): Uint8Array }
+type CryptoLib = { getRandomBytes(byteLength: number): Uint8Array }
 
 const cryptoLibPolyfill: CryptoLib = {
   // Fallback in environments without a web crypto implementation.
-  getRandomValues: (array: Uint8Array) => new Uint8Array(array.map(() => Math.floor(Math.random() * 256))),
+  getRandomBytes: (byteLength: number) => new Uint8Array(byteLength).map(() => Math.floor(Math.random() * 256)),
 }
 
-// globalThis.crypto covers browsers, web workers, node >= 19 and most edge runtimes
-const cryptoLib: CryptoLib =
-  typeof globalThis.crypto !== 'undefined' && typeof globalThis.crypto.getRandomValues === 'function'
-    ? globalThis.crypto
-    : cryptoLibPolyfill
+// globalThis.crypto covers browsers, web workers, node >= 19 and most edge
+// runtimes. globalThis.crypto is read through a local type so the file
+// compiles without the DOM or node type definitions:
+const webCrypto = (globalThis as unknown as { crypto?: { getRandomValues?(array: Uint8Array): Uint8Array } }).crypto
+const getRandomValues = webCrypto?.getRandomValues?.bind(webCrypto)
+const cryptoLib: CryptoLib = getRandomValues
+  ? { getRandomBytes: (byteLength: number) => getRandomValues(new Uint8Array(byteLength)) }
+  : cryptoLibPolyfill
 
 abstract class BaseApiError<Code extends ErrorCode, Type extends string, Description extends string> extends Error {
   public readonly isApiError = true
@@ -87,7 +90,7 @@ abstract class BaseApiError<Code extends ErrorCode, Type extends string, Descrip
     const timestamp = new Date().toISOString().replace(/[\\-:TZ]/g, "").split(".")[0] // UTC time in YYMMDDHHMMSS format
 
     const randomSuffixByteLength = 4
-    const randomHexSuffix = Array.from(cryptoLib.getRandomValues(new Uint8Array(randomSuffixByteLength)))
+    const randomHexSuffix = Array.from(cryptoLib.getRandomBytes(randomSuffixByteLength))
       .map(x => x.toString(16).padStart(2, '0'))
       .join('')
       .toUpperCase()

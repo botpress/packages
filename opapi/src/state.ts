@@ -5,11 +5,10 @@ import { schema } from './opapi'
 import type { PathParams } from './path-params'
 import { isAlphanumeric, isCapitalAlphabetical, uniqueBy } from './util'
 import { generateSchemaFromZod } from './jsonschema'
-import { OpenApiZodAny } from '@anatine/zod-openapi'
 import { objects } from './objects'
 
 type SchemaType = 'zod-schema' | 'json-schema'
-type SchemaOfType<T extends SchemaType> = T extends 'zod-schema' ? OpenApiZodAny : SchemaObject
+type SchemaOfType<T extends SchemaType> = T extends 'zod-schema' ? z.ZodType : SchemaObject
 
 export type Options = { allowUnions: boolean }
 const DEFAULT_OPTIONS: Options = { allowUnions: false }
@@ -235,7 +234,7 @@ export type CreateStateProps<
 > = {
   metadata: Metadata
   defaultParameters?: Record<DefaultParameterName, Parameter<'zod-schema'>>
-  schemas?: Record<SchemaName, { schema: OpenApiZodAny; section: SectionName }>
+  schemas?: Record<SchemaName, { schema: z.ZodType; section: SectionName }>
   sections?: Record<SectionName, { title: string; description: string }>
   errors?: readonly ApiError[]
   security?: Security[]
@@ -331,17 +330,12 @@ export function createState<SchemaName extends string, DefaultParameterName exte
   }
 }
 
-export function getRef(state: State<string, string, string>, type: ComponentType, name: string): OpenApiZodAny {
+export function getRef(state: State<string, string, string>, type: ComponentType, name: string): z.ZodType {
   if (!state.refs[type][name]) {
     throw new VError(`${type} ${name} does not exist`)
   }
 
-  return schema(z.object({}), {
-    type: undefined,
-    properties: undefined,
-    required: undefined,
-    $ref: `#/components/${type}/${name}`,
-  })
+  return schema(z.object({}), { $ref: `#/components/${type}/${name}` })
 }
 
 export const mapParameter = (param: Parameter<'zod-schema'>): Parameter<'json-schema'> => {

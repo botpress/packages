@@ -1,6 +1,6 @@
-import { OpenApiZodAny, generateSchema as generateJsonSchema } from '@anatine/zod-openapi'
 import { JSONSchema7, JSONSchema7Definition } from 'json-schema'
 import type { SchemaObject } from 'openapi3-ts'
+import { z } from 'zod'
 import { removeFromArray } from './util'
 import _ from 'lodash'
 
@@ -12,11 +12,193 @@ export type GenerateSchemaFromZodOpts = {
 export type JsonSchema = JSONSchema7
 export type NullableJsonSchema = JSONSchema7 & { nullable?: boolean }
 
-export const generateSchemaFromZod = (zodRef: OpenApiZodAny, opts?: GenerateSchemaFromZodOpts) => {
-  const jsonSchema = generateJsonSchema(zodRef, opts?.useOutput) as SchemaObject
-  formatJsonSchema(jsonSchema, opts?.allowUnions ?? false)
-  return jsonSchema
+const KEYS_HOLDING_SCHEMA_MAPS = new Set([
+  'properties',
+  'patternProperties',
+  'definitions',
+  '$defs',
+  'dependentSchemas',
+])
+const KEYS_HOLDING_SCHEMAS = new Set([
+  'items',
+  'prefixItems',
+  'additionalItems',
+  'additionalProperties',
+  'propertyNames',
+  'contains',
+  'not',
+  'if',
+  'then',
+  'else',
+  'allOf',
+  'anyOf',
+  'oneOf',
+])
+
+export const generateSchemaFromZod = (zodSchema: z.ZodType, opts?: GenerateSchemaFromZodOpts) => {
+  const jsonSchema = z.toJSONSchema(zodSchema, {
+    target: 'openapi-3.0',
+    io: opts?.useOutput ? 'output' : 'input',
+    unrepresentable: 'any',
+    override: ({ zodSchema: zodNode, jsonSchema: jsonNode }) =>
+      _overrideJsonSchema({ zodSchema: zodNode, jsonSchema: jsonNode, isOutputSchema: opts?.useOutput === true }),
+  }) as SchemaObject
+  const unwrappedSchema = _unwrapSingleAllOf(jsonSchema) as SchemaObject
+  formatJsonSchema(unwrappedSchema, opts?.allowUnions ?? false)
+  return unwrappedSchema
 }
+
+/**
+ * Returns a copy of `schema` in which `mapNode` has replaced every node:
+ * `schema` itself and every schema nested in it, parents before children. Only
+ * the keys that hold schemas are visited, so a default, an example or an enum
+ * value is kept as its author wrote it, whatever its shape.
+ */
+export const mapJsonSchemaNodes = ({
+  schema,
+  mapNode,
+}: {
+  schema: unknown
+  mapNode: (node: SchemaObject) => unknown
+}): unknown => {
+  if (Array.isArray(schema)) {
+    return schema.map((item) => mapJsonSchemaNodes({ schema: item, mapNode }))
+  }
+
+  if (typeof schema !== 'object' || schema === null) {
+    return schema
+  }
+
+  const mappedNode = mapNode(schema)
+
+  if (typeof mappedNode !== 'object' || mappedNode === null) {
+    return mappedNode
+  }
+
+  return _.mapValues(mappedNode, (value, key) => {
+    if (KEYS_HOLDING_SCHEMA_MAPS.has(key)) {
+      return _.mapValues(value, (childSchema) => mapJsonSchemaNodes({ schema: childSchema, mapNode }))
+    }
+
+    if (KEYS_HOLDING_SCHEMAS.has(key)) {
+      return mapJsonSchemaNodes({ schema: value, mapNode })
+    }
+
+    return value
+  })
+}
+
+/**
+ * Rewrites, in place, the JSON schema zod generates for one zod schema:
+ * - a schema returned by `getModelRef` carries a `$ref` in its metadata, and
+ *   becomes that reference alone so the component is not inlined;
+ * - a date has no JSON form, so it is documented as the ISO 8601 string it is
+ *   sent as;
+ * - a union is a `oneOf`;
+ * - `z.any()` accepts `null`, so it is marked nullable unless the caller set
+ *   `nullable` in its metadata;
+ * - a property typed `z.any()` or `z.unknown()` is optional, as zod 3 inferred;
+ * - `.int()` adds no bounds beyond the ones the caller set;
+ * - an object that accepts unknown keys has `additionalProperties: true`;
+ * - in an output schema, the default of a field with a `.prefault()` is the
+ *   value the schema produces when the field is absent, which zod leaves out
+ *   because a prefault value is an input.
+ */
+const _overrideJsonSchema = ({
+  zodSchema,
+  jsonSchema,
+  isOutputSchema,
+}: {
+  zodSchema: unknown
+  jsonSchema: Record<string, unknown>
+  isOutputSchema: boolean
+}) => {
+  const typedZodSchema = zodSchema as z.ZodType
+  const metadata = z.globalRegistry.get(typedZodSchema)
+  const ref = metadata?.$ref
+
+  if (typeof ref === 'string') {
+    for (const key of Object.keys(jsonSchema)) {
+      delete jsonSchema[key]
+    }
+
+    jsonSchema.$ref = ref
+    return
+  }
+
+  if (typedZodSchema._zod.def.type === 'union' && Array.isArray(jsonSchema.anyOf)) {
+    jsonSchema.oneOf = jsonSchema.anyOf
+    delete jsonSchema.anyOf
+  }
+
+  if (isOutputSchema && typedZodSchema._zod.def.type === 'prefault' && jsonSchema.default === undefined) {
+    const absentFieldResult = typedZodSchema.safeParse(undefined)
+
+    if (absentFieldResult.success) {
+      jsonSchema.default = absentFieldResult.data
+    }
+  }
+
+  if (typedZodSchema._zod.def.type === 'date') {
+    jsonSchema.type = 'string'
+    jsonSchema.format = 'date-time'
+  }
+
+  const nullableIsSetByCaller = metadata !== undefined && 'nullable' in metadata
+
+  if (typedZodSchema._zod.def.type === 'any' && !nullableIsSetByCaller) {
+    jsonSchema.nullable = true
+  }
+
+  if (jsonSchema.minimum === Number.MIN_SAFE_INTEGER) {
+    delete jsonSchema.minimum
+  }
+
+  if (jsonSchema.maximum === Number.MAX_SAFE_INTEGER) {
+    delete jsonSchema.maximum
+  }
+
+  if (typedZodSchema._zod.def.type === 'object' && Array.isArray(jsonSchema.required)) {
+    const shape = (typedZodSchema as z.ZodObject).shape
+    jsonSchema.required = jsonSchema.required.filter((key) => !_isAnyOrUnknown(shape[key]))
+  }
+
+  const { additionalProperties } = jsonSchema
+  const acceptsAnyAdditionalProperty =
+    typedZodSchema._zod.def.type === 'object' &&
+    typeof additionalProperties === 'object' &&
+    additionalProperties !== null &&
+    Object.keys(additionalProperties).length === 0
+
+  if (acceptsAnyAdditionalProperty) {
+    jsonSchema.additionalProperties = true
+  }
+}
+
+const _isAnyOrUnknown = (zodSchema: z.ZodType | undefined): boolean => {
+  const type = zodSchema?._zod.def.type
+  return type === 'any' || type === 'unknown'
+}
+
+/**
+ * Replaces each node that holds nothing but an `allOf` of one schema with that
+ * schema. zod writes a reference under a wrapper that adds nothing to it, such
+ * as `.optional()`, as such an `allOf`; replacing it keeps the reference a
+ * plain `$ref` in the spec.
+ */
+const _unwrapSingleAllOf = (schema: SchemaObject): unknown =>
+  mapJsonSchemaNodes({
+    schema,
+    mapNode: (node) => {
+      let unwrappedNode = node
+
+      while (Object.keys(unwrappedNode).length === 1 && unwrappedNode.allOf?.length === 1) {
+        unwrappedNode = unwrappedNode.allOf[0] as SchemaObject
+      }
+
+      return unwrappedNode
+    },
+  })
 
 export const formatJsonSchema = (jsonSchema: SchemaObject, allowUnions: boolean) => {
   if (jsonSchema.type === 'object') {
@@ -132,7 +314,7 @@ export const exploreJsonSchema =
   }
 
 /**
- * Lib "@anatine/zod-openapi" transforms zod to json-schema using the nullable property.
+ * zod transforms schemas to OpenAPI 3.0 using the nullable property.
  * This property is not officially supported by json-schema, but supported by ajv (see: https://ajv.js.org/json-schema.html#nullable)
  * Since it's not officially supported, some tools like "json-schema-to-typescript" don't support it.
  * This function replaces all occurrences of { type: T, nullable: true } with { anyOf: [{ type: T }, { type: 'null' }] }
@@ -150,7 +332,7 @@ export const replaceNullableWithUnion = (schema: NullableJsonSchema): JSONSchema
 }
 
 /**
- * Lib "@anatine/zod-openapi" transforms zod unions to json-schema oneOf.
+ * `generateSchemaFromZod` writes zod unions as json-schema oneOf.
  * This is a mistake as a union does not enforce that only one of the types is present.
  * This function replaces all occurrences of { oneOf: [{ type: T1 }, { type: T2 }] } with { anyOf: [{ type: T1 }, { type: T2 }] }
  */

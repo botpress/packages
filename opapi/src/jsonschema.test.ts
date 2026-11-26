@@ -1,6 +1,8 @@
 import { JSONSchema7 } from 'json-schema'
-import { test, expect } from 'vitest'
+import { describe, it, test, expect } from 'vitest'
+import { z } from 'zod'
 import {
+  generateSchemaFromZod,
   JsonSchema,
   NullableJsonSchema,
   replaceNullableWithUnion,
@@ -223,4 +225,31 @@ test('replaceOneOfWithAnyOf', () => {
   }
 
   expect(actual).toEqual(expected)
+})
+
+describe.concurrent(generateSchemaFromZod, () => {
+  it('documents in an output schema the value a prefault field takes when absent', ({ expect }) => {
+    // Arrange
+    const schema = z.object({
+      nickname: z.string().prefault('potato'),
+      sackCount: z.string().transform(Number).prefault('5'),
+    })
+
+    // Act
+    const jsonSchema = generateSchemaFromZod(schema, { useOutput: true })
+
+    // Assert
+    expect(jsonSchema.properties).toMatchObject({ nickname: { default: 'potato' }, sackCount: { default: 5 } })
+  })
+
+  it('documents in an input schema the prefault value itself', ({ expect }) => {
+    // Arrange
+    const schema = z.object({ sackCount: z.string().transform(Number).prefault('5') })
+
+    // Act
+    const jsonSchema = generateSchemaFromZod(schema)
+
+    // Assert
+    expect(jsonSchema.properties).toMatchObject({ sackCount: { default: '5' } })
+  })
 })

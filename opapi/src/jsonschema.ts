@@ -17,7 +17,8 @@ export const generateSchemaFromZod = (zodSchema: z.ZodType, opts?: GenerateSchem
     target: 'openapi-3.0',
     io: opts?.useOutput ? 'output' : 'input',
     unrepresentable: 'any',
-    override: _overrideJsonSchema,
+    override: ({ zodSchema, jsonSchema }) =>
+      _overrideJsonSchema({ zodSchema, jsonSchema, isOutputSchema: opts?.useOutput === true }),
   }) as SchemaObject
   const unwrappedSchema = _unwrapSingleAllOf(jsonSchema)
   formatJsonSchema(unwrappedSchema, opts?.allowUnions ?? false)
@@ -35,14 +36,19 @@ export const generateSchemaFromZod = (zodSchema: z.ZodType, opts?: GenerateSchem
  *   `nullable` in its metadata;
  * - a property typed `z.any()` or `z.unknown()` is optional, as zod 3 inferred;
  * - `.int()` adds no bounds beyond the ones the caller set;
- * - an object that accepts unknown keys has `additionalProperties: true`.
+ * - an object that accepts unknown keys has `additionalProperties: true`;
+ * - in an output schema, a field with a `.prefault()` documents as its default
+ *   the value the schema produces when the field is absent, which zod leaves
+ *   out because a prefault value is an input.
  */
 const _overrideJsonSchema = ({
   zodSchema,
   jsonSchema,
+  isOutputSchema,
 }: {
   zodSchema: unknown
   jsonSchema: Record<string, unknown>
+  isOutputSchema: boolean
 }) => {
   const typedZodSchema = zodSchema as z.ZodType
   const metadata = z.globalRegistry.get(typedZodSchema)
@@ -60,6 +66,14 @@ const _overrideJsonSchema = ({
   if (typedZodSchema._zod.def.type === 'union' && Array.isArray(jsonSchema.anyOf)) {
     jsonSchema.oneOf = jsonSchema.anyOf
     delete jsonSchema.anyOf
+  }
+
+  if (isOutputSchema && typedZodSchema._zod.def.type === 'prefault' && jsonSchema.default === undefined) {
+    const absentFieldResult = typedZodSchema.safeParse(undefined)
+
+    if (absentFieldResult.success) {
+      jsonSchema.default = absentFieldResult.data
+    }
   }
 
   if (typedZodSchema._zod.def.type === 'date') {

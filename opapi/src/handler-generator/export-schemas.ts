@@ -6,6 +6,7 @@ import pathlib from 'path'
 import fs from 'fs/promises'
 import { jsonSchemaToZod } from 'json-schema-to-zod'
 import type { z } from 'zod'
+import _ from 'lodash'
 
 type jsonSchemaToZodInput = Parameters<typeof jsonSchemaToZod>[0]
 type jsonSchemaToTsInput = Parameters<typeof compile>[0]
@@ -36,6 +37,17 @@ const zodToJsonSchema = (zodSchema: z.ZodType): JSONSchema7 => {
   jsonSchema = jsonschema.replaceOneOfWithAnyOf(jsonSchema)
   return jsonSchema
 }
+
+/**
+ * Exported zod schemas keep accepting objects with keys the schema does not
+ * list, so an object closed with `additionalProperties: false` is opened before
+ * the zod code is generated, and the code holds no `.strict()`.
+ */
+const _openClosedObjects = (schema: JSONSchema7) =>
+  jsonschema.mapJsonSchemaNodes({
+    schema,
+    mapSchema: (node) => (node.additionalProperties === false ? _.omit(node, 'additionalProperties') : node),
+  })
 
 const DEFAULT_OPTIONS: ExportSchemasOptions = {
   includeJsonSchemas: true,
@@ -80,10 +92,10 @@ export const exportJsonSchemas =
       // zod file
       if (options.includeZodSchemas) {
         const zodFileName = `${name}.z`
-        const zodCode = jsonSchemaToZod(jsonSchema as jsonSchemaToZodInput, { module: 'esm', zodVersion: 4 }).replace(
-          /\.strict\(\)/g,
-          '',
-        )
+        const zodCode = jsonSchemaToZod(_openClosedObjects(jsonSchema) as jsonSchemaToZodInput, {
+          module: 'esm',
+          zodVersion: 4,
+        })
         const zodFilePath = pathlib.join(outDir, `${zodFileName}.ts`)
         await fs.writeFile(zodFilePath, zodCode)
         zodFiles.push({ name, filename: zodFileName })

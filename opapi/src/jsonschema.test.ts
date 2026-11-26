@@ -227,8 +227,8 @@ test('replaceOneOfWithAnyOf', () => {
   expect(actual).toEqual(expected)
 })
 
-describe.concurrent(generateSchemaFromZod, () => {
-  it('documents in an output schema the value a prefault field takes when absent', ({ expect }) => {
+describe.sequential(generateSchemaFromZod, () => {
+  it('documents in an output schema the value a prefault field takes when absent', () => {
     // Arrange
     const schema = z.object({
       nickname: z.string().prefault('potato'),
@@ -242,7 +242,7 @@ describe.concurrent(generateSchemaFromZod, () => {
     expect(jsonSchema.properties).toMatchObject({ nickname: { default: 'potato' }, sackCount: { default: 5 } })
   })
 
-  it('documents in an input schema the prefault value itself', ({ expect }) => {
+  it('documents in an input schema the prefault value itself', () => {
     // Arrange
     const schema = z.object({ sackCount: z.string().transform(Number).prefault('5') })
 
@@ -251,5 +251,103 @@ describe.concurrent(generateSchemaFromZod, () => {
 
     // Assert
     expect(jsonSchema.properties).toMatchObject({ sackCount: { default: '5' } })
+  })
+
+  it.each([
+    { case: 'a date', field: z.date(), allowUnions: false, expected: { type: 'string', format: 'date-time' } },
+    { case: 'an integer', field: z.number().int(), allowUnions: false, expected: { type: 'integer' } },
+    {
+      case: 'an object accepting unknown keys',
+      field: z.object({}).passthrough(),
+      allowUnions: false,
+      expected: { type: 'object', additionalProperties: true },
+    },
+    { case: 'any value', field: z.any(), allowUnions: false, expected: { nullable: true } },
+    {
+      case: 'a union',
+      field: z.union([z.string(), z.number()]),
+      allowUnions: true,
+      expected: { oneOf: [{ type: 'string' }, { type: 'number' }] },
+    },
+    {
+      case: 'an optional reference',
+      field: z.string().meta({ $ref: '#/components/schemas/Bot' }).optional(),
+      allowUnions: false,
+      expected: { $ref: '#/components/schemas/Bot' },
+    },
+  ])('writes $case in the form opapi has always produced', ({ field, allowUnions, expected }) => {
+    // Arrange
+    const schema = z.object({ value: field })
+
+    // Act
+    const jsonSchema = generateSchemaFromZod(schema, { allowUnions })
+
+    // Assert
+    expect(jsonSchema.properties?.value).toStrictEqual(expected)
+  })
+
+  it('keeps fields typed any or unknown optional', () => {
+    // Arrange
+    const schema = z.object({ botName: z.string(), settings: z.any(), payload: z.unknown() })
+
+    // Act
+    const jsonSchema = generateSchemaFromZod(schema)
+
+    // Assert
+    expect(jsonSchema.required).toStrictEqual(['botName'])
+  })
+
+  it.each([
+    {
+      case: 'a UUID',
+      field: z.uuid(),
+      format: 'uuid',
+      validValue: '0b9f1c1e-6d0a-4c3a-9f2e-3b1a2c4d5e6f',
+      invalidValue: '0b9f1c1e-6d0a-0c3a-9f2e-3b1a2c4d5e6f',
+    },
+    {
+      case: 'an email address',
+      field: z.email(),
+      format: 'email',
+      validValue: 'maple@botpress.invalid',
+      invalidValue: 'maple@botpress',
+    },
+    {
+      case: 'a date-time',
+      field: z.iso.datetime(),
+      format: 'date-time',
+      validValue: '2026-11-26T15:04:05Z',
+      invalidValue: '2026-11-26T10:04:05-05:00',
+    },
+  ])('writes for $case the pattern zod checks it with', ({ field, format, validValue, invalidValue }) => {
+    // Arrange
+    const schema = z.object({ value: field })
+
+    // Act
+    const jsonSchema = generateSchemaFromZod(schema)
+
+    // Assert
+    const pattern = _.get(jsonSchema, ['properties', 'value', 'pattern'], '')
+    expect(jsonSchema.properties?.value).toMatchObject({ format })
+    expect({
+      acceptsValidValue: new RegExp(pattern).test(validValue),
+      acceptsInvalidValue: new RegExp(pattern).test(invalidValue),
+    }).toStrictEqual({ acceptsValidValue: true, acceptsInvalidValue: false })
+  })
+
+  it('keeps a default and an example shaped like a reference wrapper as written', () => {
+    // Arrange
+    const schema = z.object({
+      value: z
+        .any()
+        .default({ allOf: ['maple'] })
+        .meta({ example: { allOf: ['oak'] } }),
+    })
+
+    // Act
+    const jsonSchema = generateSchemaFromZod(schema)
+
+    // Assert
+    expect(jsonSchema.properties?.value).toMatchObject({ default: { allOf: ['maple'] }, example: { allOf: ['oak'] } })
   })
 })

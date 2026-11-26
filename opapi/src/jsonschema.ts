@@ -12,6 +12,29 @@ export type GenerateSchemaFromZodOpts = {
 export type JsonSchema = JSONSchema7
 export type NullableJsonSchema = JSONSchema7 & { nullable?: boolean }
 
+const KEYS_HOLDING_SCHEMA_MAPS = new Set([
+  'properties',
+  'patternProperties',
+  'definitions',
+  '$defs',
+  'dependentSchemas',
+])
+const KEYS_HOLDING_SCHEMAS = new Set([
+  'items',
+  'prefixItems',
+  'additionalItems',
+  'additionalProperties',
+  'propertyNames',
+  'contains',
+  'not',
+  'if',
+  'then',
+  'else',
+  'allOf',
+  'anyOf',
+  'oneOf',
+])
+
 export const generateSchemaFromZod = (zodSchema: z.ZodType, opts?: GenerateSchemaFromZodOpts) => {
   const jsonSchema = z.toJSONSchema(zodSchema, {
     target: 'openapi-3.0',
@@ -20,9 +43,49 @@ export const generateSchemaFromZod = (zodSchema: z.ZodType, opts?: GenerateSchem
     override: ({ zodSchema, jsonSchema }) =>
       _overrideJsonSchema({ zodSchema, jsonSchema, isOutputSchema: opts?.useOutput === true }),
   }) as SchemaObject
-  const unwrappedSchema = _unwrapSingleAllOf(jsonSchema)
+  const unwrappedSchema = _unwrapSingleAllOf(jsonSchema) as SchemaObject
   formatJsonSchema(unwrappedSchema, opts?.allowUnions ?? false)
   return unwrappedSchema
+}
+
+/**
+ * Returns a copy of `schema` where `mapSchema` has replaced every schema it
+ * contains, itself included, parents before children. Only the keys that hold
+ * schemas are visited, so a default, an example or an enum value is kept as
+ * its author wrote it, whatever its shape.
+ */
+export const mapJsonSchemaNodes = ({
+  schema,
+  mapSchema,
+}: {
+  schema: unknown
+  mapSchema: (schema: SchemaObject) => unknown
+}): unknown => {
+  if (Array.isArray(schema)) {
+    return schema.map((item) => mapJsonSchemaNodes({ schema: item, mapSchema }))
+  }
+
+  if (typeof schema !== 'object' || schema === null) {
+    return schema
+  }
+
+  const mappedSchema = mapSchema(schema)
+
+  if (typeof mappedSchema !== 'object' || mappedSchema === null) {
+    return mappedSchema
+  }
+
+  return _.mapValues(mappedSchema, (value, key) => {
+    if (KEYS_HOLDING_SCHEMA_MAPS.has(key)) {
+      return _.mapValues(value, (childSchema) => mapJsonSchemaNodes({ schema: childSchema, mapSchema }))
+    }
+
+    if (KEYS_HOLDING_SCHEMAS.has(key)) {
+      return mapJsonSchemaNodes({ schema: value, mapSchema })
+    }
+
+    return value
+  })
 }
 
 /**
@@ -121,19 +184,19 @@ const _acceptsUndefined = (zodSchema: z.ZodType | undefined): boolean => {
  * zod wraps a reference in `allOf` when a wrapper such as `.optional()` adds
  * nothing to it, so the reference is lifted back to stay a plain `$ref`.
  */
-const _unwrapSingleAllOf = (schema: SchemaObject): SchemaObject => {
-  if (Array.isArray(schema)) {
-    return schema.map(_unwrapSingleAllOf) as unknown as SchemaObject
-  }
-  if (typeof schema !== 'object' || schema === null) {
-    return schema
-  }
-  const keys = Object.keys(schema)
-  if (keys.length === 1 && schema.allOf?.length === 1) {
-    return _unwrapSingleAllOf(schema.allOf[0] as SchemaObject)
-  }
-  return _.mapValues(schema, (value) => _unwrapSingleAllOf(value)) as SchemaObject
-}
+const _unwrapSingleAllOf = (schema: SchemaObject): unknown =>
+  mapJsonSchemaNodes({
+    schema,
+    mapSchema: (node) => {
+      let unwrappedNode = node
+
+      while (Object.keys(unwrappedNode).length === 1 && unwrappedNode.allOf?.length === 1) {
+        unwrappedNode = unwrappedNode.allOf[0] as SchemaObject
+      }
+
+      return unwrappedNode
+    },
+  })
 
 export const formatJsonSchema = (jsonSchema: SchemaObject, allowUnions: boolean) => {
   if (jsonSchema.type === 'object') {

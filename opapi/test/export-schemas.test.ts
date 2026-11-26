@@ -83,3 +83,69 @@ describe('schemas generator', () => {
     )
   })
 })
+
+describe.concurrent(exportJsonSchemas, () => {
+  it('generates zod code that accepts unknown keys and keeps strings mentioning .strict() as written', async ({
+    expect,
+  }) => {
+    // Arrange
+    const genFolder = join(__dirname, 'gen/unknown-keys')
+    const exportSchemas = exportJsonSchemas({
+      order: {
+        type: 'object',
+        properties: {
+          status: { type: 'string', enum: ['object.strict()'], description: 'Calls .strict() on the order' },
+        },
+        required: ['status'],
+        additionalProperties: false,
+      },
+    })
+
+    // Act
+    await exportSchemas(genFolder)
+
+    // Assert
+    const { default: orderSchema } = await import(join(genFolder, 'order.z.ts'))
+    expect(orderSchema.safeParse({ status: 'object.strict()', giftWrapped: true })).toMatchObject({
+      success: true,
+      data: { status: 'object.strict()' },
+    })
+    expect(orderSchema.shape.status.description).toBe('Calls .strict() on the order')
+  })
+
+  it('generates zod code that accepts unknown keys in nested objects', async ({ expect }) => {
+    // Arrange
+    const genFolder = join(__dirname, 'gen/nested-unknown-keys')
+    const closedAddress = {
+      type: 'object',
+      properties: { city: { type: 'string' } },
+      additionalProperties: false,
+    } as const
+    const exportSchemas = exportJsonSchemas({
+      customer: {
+        type: 'object',
+        properties: {
+          billingAddress: { type: ['object', 'null'], properties: { address: closedAddress } },
+          addressesByLabel: { type: 'object', patternProperties: { '^home': closedAddress } },
+          shippingAddress: { anyOf: [closedAddress, { type: 'null' }] },
+        },
+        additionalProperties: false,
+      },
+    })
+
+    // Act
+    await exportSchemas(genFolder)
+
+    // Assert
+    const { default: customerSchema } = await import(join(genFolder, 'customer.z.ts'))
+    const addressWithUnknownKey = { city: 'Quebec', doorCode: '1234' }
+    expect(
+      customerSchema.safeParse({
+        billingAddress: { address: addressWithUnknownKey },
+        addressesByLabel: { homeMain: addressWithUnknownKey },
+        shippingAddress: addressWithUnknownKey,
+        loyaltyTier: 'gold',
+      }),
+    ).toMatchObject({ success: true })
+  })
+})

@@ -25,7 +25,7 @@ dependencies:
     version: 7.7.1
   yaml:
     specifier: ^2.3.1
-    version: 2.7.1
+    version: 2.8.3
 
 devDependencies:
   '@types/node':
@@ -57,7 +57,7 @@ devDependencies:
     version: 4.9.4
   vitest:
     specifier: ^3.0.7
-    version: 3.1.1(@types/node@22.16.4)(yaml@2.7.1)
+    version: 3.1.1(@types/node@22.16.4)(yaml@2.8.3)
 
 packages:
 
@@ -559,7 +559,7 @@ packages:
       '@vitest/spy': 3.1.1
       estree-walker: 3.0.3
       magic-string: 0.30.17
-      vite: 6.2.4(@types/node@22.16.4)(yaml@2.7.1)
+      vite: 6.2.4(@types/node@22.16.4)(yaml@2.8.3)
     dev: true
 
   /@vitest/pretty-format@3.1.1:
@@ -1074,7 +1074,7 @@ packages:
     resolution: {integrity: sha512-wa7YjyUGfNZngI/vtK0UHAN+lgDCxBPCylVXGp0zu59Fz5aiGtNXaq3DhIov063MorB+VfufLh3JlF2KdTK3xg==}
     dev: true
 
-  /vite-node@3.1.1(@types/node@22.16.4)(yaml@2.7.1):
+  /vite-node@3.1.1(@types/node@22.16.4)(yaml@2.8.3):
     resolution: {integrity: sha512-V+IxPAE2FvXpTCHXyNem0M+gWm6J7eRyWPR6vYoG/Gl+IscNOjXzztUhimQgTxaAoUoj40Qqimaa0NLIOOAH4w==}
     engines: {node: ^18.0.0 || ^20.0.0 || >=22.0.0}
     hasBin: true
@@ -1083,7 +1083,7 @@ packages:
       debug: 4.4.0
       es-module-lexer: 1.6.0
       pathe: 2.0.3
-      vite: 6.2.4(@types/node@22.16.4)(yaml@2.7.1)
+      vite: 6.2.4(@types/node@22.16.4)(yaml@2.8.3)
     transitivePeerDependencies:
       - '@types/node'
       - jiti
@@ -1099,7 +1099,7 @@ packages:
       - yaml
     dev: true
 
-  /vite@6.2.4(@types/node@22.16.4)(yaml@2.7.1):
+  /vite@6.2.4(@types/node@22.16.4)(yaml@2.8.3):
     resolution: {integrity: sha512-veHMSew8CcRzhL5o8ONjy8gkfmFJAd5Ac16oxBUjlwgX3Gq2Wqr+qNC3TjPIpy7TPV/KporLga5GT9HqdrCizw==}
     engines: {node: ^18.0.0 || ^20.0.0 || >=22.0.0}
     hasBin: true
@@ -1143,12 +1143,12 @@ packages:
       esbuild: 0.25.2
       postcss: 8.5.3
       rollup: 4.38.0
-      yaml: 2.7.1
+      yaml: 2.8.3
     optionalDependencies:
       fsevents: 2.3.3
     dev: true
 
-  /vitest@3.1.1(@types/node@22.16.4)(yaml@2.7.1):
+  /vitest@3.1.1(@types/node@22.16.4)(yaml@2.8.3):
     resolution: {integrity: sha512-kiZc/IYmKICeBAZr9DQ5rT7/6bD9G7uqQEki4fxazi1jdVl2mWGzedtBs5s6llz59yQhVb7FFY2MbHzHCnT79Q==}
     engines: {node: ^18.0.0 || ^20.0.0 || >=22.0.0}
     hasBin: true
@@ -1194,8 +1194,8 @@ packages:
       tinyexec: 0.3.2
       tinypool: 1.0.2
       tinyrainbow: 2.0.0
-      vite: 6.2.4(@types/node@22.16.4)(yaml@2.7.1)
-      vite-node: 3.1.1(@types/node@22.16.4)(yaml@2.7.1)
+      vite: 6.2.4(@types/node@22.16.4)(yaml@2.8.3)
+      vite-node: 3.1.1(@types/node@22.16.4)(yaml@2.8.3)
       why-is-node-running: 2.3.0
     transitivePeerDependencies:
       - jiti
@@ -1235,9 +1235,9 @@ packages:
     engines: {node: '>=10'}
     dev: false
 
-  /yaml@2.7.1:
-    resolution: {integrity: sha512-10ULxpnOCQXxJvBgxsn9ptjq6uviG/htZKk9veJGhlqn3w/DxQ631zFF+nlQXLwmImeS5amR2dl2U8sg6U9jsQ==}
-    engines: {node: '>= 14'}
+  /yaml@2.8.3:
+    resolution: {integrity: sha512-AvbaCLOO2Otw/lW5bmh9d/WEdcDFdQp2Z2ZUH3pX9U2ihyUY0nvLv7J6TrWowklRGPYbB/IuIMfYgxaCPg5Bpg==}
+    engines: {node: '>= 14.6'}
     hasBin: true
 
   /yargs-parser@21.1.1:

@@ -30,6 +30,13 @@ const VISITOR_ACCEPT_TIMEOUT_MS = 10_000
 const MAX_PENDING_FRAMES = 64
 const MAX_PENDING_BYTES = 256 * 1024
 
+/**
+ * Largest WebSocket message accepted from a tail or a visitor. A parsed message
+ * holds about twice its size in memory, so this limit keeps one message under
+ * about 100 MiB.
+ */
+const MAX_MESSAGE_BYTES = 48 * 1024 * 1024
+
 /** Headers a bridged ws_open forwards to the tail (auth cookies, origin checks). */
 const FORWARDED_VISITOR_HEADERS = ['cookie', 'origin', 'user-agent', 'x-forwarded-for']
 
@@ -75,7 +82,7 @@ export class TunnelServer {
       throw new Error('Cannot instantiate TunnelServer in the browser')
     }
 
-    this._wss = new WebSocket.WebSocketServer({ server: props.server, port: props.port })
+    this._wss = new WebSocket.WebSocketServer({ server: props.server, port: props.port, maxPayload: MAX_MESSAGE_BYTES })
     this._wss.on('error', (err) => this.events.emit('error', err))
     this._wss.on('close', () => this.events.emit('close', {}))
     this._wss.on('listening', () => this.events.emit('listening', {}))
@@ -250,7 +257,18 @@ export class TunnelServer {
         pendingFrames.push({ data, binary })
         return
       }
-      tunnel.sendWebSocketFrame(id, data, binary)
+
+      // A frame is relayed only when its ws_frame message fits within
+      // MAX_MESSAGE_BYTES, the limit on messages from the tail, so the same frame
+      // sent back by the tail fits too:
+      const serializedFrame = tunnel.serializeWebSocketFrame(id, data, binary)
+
+      if (Buffer.byteLength(serializedFrame) > MAX_MESSAGE_BYTES) {
+        teardown({ visitorCode: 1009, visitorReason: 'frame too large', notifyTail: true })
+        return
+      }
+
+      tunnel.sendSerializedWebSocketFrame(serializedFrame)
     })
     ws.addEventListener('close', (ev: WebSocket.CloseEvent) => {
       if (finished) return

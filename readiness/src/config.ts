@@ -50,7 +50,7 @@ export const getConfig = () => {
     const parsedConfig = configSchema.safeParse(config)
 
     if (!parsedConfig.success) {
-      const zodError = parsedConfig.error.errors[0]
+      const zodError = parsedConfig.error.issues[0]
 
       if (zodError) {
         throw new Error(`path: .${zodError.path.join('.')}, message: ${zodError.message}`)

@@ -17,6 +17,12 @@ import {
   tailSchema
 } from './types'
 
+/**
+ * Validating a message keeps about 1 KiB per invalid value, so this limit keeps
+ * the validation of one message under about 100 MiB.
+ */
+const MAX_MESSAGE_VALUES = 100_000
+
 export type ClientCloseEvent = WebSocket.CloseEvent
 export type ClientErrorEvent = WebSocket.Event
 export type ClientOpenEvent = WebSocket.Event
@@ -86,9 +92,19 @@ export abstract class TunnelClient {
 
   /** Relay one WebSocket frame of the bridged connection `id`. */
   public readonly sendWebSocketFrame = (id: string, data: string, binary?: boolean) => {
-    this._throwIfClosed()
+    this.sendSerializedWebSocketFrame(this.serializeWebSocketFrame(id, data, binary))
+  }
+
+  /** The `ws_frame` message that `sendWebSocketFrame` sends, as a JSON string. */
+  public readonly serializeWebSocketFrame = (id: string, data: string, binary?: boolean): string => {
     const frame: TunnelWsFrame = { type: 'ws_frame', id, data, ...(binary && { binary }) }
-    this._ws.send(JSON.stringify(frame))
+    return JSON.stringify(frame)
+  }
+
+  /** Send a message built by `serializeWebSocketFrame`. */
+  public readonly sendSerializedWebSocketFrame = (serializedFrame: string) => {
+    this._throwIfClosed()
+    this._ws.send(serializedFrame)
   }
 
   /** Close the bridged WebSocket connection `id` on the other end. */
@@ -303,6 +319,10 @@ export class TunnelHead extends TunnelClient {
     | undefined => {
     const data = JSON.parse(ev.data.toString())
 
+    if (_countJsonValuesUpTo({ body: data, limit: MAX_MESSAGE_VALUES }) > MAX_MESSAGE_VALUES) {
+      return
+    }
+
     const parseResult = headSchema.safeParse(data)
     if (!parseResult.success) {
       return
@@ -323,4 +343,46 @@ export class TunnelHead extends TunnelClient {
 
     return { type: 'response', response: parseResult.data }
   }
+}
+
+/**
+ * Counts the array elements and object keys of a parsed JSON message,
+ * iteratively so deep nesting cannot overflow the stack, and stops as soon as
+ * the count passes `limit`.
+ */
+const _countJsonValuesUpTo = ({ body, limit }: { body: unknown; limit: number }): number => {
+  const pendingValues: unknown[] = [body]
+  let count = 0
+
+  while (pendingValues.length > 0) {
+    const value = pendingValues.pop()
+
+    if (Array.isArray(value)) {
+      count += value.length
+
+      if (count > limit) {
+        return count
+      }
+
+      for (const child of value) {
+        pendingValues.push(child)
+      }
+    } else if (typeof value === 'object' && value !== null) {
+      for (const key in value) {
+        if (!Object.hasOwn(value, key)) {
+          continue
+        }
+
+        count += 1
+
+        if (count > limit) {
+          return count
+        }
+
+        pendingValues.push((value as Record<string, unknown>)[key])
+      }
+    }
+  }
+
+  return count
 }
